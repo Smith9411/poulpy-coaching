@@ -39,8 +39,8 @@ export default function Hero() {
             <p className="text-xl text-gray-300 mb-4">
               Coaching individuel haut de gamme sur{' '}
               <span className="text-purple-400 font-semibold">Valorant</span> (Immortal 2 #5000),{' '}
-              <span className="text-orange-400 font-semibold">Apex Legends</span> (Predator 3x pick #450) et{' '}
-              <span className="text-cyan-400 font-semibold">Aim Training</span> (Voltaic JADE)
+              <span className="text-orange-400 font-semibold">Apex Legends</span> (3x pick #450 S24) et{' '}
+              <span className="text-cyan-400 font-semibold">Aim Training</span> (KovaaK's)
             </p>
             <p className="text-lg text-gray-400 mb-8">
               par <span className="text-white font-semibold">Poulpy</span>.
@@ -103,7 +103,7 @@ export default function Hero() {
                     <div>
                       <h3 className="text-2xl font-bold">POULPY</h3>
                       <p className="text-sm text-purple-400">ATHERIS COACH</p>
-                      <p className="text-xs text-gray-400">20 ans • MNK • Immortal 2 & Predator</p>
+                      <p className="text-xs text-gray-400">20 ans • MNK • Immortal 2 & 3x pick #450</p>
                     </div>
                   </div>
                   <div className="glass px-3 py-1 rounded-lg">
@@ -120,9 +120,9 @@ export default function Hero() {
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <Award size={16} className="text-cyan-400" />
-                        <span className="text-sm font-medium">Kovaak's / Voltaic Benchmark</span>
+                        <span className="text-sm font-medium">KovaaK's Aim Trainer</span>
                       </div>
-                      <span className="text-sm font-bold text-cyan-400">Voltaic JADE confirmed</span>
+                      <span className="text-sm font-bold text-cyan-400">KovaaK's Expert</span>
                     </div>
                     <div className="h-2 bg-black/40 rounded-full overflow-hidden">
                       <motion.div
@@ -158,7 +158,7 @@ export default function Hero() {
                         <Zap size={16} className="text-orange-400" />
                         <span className="text-sm font-medium">Apex Legends Rank</span>
                       </div>
-                      <span className="text-sm font-bold text-orange-400">Predator • 3x pick #450</span>
+                      <span className="text-sm font-bold text-orange-400">3x pick #450 (S24)</span>
                     </div>
                     <div className="h-2 bg-black/40 rounded-full overflow-hidden">
                       <motion.div

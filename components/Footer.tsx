@@ -1,14 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { MessageCircle, Video, Monitor } from 'lucide-react';
+import { MessageCircle, Video, Monitor, Coffee } from 'lucide-react';
 
 export default function Footer() {
   const socialLinks = [
-    { icon: MessageCircle, href: '#', label: 'Discord' },
-    { icon: Monitor, href: '#', label: 'Twitch' },
-    { icon: Video, href: '#', label: 'YouTube' },
-    { icon: MessageCircle, href: '#', label: 'X' },
+    { icon: MessageCircle, href: 'https://konect.gg/Mister_Poulpi', label: 'Discord' },
+    { icon: Monitor, href: 'https://www.twitch.tv/ccs_poulpy', label: 'Twitch' },
+    { icon: Video, href: 'https://www.youtube.com/@Poulpy_C', label: 'YouTube' },
+    { icon: Video, href: 'https://www.tiktok.com/@poulpy_ccs', label: 'TikTok' },
   ];
 
   const links = [
@@ -60,11 +60,13 @@ export default function Footer() {
           {/* Social */}
           <div>
             <h3 className="font-semibold mb-4">Réseaux sociaux</h3>
-            <div className="flex gap-3">
+            <div className="flex gap-3 mb-4">
               {socialLinks.map((social) => (
                 <a
                   key={social.label}
                   href={social.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="w-10 h-10 rounded-lg glass flex items-center justify-center hover:bg-white/10 transition-all group"
                   aria-label={social.label}
                 >
@@ -72,6 +74,15 @@ export default function Footer() {
                 </a>
               ))}
             </div>
+            <a
+              href="https://ko-fi.com/poulpy_"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-600 to-orange-500 rounded-lg text-sm font-semibold hover:shadow-lg hover:shadow-pink-500/50 transition-all"
+            >
+              <Coffee size={18} />
+              Support sur Ko-fi
+            </a>
           </div>
         </div>
 
