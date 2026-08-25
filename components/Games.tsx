@@ -21,8 +21,6 @@ export default function Games() {
         'Gestion de l\'économie & Clutch',
         'Analyse approfondie de VOD',
       ],
-      buttonText: 'Voir le coaching Valorant →',
-      buttonHref: '#jeux',
     },
     {
       title: 'APEX LEGENDS',
@@ -40,8 +38,6 @@ export default function Games() {
         'Communication & IGL Decision',
         'Rotation & Zone optimale',
       ],
-      buttonText: 'Voir le coaching Apex →',
-      buttonHref: '#jeux',
     },
     {
       title: 'AIM TRAINING',
@@ -59,8 +55,6 @@ export default function Games() {
         'Analyse de posture & Sensibilité DPI',
         'Routine d\'échauffement sur-mesure',
       ],
-      buttonText: 'Voir l\'aim training →',
-      buttonHref: '#jeux',
     },
   ];
 
@@ -128,14 +122,7 @@ export default function Games() {
                 </div>
               </div>
 
-              {/* Button */}
-              <a
-                href={game.buttonHref}
-                className={`block w-full text-center px-6 py-3 glass rounded-xl font-semibold hover:bg-gradient-to-br ${game.iconColor} hover:shadow-lg transition-all`}
-              >
-                {game.buttonText}
-              </a>
-            </motion.div>
+                          </motion.div>
           ))}
         </div>
       </div>

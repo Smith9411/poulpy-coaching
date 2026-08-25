@@ -131,7 +131,7 @@ export default function About() {
                 {/* Social links */}
                 <div className="flex items-center justify-center lg:justify-center gap-3 max-w-md mx-auto">
                   <a
-                    href="https://konect.gg/Mister_Poulpi"
+                    href="https://discord.gg/rJMg3ZZRkp"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="glass px-4 py-2 rounded-lg hover:bg-white/10 transition-all flex items-center gap-2 text-sm"
