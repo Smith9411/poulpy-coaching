@@ -67,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const isAdmin = email === ADMIN_EMAIL;
-    const userData = { email, username, password };
+    const userData = { email, username, password, createdAt: new Date().toISOString() };
     users[email] = userData;
     localStorage.setItem('poulpy_users', JSON.stringify(users));
 
