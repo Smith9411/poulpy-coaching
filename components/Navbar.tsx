@@ -47,15 +47,15 @@ export default function Navbar() {
   }, []);
 
   const navLinks = [
-    { href: '#coaching', label: 'Coaching', id: 'coaching' },
-    { href: '#jeux', label: 'Jeux', id: 'jeux' },
-    { href: '#methode', label: 'Méthode', id: 'methode' },
-    { href: '#progression', label: 'Progression', id: 'progression' },
-    { href: '#tarifs', label: 'Tarifs', id: 'tarifs' },
-    { href: '#booking', label: 'Réserver', id: 'booking' },
-    { href: '#avis', label: 'Avis', id: 'avis' },
-    { href: '#apropos', label: 'À propos', id: 'apropos' },
-    { href: '#faq', label: 'FAQ', id: 'faq' },
+    { href: '/#coaching', label: 'Coaching', id: 'coaching' },
+    { href: '/#jeux', label: 'Jeux', id: 'jeux' },
+    { href: '/#methode', label: 'Méthode', id: 'methode' },
+    { href: '/#progression', label: 'Progression', id: 'progression' },
+    { href: '/#tarifs', label: 'Tarifs', id: 'tarifs' },
+    { href: '/#booking', label: 'Réserver', id: 'booking' },
+    { href: '/#avis', label: 'Avis', id: 'avis' },
+    { href: '/#apropos', label: 'À propos', id: 'apropos' },
+    { href: '/#faq', label: 'FAQ', id: 'faq' },
   ];
 
   return (
@@ -103,7 +103,7 @@ export default function Navbar() {
                 Connexion
               </button>
               <Link
-                href="#booking"
+                href="/#booking"
                 className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-lg text-sm font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all hover:scale-105"
               >
                 Réserver une session →
@@ -162,7 +162,7 @@ export default function Navbar() {
                     Connexion
                   </button>
                   <Link
-                    href="#booking"
+                    href="/#booking"
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="px-6 py-3 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-lg text-lg font-semibold text-center hover:shadow-lg hover:shadow-purple-500/50 transition-all"
                   >
