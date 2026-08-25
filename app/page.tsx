@@ -17,8 +17,8 @@ export default function Home() {
       <Games />
       <Method />
       <Progression />
-      <Booking />
       <Pricing />
+      <Booking />
       <Testimonials />
       <About />
       <FAQ />

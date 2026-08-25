@@ -166,49 +166,6 @@ export default function Booking() {
           </p>
         </motion.div>
 
-        {/* Pricing Summary - Step 1 only */}
-        {step === 1 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="mb-10"
-          >
-            <div className="max-w-5xl mx-auto">
-              <div className="grid md:grid-cols-3 gap-4">
-                {plans.map((plan, index) => (
-                  <motion.div
-                    key={plan.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.08 }}
-                    className={`glass-dark rounded-xl p-5 text-center transition-all hover:bg-white/5 ${
-                      plan.popular ? 'border-2 border-purple-500/50 relative' : ''
-                    }`}
-                  >
-                    {plan.popular && (
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                        <span className="bg-gradient-to-r from-purple-600 to-cyan-500 px-3 py-0.5 rounded-full text-xs font-bold">
-                          LE PLUS CHOISI
-                        </span>
-                      </div>
-                    )}
-                    <h4 className="font-semibold text-sm text-gray-400 mb-2 uppercase tracking-wide">{plan.name}</h4>
-                    <div className="flex items-center justify-center gap-1 mb-1">
-                      <span className="text-3xl font-bold bg-gradient-to-r text-transparent bg-clip-text"
-                        style={{ background: plan.color }}>
-                        {plan.price}
-                      </span>
-                      <span className="text-gray-400 text-lg">€</span>
-                    </div>
-                    <p className="text-sm text-gray-500">{plan.duration}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
-
         {/* Step 1: Choose Plan */}
         {step === 1 && (
           <motion.div

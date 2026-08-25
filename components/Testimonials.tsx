@@ -11,6 +11,13 @@ export default function Testimonials() {
 
   const testimonials = [
     {
+      name: 'Smith94',
+      game: 'Valorant',
+      rank: 'Platine → Ascendant 3',
+      text: 'Incroyable progression ! Je suis passé de Platine à Ascendant 3 en quelques semaines. Le coaching de Poulpy sur le game sense et la prise de décision en clutch a tout changé. Il voit des choses que personne d\'autre ne voit. Vraiment le meilleur investissement pour mon jeu.',
+      rating: 5,
+    },
+    {
       name: 'Alex',
       game: 'Valorant',
       rank: 'Gold → Diamant',
@@ -36,13 +43,6 @@ export default function Testimonials() {
       game: 'Valorant',
       rank: 'Platine → Immortal',
       text: 'Poulpy ne se contente pas de pointer les erreurs, il explique le pourquoi et donne des solutions concrètes.',
-      rating: 5,
-    },
-    {
-      name: 'Smith94',
-      game: 'Valorant',
-      rank: 'Platine → Ascendant 3',
-      text: 'Incroyable progression ! Je suis passé de Platine à Ascendant 3 en quelques semaines. Le coaching de Poulpy sur le game sense et la prise de décision en clutch a tout changé. Il voit des choses que personne d\'autre ne voit. Vraiment le meilleur investissement pour mon jeu.',
       rating: 5,
     },
   ];

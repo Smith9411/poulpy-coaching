@@ -102,11 +102,6 @@ export default function Hero() {
                         alt="Poulpy"
                         className="w-full h-full object-cover"
                       />
-                      <motion.div
-                        animate={{ scale: [1, 1.15, 1] }}
-                        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                        className="absolute -top-2 -right-2 w-4 h-4 bg-green-500 rounded-full border-2 border-[#0a0a0f] shadow-lg shadow-green-500/50"
-                      />
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold">POULPY</h3>
