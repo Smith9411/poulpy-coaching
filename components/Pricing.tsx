@@ -72,7 +72,7 @@ export default function Pricing() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className={`relative glass-dark rounded-2xl p-8 hover:bg-white/5 transition-all ${
+              className={`relative glass-dark rounded-2xl p-8 hover:bg-white/5 transition-all flex flex-col ${
                 plan.popular ? 'border-2 border-purple-500/50 scale-105' : ''
               }`}
             >
@@ -98,7 +98,7 @@ export default function Pricing() {
               <p className="text-gray-400 mb-6">{plan.duration}</p>
 
               {/* Features */}
-              <ul className="space-y-3 mb-8">
+              <ul className="space-y-3 mb-6 flex-1">
                 {plan.features.map((feature) => (
                   <li key={feature} className="flex items-start gap-2">
                     <Check size={20} className="text-purple-400 flex-shrink-0 mt-0.5" />
@@ -107,10 +107,10 @@ export default function Pricing() {
                 ))}
               </ul>
 
-              {/* Button */}
+              {/* Button - aligned at bottom */}
               <a
                 href="#booking"
-                className={`block w-full text-center px-6 py-3 rounded-xl font-semibold transition-all ${
+                className={`block w-full text-center px-6 py-3 rounded-xl font-semibold transition-all mt-auto ${
                   plan.popular
                     ? 'bg-gradient-to-r from-purple-600 to-cyan-500 hover:shadow-lg hover:shadow-purple-500/50'
                     : 'glass hover:bg-white/10'

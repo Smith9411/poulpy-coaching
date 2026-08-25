@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>('coaching');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,15 +18,44 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // IntersectionObserver for active section highlight
+  useEffect(() => {
+    const sections = ['coaching', 'jeux', 'methode', 'progression', 'booking', 'tarifs', 'avis', 'apropos', 'faq'];
+    const observers: IntersectionObserver[] = [];
+
+    sections.forEach((sectionId) => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                setActiveSection(sectionId);
+              }
+            });
+          },
+          { rootMargin: '-20% 0px -60% 0px', threshold: 0 }
+        );
+        observer.observe(element);
+        observers.push(observer);
+      }
+    });
+
+    return () => {
+      observers.forEach((obs) => obs.disconnect());
+    };
+  }, []);
+
   const navLinks = [
-    { href: '/', label: 'Accueil' },
-    { href: '#coaching', label: 'Coaching' },
-    { href: '#jeux', label: 'Jeux' },
-    { href: '#methode', label: 'Méthode' },
-    { href: '#tarifs', label: 'Tarifs' },
-    { href: '#avis', label: 'Avis' },
-    { href: '#apropos', label: 'À propos' },
-    { href: '#faq', label: 'FAQ' },
+    { href: '#coaching', label: 'Coaching', id: 'coaching' },
+    { href: '#jeux', label: 'Jeux', id: 'jeux' },
+    { href: '#methode', label: 'Méthode', id: 'methode' },
+    { href: '#progression', label: 'Progression', id: 'progression' },
+    { href: '#booking', label: 'Réserver', id: 'booking' },
+    { href: '#tarifs', label: 'Tarifs', id: 'tarifs' },
+    { href: '#avis', label: 'Avis', id: 'avis' },
+    { href: '#apropos', label: 'À propos', id: 'apropos' },
+    { href: '#faq', label: 'FAQ', id: 'faq' },
   ];
 
   return (
@@ -55,7 +85,11 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="px-4 py-2 rounded-lg text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 transition-all"
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    activeSection === link.id
+                      ? 'text-white bg-white/10 shadow-lg shadow-purple-500/20'
+                      : 'text-gray-300 hover:text-white hover:bg-white/5'
+                  }`}
                 >
                   {link.label}
                 </Link>
@@ -109,7 +143,9 @@ export default function Navbar() {
                     <Link
                       href={link.href}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="text-2xl font-semibold text-gray-300 hover:text-white transition-colors"
+                      className={`text-2xl font-semibold hover:text-white transition-colors ${
+                        activeSection === link.id ? 'text-gradient' : 'text-gray-300'
+                      }`}
                     >
                       {link.label}
                     </Link>

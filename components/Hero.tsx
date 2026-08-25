@@ -96,8 +96,12 @@ export default function Hero() {
                 {/* Header */}
                 <div className="flex items-start justify-between mb-6">
                   <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center relative">
-                      <div className="text-3xl">🐙</div>
+                    <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center relative overflow-hidden">
+                      <img
+                        src="/poulpy-profile.png"
+                        alt="Poulpy"
+                        className="w-full h-full object-cover"
+                      />
                       <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-[#1a1a24]" />
                     </div>
                     <div>
