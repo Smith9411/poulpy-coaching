@@ -9,10 +9,10 @@ const views = {
   global: {
     label: 'Global',
     metrics: [
-      { label: 'Aim Score', subLabel: 'Flick / Tracking', value: 78, color: 'from-cyan-500 to-cyan-400', icon: Target },
-      { label: 'Game Sense', subLabel: '& Vision tactique', value: 72, color: 'from-purple-500 to-purple-400', icon: Zap },
-      { label: 'Mouvement', subLabel: 'Fluidité', value: 68, color: 'from-orange-500 to-orange-400', icon: Activity },
-      { label: 'Consistency', subLabel: 'Régularité', value: 81, color: 'from-green-500 to-emerald-400', icon: BarChart3 },
+      { label: 'Aim Score', subLabel: 'Flick / Tracking', value: 78, color: ['#06b6d4', '#22d3ee'], icon: Target },
+      { label: 'Game Sense', subLabel: '& Vision tactique', value: 72, color: ['#a855f7', '#c084fc'], icon: Zap },
+      { label: 'Mouvement', subLabel: 'Fluidité', value: 68, color: ['#f97316', '#fb923c'], icon: Activity },
+      { label: 'Consistency', subLabel: 'Régularité', value: 81, color: ['#10b981', '#34d399'], icon: BarChart3 },
     ],
     sessions: [
       { s: 'S1', rr: 0 },
@@ -27,10 +27,10 @@ const views = {
   valorant: {
     label: 'Valorant',
     metrics: [
-      { label: 'Aim Score', subLabel: 'Flick / Tracking', value: 82, color: 'from-red-500 to-red-400', icon: Target },
-      { label: 'Game Sense', subLabel: '& Vision tactique', value: 76, color: 'from-purple-500 to-purple-400', icon: Zap },
-      { label: 'Mouvement', subLabel: 'Fluidité', value: 70, color: 'from-orange-500 to-orange-400', icon: Activity },
-      { label: 'Consistency', subLabel: 'Régularité', value: 84, color: 'from-green-500 to-emerald-400', icon: BarChart3 },
+      { label: 'Aim Score', subLabel: 'Flick / Tracking', value: 82, color: ['#ef4444', '#f87171'], icon: Target },
+      { label: 'Game Sense', subLabel: '& Vision tactique', value: 76, color: ['#a855f7', '#c084fc'], icon: Zap },
+      { label: 'Mouvement', subLabel: 'Fluidité', value: 70, color: ['#f97316', '#fb923c'], icon: Activity },
+      { label: 'Consistency', subLabel: 'Régularité', value: 84, color: ['#10b981', '#34d399'], icon: BarChart3 },
     ],
     sessions: [
       { s: 'S1', rr: 0 },
@@ -45,10 +45,10 @@ const views = {
   apex: {
     label: 'Apex Legends',
     metrics: [
-      { label: 'Aim Score', subLabel: 'Flick / Tracking', value: 75, color: 'from-cyan-500 to-cyan-400', icon: Target },
-      { label: 'Game Sense', subLabel: '& Vision tactique', value: 79, color: 'from-purple-500 to-purple-400', icon: Zap },
-      { label: 'Mouvement', subLabel: 'Fluidité', value: 88, color: 'from-orange-500 to-orange-400', icon: Activity },
-      { label: 'Consistency', subLabel: 'Régularité', value: 73, color: 'from-green-500 to-emerald-400', icon: BarChart3 },
+      { label: 'Aim Score', subLabel: 'Flick / Tracking', value: 75, color: ['#06b6d4', '#22d3ee'], icon: Target },
+      { label: 'Game Sense', subLabel: '& Vision tactique', value: 79, color: ['#a855f7', '#c084fc'], icon: Zap },
+      { label: 'Mouvement', subLabel: 'Fluidité', value: 88, color: ['#f97316', '#fb923c'], icon: Activity },
+      { label: 'Consistency', subLabel: 'Régularité', value: 73, color: ['#10b981', '#34d399'], icon: BarChart3 },
     ],
     sessions: [
       { s: 'S1', rr: 0 },
@@ -294,7 +294,7 @@ export default function Progression() {
                         viewport={{ once: true }}
                         transition={{ duration: 1.2, delay: 0.3 + index * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
                         className="h-full rounded-full relative"
-                        style={{ background: `linear-gradient(90deg, ${metric.color.split(' to ')[0]}, ${metric.color.split(' to ')[1]})` }}
+                        style={{ background: `linear-gradient(90deg, ${metric.color[0]}, ${metric.color[1]})` }}
                       >
                         {/* Glow effect */}
                         <div className="absolute inset-0 bg-white/20 blur-sm" />

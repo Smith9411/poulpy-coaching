@@ -102,7 +102,11 @@ export default function Hero() {
                         alt="Poulpy"
                         className="w-full h-full object-cover"
                       />
-                      <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-[#1a1a24]" />
+                      <motion.div
+                        animate={{ scale: [1, 1.1, 1] }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                        className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-[#0a0a0f] shadow-lg shadow-green-500/50"
+                      />
                     </div>
                     <div>
                       <h3 className="text-2xl font-bold">POULPY</h3>
@@ -126,7 +130,7 @@ export default function Hero() {
                         <Award size={16} className="text-cyan-400" />
                         <span className="text-sm font-medium">KovaaK's Aim Trainer</span>
                       </div>
-                      <span className="text-sm font-bold text-cyan-400">KovaaK's Expert</span>
+                      <span className="text-sm font-bold text-cyan-400">VT Jade Confirmed</span>
                     </div>
                     <div className="h-2 bg-black/40 rounded-full overflow-hidden">
                       <motion.div
@@ -194,15 +198,31 @@ export default function Hero() {
                 </div>
 
                 {/* Badge */}
-                <div className="glass px-4 py-3 rounded-xl flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 1.3 }}
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  className="glass px-4 py-3 rounded-xl flex items-center gap-3 group"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.03)',
+                    backdropFilter: 'blur(20px)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    boxShadow: '0 8px 32px rgba(139, 92, 246, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+                  }}
+                >
+                  <motion.div
+                    animate={{ rotate: [0, 2, -2, 0] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center"
+                  >
                     <Award size={20} />
-                  </div>
+                  </motion.div>
                   <div>
                     <div className="text-sm font-semibold">MNK Specialist</div>
                     <div className="text-xs text-gray-400">Mouse & Keyboard Expert</div>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Atheris Badge */}
                 <div className="mt-4 flex items-center justify-center">
