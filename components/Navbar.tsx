@@ -2,12 +2,15 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, User } from 'lucide-react';
+import { Menu, X, User, LogOut, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useAuth } from '@/context/AuthContext';
 
 export default function Navbar() {
+  const { user, logout, isLoading } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>('coaching');
 
   useEffect(() => {
@@ -46,6 +49,17 @@ export default function Navbar() {
     };
   }, []);
 
+  // Close profile menu on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (isProfileMenuOpen && !(e.target as HTMLElement).closest('.profile-menu')) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isProfileMenuOpen]);
+
   const navLinks = [
     { href: '/#coaching', label: 'Coaching', id: 'coaching' },
     { href: '/#jeux', label: 'Jeux', id: 'jeux' },
@@ -57,6 +71,31 @@ export default function Navbar() {
     { href: '/#apropos', label: 'À propos', id: 'apropos' },
     { href: '/#faq', label: 'FAQ', id: 'faq' },
   ];
+
+  if (isLoading) {
+    return (
+      <motion.nav
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        className="fixed top-0 left-0 right-0 z-50 bg-transparent border-b border-white/5"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 lg:h-20">
+            <Link href="/" className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-2xl">
+                🐙
+              </div>
+              <span className="text-xl font-bold tracking-tight">POULPY<span className="text-purple-400">.</span></span>
+            </Link>
+            <div className="hidden lg:flex items-center gap-4">
+              <div className="w-10 h-10 rounded-full bg-white/10 animate-pulse" />
+              <div className="w-32 h-10 rounded-lg bg-white/10 animate-pulse" />
+            </div>
+          </div>
+        </div>
+      </motion.nav>
+    );
+  }
 
   return (
     <>
@@ -96,18 +135,73 @@ export default function Navbar() {
               ))}
             </div>
 
-            {/* Right side buttons */}
+            {/* Right side - Auth or User Menu */}
             <div className="hidden lg:flex items-center gap-4">
-              <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors">
-                <User size={18} />
-                Connexion
-              </button>
-              <Link
-                href="/#booking"
-                className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-lg text-sm font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all hover:scale-105"
-              >
-                Réserver une session →
-              </Link>
+              {user ? (
+                <div className="relative profile-menu">
+                  {/* Profile Button */}
+                  <button
+                    onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white/5 transition-all group"
+                    aria-label="Menu utilisateur"
+                    aria-expanded={isProfileMenuOpen}
+                  >
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white font-bold text-sm group-hover:scale-110 transition-transform">
+                      {user.initial}
+                    </div>
+                    <ChevronDown size={16} className={`text-gray-400 transition-transform ${isProfileMenuOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {/* Profile Dropdown */}
+                  <AnimatePresence>
+                    {isProfileMenuOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                        transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+                        className="absolute right-0 top-full mt-2 w-56 glass-dark rounded-xl border border-white/10 shadow-2xl overflow-hidden py-2 z-50"
+                      >
+                        <div className="px-4 py-3 border-b border-white/5">
+                          <p className="font-semibold text-white">{user.username}</p>
+                          <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                        </div>
+                        <Link
+                          href="/profile"
+                          className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
+                          onClick={() => setIsProfileMenuOpen(false)}
+                        >
+                          <User size={18} />
+                          Mon profil
+                        </Link>
+                        <button
+                          onClick={() => { logout(); setIsProfileMenuOpen(false); }}
+                          className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors text-left"
+                        >
+                          <LogOut size={18} />
+                          Déconnexion
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ) : (
+                <>
+                  <Link
+                    href="/auth"
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors"
+                  >
+                    <User size={18} />
+                    Connexion
+                  </Link>
+                  <Link
+                    href="/#booking"
+                    className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-lg text-sm font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all hover:scale-105"
+                  >
+                    Réserver une session →
+                  </Link>
+                </>
+              )}
             </div>
 
             {/* Mobile menu button */}
@@ -157,17 +251,52 @@ export default function Navbar() {
                   transition={{ delay: navLinks.length * 0.05 }}
                   className="flex flex-col gap-4 mt-8 w-full max-w-xs"
                 >
-                  <button className="flex items-center justify-center gap-2 px-6 py-3 text-lg font-medium text-gray-300 border border-white/10 rounded-lg hover:bg-white/5 transition-all">
-                    <User size={20} />
-                    Connexion
-                  </button>
-                  <Link
-                    href="/#booking"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="px-6 py-3 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-lg text-lg font-semibold text-center hover:shadow-lg hover:shadow-purple-500/50 transition-all"
-                  >
-                    Réserver une session →
-                  </Link>
+                  {user ? (
+                    <>
+                      <div className="flex items-center gap-4 px-6 py-3 glass rounded-lg border border-white/10">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white font-bold text-lg">
+                          {user.initial}
+                        </div>
+                        <div className="text-left">
+                          <p className="font-semibold text-white">{user.username}</p>
+                          <p className="text-xs text-gray-400">{user.email}</p>
+                        </div>
+                      </div>
+                      <Link
+                        href="/profile"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-lg text-lg font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all"
+                      >
+                        <User size={20} />
+                        Mon profil
+                      </Link>
+                      <button
+                        onClick={() => { logout(); setIsMobileMenuOpen(false); }}
+                        className="flex items-center justify-center gap-2 px-6 py-3 glass rounded-lg border border-white/10 text-lg font-medium text-red-400 hover:bg-red-500/10 transition-all"
+                      >
+                        <LogOut size={20} />
+                        Déconnexion
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        href="/auth"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center justify-center gap-2 px-6 py-3 glass rounded-lg border border-white/10 text-lg font-medium text-gray-300 hover:bg-white/5 transition-all"
+                      >
+                        <User size={20} />
+                        Connexion / S'inscrire
+                      </Link>
+                      <Link
+                        href="/#booking"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="px-6 py-3 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-lg text-lg font-semibold text-center hover:shadow-lg hover:shadow-purple-500/50 transition-all"
+                      >
+                        Réserver une session →
+                      </Link>
+                    </>
+                  )}
                 </motion.div>
               </div>
             </div>
