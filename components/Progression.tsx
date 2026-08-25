@@ -1,67 +1,95 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { TrendingUp, Target, BarChart3, Clock, Award, Flame, Sparkles } from 'lucide-react';
+import { TrendingUp, Target, Zap, Activity, BarChart3 } from 'lucide-react';
+import { useState } from 'react';
 
-// Custom icons
-const Crosshair = ({ size = 24, className = '' }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <circle cx="12" cy="12" r="10" />
-    <line x1="22" y1="12" x2="18" y2="12" />
-    <line x1="6" y1="12" x2="2" y2="12" />
-    <line x1="12" y1="6" x2="12" y2="2" />
-    <line x1="12" y1="22" x2="12" y2="18" />
-  </svg>
-);
-
-const Brain = ({ size = 24, className = '' }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-    <path d="M12 5a3 3 0 1 0-3 3c0 1.5 1 2.5 2 3.5A5.5 5.5 0 0 0 5 15c0 2.5 2 4.5 5 4.5s5-2 5-4.5a5.5 5.5 0 0 0-4-5.5c1-1 2-2 2-3.5a3 3 0 1 0-3-3z" />
-  </svg>
-);
+// Data per game view: progress metrics + RR/LP curve
+const views = {
+  global: {
+    label: 'Global',
+    metrics: [
+      { label: 'Aim Score', subLabel: 'Flick / Tracking', value: 78, color: 'from-cyan-500 to-cyan-400', icon: Target },
+      { label: 'Game Sense', subLabel: '& Vision tactique', value: 72, color: 'from-purple-500 to-purple-400', icon: Zap },
+      { label: 'Mouvement', subLabel: 'Fluidité', value: 68, color: 'from-orange-500 to-orange-400', icon: Activity },
+      { label: 'Consistency', subLabel: 'Régularité', value: 81, color: 'from-green-500 to-emerald-400', icon: BarChart3 },
+    ],
+    sessions: [
+      { s: 'S1', rr: 0 },
+      { s: 'S2', rr: 18 },
+      { s: 'S3', rr: 42 },
+      { s: 'S4', rr: 71 },
+      { s: 'S5', rr: 105 },
+    ],
+    color1: '#a855f7',
+    color2: '#06b6d4',
+  },
+  valorant: {
+    label: 'Valorant',
+    metrics: [
+      { label: 'Aim Score', subLabel: 'Flick / Tracking', value: 82, color: 'from-red-500 to-red-400', icon: Target },
+      { label: 'Game Sense', subLabel: '& Vision tactique', value: 76, color: 'from-purple-500 to-purple-400', icon: Zap },
+      { label: 'Mouvement', subLabel: 'Fluidité', value: 70, color: 'from-orange-500 to-orange-400', icon: Activity },
+      { label: 'Consistency', subLabel: 'Régularité', value: 84, color: 'from-green-500 to-emerald-400', icon: BarChart3 },
+    ],
+    sessions: [
+      { s: 'S1', rr: 0 },
+      { s: 'S2', rr: 22 },
+      { s: 'S3', rr: 48 },
+      { s: 'S4', rr: 80 },
+      { s: 'S5', rr: 120 },
+    ],
+    color1: '#ef4444',
+    color2: '#f97316',
+  },
+  apex: {
+    label: 'Apex Legends',
+    metrics: [
+      { label: 'Aim Score', subLabel: 'Flick / Tracking', value: 75, color: 'from-cyan-500 to-cyan-400', icon: Target },
+      { label: 'Game Sense', subLabel: '& Vision tactique', value: 79, color: 'from-purple-500 to-purple-400', icon: Zap },
+      { label: 'Mouvement', subLabel: 'Fluidité', value: 88, color: 'from-orange-500 to-orange-400', icon: Activity },
+      { label: 'Consistency', subLabel: 'Régularité', value: 73, color: 'from-green-500 to-emerald-400', icon: BarChart3 },
+    ],
+    sessions: [
+      { s: 'S1', rr: 0 },
+      { s: 'S2', rr: 15 },
+      { s: 'S3', rr: 38 },
+      { s: 'S4', rr: 65 },
+      { s: 'S5', rr: 95 },
+    ],
+    color1: '#06b6d4',
+    color2: '#3b82f6',
+  },
+};
 
 export default function Progression() {
-  const stats = [
-    { label: 'Joueurs accompagnés', value: '+150', icon: Award, color: 'text-yellow-400', bg: 'from-yellow-500/20 to-yellow-400/20' },
-    { label: 'Taux de progression', value: '87%', icon: TrendingUp, color: 'text-green-400', bg: 'from-green-500/20 to-green-400/20' },
-    { label: 'Sessions délivrées', value: '+500', icon: Target, color: 'text-purple-400', bg: 'from-purple-500/20 to-purple-400/20' },
-    { label: 'Heures de coaching', value: '+800h', icon: Clock, color: 'text-cyan-400', bg: 'from-cyan-500/20 to-cyan-400/20' },
-  ];
+  const [activeView, setActiveView] = useState<'global' | 'valorant' | 'apex'>('global');
+  const view = views[activeView];
 
-  const progressionSteps = [
-    {
-      week: 'Semaine 1-2',
-      title: 'Diagnostic & Fondations',
-      description: 'Analyse complète du gameplay, réglages sensibilité, setup matériel, identification des 3 axes prioritaires.',
-      metrics: ['VOD Review complète', 'Setup optimal validé', 'Plan d\'action écrit'],
-      color: 'from-purple-500 to-cyan-500',
-      icon: Target,
-    },
-    {
-      week: 'Semaine 3-6',
-      title: 'Construction Mécanique',
-      description: 'Routines aim quotidiennes, drills de placement, micro-corrections, travail de la constance.',
-      metrics: ['Routine KovaaK\'s personnalisée', 'Tracking +40%', 'Flick consistency +35%'],
-      color: 'from-cyan-500 to-blue-500',
-      icon: Crosshair,
-    },
-    {
-      week: 'Mois 2-3',
-      title: 'Game Sense & Décision',
-      description: 'Lecture de jeu avancée, anticipation rotations, gestion économie, clutch factor, communication.',
-      metrics: ['Winrate +25%', 'Clutch rate x2', 'Decision making score +30%'],
-      color: 'from-blue-500 to-indigo-500',
-      icon: Brain,
-    },
-    {
-      week: 'Mois 3+',
-      title: 'Performance & Maintien',
-      description: 'Montée en rang stable, préparation tournois, mental game, autonomie complète sur l\'entraînement.',
-      metrics: ['Rank up garanti', 'Autonomie entraînement', 'Mental fortifié'],
-      color: 'from-indigo-500 to-purple-500',
-      icon: TrendingUp,
-    },
-  ];
+  // Build smooth path from session data
+  const buildPath = (data: { rr: number }[], maxRR: number, width: number, height: number) => {
+    const padX = 40;
+    const padY = 40;
+    const usableW = width - padX * 2;
+    const usableH = height - padY * 2;
+    return data.map((d, i) => {
+      const x = padX + (i / (data.length - 1)) * usableW;
+      const y = padY + (1 - d.rr / maxRR) * usableH;
+      return { x, y, ...d };
+    });
+  };
+
+  const chartW = 500;
+  const chartH = 320;
+  const maxRR = 130;
+  const points = buildPath(view.sessions, maxRR, chartW, chartH);
+  const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
+  const areaPath = `${linePath} L ${points[points.length - 1].x} ${chartH - 40} L ${points[0].x} ${chartH - 40} Z`;
+
+  const handleCTAClick = () => {
+    const booking = document.getElementById('booking');
+    if (booking) booking.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
     <section id="progression" className="py-20 relative overflow-hidden">
@@ -77,137 +105,226 @@ export default function Progression() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-10"
         >
           <div className="inline-block glass px-4 py-2 rounded-full mb-4">
-            <span className="text-sm text-purple-400 font-medium">SUIVI DE PROGRESSION</span>
+            <span className="text-sm text-purple-400 font-medium">SUIVI MÉTRIQUE RIGOUREUX</span>
           </div>
-          <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-            Ta progression <span className="text-gradient">visualisée & mesurée.</span>
+          <h2 className="text-4xl sm:text-5xl font-bold mb-3">
+            Ta progression <span className="text-gradient">visualisée.</span>
           </h2>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Chaque étape est quantifiée. Pas de ressenti, des données. Tu vois exactement où tu en es et où tu vas.
+          <p className="text-lg text-gray-400 max-w-3xl mx-auto">
+            Après chaque session. Visualise objectivement tes gains de performance et d'aim.
           </p>
         </motion.div>
 
-        {/* Key Stats */}
+        {/* Analytics Window */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: 30, scale: 0.98 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.1 }}
-          className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-20"
+          transition={{ duration: 0.5 }}
+          className="glass-dark rounded-2xl overflow-hidden border border-white/10 backdrop-blur-2xl"
         >
-          {stats.map((stat, index) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="glass-dark rounded-2xl p-6 text-center group hover:bg-white/5 transition-all"
-            >
-              <div className={`w-14 h-14 rounded-xl mx-auto mb-4 flex items-center justify-center ${stat.bg}`}>
-                <stat.icon size={28} className={stat.color} />
+          {/* macOS-style Window Header */}
+          <div className="flex items-center justify-between px-4 py-3 bg-black/30 border-b border-white/5 backdrop-blur-xl">
+            {/* Traffic lights + title grouped on left */}
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-500 transition-colors" />
+                <div className="w-3 h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-500 transition-colors" />
+                <div className="w-3 h-3 rounded-full bg-green-500/80 hover:bg-green-500 transition-colors" />
               </div>
-              <div className="text-4xl font-bold mb-1">{stat.value}</div>
-              <div className="text-sm text-gray-400">{stat.label}</div>
-            </motion.div>
-          ))}
-        </motion.div>
+              <span className="glass px-2 py-0.5 rounded text-xs font-mono text-gray-400">Poulpy_analytics_V2.4.exe</span>
+            </div>
 
-        {/* Progression Timeline */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.2 }}
-          className="relative"
-        >
-          {/* Vertical line */}
-          <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-purple-500/30 via-cyan-500/30 to-purple-500/30 -translate-x-1/2" />
+            {/* Game view toggles on right */}
+            <div className="flex items-center gap-1 glass px-1 py-1 rounded-lg">
+              {(['global', 'valorant', 'apex'] as const).map((key) => (
+                <button
+                  key={key}
+                  onClick={() => setActiveView(key)}
+                  className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
+                    activeView === key
+                      ? 'bg-gradient-to-r from-purple-600 to-cyan-500 text-white shadow-lg'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  {key === 'global' ? 'Global' : key === 'valorant' ? 'Valorant' : 'Apex'}
+                </button>
+              ))}
+            </div>
+          </div>
 
-          <div className="space-y-12">
-            {progressionSteps.map((step, index) => (
-              <motion.div
-                key={step.week}
-                initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.15 }}
-                className={`relative lg:w-1/2 ${index % 2 === 0 ? 'lg:pr-12 lg:text-right' : 'lg:pl-12 lg:ml-auto'}`}
-              >
-                {/* Dot on timeline */}
-                <div className="hidden lg:block absolute top-8 w-4 h-4 rounded-full border-4 border-[#0a0a0f] z-10"
-                  style={{
-                    left: index % 2 === 0 ? 'calc(50% - 2px)' : 'calc(50% - 2px)',
-                    background: `linear-gradient(135deg, ${step.color.split(' to ')[0]}, ${step.color.split(' to ')[1]})`,
-                  }}
-                />
+          {/* Divider */}
+          <div className="h-px bg-white/5" />
 
-                <div className="glass-dark rounded-2xl p-6 sm:p-8 hover:bg-white/5 transition-all relative">
-                  {/* Week badge */}
-                  <div className="inline-block mb-4 px-4 py-1.5 rounded-full text-xs font-bold text-white"
-                    style={{ background: `linear-gradient(135deg, ${step.color.split(' to ')[0]}, ${step.color.split(' to ')[1]})` }}
-                  >
-                    {step.week}
-                  </div>
-
-                  {/* Icon */}
-                  <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-4"
-                    style={{ background: `linear-gradient(135deg, ${step.color.split(' to ')[0]}/20, ${step.color.split(' to ')[1]}/20)` }}
-                  >
-                    <step.icon size={28} style={{ color: step.color.split(' to ')[0] }} />
-                  </div>
-
-                  <h3 className="text-2xl font-bold mb-3">{step.title}</h3>
-                  <p className="text-gray-300 mb-6 leading-relaxed">{step.description}</p>
-
-                  {/* Metrics */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    {step.metrics.map((metric, mIndex) => (
-                      <motion.div
-                        key={metric}
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.3 + mIndex * 0.1 }}
-                        className="glass px-4 py-3 rounded-xl text-center"
-                      >
-                        <Sparkles size={16} className="mx-auto mb-1 text-purple-400" />
-                        <p className="text-sm font-medium text-gray-200">{metric}</p>
-                      </motion.div>
-                    ))}
-                  </div>
+          {/* Main Content Area */}
+          <div className="grid lg:grid-cols-2 gap-0">
+            {/* LEFT: Ascension Curve Chart */}
+            <div className="p-6 lg:p-8 min-h-[420px] flex flex-col">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <TrendingUp size={18} className="text-cyan-400" />
+                  <span className="font-semibold text-white">Courbe d'ascension</span>
                 </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+                <span className="text-xs text-gray-500 font-mono">RR / LP par session</span>
+              </div>
 
-        {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.6 }}
-          className="text-center mt-16"
-        >
-          <div className="glass-dark rounded-2xl p-8 sm:p-12 max-w-3xl mx-auto border border-purple-500/30">
-            <h3 className="text-2xl sm:text-3xl font-bold mb-4">
-              Prêt à <span className="text-gradient">démarrer ton suivi</span> ?
-            </h3>
-            <p className="text-gray-300 mb-6">
-              Rejoins les 150+ joueurs qui ont déjà franchi le cap. Première session diagnostic offerte pour établir ton plan.
-            </p>
-            <a
-              href="#booking"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl text-lg font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all hover:scale-105"
-            >
-              <Flame size={22} />
-              Commencer mon suivi
-            </a>
+              {/* Chart Container */}
+              <div className="flex-1 relative">
+                <svg
+                  viewBox={`0 0 ${chartW} ${chartH}`}
+                  className="w-full h-full"
+                  preserveAspectRatio="none"
+                >
+                  <defs>
+                    <linearGradient id="curveStroke" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stopColor={view.color1} />
+                      <stop offset="100%" stopColor={view.color2} />
+                    </linearGradient>
+                    <linearGradient id="curveFill" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={view.color1} stopOpacity="0.35" />
+                      <stop offset="100%" stopColor={view.color1} stopOpacity="0" />
+                    </linearGradient>
+                    <linearGradient id="curveReflection" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={view.color2} stopOpacity="0.15" />
+                      <stop offset="100%" stopColor={view.color2} stopOpacity="0" />
+                    </linearGradient>
+                    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur stdDeviation="4" result="blur" />
+                      <feMerge>
+                        <feMergeNode in="blur" />
+                        <feMergeNode in="SourceGraphic" />
+                      </feMerge>
+                    </filter>
+                  </defs>
+
+                  {/* Grid lines */}
+                  {[0, 25, 50, 75, 100].map((pct, i) => {
+                    const y = 40 + (1 - pct / 100) * (chartH - 80);
+                    return (
+                      <g key={pct}>
+                        <line x1={40} y1={y} x2={chartW - 30} y2={y} stroke="#ffffff" strokeOpacity="0.05" strokeWidth={1} />
+                        <text x={30} y={y + 4} textAnchor="end" fill="#ffffff" fillOpacity="0.4" fontSize={10} fontFamily="monospace">
+                          {pct}%
+                        </text>
+                      </g>
+                    );
+                  })}
+
+                  {/* X-axis labels */}
+                  {points.map((p, i) => (
+                    <text key={p.s} x={p.x} y={chartH - 15} textAnchor="middle" fill="#ffffff" fillOpacity="0.5" fontSize={11} fontFamily="monospace">
+                      {p.s}
+                    </text>
+                  ))}
+
+                  {/* Reflection (mirrored curve below) */}
+                  <path
+                    d={points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ` L ${points[points.length - 1].x} ${chartH - 40} L ${points[0].x} ${chartH - 40} Z`}
+                    fill="url(#curveReflection)"
+                    opacity={0.4}
+                  />
+
+                  {/* Area fill */}
+                  <path d={areaPath} fill="url(#curveFill)" />
+
+                  {/* Main curve line with glow */}
+                  <path
+                    d={linePath}
+                    stroke="url(#curveStroke)"
+                    strokeWidth={3}
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    filter="url(#glow)"
+                  />
+
+                  {/* Data points */}
+                  {points.map((p, i) => (
+                    <g key={p.s}>
+                      <circle cx={p.x} cy={p.y} r={5} fill={view.color2} stroke="#0a0a0f" strokeWidth={2} />
+                      <circle cx={p.x} cy={p.y} r={2} fill="#fff" />
+                      {/* RR value label above point */}
+                      <text x={p.x} y={p.y - 12} textAnchor="middle" fill="#ffffff" fillOpacity="0.8" fontSize={10} fontFamily="monospace">
+                        +{p.rr}
+                      </text>
+                    </g>
+                  ))}
+                </svg>
+              </div>
+            </div>
+
+            {/* RIGHT: Progress Bars */}
+            <div className="p-6 lg:p-8 min-h-[420px] flex flex-col justify-center border-l border-white/5 bg-black/20">
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-2">
+                  <BarChart3 size={18} className="text-purple-400" />
+                  <span className="font-semibold text-white">Score d'évaluation</span>
+                </div>
+                <span className="text-xs text-gray-500 font-mono">Mécanique & Tactique</span>
+              </div>
+
+              <div className="space-y-6">
+                {view.metrics.map((metric, index) => (
+                  <motion.div
+                    key={metric.label}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.2 + index * 0.1 }}
+                    className="group"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <metric.icon size={16} className="text-gray-400 group-hover:text-white transition-colors" />
+                        <div>
+                          <div className="font-medium text-white text-sm">{metric.label}</div>
+                          <div className="text-xs text-gray-500">{metric.subLabel}</div>
+                        </div>
+                      </div>
+                      <span className="font-mono font-bold text-lg text-white">{metric.value}%</span>
+                    </div>
+                    <div className="h-2.5 bg-black/40 rounded-full overflow-hidden relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10" />
+                      <motion.div
+                        initial={{ width: 0 }}
+                        whileInView={{ width: `${metric.value}%` }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1.2, delay: 0.3 + index * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        className="h-full rounded-full relative"
+                        style={{ background: `linear-gradient(90deg, ${metric.color.split(' to ')[0]}, ${metric.color.split(' to ')[1]})` }}
+                      >
+                        {/* Glow effect */}
+                        <div className="absolute inset-0 bg-white/20 blur-sm" />
+                      </motion.div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
           </div>
+
+          {/* Bottom CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.7 }}
+            className="px-6 py-6 bg-black/20 border-t border-white/5 flex items-center justify-center"
+          >
+            <button
+              onClick={handleCTAClick}
+              className="group relative px-8 py-4 rounded-xl font-semibold text-lg bg-gradient-to-r from-purple-600 to-cyan-500 hover:shadow-lg hover:shadow-purple-500/50 transition-all hover:scale-105 flex items-center gap-3"
+            >
+              <Activity size={22} className="group-hover:rotate-12 transition-transform" />
+              Prêt à mesurer ta vraie valeur ??
+              <TrendingUp size={22} className="group-hover:translate-x-1 transition-transform" />
+              {/* Animated glow border */}
+              <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-400/0 via-cyan-400/30 to-purple-400/0 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
+            </button>
+          </motion.div>
         </motion.div>
       </div>
     </section>
