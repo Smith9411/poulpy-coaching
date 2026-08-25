@@ -67,7 +67,7 @@ export default function Progression() {
   const view = views[activeView];
 
   // Build smooth path from session data
-  const buildPath = (data: { rr: number }[], maxRR: number, width: number, height: number) => {
+  const buildPath = (data: { s: string; rr: number }[], maxRR: number, width: number, height: number) => {
     const padX = 40;
     const padY = 40;
     const usableW = width - padX * 2;
