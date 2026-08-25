@@ -103,9 +103,9 @@ export default function Hero() {
                         className="w-full h-full object-cover"
                       />
                       <motion.div
-                        animate={{ scale: [1, 1.1, 1] }}
+                        animate={{ scale: [1, 1.15, 1] }}
                         transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                        className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-[#0a0a0f] shadow-lg shadow-green-500/50"
+                        className="absolute -top-2 -right-2 w-4 h-4 bg-green-500 rounded-full border-2 border-[#0a0a0f] shadow-lg shadow-green-500/50"
                       />
                     </div>
                     <div>

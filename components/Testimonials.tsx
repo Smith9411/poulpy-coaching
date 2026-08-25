@@ -1,11 +1,13 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
-import { useState } from 'react';
+import { ChevronLeft, ChevronRight, Star, ArrowRight } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 
 export default function Testimonials() {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
 
   const testimonials = [
     {
@@ -36,15 +38,29 @@ export default function Testimonials() {
       text: 'Poulpy ne se contente pas de pointer les erreurs, il explique le pourquoi et donne des solutions concrètes.',
       rating: 5,
     },
+    {
+      name: 'Smith94',
+      game: 'Valorant',
+      rank: 'Platine → Ascendant 3',
+      text: 'Incroyable progression ! Je suis passé de Platine à Ascendant 3 en quelques semaines. Le coaching de Poulpy sur le game sense et la prise de décision en clutch a tout changé. Il voit des choses que personne d\'autre ne voit. Vraiment le meilleur investissement pour mon jeu.',
+      rating: 5,
+    },
   ];
 
-  const nextTestimonial = () => {
+  const nextTestimonial = useCallback(() => {
     setCurrentIndex((prev) => (prev + 1) % testimonials.length);
-  };
+  }, []);
 
-  const prevTestimonial = () => {
+  const prevTestimonial = useCallback(() => {
     setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
-  };
+  }, []);
+
+  // Auto-scroll carousel
+  useEffect(() => {
+    if (isHovered) return;
+    const interval = setInterval(nextTestimonial, 5000);
+    return () => clearInterval(interval);
+  }, [isHovered, nextTestimonial]);
 
   return (
     <section id="avis" className="py-20 relative overflow-hidden">
@@ -62,14 +78,17 @@ export default function Testimonials() {
         </motion.div>
 
         {/* Carousel */}
-        <div className="relative max-w-4xl mx-auto">
+        <div className="relative max-w-4xl mx-auto"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
           <AnimatePresence mode="wait">
             <motion.div
               key={currentIndex}
               initial={{ opacity: 0, x: 100 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -100 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.4 }}
               className="glass-dark rounded-2xl p-8 sm:p-12"
             >
               {/* Stars */}
@@ -125,6 +144,24 @@ export default function Testimonials() {
               <ChevronRight size={24} />
             </button>
           </div>
+
+          {/* View All Reviews Button */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.5 }}
+            className="mt-12 text-center"
+          >
+            <Link
+              href="/avis"
+              className="inline-flex items-center gap-2 px-6 py-3 glass rounded-xl font-semibold hover:bg-white/10 transition-all group"
+            >
+              Voir tous les avis
+              <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <p className="text-xs text-gray-500 mt-2">Page dédiée bientôt disponible</p>
+          </motion.div>
         </div>
       </div>
     </section>
