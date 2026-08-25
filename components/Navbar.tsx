@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, User, LogOut, ChevronDown } from 'lucide-react';
+import { Menu, X, User, LogOut, ChevronDown, Settings, Shield, BarChart2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 
@@ -165,6 +165,11 @@ export default function Navbar() {
                         <div className="px-4 py-3 border-b border-white/5">
                           <p className="font-semibold text-white">{user.username}</p>
                           <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                          {user.isAdmin && (
+                            <span className="inline-block mt-1 px-2 py-0.5 text-xs font-bold bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full text-black">
+                              ADMIN
+                            </span>
+                          )}
                         </div>
                         <Link
                           href="/profile"
@@ -174,6 +179,35 @@ export default function Navbar() {
                           <User size={18} />
                           Mon profil
                         </Link>
+                        {user.isAdmin && (
+                          <>
+                            <hr className="my-2 border-white/10" />
+                            <Link
+                              href="/admin"
+                              className="flex items-center gap-3 px-4 py-3 text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 transition-colors"
+                              onClick={() => setIsProfileMenuOpen(false)}
+                            >
+                              <Shield size={18} />
+                              Panneau Admin
+                            </Link>
+                            <Link
+                              href="/admin/stats"
+                              className="flex items-center gap-3 px-4 py-3 text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition-colors"
+                              onClick={() => setIsProfileMenuOpen(false)}
+                            >
+                              <BarChart2 size={18} />
+                              Statistiques
+                            </Link>
+                            <Link
+                              href="/admin/settings"
+                              className="flex items-center gap-3 px-4 py-3 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10 transition-colors"
+                              onClick={() => setIsProfileMenuOpen(false)}
+                            >
+                              <Settings size={18} />
+                              Paramètres
+                            </Link>
+                          </>
+                        )}
                         <button
                           onClick={() => { logout(); setIsProfileMenuOpen(false); }}
                           className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors text-left"
@@ -260,6 +294,11 @@ export default function Navbar() {
                         <div className="text-left">
                           <p className="font-semibold text-white">{user.username}</p>
                           <p className="text-xs text-gray-400">{user.email}</p>
+                          {user.isAdmin && (
+                            <span className="inline-block mt-1 px-2 py-0.5 text-xs font-bold bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full text-black">
+                              ADMIN
+                            </span>
+                          )}
                         </div>
                       </div>
                       <Link
@@ -270,6 +309,34 @@ export default function Navbar() {
                         <User size={20} />
                         Mon profil
                       </Link>
+                      {user.isAdmin && (
+                        <>
+                          <Link
+                            href="/admin"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="flex items-center justify-center gap-2 px-6 py-3 glass rounded-lg border border-purple-500/30 text-lg font-medium text-purple-400 hover:bg-purple-500/10 transition-all"
+                          >
+                            <Shield size={20} />
+                            Panneau Admin
+                          </Link>
+                          <Link
+                            href="/admin/stats"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="flex items-center justify-center gap-2 px-6 py-3 glass rounded-lg border border-cyan-500/30 text-lg font-medium text-cyan-400 hover:bg-cyan-500/10 transition-all"
+                          >
+                            <BarChart2 size={20} />
+                            Statistiques
+                          </Link>
+                          <Link
+                            href="/admin/settings"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className="flex items-center justify-center gap-2 px-6 py-3 glass rounded-lg border border-yellow-500/30 text-lg font-medium text-yellow-400 hover:bg-yellow-500/10 transition-all"
+                          >
+                            <Settings size={20} />
+                            Paramètres
+                          </Link>
+                        </>
+                      )}
                       <button
                         onClick={() => { logout(); setIsMobileMenuOpen(false); }}
                         className="flex items-center justify-center gap-2 px-6 py-3 glass rounded-lg border border-white/10 text-lg font-medium text-red-400 hover:bg-red-500/10 transition-all"

@@ -2,10 +2,13 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
+const ADMIN_EMAIL = 'tborgesbessonnet@gmail.com';
+
 interface User {
   email: string;
   username: string;
   initial: string;
+  isAdmin: boolean;
 }
 
 interface AuthContextType {
@@ -41,10 +44,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error('Email ou mot de passe incorrect');
     }
 
+    const isAdmin = email === ADMIN_EMAIL;
     const userObj = {
       email: userData.email,
       username: userData.username,
       initial: userData.username.charAt(0).toUpperCase(),
+      isAdmin,
     };
 
     setUser(userObj);
@@ -61,6 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error('Cet email est déjà utilisé');
     }
 
+    const isAdmin = email === ADMIN_EMAIL;
     const userData = { email, username, password };
     users[email] = userData;
     localStorage.setItem('poulpy_users', JSON.stringify(users));
@@ -69,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       email,
       username,
       initial: username.charAt(0).toUpperCase(),
+      isAdmin,
     };
 
     setUser(userObj);
