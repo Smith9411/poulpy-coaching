@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { Star, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import Navbar from '@/components/Navbar';
 
 export default function Avis() {
   const testimonials = [
@@ -44,7 +45,9 @@ export default function Avis() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#0a0a0f] py-20">
+    <>
+      <Navbar />
+      <main className="min-h-screen bg-[#0a0a0f] py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -154,5 +157,6 @@ export default function Avis() {
         </motion.div>
       </div>
     </main>
+    </>
   );
 }

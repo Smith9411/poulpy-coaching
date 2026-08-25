@@ -3,10 +3,13 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { MessageCircle, ArrowRight, Mail, Globe, MapPin } from 'lucide-react';
+import Navbar from '@/components/Navbar';
 
 export default function Contact() {
   return (
-    <main className="min-h-screen bg-[#0a0a0f] py-20">
+    <>
+      <Navbar />
+      <main className="min-h-screen bg-[#0a0a0f] py-20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -160,5 +163,6 @@ export default function Contact() {
         </motion.div>
       </div>
     </main>
+    </>
   );
 }
