@@ -21,8 +21,8 @@ export default function Games() {
         'Gestion de l\'économie & Clutch',
         'Analyse approfondie de VOD',
       ],
-      buttonText: 'Coaching Valorant →',
-      buttonHref: '#valorant',
+      buttonText: 'Voir le coaching Valorant →',
+      buttonHref: '#jeux',
     },
     {
       title: 'APEX LEGENDS',
@@ -40,8 +40,8 @@ export default function Games() {
         'Communication & IGL Decision',
         'Rotation & Zone optimale',
       ],
-      buttonText: 'Coaching Apex →',
-      buttonHref: '#apex',
+      buttonText: 'Voir le coaching Apex →',
+      buttonHref: '#jeux',
     },
     {
       title: 'AIM TRAINING',
@@ -59,8 +59,8 @@ export default function Games() {
         'Analyse de posture & Sensibilité DPI',
         'Routine d\'échauffement sur-mesure',
       ],
-      buttonText: 'Améliorer mon aim →',
-      buttonHref: '#aim',
+      buttonText: 'Voir l\'aim training →',
+      buttonHref: '#jeux',
     },
   ];
 
