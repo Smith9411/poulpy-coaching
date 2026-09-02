@@ -79,32 +79,20 @@ function useUnreadNotifications(userId: string | undefined, isAdmin: boolean) {
 
     const fetchItems = async () => {
       try {
-        const { data } = await supabase
-          .from('coaching_messages')
-          .select('id, message, created_at, sender_id, student_id')
-          .neq('sender_id', userId)
-          .is('read_at', null)
-          .order('created_at', { ascending: false })
-          .limit(10);
-        if (cancelled || !data) return;
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+        if (!token) {
+          if (!cancelled) setItems([]);
+          return;
+        }
 
-        const senderIds = Array.from(new Set(data.map((m) => m.sender_id)));
-        const { data: senders } = await supabase
-          .from('profiles')
-          .select('id, username')
-          .in('id', senderIds);
-        const senderMap = new Map(senders?.map((s) => [s.id, s.username]) || []);
-
-        setItems(
-          data.map((m) => ({
-            id: m.id,
-            message: m.message,
-            created_at: m.created_at,
-            sender_id: m.sender_id,
-            student_id: m.student_id,
-            sender_name: senderMap.get(m.sender_id) || (isAdmin ? 'Élève' : 'Coach'),
-          }))
-        );
+        const res = await fetch('/api/notifications/unread', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error('Erreur notifs');
+        const data = await res.json();
+        if (cancelled) return;
+        setItems(data.items || []);
       } catch (err) {
         console.error('Erreur notifs:', err);
       }
