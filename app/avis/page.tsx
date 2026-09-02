@@ -5,6 +5,7 @@ import { Star, ArrowRight, MessageSquarePlus, Trash2, Check, X, Loader2, Shield,
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect, useCallback } from 'react';
+import { supabase } from '@/lib/supabase';
 
 interface Review {
   id: string;
@@ -20,18 +21,36 @@ interface Review {
 const GAME_OPTIONS = [
   'Valorant',
   'Apex Legends',
-  'Aim Training',
-  'Counter-Strike 2',
-  'Overwatch 2',
-  'League of Legends',
-  'Fortnite',
-  'Rocket League',
   'Autre',
+];
+
+const VALORANT_RANKS = [
+  'Iron 1', 'Iron 2', 'Iron 3',
+  'Bronze 1', 'Bronze 2', 'Bronze 3',
+  'Silver 1', 'Silver 2', 'Silver 3',
+  'Gold 1', 'Gold 2', 'Gold 3',
+  'Platinum 1', 'Platinum 2', 'Platinum 3',
+  'Diamond 1', 'Diamond 2', 'Diamond 3',
+  'Ascendant 1', 'Ascendant 2', 'Ascendant 3',
+  'Immortal 1', 'Immortal 2', 'Immortal 3',
+  'Radiant',
+];
+
+const APEX_RANKS = [
+  'Rookie',
+  'Bronze',
+  'Silver',
+  'Gold',
+  'Platinum',
+  'Diamond',
+  'Master',
+  'Predator',
 ];
 
 export default function Avis() {
   const { user } = useAuth();
   const [reviews, setReviews] = useState<Review[]>([]);
+  const [userAvatars, setUserAvatars] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -44,6 +63,7 @@ export default function Avis() {
   const [rank, setRank] = useState('');
   const [rankFrom, setRankFrom] = useState('');
   const [rankTo, setRankTo] = useState('');
+  const [customRank, setCustomRank] = useState('');
   const [rating, setRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
   const [text, setText] = useState('');
@@ -60,6 +80,27 @@ export default function Avis() {
       const data = await res.json();
       if (data.reviews) {
         setReviews(data.reviews);
+
+        // Fetch avatars for users with user_id
+        const avatarMap: Record<string, string> = {};
+        const userIds = data.reviews.filter((r: Review) => r.user_id).map((r: Review) => r.user_id);
+
+        if (userIds.length > 0) {
+          const { data: profiles } = await supabase
+            .from('profiles')
+            .select('id, avatar_url')
+            .in('id', userIds);
+
+          if (profiles) {
+            profiles.forEach((profile: any) => {
+              if (profile.avatar_url) {
+                avatarMap[profile.id] = profile.avatar_url;
+              }
+            });
+          }
+        }
+
+        setUserAvatars(avatarMap);
       }
     } catch {
       // Ignorer
@@ -80,9 +121,11 @@ export default function Avis() {
       return;
     }
 
-    // Calculate rank value based on type
+    // Calculate rank value based on type and game
     let finalRank = 'Membre Poulpy';
-    if (rankType === 'rank') {
+    if (game === 'Autre') {
+      finalRank = customRank.trim() || 'Membre Poulpy';
+    } else if (rankType === 'rank') {
       finalRank = rank.trim() || 'Membre Poulpy';
     } else {
       // Progression mode: from -> to
@@ -119,6 +162,7 @@ export default function Avis() {
       setRank('');
       setRankFrom('');
       setRankTo('');
+      setCustomRank('');
       setIsFormOpen(false);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erreur lors de la publication';
@@ -255,7 +299,13 @@ export default function Avis() {
                       </label>
                       <select
                         value={game}
-                        onChange={(e) => setGame(e.target.value)}
+                        onChange={(e) => {
+                          setGame(e.target.value);
+                          setRank('');
+                          setRankFrom('');
+                          setRankTo('');
+                          setCustomRank('');
+                        }}
                         className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit focus:outline-none focus:border-purple-500"
                       >
                         {GAME_OPTIONS.map((g) => (
@@ -266,80 +316,119 @@ export default function Avis() {
                       </select>
                     </div>
 
-                    {/* Rank Type Selector */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Type de renseignement
-                      </label>
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => setRankType('rank')}
-                          className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                            rankType === 'rank'
-                              ? 'bg-purple-600 text-white'
-                              : 'bg-white/5 text-gray-400 hover:bg-white/10'
-                          }`}
-                        >
-                          Rang actuel
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setRankType('progression')}
-                          className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                            rankType === 'progression'
-                              ? 'bg-purple-600 text-white'
-                              : 'bg-white/5 text-gray-400 hover:bg-white/10'
-                          }`}
-                        >
-                          Progression
-                        </button>
+                    {/* Rank Type Selector - Only for Valorant and Apex */}
+                    {game !== 'Autre' && (
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Type de renseignement
+                        </label>
+                        <div className="flex gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setRankType('rank')}
+                            className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                              rankType === 'rank'
+                                ? 'bg-purple-600 text-white'
+                                : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                            }`}
+                          >
+                            Rang actuel
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setRankType('progression')}
+                            className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                              rankType === 'progression'
+                                ? 'bg-purple-600 text-white'
+                                : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                            }`}
+                          >
+                            Progression
+                          </button>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
 
-                  {/* Rank Input - Single field for rank mode */}
-                  {rankType === 'rank' && (
+                  {/* Custom rank input for "Autre" */}
+                  {game === 'Autre' && (
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Rang actuel
+                        Rang / Niveau
                       </label>
                       <input
                         type="text"
-                        placeholder="Ex: Diamant 2"
-                        value={rank}
-                        onChange={(e) => setRank(e.target.value)}
+                        placeholder="Ex: Master 1000 points"
+                        value={customRank}
+                        onChange={(e) => setCustomRank(e.target.value)}
                         className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500"
                       />
                     </div>
                   )}
 
-                  {/* Progression Inputs - Two fields for progression mode */}
-                  {rankType === 'progression' && (
+                  {/* Rank Input - Single field for rank mode (Valorant/Apex) */}
+                  {game !== 'Autre' && rankType === 'rank' && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Rang actuel
+                      </label>
+                      <select
+                        value={rank}
+                        onChange={(e) => setRank(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit focus:outline-none focus:border-purple-500"
+                      >
+                        <option value="" className="bg-[#13161e] text-white">
+                          Sélectionne ton rang
+                        </option>
+                        {(game === 'Valorant' ? VALORANT_RANKS : APEX_RANKS).map((r) => (
+                          <option key={r} value={r} className="bg-[#13161e] text-white">
+                            {r}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {/* Progression Inputs - Two fields for progression mode (Valorant/Apex) */}
+                  {game !== 'Autre' && rankType === 'progression' && (
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
                           Rang de départ
                         </label>
-                        <input
-                          type="text"
-                          placeholder="Ex: Platine"
+                        <select
                           value={rankFrom}
                           onChange={(e) => setRankFrom(e.target.value)}
-                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500"
-                        />
+                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit focus:outline-none focus:border-purple-500"
+                        >
+                          <option value="" className="bg-[#13161e] text-white">
+                            Départ
+                          </option>
+                          {(game === 'Valorant' ? VALORANT_RANKS : APEX_RANKS).map((r) => (
+                            <option key={r} value={r} className="bg-[#13161e] text-white">
+                              {r}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-gray-300 mb-2">
                           Rang d'arrivée
                         </label>
-                        <input
-                          type="text"
-                          placeholder="Ex: Diamant 3"
+                        <select
                           value={rankTo}
                           onChange={(e) => setRankTo(e.target.value)}
-                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500"
-                        />
+                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit focus:outline-none focus:border-purple-500"
+                        >
+                          <option value="" className="bg-[#13161e] text-white">
+                            Arrivée
+                          </option>
+                          {(game === 'Valorant' ? VALORANT_RANKS : APEX_RANKS).map((r) => (
+                            <option key={r} value={r} className="bg-[#13161e] text-white">
+                              {r}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                   )}
@@ -478,9 +567,25 @@ export default function Avis() {
 
                 {/* Author Info */}
                 <div className="pt-4 border-t border-white/5 flex items-center justify-between">
-                  <div>
-                    <div className="font-bold text-base mb-0.5">{testimonial.name}</div>
-                    <div className="text-purple-400 text-xs font-medium">{testimonial.game}</div>
+                  <div className="flex items-center gap-3">
+                    {/* Avatar */}
+                    {testimonial.user_id && userAvatars[testimonial.user_id] ? (
+                      <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-purple-500/30">
+                        <img
+                          src={userAvatars[testimonial.user_id]}
+                          alt={testimonial.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm">
+                        {testimonial.name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div>
+                      <div className="font-bold text-base mb-0.5">{testimonial.name}</div>
+                      <div className="text-purple-400 text-xs font-medium">{testimonial.game}</div>
+                    </div>
                   </div>
                   <div className="text-xs px-2.5 py-1 rounded-full bg-white/5 text-gray-400">
                     {testimonial.rank}
