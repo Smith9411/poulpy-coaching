@@ -2,6 +2,7 @@
 
 import { MessageSquare, Calendar, Check, Loader2, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabase';
 import { useState, useEffect, useCallback } from 'react';
 
 interface Message {
