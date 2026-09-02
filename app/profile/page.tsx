@@ -6,7 +6,15 @@ import { User, Mail, Settings, LogOut, Shield, Clock, Award } from 'lucide-react
 import { useAuth } from '@/context/AuthContext';
 
 export default function Profile() {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading: authLoading } = useAuth();
+
+  if (authLoading) {
+    return (
+      <main className="min-h-screen page-bg py-24 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      </main>
+    );
+  }
 
   if (!user) {
     return (

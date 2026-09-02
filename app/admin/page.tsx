@@ -1,6 +1,5 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { Shield, Users, DollarSign, BarChart2, Settings, LogOut, Mail, Award } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
@@ -8,7 +7,7 @@ import { supabase } from '@/lib/supabase';
 import { useEffect, useState } from 'react';
 
 export default function AdminDashboard() {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading: authLoading } = useAuth();
   const [userCount, setUserCount] = useState<number | null>(null);
 
   useEffect(() => {
@@ -18,14 +17,18 @@ export default function AdminDashboard() {
     });
   }, [user?.isAdmin]);
 
+  if (authLoading) {
+    return (
+      <main className="min-h-screen page-bg py-24 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      </main>
+    );
+  }
+
   if (!user || !user.isAdmin) {
     return (
       <main className="min-h-screen page-bg py-24 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center card rounded-2xl p-12 max-w-md mx-auto px-4"
-        >
+        <div className="text-center card rounded-2xl p-12 max-w-md mx-auto px-4">
           <Shield size={64} className="mx-auto mb-6 text-gray-500" />
           <h1 className="text-3xl font-bold mb-4">Accès refusé</h1>
           <p className="text-gray-400 mb-8">Tu n&apos;as pas les permissions d&apos;administrateur.</p>
@@ -35,7 +38,7 @@ export default function AdminDashboard() {
           >
             Retour à l&apos;accueil
           </Link>
-        </motion.div>
+        </div>
       </main>
     );
   }
@@ -56,105 +59,91 @@ export default function AdminDashboard() {
 
   return (
     <main className="min-h-screen page-bg py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-          {/* Header */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="mb-12">
-            <div className="inline-block glass px-4 py-2 rounded-full mb-4">
-              <span className="text-sm text-purple-400 font-medium">PANNEAU ADMIN</span>
-            </div>
-            <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-              Tableau de bord <span className="text-gradient">administrateur</span>
-            </h1>
-            <p className="text-xl text-gray-300 max-w-2xl">
-              Gestion complète de la plateforme Poulpy Coaching
-            </p>
-          </motion.div>
-
-          {/* Stats Grid */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
-          >
-            {stats.map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 + i * 0.1 }}
-                className="card rounded-2xl p-6 hover:bg-white/5 transition-all"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm text-gray-400 mb-1">{stat.label}</p>
-                    <p className="text-3xl font-bold">{stat.value}</p>
-                  </div>
-                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center`}>
-                    <stat.icon size={24} className="text-white" />
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {/* Quick Actions */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="mb-12"
-          >
-            <h2 className="text-2xl font-bold mb-6">Actions rapides</h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {quickActions.map((action) => (
-                <button
-                  key={action.label}
-                  onClick={() => { if (action.onClick) action.onClick(); else window.location.href = action.href; }}
-                  className={`card border rounded-xl p-6 text-left transition-all group flex flex-col items-start gap-4 ${action.cls}`}
-                >
-                  <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <action.icon size={24} />
-                  </div>
-                  <span className="font-semibold">{action.label}</span>
-                </button>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Info */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.6 }}
-            className="card rounded-2xl p-8"
-          >
-            <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
-              <Shield size={24} className="text-purple-400" />
-              Informations
-            </h3>
-            <div className="grid sm:grid-cols-2 gap-6 text-gray-300">
-              <div>
-                <h4 className="font-semibold mb-3 flex items-center gap-2">
-                  <Mail size={18} className="text-purple-400" />
-                  Compte admin
-                </h4>
-                <p className="text-sm">Email: {user.email}</p>
-                <p className="text-sm">Pseudo: {user.username}</p>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-3 flex items-center gap-2">
-                  <Award size={18} className="text-yellow-400" />
-                  Permissions
-                </h4>
-                <ul className="space-y-1 text-sm">
-                  <li>• Accès panneau admin</li>
-                  <li>• Gestion utilisateurs</li>
-                  <li>• Statistiques globales</li>
-                  <li>• Configuration site</li>
-                </ul>
-              </div>
-            </div>
-          </motion.div>
-
+        {/* Header */}
+        <div className="mb-12">
+          <div className="inline-block glass px-4 py-2 rounded-full mb-4">
+            <span className="text-sm text-purple-400 font-medium">PANNEAU ADMIN</span>
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-bold mb-4">
+            Tableau de bord <span className="text-gradient">administrateur</span>
+          </h1>
+          <p className="text-xl text-gray-300 max-w-2xl">
+            Gestion complète de la plateforme Poulpy Coaching
+          </p>
         </div>
-      </main>
+
+        {/* Stats Grid */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {stats.map((stat) => (
+            <div
+              key={stat.label}
+              className="card rounded-2xl p-6 hover:bg-white/5 transition-all"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-400 mb-1">{stat.label}</p>
+                  <p className="text-3xl font-bold">{stat.value}</p>
+                </div>
+                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center`}>
+                  <stat.icon size={24} className="text-white" />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold mb-6">Actions rapides</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {quickActions.map((action) => (
+              <button
+                key={action.label}
+                onClick={() => { if (action.onClick) action.onClick(); else window.location.href = action.href; }}
+                className={`card border rounded-xl p-6 text-left transition-all group flex flex-col items-start gap-4 ${action.cls}`}
+              >
+                <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <action.icon size={24} />
+                </div>
+                <span className="font-semibold">{action.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Info */}
+        <div className="card rounded-2xl p-8">
+          <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
+            <Shield size={24} className="text-purple-400" />
+            Informations
+          </h3>
+          <div className="grid sm:grid-cols-2 gap-6 text-gray-300">
+            <div>
+              <h4 className="font-semibold mb-3 flex items-center gap-2">
+                <Mail size={18} className="text-purple-400" />
+                Compte admin
+              </h4>
+              <p className="text-sm">Email : {user.email}</p>
+              <p className="text-sm">Pseudo : {user.username}</p>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-3 flex items-center gap-2">
+                <Award size={18} className="text-yellow-400" />
+                Permissions
+              </h4>
+              <ul className="space-y-1 text-sm">
+                <li>• Accès panneau admin</li>
+                <li>• Gestion utilisateurs</li>
+                <li>• Statistiques globales</li>
+                <li>• Configuration site</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
   );
 }

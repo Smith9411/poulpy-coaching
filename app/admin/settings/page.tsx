@@ -1,30 +1,33 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import Link from 'next/link';
 import { Shield, ArrowLeft, Save, RotateCcw, Globe, Mail, Shield as ShieldIcon, Palette } from 'lucide-react';
+import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useState } from 'react';
 
 export default function AdminSettings() {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const [saved, setSaved] = useState(false);
+
+  if (authLoading) {
+    return (
+      <main className="min-h-screen page-bg py-24 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      </main>
+    );
+  }
 
   if (!user || !user.isAdmin) {
     return (
       <main className="min-h-screen page-bg py-24 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center card rounded-2xl p-12 max-w-md mx-auto px-4"
-        >
+        <div className="text-center card rounded-2xl p-12 max-w-md mx-auto px-4">
           <Shield size={64} className="mx-auto mb-6 text-gray-500" />
           <h1 className="text-3xl font-bold mb-4">Accès refusé</h1>
           <p className="text-gray-400 mb-8">Tu n&apos;as pas les permissions d&apos;administrateur.</p>
           <Link href="/admin" className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all">
             Retour à l&apos;admin
           </Link>
-        </motion.div>
+        </div>
       </main>
     );
   }
@@ -84,50 +87,37 @@ export default function AdminSettings() {
   return (
     <main className="min-h-screen page-bg py-24">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-12"
-        >
+        <div className="mb-12">
           <Link href="/admin" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6">
             <ArrowLeft size={20} />
             Retour admin
           </Link>
-          <div className="inline-block glass px-4 py-2 rounded-full mb-4">
-            <span className="text-sm text-yellow-400 font-medium">PARAMÈTRES</span>
+          <div>
+            <div className="inline-block glass px-4 py-2 rounded-full mb-4">
+              <span className="text-sm text-yellow-400 font-medium">PARAMÈTRES</span>
+            </div>
+            <h1 className="text-4xl sm:text-5xl font-bold mb-4">
+              Paramètres <span className="text-gradient">du site</span>
+            </h1>
+            <p className="text-xl text-gray-300 max-w-2xl">
+              Configuration globale de la plateforme Poulpy Coaching
+            </p>
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-            Paramètres <span className="text-gradient">du site</span>
-          </h1>
-          <p className="text-xl text-gray-300 max-w-2xl">
-            Configuration globale de la plateforme Poulpy Coaching
-          </p>
-        </motion.div>
+        </div>
 
         {saved && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6 p-4 rounded-xl bg-green-500/20 border border-green-500/30 text-green-400 text-sm font-medium"
-          >
+          <div className="mb-6 p-4 rounded-xl bg-green-500/20 border border-green-500/30 text-green-400 text-sm font-medium">
             Paramètres enregistrés avec succès !
-          </motion.div>
+          </div>
         )}
 
-        <motion.form
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
+        <form
           className="space-y-8"
           onSubmit={handleSave}
         >
-          {settingsSections.map((section, sectionIndex) => (
-            <motion.div
+          {settingsSections.map((section) => (
+            <div
               key={section.title}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 + sectionIndex * 0.1 }}
               className="card rounded-2xl p-6"
             >
               <div className="flex items-center gap-3 mb-6">
@@ -178,15 +168,10 @@ export default function AdminSettings() {
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
           ))}
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="flex items-center justify-end gap-4 pt-6 border-t border-white/5"
-          >
+          <div className="flex items-center justify-end gap-4 pt-6 border-t border-white/5">
             <button
               type="button"
               className="px-6 py-3 card rounded-xl font-semibold hover:bg-white/10 transition-all flex items-center gap-2"
@@ -201,8 +186,8 @@ export default function AdminSettings() {
               <Save size={18} />
               Sauvegarder
             </button>
-          </motion.div>
-        </motion.form>
+          </div>
+        </form>
       </div>
     </main>
   );
