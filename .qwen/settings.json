@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx *)",
+      "Bash(cd *)",
+      "Bash(rmdir *)",
+      "Bash(npm run *)",
+      "Bash(ping *)",
+      "Bash(curl *)"
+    ]
+  },
+  "$version": 4
+}
