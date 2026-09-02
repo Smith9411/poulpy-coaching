@@ -13,11 +13,11 @@ export default function Profile() {
     return (
       <>
         <Navbar />
-        <main className="min-h-screen bg-[#0a0a0f] py-20 flex items-center justify-center">
+        <main className="min-h-screen page-bg py-20 flex items-center justify-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center glass-dark rounded-2xl p-12 max-w-md mx-auto px-4"
+            className="text-center card rounded-2xl p-12 max-w-md mx-auto px-4"
           >
             <User size={64} className="mx-auto mb-6 text-gray-500" />
             <h1 className="text-3xl font-bold mb-4">Non connecté</h1>
@@ -38,7 +38,7 @@ export default function Profile() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-[#0a0a0f] py-20">
+      <main className="min-h-screen page-bg py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <motion.div
@@ -63,7 +63,7 @@ export default function Profile() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="glass-dark rounded-2xl p-8 mb-12"
+            className="card rounded-2xl p-8 mb-12"
           >
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-8">
               {/* Avatar */}
@@ -71,7 +71,7 @@ export default function Profile() {
                 <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-4xl font-bold text-white">
                   {user.initial}
                 </div>
-                <div className="absolute bottom-0 right-0 w-8 h-8 bg-green-500 rounded-full border-4 border-[#0a0a0f] flex items-center justify-center">
+                <div className="absolute bottom-0 right-0 w-8 h-8 bg-green-500 rounded-full border-4 border-page flex items-center justify-center">
                   <Shield size={16} className="text-white" />
                 </div>
               </div>
@@ -107,7 +107,7 @@ export default function Profile() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="grid sm:grid-cols-3 gap-6 mb-12"
           >
-            <div className="glass-dark rounded-2xl p-6 text-center hover:bg-white/5 transition-all group">
+            <div className="card rounded-2xl p-6 text-center hover:bg-white/5 transition-all group">
               <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <Clock size={24} className="text-white" />
               </div>
@@ -122,7 +122,7 @@ export default function Profile() {
               </Link>
             </div>
 
-            <div className="glass-dark rounded-2xl p-6 text-center hover:bg-white/5 transition-all group">
+            <div className="card rounded-2xl p-6 text-center hover:bg-white/5 transition-all group">
               <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-600 to-blue-500 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <Award size={24} className="text-white" />
               </div>
@@ -133,7 +133,7 @@ export default function Profile() {
               </span>
             </div>
 
-            <div className="glass-dark rounded-2xl p-6 text-center hover:bg-white/5 transition-all group">
+            <div className="card rounded-2xl p-6 text-center hover:bg-white/5 transition-all group">
               <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-pink-600 to-purple-500 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                 <Settings size={24} className="text-white" />
               </div>
@@ -150,7 +150,7 @@ export default function Profile() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
-            className="glass-dark rounded-2xl p-8"
+            className="card rounded-2xl p-8"
           >
             <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
               <Shield size={24} className="text-purple-400" />
@@ -159,12 +159,12 @@ export default function Profile() {
             <div className="space-y-4 text-gray-300">
               <p>Cet espace personnel est en cours de développement. Bientôt, tu pourras :</p>
               <ul className="space-y-3 pl-6 list-disc">
-                <li>Voir l'historique de tes sessions de coaching</li>
+                <li>Voir l&apos;historique de tes sessions de coaching</li>
                 <li>Suivre ta progression de rang (Valorant, Apex, Aim)</li>
                 <li>Accéder à tes VOD review et analyses</li>
                 <li>Gérer tes créneaux de réservation</li>
                 <li>Modifier tes préférences et notifications</li>
-                <li>Télécharger tes plans d'entraînement personnalisés</li>
+                <li>Télécharger tes plans d&apos;entraînement personnalisés</li>
               </ul>
               <p className="text-sm text-gray-500 pt-4 border-t border-white/5">
                 Pour toute question, rejoins le <a href="https://discord.gg/rJMg3ZZRkp" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300 underline">Discord</a>.
