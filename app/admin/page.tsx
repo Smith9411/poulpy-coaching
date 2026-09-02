@@ -4,62 +4,62 @@ import { motion } from 'framer-motion';
 import { Shield, Users, DollarSign, BarChart2, Settings, LogOut, Mail, Award } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import Navbar from '@/components/Navbar';
+import { supabase } from '@/lib/supabase';
+import { useEffect, useState } from 'react';
 
 export default function AdminDashboard() {
   const { user, logout } = useAuth();
+  const [userCount, setUserCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!user?.isAdmin) return;
+    supabase.from('profiles').select('id', { count: 'exact', head: true }).then(({ count }) => {
+      setUserCount(count ?? 0);
+    });
+  }, [user?.isAdmin]);
 
   if (!user || !user.isAdmin) {
     return (
-      <>
-        <Navbar />
-        <main className="min-h-screen bg-[#0a0a0f] py-20 flex items-center justify-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center glass-dark rounded-2xl p-12 max-w-md mx-auto px-4"
+      <main className="min-h-screen page-bg py-24 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center card rounded-2xl p-12 max-w-md mx-auto px-4"
+        >
+          <Shield size={64} className="mx-auto mb-6 text-gray-500" />
+          <h1 className="text-3xl font-bold mb-4">Accès refusé</h1>
+          <p className="text-gray-400 mb-8">Tu n&apos;as pas les permissions d&apos;administrateur.</p>
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all"
           >
-            <Shield size={64} className="mx-auto mb-6 text-gray-500" />
-            <h1 className="text-3xl font-bold mb-4">Accès refusé</h1>
-            <p className="text-gray-400 mb-8">Tu n'as pas les permissions d'administrateur.</p>
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all"
-            >
-              Retour à l'accueil
-            </Link>
-          </motion.div>
-        </main>
-      </>
+            Retour à l&apos;accueil
+          </Link>
+        </motion.div>
+      </main>
     );
   }
 
   const stats = [
-    { label: 'Utilisateurs', value: '0', icon: Users, color: 'text-purple-400', bg: 'from-purple-600 to-purple-400' },
-    { label: 'Sessions réservées', value: '0', icon: Award, color: 'text-cyan-400', bg: 'from-cyan-600 to-cyan-400' },
-    { label: 'Revenus', value: '0€', icon: DollarSign, color: 'text-green-400', bg: 'from-green-600 to-green-400' },
-    { label: 'Taux conversion', value: '0%', icon: BarChart2, color: 'text-yellow-400', bg: 'from-yellow-600 to-yellow-400' },
+    { label: 'Utilisateurs', value: userCount === null ? '…' : String(userCount), icon: Users, gradient: 'from-purple-600 to-purple-400' },
+    { label: 'Sessions réservées', value: '0', icon: Award, gradient: 'from-cyan-600 to-cyan-400' },
+    { label: 'Revenus', value: '0 €', icon: DollarSign, gradient: 'from-green-600 to-green-400' },
+    { label: 'Taux conversion', value: '0 %', icon: BarChart2, gradient: 'from-yellow-600 to-yellow-400' },
   ];
 
   const quickActions = [
-    { label: 'Gérer utilisateurs', href: '/admin/users', icon: Users, color: 'border-purple-500/30 hover:bg-purple-500/10 text-purple-400' },
-    { label: 'Voir statistiques', href: '/admin/stats', icon: BarChart2, color: 'border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-400' },
-    { label: 'Paramètres site', href: '/admin/settings', icon: Settings, color: 'border-yellow-500/30 hover:bg-yellow-500/10 text-yellow-400' },
-    { label: 'Déconnexion', href: '#', icon: LogOut, color: 'border-red-500/30 hover:bg-red-500/10 text-red-400', onClick: logout },
+    { label: 'Gérer utilisateurs', href: '/admin/users', icon: Users, cls: 'border-purple-500/30 hover:bg-purple-500/10 text-purple-400' },
+    { label: 'Voir statistiques', href: '/admin/stats', icon: BarChart2, cls: 'border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-400' },
+    { label: 'Paramètres site', href: '/admin/settings', icon: Settings, cls: 'border-yellow-500/30 hover:bg-yellow-500/10 text-yellow-400' },
+    { label: 'Déconnexion', href: '#', icon: LogOut, cls: 'border-red-500/30 hover:bg-red-500/10 text-red-400', onClick: logout },
   ];
 
   return (
-    <>
-      <Navbar />
-      <main className="min-h-screen bg-[#0a0a0f] py-20">
+    <main className="min-h-screen page-bg py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
           {/* Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-            className="mb-12"
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="mb-12">
             <div className="inline-block glass px-4 py-2 rounded-full mb-4">
               <span className="text-sm text-purple-400 font-medium">PANNEAU ADMIN</span>
             </div>
@@ -73,26 +73,23 @@ export default function AdminDashboard() {
 
           {/* Stats Grid */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12"
           >
-            {stats.map((stat, index) => (
+            {stats.map((stat, i) => (
               <motion.div
                 key={stat.label}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 + index * 0.1 }}
-                className="glass-dark rounded-2xl p-6 hover:bg-white/5 transition-all group"
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 + i * 0.1 }}
+                className="card rounded-2xl p-6 hover:bg-white/5 transition-all"
               >
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-400 mb-1">{stat.label}</p>
                     <p className="text-3xl font-bold">{stat.value}</p>
                   </div>
-                  <div className="w-14 h-14 rounded-xl flex items-center justify-center"
-                    style={{ background: `linear-gradient(135deg, ${stat.bg})` }}>
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${stat.gradient} flex items-center justify-center`}>
                     <stat.icon size={24} className="text-white" />
                   </div>
                 </div>
@@ -102,41 +99,32 @@ export default function AdminDashboard() {
 
           {/* Quick Actions */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
             className="mb-12"
           >
             <h2 className="text-2xl font-bold mb-6">Actions rapides</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {quickActions.map((action) => (
-                <motion.button
+                <button
                   key={action.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1 }}
                   onClick={() => { if (action.onClick) action.onClick(); else window.location.href = action.href; }}
-                  className={`glass-dark rounded-xl p-6 text-left hover:bg-white/5 transition-all group flex flex-col items-start gap-4 ${action.color}`}
+                  className={`card border rounded-xl p-6 text-left transition-all group flex flex-col items-start gap-4 ${action.cls}`}
                 >
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform"
-                    style={{ background: action.color.includes('purple') ? 'linear-gradient(135deg, #7c3aed/20, #7c3aed/10)' :
-                           action.color.includes('cyan') ? 'linear-gradient(135deg, #06b6d4/20, #06b6d4/10)' :
-                           action.color.includes('yellow') ? 'linear-gradient(135deg, #eab308/20, #eab308/10)' :
-                           'linear-gradient(135deg, #ef4444/20, #ef4444/10)' }}>
+                  <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
                     <action.icon size={24} />
                   </div>
                   <span className="font-semibold">{action.label}</span>
-                </motion.button>
+                </button>
               ))}
             </div>
           </motion.div>
 
           {/* Info */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
-            className="glass-dark rounded-2xl p-8"
+            className="card rounded-2xl p-8"
           >
             <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
               <Shield size={24} className="text-purple-400" />
@@ -165,8 +153,8 @@ export default function AdminDashboard() {
               </div>
             </div>
           </motion.div>
+
         </div>
       </main>
-    </>
   );
 }

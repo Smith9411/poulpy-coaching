@@ -4,16 +4,13 @@ import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { User, Mail, Settings, LogOut, Shield, Clock, Award } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import Navbar from '@/components/Navbar';
 
 export default function Profile() {
   const { user, logout } = useAuth();
 
   if (!user) {
     return (
-      <>
-        <Navbar />
-        <main className="min-h-screen page-bg py-20 flex items-center justify-center">
+      <main className="min-h-screen page-bg py-24 flex items-center justify-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -31,14 +28,11 @@ export default function Profile() {
             </Link>
           </motion.div>
         </main>
-      </>
     );
   }
 
   return (
-    <>
-      <Navbar />
-      <main className="min-h-screen page-bg py-20">
+    <main className="min-h-screen page-bg py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <motion.div
@@ -173,6 +167,5 @@ export default function Profile() {
           </motion.div>
         </div>
       </main>
-    </>
   );
 }

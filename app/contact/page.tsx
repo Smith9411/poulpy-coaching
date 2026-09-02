@@ -3,13 +3,10 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { MessageCircle, ArrowRight, Mail, Globe, MapPin } from 'lucide-react';
-import Navbar from '@/components/Navbar';
 
 export default function Contact() {
   return (
-    <>
-      <Navbar />
-      <main className="min-h-screen bg-[#0a0a0f] py-20">
+    <main className="min-h-screen page-bg py-24">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -25,7 +22,7 @@ export default function Contact() {
             On en <span className="text-gradient">discute ?</span>
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            La meilleure façon de me rejoindre pour parler coaching, c'est par là.
+            La meilleure façon de me rejoindre pour parler coaching, c&apos;est par là.
           </p>
         </motion.div>
 
@@ -36,9 +33,9 @@ export default function Contact() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="mb-16"
         >
-          <div className="glass-dark rounded-3xl p-8 sm:p-12 relative overflow-hidden border border-purple-500/30">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 to-cyan-500/10" />
-            <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-bl from-purple-600/20 to-transparent rounded-full blur-3xl" />
+          <div className="card rounded-3xl p-8 sm:p-12 relative overflow-hidden border border-purple-500/30">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 to-cyan-500/10 pointer-events-none" />
+            <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-bl from-purple-600/20 to-transparent rounded-full blur-3xl pointer-events-none" />
 
             <div className="relative z-10 flex flex-col items-center text-center gap-6">
               <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
@@ -48,12 +45,12 @@ export default function Contact() {
               <div>
                 <h2 className="text-2xl sm:text-3xl font-bold mb-2">Rejoins le Discord</h2>
                 <p className="text-gray-400 text-lg">
-                  C'est là que tout se passe : réservation, questions, suivi, communauté.
+                  C&apos;est là que tout se passe : réservation, questions, suivi, communauté.
                 </p>
               </div>
 
               <a
-                href="https://konect.gg/Mister_Poulpi"
+                href="https://discord.gg/rJMg3ZZRkp"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold text-lg hover:shadow-lg hover:shadow-purple-500/50 transition-all hover:scale-105"
@@ -77,7 +74,7 @@ export default function Contact() {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="grid sm:grid-cols-3 gap-6 mb-16"
         >
-          <div className="glass-dark rounded-2xl p-6 text-center hover:bg-white/5 transition-all group">
+          <div className="card rounded-2xl p-6 text-center hover:bg-white/5 transition-all group">
             <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
               <Mail size={24} className="text-white" />
             </div>
@@ -93,20 +90,20 @@ export default function Contact() {
             </a>
           </div>
 
-          <div className="glass-dark rounded-2xl p-6 text-center hover:bg-white/5 transition-all group">
+          <div className="card rounded-2xl p-6 text-center hover:bg-white/5 transition-all group">
             <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
               <Globe size={24} className="text-white" />
             </div>
             <h3 className="font-bold text-lg mb-2">Réseaux</h3>
             <p className="text-gray-400 text-sm">
-              Suis l'actu et les tips gratuits
+              Suis l&apos;actu et les tips gratuits
             </p>
-            <div className="mt-3 flex items-center justify-center gap-3">
+            <div className="mt-3 flex items-center justify-center gap-4">
               <a
                 href="https://www.twitch.tv/ccs_poulpy"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-purple-600 transition-colors"
+                className="text-gray-400 hover:text-purple-400 transition-colors"
                 aria-label="Twitch"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M21 1.71v20.58c0 .94-.76 1.71-1.7 1.71H4.7c-.94 0-1.71-.76-1.71-1.71V1.71C3 0.77 3.76 0 4.7 0h14.6c.94 0 1.7.77 1.7 1.71zM8.79 17.74l8.5-6.37c.51-.38.51-1.25 0-1.63l-8.5-6.37c-.51-.38-1.25-.08-1.25.67v12.73c0 .75.74 1.05 1.25.67z"/></svg>
@@ -132,7 +129,7 @@ export default function Contact() {
             </div>
           </div>
 
-          <div className="glass-dark rounded-2xl p-6 text-center hover:bg-white/5 transition-all group">
+          <div className="card rounded-2xl p-6 text-center hover:bg-white/5 transition-all group">
             <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
               <MapPin size={24} className="text-white" />
             </div>
@@ -155,14 +152,13 @@ export default function Contact() {
         >
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-6 py-3 glass rounded-xl font-semibold hover:bg-white/10 transition-all group"
+            className="inline-flex items-center gap-2 px-6 py-3 card rounded-xl font-semibold hover:bg-white/10 transition-all group"
           >
             <ArrowRight size={20} className="-rotate-90 group-hover:-translate-x-1 transition-transform" />
-            Retour à l'accueil
+            Retour à l&apos;accueil
           </Link>
         </motion.div>
       </div>
     </main>
-    </>
   );
 }

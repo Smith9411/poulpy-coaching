@@ -10,42 +10,41 @@ export default function Avis() {
       name: 'Smith94',
       game: 'Valorant',
       rank: 'Platine → Ascendant 3',
-      text: 'Incroyable progression ! Je suis passé de Platine à Ascendant 3 en quelques semaines. Le coaching de Poulpy sur le game sense et la prise de décision en clutch a tout changé. Il voit des choses que personne d\'autre ne voit. Vraiment le meilleur investissement pour mon jeu.',
+      text: "Incroyable progression ! Je suis passé de Platine à Ascendant 3 en quelques semaines. Le coaching de Poulpy sur le game sense et la prise de décision en clutch a tout changé. Il voit des choses que personne d'autre ne voit. Vraiment le meilleur investissement pour mon jeu.",
       rating: 5,
     },
     {
       name: 'Alex',
       game: 'Valorant',
       rank: 'Gold → Diamant',
-      text: 'En 3 sessions, j\'ai enfin compris pourquoi je bloquais en ranked. Poulpy m\'a aidé à corriger mon placement et ma prise de décision.',
+      text: "En 3 sessions, j'ai enfin compris pourquoi je bloquais en ranked. Poulpy m'a aidé à corriger mon placement et ma prise de décision.",
       rating: 5,
     },
     {
       name: 'Sarah',
       game: 'Apex Legends',
       rank: 'Platine → Master',
-      text: 'Le coaching le plus précis que j\'ai eu. Les conseils sur le movement et le tracking ont totalement changé mon jeu.',
+      text: "Le coaching le plus précis que j'ai eu. Les conseils sur le movement et le tracking ont totalement changé mon jeu.",
       rating: 5,
     },
     {
       name: 'Maxime',
       game: 'Aim Training',
       rank: 'Silver → Platinum Voltaic',
-      text: 'Mes scores Kovaak\'s ont explosé en 1 mois. La routine personnalisée fait toute la différence.',
+      text: "Mes scores Kovaak's ont explosé en 1 mois. La routine personnalisée fait toute la différence.",
       rating: 5,
     },
     {
       name: 'Thomas',
       game: 'Valorant',
       rank: 'Platine → Immortal',
-      text: 'Poulpy ne se contente pas de pointer les erreurs, il explique le pourquoi et donne des solutions concrètes.',
+      text: "Poulpy ne se contente pas de pointer les erreurs, il explique le pourquoi et donne des solutions concrètes.",
       rating: 5,
     },
   ];
 
   return (
-    <>
-      <main className="min-h-screen bg-[#0a0a0f] dark:bg-[#0a0a0f] py-20" style={{backgroundColor: 'var(--page-bg, #0a0a0f)'}}>
+    <main className="min-h-screen page-bg py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
@@ -78,7 +77,7 @@ export default function Avis() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 + index * 0.1 }}
-              className="glass-dark rounded-2xl p-8 hover:bg-white/5 transition-all group"
+              className="card rounded-2xl p-8 hover:bg-white/5 transition-all group"
             >
               {/* Stars */}
               <div className="flex justify-start gap-1 mb-6">
@@ -89,7 +88,7 @@ export default function Avis() {
 
               {/* Quote */}
               <blockquote className="text-lg text-gray-200 mb-8 leading-relaxed">
-                "{testimonial.text}"
+                &ldquo;{testimonial.text}&rdquo;
               </blockquote>
 
               {/* Author */}
@@ -109,25 +108,25 @@ export default function Avis() {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16 max-w-4xl mx-auto"
         >
-          <div className="glass rounded-xl p-6 text-center">
+          <div className="card rounded-xl p-6 text-center">
             <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
               {testimonials.length}+
             </div>
             <div className="text-xs text-gray-400">Avis vérifiés</div>
           </div>
-          <div className="glass rounded-xl p-6 text-center">
+          <div className="card rounded-xl p-6 text-center">
             <div className="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
               5.0/5
             </div>
             <div className="text-xs text-gray-400">Note moyenne</div>
           </div>
-          <div className="glass rounded-xl p-6 text-center">
+          <div className="card rounded-xl p-6 text-center">
             <div className="text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">
               100%
             </div>
             <div className="text-xs text-gray-400">Satisfaction</div>
           </div>
-          <div className="glass rounded-xl p-6 text-center">
+          <div className="card rounded-xl p-6 text-center">
             <div className="text-3xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
               3/3
             </div>
@@ -144,10 +143,10 @@ export default function Avis() {
         >
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-6 py-3 glass rounded-xl font-semibold hover:bg-white/10 transition-all group"
+            className="inline-flex items-center gap-2 px-6 py-3 card rounded-xl font-semibold hover:bg-white/10 transition-all group"
           >
             <ArrowRight size={20} className="-rotate-90 group-hover:-translate-x-1 transition-transform" />
-            Retour à l'accueil
+            Retour à l&apos;accueil
           </Link>
           <p className="text-sm text-gray-500 mt-4">
             Prêt à progresser toi aussi ? Rejoins le Discord pour réserver ta session.
@@ -155,6 +154,5 @@ export default function Avis() {
         </motion.div>
       </div>
     </main>
-    </>
   );
 }

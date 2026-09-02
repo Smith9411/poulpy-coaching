@@ -55,8 +55,7 @@ export default function Auth() {
   };
 
   return (
-    <>
-      <main className="min-h-screen bg-[#0a0a0f] dark:bg-[#0a0a0f] py-20" style={{backgroundColor: 'var(--page-bg, #0a0a0f)'}}>
+    <main className="min-h-screen page-bg py-24">
         <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <motion.div
@@ -85,7 +84,7 @@ export default function Auth() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="glass-dark rounded-2xl p-8"
+            className="card rounded-2xl p-8"
           >
             {error && (
               <motion.div
@@ -122,7 +121,7 @@ export default function Auth() {
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       required={!isLogin}
-                      className="w-full pl-10 pr-4 py-3 glass rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all"
                       placeholder="Ton pseudo (ex: Poulpy)"
                       autoComplete="username"
                       disabled={isLoading}
@@ -143,7 +142,7 @@ export default function Auth() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="w-full pl-10 pr-4 py-3 glass rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all"
+                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all"
                     placeholder="ton@email.com"
                     autoComplete="email"
                     disabled={isLoading}
@@ -163,7 +162,7 @@ export default function Auth() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="w-full pl-10 pr-12 py-3 glass rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all"
+                    className="w-full pl-10 pr-12 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all"
                     placeholder="••••••••"
                     autoComplete={isLogin ? 'current-password' : 'new-password'}
                     disabled={isLoading}
@@ -227,14 +226,13 @@ export default function Auth() {
           >
             <Link
               href="/"
-              className="inline-flex items-center gap-2 px-6 py-3 glass rounded-xl font-semibold hover:bg-white/10 transition-all group"
+              className="inline-flex items-center gap-2 px-6 py-3 card rounded-xl font-semibold hover:bg-white/10 transition-all group"
             >
               <ArrowRight size={20} className="-rotate-90 group-hover:-translate-x-1 transition-transform" />
-              Retour à l'accueil
+              Retour à l&apos;accueil
             </Link>
           </motion.div>
         </div>
       </main>
-    </>
   );
 }
