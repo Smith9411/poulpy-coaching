@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
       .from('coaching_messages')
       .select('*')
       .eq('student_id', user.id)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: true });
 
     if (error) throw error;
 
