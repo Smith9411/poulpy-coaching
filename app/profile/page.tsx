@@ -64,17 +64,21 @@ export default function Profile() {
 
     setIsUploading(true);
     try {
-      const fileExt = file.name.split('.').pop() || 'png';
-      const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('userId', user.id);
 
-      const { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(fileName, file, { contentType: file.type, upsert: true });
+      const res = await fetch('/api/avatar/upload', {
+        method: 'POST',
+        body: formData,
+      });
 
-      if (uploadError) throw uploadError;
+      const result = await res.json();
+      if (!res.ok || result.error) {
+        throw new Error(result.error || "Erreur lors de l'envoi");
+      }
 
-      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(fileName);
-      await updateAvatar(urlData.publicUrl);
+      await updateAvatar(result.url);
       showStatus('success', 'Photo de profil mise à jour avec succès !');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erreur lors du téléchargement';
