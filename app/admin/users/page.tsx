@@ -17,7 +17,7 @@ interface UserRow {
 }
 
 export default function AdminUsers() {
-  const { user, isLoading: authLoading } = useAuth();
+  const { user, refreshUser, isLoading: authLoading } = useAuth();
   const [users, setUsers] = useState<UserRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
@@ -171,6 +171,9 @@ export default function AdminUsers() {
       setUsers((prev) =>
         prev.map((p) => (p.id === u.id ? { ...p, avatarUrl: null } : p))
       );
+      if (u.username === user.username || u.id === user.id) {
+        await refreshUser();
+      }
       showSuccess(`Photo de profil de ${u.username} retirée avec succès !`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erreur';

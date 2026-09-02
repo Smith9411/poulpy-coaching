@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
-      user_metadata: { avatar_url: null },
+      user_metadata: { avatar_url: '' },
     });
 
     if (error) throw error;

@@ -1,122 +1,424 @@
 'use client';
 
-import { motion } from 'framer-motion';
-import { Star, ArrowRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Star, ArrowRight, MessageSquarePlus, Trash2, Check, X, Loader2, Shield, User as UserIcon } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
+import { useState, useEffect, useCallback } from 'react';
+
+interface Review {
+  id: string;
+  name: string;
+  game: string;
+  rank: string;
+  text: string;
+  rating: number;
+  userId?: string;
+  createdAt: string;
+}
+
+const GAME_OPTIONS = [
+  'Valorant',
+  'Apex Legends',
+  'Aim Training',
+  'Counter-Strike 2',
+  'Overwatch 2',
+  'League of Legends',
+  'Fortnite',
+  'Rocket League',
+  'Autre',
+];
 
 export default function Avis() {
-  const testimonials = [
-    {
-      name: 'Smith94',
-      game: 'Valorant',
-      rank: 'Platine → Ascendant 3',
-      text: "Incroyable progression ! Je suis passé de Platine à Ascendant 3 en quelques semaines. Le coaching de Poulpy sur le game sense et la prise de décision en clutch a tout changé. Il voit des choses que personne d'autre ne voit. Vraiment le meilleur investissement pour mon jeu.",
-      rating: 5,
-    },
-    {
-      name: 'Alex',
-      game: 'Valorant',
-      rank: 'Gold → Diamant',
-      text: "En 3 sessions, j'ai enfin compris pourquoi je bloquais en ranked. Poulpy m'a aidé à corriger mon placement et ma prise de décision.",
-      rating: 5,
-    },
-    {
-      name: 'Sarah',
-      game: 'Apex Legends',
-      rank: 'Platine → Master',
-      text: "Le coaching le plus précis que j'ai eu. Les conseils sur le movement et le tracking ont totalement changé mon jeu.",
-      rating: 5,
-    },
-    {
-      name: 'Maxime',
-      game: 'Aim Training',
-      rank: 'Silver → Platinum Voltaic',
-      text: "Mes scores Kovaak's ont explosé en 1 mois. La routine personnalisée fait toute la différence.",
-      rating: 5,
-    },
-    {
-      name: 'Thomas',
-      game: 'Valorant',
-      rank: 'Platine → Immortal',
-      text: "Poulpy ne se contente pas de pointer les erreurs, il explique le pourquoi et donne des solutions concrètes.",
-      rating: 5,
-    },
-  ];
+  const { user } = useAuth();
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Form state
+  const [game, setGame] = useState('Valorant');
+  const [rank, setRank] = useState('');
+  const [rating, setRating] = useState(5);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [text, setText] = useState('');
+
+  const showStatus = (type: 'success' | 'error', text: string) => {
+    setStatusMsg({ type, text });
+    setTimeout(() => setStatusMsg(null), 3500);
+  };
+
+  const fetchReviews = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch('/api/reviews');
+      const data = await res.json();
+      if (data.reviews) {
+        setReviews(data.reviews);
+      }
+    } catch {
+      // Ignorer
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchReviews();
+  }, [fetchReviews]);
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+    if (!text.trim()) {
+      showStatus('error', "Merci d'écrire un message pour ton avis.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const res = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: user.username,
+          game,
+          rank: rank.trim() || 'Membre Poulpy',
+          rating,
+          text: text.trim(),
+          userId: user.id,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || "Erreur lors de l'envoi");
+
+      setReviews((prev) => [data.review, ...prev]);
+      showStatus('success', 'Ton avis a été publié avec succès ! Merci pour ton retour.');
+      setText('');
+      setRank('');
+      setIsFormOpen(false);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erreur lors de la publication';
+      showStatus('error', msg);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteReview = async (id: string) => {
+    try {
+      const res = await fetch(`/api/reviews?id=${id}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || 'Erreur');
+
+      setReviews((prev) => prev.filter((r) => r.id !== id));
+      showStatus('success', "L'avis a été supprimé.");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erreur de suppression';
+      showStatus('error', msg);
+    } finally {
+      setConfirmDeleteId(null);
+    }
+  };
+
+  const avgRating =
+    reviews.length > 0
+      ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
+      : '5.0';
+
+  const distinctGames = new Set(reviews.map((r) => r.game)).size;
 
   return (
     <main className="min-h-screen page-bg py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
+        <div className="text-center mb-12">
           <div className="inline-block glass px-4 py-2 rounded-full mb-4">
-            <span className="text-sm text-purple-400 font-medium">AVIS</span>
+            <span className="text-sm text-purple-400 font-medium">AVIS & TÉMOIGNAGES</span>
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
             Ils ont joué. Ils ont <span className="text-gradient">progressé.</span>
           </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Tous les retours de joueurs accompagnés. Pas de filtre, que du réel.
+          <p className="text-xl text-gray-300 max-w-2xl mx-auto mb-8">
+            Tous les retours authentiques des joueurs accompagnés en coaching.
           </p>
-        </motion.div>
+
+          {/* Action CTA */}
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            {user ? (
+              <button
+                onClick={() => setIsFormOpen(!isFormOpen)}
+                className="inline-flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40 transition-all hover:scale-105 cursor-pointer"
+              >
+                <MessageSquarePlus size={20} />
+                {isFormOpen ? 'Fermer le formulaire' : 'Laisser un avis'}
+              </button>
+            ) : (
+              <Link
+                href="/auth"
+                className="inline-flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40 transition-all hover:scale-105"
+              >
+                <UserIcon size={18} />
+                Se connecter pour laisser un avis
+              </Link>
+            )}
+          </div>
+        </div>
+
+        {/* Status toast */}
+        {statusMsg && (
+          <div
+            className={`max-w-2xl mx-auto mb-8 p-4 rounded-xl text-sm font-medium flex items-center gap-2 ${
+              statusMsg.type === 'success'
+                ? 'bg-green-500/20 border border-green-500/30 text-green-400'
+                : 'bg-red-500/20 border border-red-500/30 text-red-400'
+            }`}
+          >
+            {statusMsg.type === 'success' ? <Check size={18} /> : <X size={18} />}
+            <span>{statusMsg.text}</span>
+          </div>
+        )}
+
+        {/* Admin Moderation Notice */}
+        {user?.isAdmin && (
+          <div className="max-w-4xl mx-auto mb-8 p-4 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-300 text-sm flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <Shield size={18} className="text-purple-400 flex-shrink-0" />
+              <span>
+                <strong>Mode Administrateur actif :</strong> vous pouvez modérer et supprimer n&apos;importe quel avis avec l&apos;icône corbeille.
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Add Review Form */}
+        <AnimatePresence>
+          {isFormOpen && user && (
+            <motion.div
+              initial={{ opacity: 0, height: 0, y: -20 }}
+              animate={{ opacity: 1, height: 'auto', y: 0 }}
+              exit={{ opacity: 0, height: 0, y: -20 }}
+              transition={{ duration: 0.35 }}
+              className="overflow-hidden max-w-2xl mx-auto mb-16"
+            >
+              <form onSubmit={handleSubmitReview} className="card rounded-2xl p-8 border border-purple-500/30 shadow-2xl">
+                <h3 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                  <MessageSquarePlus size={24} className="text-purple-400" />
+                  Rédiger ton avis
+                </h3>
+
+                <div className="space-y-5">
+                  {/* Pseudo (auto-filled from user profile) */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Nom / Pseudo affiché
+                    </label>
+                    <input
+                      type="text"
+                      value={user.username}
+                      disabled
+                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-gray-400 cursor-not-allowed"
+                    />
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {/* Game selection */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Jeu concerné
+                      </label>
+                      <select
+                        value={game}
+                        onChange={(e) => setGame(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit focus:outline-none focus:border-purple-500"
+                      >
+                        {GAME_OPTIONS.map((g) => (
+                          <option key={g} value={g} className="bg-[#13161e] text-white">
+                            {g}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Rank / Progression */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Progression / Rang
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Ex: Platine → Diamant 3"
+                        value={rank}
+                        onChange={(e) => setRank(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Rating with clickable stars */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Note ({rating}/5 étoiles)
+                    </label>
+                    <div className="flex items-center gap-2">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type="button"
+                          onClick={() => setRating(star)}
+                          onMouseEnter={() => setHoverRating(star)}
+                          onMouseLeave={() => setHoverRating(0)}
+                          className="p-1 hover:scale-125 transition-transform"
+                        >
+                          <Star
+                            size={28}
+                            className={`${
+                              (hoverRating || rating) >= star
+                                ? 'fill-yellow-400 text-yellow-400'
+                                : 'text-gray-600'
+                            } transition-colors`}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Comment Textarea */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Ton retour d&apos;expérience
+                    </label>
+                    <textarea
+                      rows={4}
+                      required
+                      placeholder="Comment s'est passée ta session ? Quels aspects de ton jeu ont progressé ?"
+                      value={text}
+                      onChange={(e) => setText(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500"
+                    />
+                  </div>
+
+                  {/* Submit buttons */}
+                  <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/5">
+                    <button
+                      type="button"
+                      onClick={() => setIsFormOpen(false)}
+                      className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-medium transition-colors"
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40 transition-all disabled:opacity-50"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 size={18} className="animate-spin" />
+                          Publication...
+                        </>
+                      ) : (
+                        'Publier mon avis'
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Testimonials Grid */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="grid sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-16"
-        >
-          {testimonials.map((testimonial, index) => (
-            <motion.article
-              key={testimonial.name}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 + index * 0.1 }}
-              className="card rounded-2xl p-8 hover:bg-white/5 transition-all group"
-            >
-              {/* Stars */}
-              <div className="flex justify-start gap-1 mb-6">
-                {[...Array(testimonial.rating)].map((_, i) => (
-                  <Star key={i} size={20} className="fill-yellow-400 text-yellow-400" />
-                ))}
-              </div>
+        {isLoading ? (
+          <div className="p-20 text-center">
+            <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-gray-400">Chargement des avis...</p>
+          </div>
+        ) : (
+          <div className="grid sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-16">
+            {reviews.map((testimonial) => (
+              <article
+                key={testimonial.id}
+                className="card rounded-2xl p-8 hover:bg-white/5 transition-all group flex flex-col justify-between relative"
+              >
+                <div>
+                  {/* Top: Stars + Admin Delete Button */}
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-1">
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <Star key={i} size={18} className="fill-yellow-400 text-yellow-400" />
+                      ))}
+                    </div>
 
-              {/* Quote */}
-              <blockquote className="text-lg text-gray-200 mb-8 leading-relaxed">
-                &ldquo;{testimonial.text}&rdquo;
-              </blockquote>
+                    {/* Admin Delete Action */}
+                    {user?.isAdmin && (
+                      <div>
+                        {confirmDeleteId === testimonial.id ? (
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => handleDeleteReview(testimonial.id)}
+                              className="px-2 py-1 text-xs rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/40 transition-colors font-medium"
+                            >
+                              Supprimer
+                            </button>
+                            <button
+                              onClick={() => setConfirmDeleteId(null)}
+                              className="px-2 py-1 text-xs rounded-lg bg-white/5 text-gray-400 hover:bg-white/10"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setConfirmDeleteId(testimonial.id)}
+                            title="Supprimer cet avis (Admin)"
+                            className="p-1.5 rounded-lg hover:bg-red-500/10 text-gray-500 hover:text-red-400 transition-colors"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </div>
 
-              {/* Author */}
-              <div>
-                <div className="font-bold text-lg mb-1">{testimonial.name}</div>
-                <div className="text-purple-400 font-medium mb-1">{testimonial.game}</div>
-                <div className="text-sm text-gray-400">{testimonial.rank}</div>
-              </div>
-            </motion.article>
-          ))}
-        </motion.div>
+                  {/* Quote */}
+                  <blockquote className="text-base text-gray-200 mb-8 leading-relaxed">
+                    &ldquo;{testimonial.text}&rdquo;
+                  </blockquote>
+                </div>
+
+                {/* Author Info */}
+                <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                  <div>
+                    <div className="font-bold text-base mb-0.5">{testimonial.name}</div>
+                    <div className="text-purple-400 text-xs font-medium">{testimonial.game}</div>
+                  </div>
+                  <div className="text-xs px-2.5 py-1 rounded-full bg-white/5 text-gray-400">
+                    {testimonial.rank}
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
 
         {/* Stats Summary */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16 max-w-4xl mx-auto"
-        >
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16 max-w-4xl mx-auto">
           <div className="card rounded-xl p-6 text-center">
             <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
-              {testimonials.length}+
+              {reviews.length}+
             </div>
             <div className="text-xs text-gray-400">Avis vérifiés</div>
           </div>
           <div className="card rounded-xl p-6 text-center">
             <div className="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
-              5.0/5
+              {avgRating}/5
             </div>
             <div className="text-xs text-gray-400">Note moyenne</div>
           </div>
@@ -128,19 +430,14 @@ export default function Avis() {
           </div>
           <div className="card rounded-xl p-6 text-center">
             <div className="text-3xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
-              3/3
+              {distinctGames}
             </div>
             <div className="text-xs text-gray-400">Jeux couverts</div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Back to home / CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="text-center"
-        >
+        <div className="text-center">
           <Link
             href="/"
             className="inline-flex items-center gap-2 px-6 py-3 card rounded-xl font-semibold hover:bg-white/10 transition-all group"
@@ -151,7 +448,7 @@ export default function Avis() {
           <p className="text-sm text-gray-500 mt-4">
             Prêt à progresser toi aussi ? Rejoins le Discord pour réserver ta session.
           </p>
-        </motion.div>
+        </div>
       </div>
     </main>
   );

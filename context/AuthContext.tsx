@@ -32,7 +32,7 @@ async function buildUser(session: Session): Promise<User> {
   const meta = session.user.user_metadata || {};
   let username: string = meta.username || session.user.email?.split('@')[0] || 'Joueur';
   let isAdmin = false;
-  const avatarUrl: string | null = meta.avatar_url || null;
+  const avatarUrl: string | null = (meta.avatar_url && typeof meta.avatar_url === 'string' && meta.avatar_url.trim() !== '') ? meta.avatar_url : null;
 
   try {
     const { data } = await supabase
@@ -127,10 +127,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const updateAvatar = async (avatarUrl: string | null) => {
     const { error } = await supabase.auth.updateUser({
-      data: { avatar_url: avatarUrl },
+      data: { avatar_url: avatarUrl || '' },
     });
     if (error) throw error;
-    setUser((prev) => (prev ? { ...prev, avatarUrl } : null));
+    setUser((prev) => (prev ? { ...prev, avatarUrl: avatarUrl || null } : null));
   };
 
   const updateUsername = async (newUsername: string) => {

@@ -1,0 +1,47 @@
+[
+  {
+    "id": "review-1",
+    "name": "Smith94",
+    "game": "Valorant",
+    "rank": "Platine → Ascendant 3",
+    "text": "Incroyable progression ! Je suis passé de Platine à Ascendant 3 en quelques semaines. Le coaching de Poulpy sur le game sense et la prise de décision en clutch a tout changé. Il voit des choses que personne d'autre ne voit. Vraiment le meilleur investissement pour mon jeu.",
+    "rating": 5,
+    "createdAt": "2026-08-15T14:30:00.000Z"
+  },
+  {
+    "id": "review-2",
+    "name": "Alex",
+    "game": "Valorant",
+    "rank": "Gold → Diamant",
+    "text": "En 3 sessions, j'ai enfin compris pourquoi je bloquais en ranked. Poulpy m'a aidé à corriger mon placement et ma prise de décision.",
+    "rating": 5,
+    "createdAt": "2026-08-20T18:00:00.000Z"
+  },
+  {
+    "id": "review-3",
+    "name": "Sarah",
+    "game": "Apex Legends",
+    "rank": "Platine → Master",
+    "text": "Le coaching le plus précis que j'ai eu. Les conseils sur le movement et le tracking ont totalement changé mon jeu.",
+    "rating": 5,
+    "createdAt": "2026-08-22T20:15:00.000Z"
+  },
+  {
+    "id": "review-4",
+    "name": "Maxime",
+    "game": "Aim Training",
+    "rank": "Silver → Platinum Voltaic",
+    "text": "Mes scores Kovaak's ont explosé en 1 mois. La routine personnalisée fait toute la différence.",
+    "rating": 5,
+    "createdAt": "2026-08-25T11:45:00.000Z"
+  },
+  {
+    "id": "review-5",
+    "name": "Thomas",
+    "game": "Valorant",
+    "rank": "Platine → Immortal",
+    "text": "Poulpy ne se contente pas de pointer les erreurs, il explique le pourquoi et donne des solutions concrètes.",
+    "rating": 5,
+    "createdAt": "2026-08-28T16:20:00.000Z"
+  }
+]
