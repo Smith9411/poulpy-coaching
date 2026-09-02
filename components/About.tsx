@@ -27,12 +27,6 @@ export default function About() {
 
   return (
     <section id="apropos" className="py-20 relative overflow-hidden">
-      {/* Background glow effects */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-gradient-to-br from-purple-600/10 to-transparent rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-gradient-to-br from-cyan-600/10 to-transparent rounded-full blur-3xl" />
-      </div>
-
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
         <motion.div
@@ -61,9 +55,6 @@ export default function About() {
           className="max-w-4xl mx-auto mb-20"
         >
           <div className="glass-dark rounded-3xl p-8 sm:p-12 relative overflow-hidden border border-purple-500/20">
-            {/* Background pattern */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-purple-600/5 via-transparent to-transparent" />
-            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-purple-600/10 to-transparent rounded-full blur-3xl" />
 
             <div className="relative z-10 flex flex-col lg:flex-row gap-8 items-center lg:items-start">
               {/* Photo */}
@@ -77,9 +68,6 @@ export default function About() {
                   {/* Online indicator */}
                   <div className="absolute bottom-4 right-4 w-6 h-6 bg-green-500 rounded-full border-4 border-[#0a0a0f] animate-pulse" />
                 </div>
-                {/* Decorative elements */}
-                <div className="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br from-purple-600/30 to-cyan-500/30 rounded-full blur-2xl" />
-                <div className="absolute bottom-4 left-4 w-16 h-16 bg-gradient-to-br from-cyan-500/30 to-purple-500/30 rounded-full blur-2xl" />
               </div>
 
               {/* Info */}
