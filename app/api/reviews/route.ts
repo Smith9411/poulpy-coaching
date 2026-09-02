@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!supabaseUrl || !supabaseServiceKey) {
+  throw new Error('Variables Supabase manquantes');
+}
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 interface ReviewItem {
   id: string;
@@ -9,35 +17,24 @@ interface ReviewItem {
   rank: string;
   text: string;
   rating: number;
-  userId?: string;
-  createdAt: string;
-}
-
-const reviewsFilePath = path.join(process.cwd(), 'data', 'reviews.json');
-
-function getReviews(): ReviewItem[] {
-  try {
-    if (!fs.existsSync(reviewsFilePath)) {
-      return [];
-    }
-    const raw = fs.readFileSync(reviewsFilePath, 'utf8');
-    return JSON.parse(raw);
-  } catch {
-    return [];
-  }
-}
-
-function saveReviews(reviews: ReviewItem[]) {
-  const dir = path.dirname(reviewsFilePath);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-  fs.writeFileSync(reviewsFilePath, JSON.stringify(reviews, null, 2), 'utf8');
+  user_id?: string;
+  created_at: string;
 }
 
 export async function GET() {
-  const reviews = getReviews();
-  return NextResponse.json({ reviews });
+  try {
+    const { data: reviews, error } = await supabase
+      .from('reviews')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    return NextResponse.json({ reviews: reviews || [] });
+  } catch (error) {
+    console.error('Erreur récupération avis:', error);
+    return NextResponse.json({ reviews: [] });
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -52,7 +49,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const reviews = getReviews();
     const newReview: ReviewItem = {
       id: `review-${Date.now()}`,
       name: name.trim(),
@@ -60,16 +56,22 @@ export async function POST(req: NextRequest) {
       rank: (rank || 'Membre Poulpy').trim(),
       text: text.trim(),
       rating: Math.min(5, Math.max(1, Number(rating) || 5)),
-      userId: userId || undefined,
-      createdAt: new Date().toISOString(),
+      user_id: userId || null,
+      created_at: new Date().toISOString(),
     };
 
-    reviews.unshift(newReview);
-    saveReviews(reviews);
+    const { data, error } = await supabase
+      .from('reviews')
+      .insert([newReview])
+      .select()
+      .single();
 
-    return NextResponse.json({ review: newReview, success: true });
+    if (error) throw error;
+
+    return NextResponse.json({ review: data, success: true });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Erreur serveur';
+    console.error('Erreur création avis:', err);
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
@@ -83,13 +85,17 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'id manquant' }, { status: 400 });
     }
 
-    const reviews = getReviews();
-    const filtered = reviews.filter((r) => r.id !== id);
-    saveReviews(filtered);
+    const { error } = await supabase
+      .from('reviews')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
 
     return NextResponse.json({ success: true });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Erreur serveur';
+    console.error('Erreur suppression avis:', err);
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

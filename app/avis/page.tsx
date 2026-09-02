@@ -13,8 +13,8 @@ interface Review {
   rank: string;
   text: string;
   rating: number;
-  userId?: string;
-  createdAt: string;
+  user_id?: string;
+  created_at: string;
 }
 
 const GAME_OPTIONS = [
@@ -40,7 +40,10 @@ export default function Avis() {
 
   // Form state
   const [game, setGame] = useState('Valorant');
+  const [rankType, setRankType] = useState<'rank' | 'progression'>('rank');
   const [rank, setRank] = useState('');
+  const [rankFrom, setRankFrom] = useState('');
+  const [rankTo, setRankTo] = useState('');
   const [rating, setRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
   const [text, setText] = useState('');
@@ -77,6 +80,21 @@ export default function Avis() {
       return;
     }
 
+    // Calculate rank value based on type
+    let finalRank = 'Membre Poulpy';
+    if (rankType === 'rank') {
+      finalRank = rank.trim() || 'Membre Poulpy';
+    } else {
+      // Progression mode: from -> to
+      if (rankFrom.trim() && rankTo.trim()) {
+        finalRank = `${rankFrom.trim()} → ${rankTo.trim()}`;
+      } else if (rankFrom.trim()) {
+        finalRank = rankFrom.trim();
+      } else if (rankTo.trim()) {
+        finalRank = rankTo.trim();
+      }
+    }
+
     setIsSubmitting(true);
     try {
       const res = await fetch('/api/reviews', {
@@ -85,7 +103,7 @@ export default function Avis() {
         body: JSON.stringify({
           name: user.username,
           game,
-          rank: rank.trim() || 'Membre Poulpy',
+          rank: finalRank,
           rating,
           text: text.trim(),
           userId: user.id,
@@ -99,6 +117,8 @@ export default function Avis() {
       showStatus('success', 'Ton avis a été publié avec succès ! Merci pour ton retour.');
       setText('');
       setRank('');
+      setRankFrom('');
+      setRankTo('');
       setIsFormOpen(false);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erreur lors de la publication';
@@ -246,20 +266,83 @@ export default function Avis() {
                       </select>
                     </div>
 
-                    {/* Rank / Progression */}
+                    {/* Rank Type Selector */}
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-2">
-                        Progression / Rang
+                        Type de renseignement
+                      </label>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setRankType('rank')}
+                          className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                            rankType === 'rank'
+                              ? 'bg-purple-600 text-white'
+                              : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                          }`}
+                        >
+                          Rang actuel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setRankType('progression')}
+                          className={`flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                            rankType === 'progression'
+                              ? 'bg-purple-600 text-white'
+                              : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                          }`}
+                        >
+                          Progression
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Rank Input - Single field for rank mode */}
+                  {rankType === 'rank' && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Rang actuel
                       </label>
                       <input
                         type="text"
-                        placeholder="Ex: Platine → Diamant 3"
+                        placeholder="Ex: Diamant 2"
                         value={rank}
                         onChange={(e) => setRank(e.target.value)}
                         className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500"
                       />
                     </div>
-                  </div>
+                  )}
+
+                  {/* Progression Inputs - Two fields for progression mode */}
+                  {rankType === 'progression' && (
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Rang de départ
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Ex: Platine"
+                          value={rankFrom}
+                          onChange={(e) => setRankFrom(e.target.value)}
+                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                          Rang d'arrivée
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Ex: Diamant 3"
+                          value={rankTo}
+                          onChange={(e) => setRankTo(e.target.value)}
+                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500"
+                        />
+                      </div>
+                    </div>
+                  )}
 
                   {/* Rating with clickable stars */}
                   <div>
