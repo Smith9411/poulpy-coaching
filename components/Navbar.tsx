@@ -18,6 +18,7 @@ function useUnreadCount(userId: string | undefined, isAdmin: boolean) {
     }
 
     let cancelled = false;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
 
     const fetchCount = async () => {
       try {
@@ -47,18 +48,25 @@ function useUnreadCount(userId: string | undefined, isAdmin: boolean) {
 
     fetchCount();
 
-    const channel = supabase
-      .channel(`navbar-unread-${userId}`)
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'coaching_messages' },
-        () => fetchCount()
-      )
-      .subscribe();
+    // Build and subscribe the channel synchronously inside a microtask
+    // so we don't race with React Strict Mode's double-invoke.
+    queueMicrotask(() => {
+      if (cancelled) return;
+      channel = supabase
+        .channel(`navbar-unread-${userId}`)
+        .on(
+          'postgres_changes',
+          { event: '*', schema: 'public', table: 'coaching_messages' },
+          () => fetchCount()
+        )
+        .subscribe();
+    });
 
     return () => {
       cancelled = true;
-      supabase.removeChannel(channel);
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
     };
   }, [userId, isAdmin]);
 

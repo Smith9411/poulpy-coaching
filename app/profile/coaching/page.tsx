@@ -80,16 +80,24 @@ export default function StudentCoachingPage() {
 
   useEffect(() => {
     if (!user?.id) return;
-    const channel = supabase
-      .channel(`student-chat-${user.id}`)
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'coaching_messages', filter: `student_id=eq.${user.id}` },
-        () => fetchMessages(false)
-      )
-      .subscribe();
+    let cancelled = false;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
+    queueMicrotask(() => {
+      if (cancelled) return;
+      channel = supabase
+        .channel(`student-chat-${user.id}`)
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'coaching_messages', filter: `student_id=eq.${user.id}` },
+          () => fetchMessages(false)
+        )
+        .subscribe();
+    });
+
     return () => {
-      supabase.removeChannel(channel);
+      cancelled = true;
+      if (channel) supabase.removeChannel(channel);
     };
   }, [user?.id, fetchMessages]);
 
