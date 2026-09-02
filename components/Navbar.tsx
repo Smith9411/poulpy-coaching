@@ -76,7 +76,7 @@ export default function Navbar() {
   if (isLoading) {
     return (
       <motion.nav
-        className="fixed top-0 left-0 right-0 z-50 bg-transparent border-b border-white/5"
+        className="fixed top-0 left-0 right-0 z-50 bg-transparent"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
@@ -99,8 +99,10 @@ export default function Navbar() {
   return (
     <>
       <motion.nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          isScrolled ? 'glass-dark shadow-2xl' : 'bg-transparent border-b border-white/5'
+        className={`fixed top-0 left-0 right-0 z-50 duration-300 ${
+          isScrolled
+            ? 'bg-black/50 backdrop-blur-xl shadow-[0_1px_0_rgba(255,255,255,0.07),0_8px_32px_rgba(0,0,0,0.4)]'
+            : 'bg-transparent'
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
