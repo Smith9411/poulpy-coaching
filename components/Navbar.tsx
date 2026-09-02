@@ -144,8 +144,12 @@ export default function Navbar() {
                     aria-label="Menu utilisateur"
                     aria-expanded={isProfileMenuOpen}
                   >
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white font-bold text-sm group-hover:scale-110 transition-transform">
-                      {user.initial}
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white font-bold text-sm group-hover:scale-110 transition-transform overflow-hidden">
+                      {user.avatarUrl ? (
+                        <img src={user.avatarUrl} alt={user.username} className="w-full h-full object-cover" />
+                      ) : (
+                        user.initial
+                      )}
                     </div>
                     <ChevronDown size={16} className={`text-gray-400 transition-transform ${isProfileMenuOpen ? 'rotate-180' : ''}`} />
                   </button>
@@ -289,8 +293,12 @@ export default function Navbar() {
                   {user ? (
                     <>
                       <div className="flex items-center gap-4 px-6 py-3 glass rounded-lg border border-white/10">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white font-bold text-lg">
-                          {user.initial}
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white font-bold text-lg overflow-hidden">
+                          {user.avatarUrl ? (
+                            <img src={user.avatarUrl} alt={user.username} className="w-full h-full object-cover" />
+                          ) : (
+                            user.initial
+                          )}
                         </div>
                         <div className="text-left">
                           <p className="font-semibold text-white">{user.username}</p>

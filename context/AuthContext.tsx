@@ -4,11 +4,13 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { type Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 
-interface User {
+export interface User {
+  id: string;
   email: string;
   username: string;
   initial: string;
   isAdmin: boolean;
+  avatarUrl?: string | null;
 }
 
 interface AuthContextType {
@@ -17,6 +19,9 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, username: string, password: string) => Promise<{ needsEmailConfirmation: boolean }>;
   logout: () => Promise<void>;
+  updateAvatar: (avatarUrl: string | null) => Promise<void>;
+  updateUsername: (newUsername: string) => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -27,6 +32,7 @@ async function buildUser(session: Session): Promise<User> {
   const meta = session.user.user_metadata || {};
   let username: string = meta.username || session.user.email?.split('@')[0] || 'Joueur';
   let isAdmin = false;
+  const avatarUrl: string | null = meta.avatar_url || null;
 
   try {
     const { data } = await supabase
@@ -43,16 +49,25 @@ async function buildUser(session: Session): Promise<User> {
   }
 
   return {
+    id: session.user.id,
     email: session.user.email || '',
     username,
     initial: username.charAt(0).toUpperCase(),
     isAdmin,
+    avatarUrl,
   };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  const refreshUser = async () => {
+    const { data } = await supabase.auth.getSession();
+    if (data.session) {
+      setUser(await buildUser(data.session));
+    }
+  };
 
   useEffect(() => {
     // Session existante au chargement de la page
@@ -86,7 +101,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       throw new Error(error.message);
     }
-    // onAuthStateChange met à jour l'utilisateur
   };
 
   const register = async (email: string, username: string, password: string) => {
@@ -104,8 +118,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       throw new Error(error.message);
     }
-    // Si la confirmation d'email est exigée dans Supabase, aucune session n'est renvoyée :
-    // le compte existe mais l'utilisateur doit confirmer avant de se connecter.
     return { needsEmailConfirmation: !data.session };
   };
 
@@ -113,8 +125,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
   };
 
+  const updateAvatar = async (avatarUrl: string | null) => {
+    const { error } = await supabase.auth.updateUser({
+      data: { avatar_url: avatarUrl },
+    });
+    if (error) throw error;
+    setUser((prev) => (prev ? { ...prev, avatarUrl } : null));
+  };
+
+  const updateUsername = async (newUsername: string) => {
+    if (!user) return;
+    const { error: authErr } = await supabase.auth.updateUser({
+      data: { username: newUsername },
+    });
+    if (authErr) throw authErr;
+
+    await supabase.from('profiles').update({ username: newUsername }).eq('id', user.id);
+    setUser((prev) => (prev ? { ...prev, username: newUsername, initial: newUsername.charAt(0).toUpperCase() } : null));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register, logout, updateAvatar, updateUsername, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,8 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Shield, ArrowLeft, User, Search, ShieldOff, ShieldCheck, AlertTriangle, Trash2, RefreshCw } from 'lucide-react';
+import { Shield, ArrowLeft, User, Search, ShieldOff, ShieldCheck, AlertTriangle, Trash2, RefreshCw, Edit2, Check, X, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { useState, useEffect, useCallback } from 'react';
@@ -32,11 +31,14 @@ export default function AdminUsers() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [busyId, setBusyId] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [editingUserId, setEditingUserId] = useState<string | null>(null);
+  const [editingUsername, setEditingUsername] = useState('');
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
 
   const showSuccess = (msg: string) => {
     setSuccessMsg(msg);
-    setTimeout(() => setSuccessMsg(''), 3000);
+    setTimeout(() => setSuccessMsg(''), 3500);
   };
 
   const fetchUsers = useCallback(async () => {
@@ -73,7 +75,6 @@ export default function AdminUsers() {
     }
   }, [user?.isAdmin, fetchUsers]);
 
-  // Si l'authentification est en cours de vérification, afficher un loader discret sans animation saccadée
   if (authLoading) {
     return (
       <main className="min-h-screen page-bg py-24 flex items-center justify-center">
@@ -82,7 +83,6 @@ export default function AdminUsers() {
     );
   }
 
-  // Si pas admin ou non connecté
   if (!user || !user.isAdmin) {
     return (
       <main className="min-h-screen page-bg py-24 flex items-center justify-center">
@@ -108,9 +108,42 @@ export default function AdminUsers() {
       setLoadError(error.message);
     } else {
       setUsers((prev) => prev.map((p) => (p.id === u.id ? { ...p, isAdmin: !p.isAdmin } : p)));
-      showSuccess(`${u.username} est maintenant ${!u.isAdmin ? 'admin' : 'membre'}`);
+      showSuccess(`${u.username} est maintenant ${!u.isAdmin ? 'administrateur' : 'membre'}`);
     }
     setBusyId(null);
+  };
+
+  const handleStartEdit = (u: UserRow) => {
+    setEditingUserId(u.id);
+    setEditingUsername(u.username);
+  };
+
+  const handleSaveUsername = async (u: UserRow) => {
+    const trimmed = editingUsername.trim();
+    if (!trimmed || trimmed === u.username) {
+      setEditingUserId(null);
+      return;
+    }
+    setIsSavingEdit(true);
+    const { error } = await supabase
+      .from('profiles')
+      .update({ username: trimmed })
+      .eq('id', u.id);
+
+    if (error) {
+      setLoadError(error.message);
+    } else {
+      setUsers((prev) =>
+        prev.map((p) =>
+          p.id === u.id
+            ? { ...p, username: trimmed, initial: trimmed.charAt(0).toUpperCase() }
+            : p
+        )
+      );
+      showSuccess(`Pseudo de ${u.username} modifié en "${trimmed}" !`);
+      setEditingUserId(null);
+    }
+    setIsSavingEdit(false);
   };
 
   const deleteUser = async (u: UserRow) => {
@@ -175,7 +208,7 @@ export default function AdminUsers() {
               Gestion des <span className="text-gradient">utilisateurs</span>
             </h1>
             <p className="text-xl text-gray-300 max-w-2xl">
-              Tous les comptes enregistrés sur la plateforme — synchronisés en direct
+              Modifie les pseudos, gère les rôles et administre les comptes de la plateforme en direct.
             </p>
           </div>
         </div>
@@ -256,14 +289,50 @@ export default function AdminUsers() {
                       key={u.id}
                       className="hover:bg-white/5 transition-colors"
                     >
-                      {/* Avatar + pseudo */}
+                      {/* Avatar + pseudo (avec édition inline) */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
                             {u.initial}
                           </div>
                           <div>
-                            <p className="font-medium">{u.username}</p>
+                            {editingUserId === u.id ? (
+                              <div className="flex items-center gap-1.5">
+                                <input
+                                  type="text"
+                                  value={editingUsername}
+                                  onChange={(e) => setEditingUsername(e.target.value)}
+                                  className="px-2.5 py-1 text-sm rounded-lg bg-white/10 border border-white/20 text-inherit focus:outline-none focus:border-purple-500"
+                                  autoFocus
+                                />
+                                <button
+                                  onClick={() => handleSaveUsername(u)}
+                                  disabled={isSavingEdit}
+                                  className="p-1 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30"
+                                  title="Enregistrer"
+                                >
+                                  {isSavingEdit ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                                </button>
+                                <button
+                                  onClick={() => setEditingUserId(null)}
+                                  className="p-1 rounded-lg bg-white/5 text-gray-400 hover:bg-white/10"
+                                  title="Annuler"
+                                >
+                                  <X size={14} />
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-2">
+                                <p className="font-medium">{u.username}</p>
+                                <button
+                                  onClick={() => handleStartEdit(u)}
+                                  className="p-1 rounded hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                                  title="Modifier le pseudo"
+                                >
+                                  <Edit2 size={13} />
+                                </button>
+                              </div>
+                            )}
                             {u.isAdmin && (
                               <span className="text-xs text-yellow-400 font-medium">Administrateur</span>
                             )}
@@ -347,7 +416,7 @@ export default function AdminUsers() {
 
         {/* Légende */}
         <p className="text-xs text-gray-500 text-center mt-4">
-          Les données sont lues en direct depuis Supabase · Cliquer sur une colonne pour trier
+          Les données sont synchronisées en direct avec Supabase · Cliquer sur le crayon pour modifier un pseudo
         </p>
 
       </div>
