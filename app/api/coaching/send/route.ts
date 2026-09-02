@@ -68,6 +68,7 @@ export async function POST(req: NextRequest) {
       .insert([{
         student_id: studentId,
         sender_id: user.id,
+        admin_id: isAdmin ? user.id : null,
         message: message.trim(),
         message_type: isAdmin ? (messageType || 'progression') : 'student',
       }])

@@ -100,25 +100,8 @@ export default function StudentCoachingPage() {
 
   useEffect(() => {
     if (!user?.id || !studentId) return;
-    let cancelled = false;
-    let channel: ReturnType<typeof supabase.channel> | null = null;
-
-    queueMicrotask(() => {
-      if (cancelled) return;
-      channel = supabase
-        .channel(`admin-chat-${studentId}`)
-        .on(
-          'postgres_changes',
-          { event: 'INSERT', schema: 'public', table: 'coaching_messages', filter: `student_id=eq.${studentId}` },
-          () => fetchStudentData(true)
-        )
-        .subscribe();
-    });
-
-    return () => {
-      cancelled = true;
-      if (channel) supabase.removeChannel(channel);
-    };
+    const interval = setInterval(() => fetchStudentData(true), 8000);
+    return () => clearInterval(interval);
   }, [studentId, user?.id, fetchStudentData]);
 
   useEffect(() => {
@@ -153,6 +136,7 @@ export default function StudentCoachingPage() {
       const data = await res.json();
       if (!res.ok || data.error) throw new Error(data.error || 'Erreur envoi');
       setNewMessage('');
+      await fetchStudentData(false);
     } catch (err) {
       console.error('Erreur envoi message:', err);
       setError(err instanceof Error ? err.message : 'Erreur lors de l\'envoi');
