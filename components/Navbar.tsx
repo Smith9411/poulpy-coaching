@@ -8,55 +8,6 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import ThemeToggle from './ThemeToggle';
 
-function useUnreadCount(userId: string | undefined, isAdmin: boolean) {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (!userId) {
-      setCount(0);
-      return;
-    }
-
-    let cancelled = false;
-
-    const fetchCount = async () => {
-      try {
-        if (isAdmin) {
-          const { data } = await supabase
-            .from('coaching_messages')
-            .select('student_id, read_at, sender_id')
-            .neq('sender_id', userId)
-            .is('read_at', null);
-          if (cancelled || !data) return;
-          const distinct = new Set(data.map((m) => m.student_id));
-          setCount(distinct.size);
-        } else {
-          const { count: c } = await supabase
-            .from('coaching_messages')
-            .select('*', { count: 'exact', head: true })
-            .eq('student_id', userId)
-            .neq('sender_id', userId)
-            .is('read_at', null);
-          if (cancelled) return;
-          setCount(c ?? 0);
-        }
-      } catch (err) {
-        console.error('Erreur compteur notifs:', err);
-      }
-    };
-
-    fetchCount();
-    const interval = setInterval(fetchCount, 15000);
-
-    return () => {
-      cancelled = true;
-      clearInterval(interval);
-    };
-  }, [userId, isAdmin]);
-
-  return count;
-}
-
 interface NotificationItem {
   id: string;
   message: string;
@@ -64,9 +15,11 @@ interface NotificationItem {
   sender_id: string;
   sender_name: string;
   student_id: string;
+  is_mine: boolean;
+  is_unread: boolean;
 }
 
-function useUnreadNotifications(userId: string | undefined, isAdmin: boolean) {
+function useRecentMessages(userId: string | undefined, isAdmin: boolean) {
   const [items, setItems] = useState<NotificationItem[]>([]);
 
   useEffect(() => {
@@ -86,7 +39,7 @@ function useUnreadNotifications(userId: string | undefined, isAdmin: boolean) {
           return;
         }
 
-        const res = await fetch('/api/notifications/unread', {
+        const res = await fetch('/api/notifications/recent', {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error('Erreur notifs');
@@ -112,7 +65,7 @@ function useUnreadNotifications(userId: string | undefined, isAdmin: boolean) {
 function NotificationsBell({ href }: { href: string }) {
   const { user } = useAuth();
   const isAdmin = user?.isAdmin ?? false;
-  const items = useUnreadNotifications(user?.id, isAdmin);
+  const items = useRecentMessages(user?.id, isAdmin);
   const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -127,20 +80,20 @@ function NotificationsBell({ href }: { href: string }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isOpen]);
 
-  const count = items.length;
+  const unreadCount = items.filter((i) => i.is_unread).length;
 
   return (
     <div ref={wrapperRef} className="relative">
       <button
         onClick={() => setIsOpen((v) => !v)}
         className="relative p-2 rounded-lg hover:bg-white/5 transition-colors"
-        aria-label={`Notifications${count > 0 ? ` (${count} non lues)` : ''}`}
+        aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} non lues)` : ''}`}
         aria-expanded={isOpen}
       >
         <Bell size={20} className="text-gray-300" />
-        {count > 0 && (
+        {unreadCount > 0 && (
           <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
-            {count > 99 ? '99+' : count}
+            {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
       </button>
@@ -155,34 +108,52 @@ function NotificationsBell({ href }: { href: string }) {
             className="absolute right-0 top-full mt-2 w-80 bg-gray-900 border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50"
           >
             <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
-              <p className="font-semibold text-white">Notifications</p>
-              {count > 0 && (
-                <span className="text-xs text-gray-400">{count} non lue{count > 1 ? 's' : ''}</span>
+              <p className="font-semibold text-white">Derniers messages</p>
+              {unreadCount > 0 && (
+                <span className="text-xs text-gray-400">{unreadCount} non lu{unreadCount > 1 ? 's' : ''}</span>
               )}
             </div>
 
             <div className="max-h-80 overflow-y-auto">
-              {count === 0 ? (
+              {items.length === 0 ? (
                 <div className="px-4 py-8 text-center text-gray-500 text-sm">
                   <Bell size={28} className="mx-auto mb-2 opacity-40" />
-                  Aucun message non lu
+                  Aucun message pour le moment
                 </div>
               ) : (
                 items.map((item) => (
-                  <div key={item.id} className="px-4 py-3 border-b border-white/5 hover:bg-white/5 transition-colors">
+                  <div
+                    key={item.id}
+                    className={`px-4 py-3 border-b border-white/5 hover:bg-white/5 transition-colors ${
+                      item.is_unread ? 'bg-purple-500/5' : ''
+                    }`}
+                  >
                     <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0 ${
+                          item.is_mine
+                            ? 'bg-gradient-to-br from-cyan-500 to-purple-500'
+                            : 'bg-gradient-to-br from-purple-600 to-cyan-500'
+                        }`}
+                      >
                         {item.sender_name.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
-                          <p className="text-sm font-semibold text-white truncate">{item.sender_name}</p>
+                          <p className="text-sm font-semibold text-white truncate">
+                            {item.is_mine ? 'Moi' : item.sender_name}
+                          </p>
                           <span className="text-[10px] text-gray-500 shrink-0">
                             {new Date(item.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
                           </span>
                         </div>
-                        <p className="text-xs text-gray-300 line-clamp-2 mt-0.5">{item.message}</p>
+                        <p className={`text-xs mt-0.5 line-clamp-2 ${item.is_unread ? 'text-white' : 'text-gray-400'}`}>
+                          {item.message}
+                        </p>
                       </div>
+                      {item.is_unread && (
+                        <span className="w-2 h-2 rounded-full bg-purple-500 shrink-0 mt-2" aria-label="Non lu" />
+                      )}
                     </div>
                   </div>
                 ))
