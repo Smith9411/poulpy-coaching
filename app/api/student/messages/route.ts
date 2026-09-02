@@ -2,34 +2,36 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-if (!supabaseUrl || !supabaseServiceKey) {
+if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Variables Supabase manquantes');
 }
 
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export async function GET(req: NextRequest) {
   try {
-    // Get student ID from auth header (this would need proper auth implementation)
+    // Get the authorization header
     const authHeader = req.headers.get('authorization');
     if (!authHeader) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     }
 
-    // For now, we'll use a simpler approach - pass studentId as query param
-    const { searchParams } = new URL(req.url);
-    const studentId = searchParams.get('studentId');
+    // Extract the token (format: "Bearer <token>")
+    const token = authHeader.replace('Bearer ', '');
 
-    if (!studentId) {
-      return NextResponse.json({ error: 'studentId manquant' }, { status: 400 });
+    // Verify the token and get user
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Token invalide' }, { status: 401 });
     }
 
+    // Get messages for this user
     const { data: messages, error } = await supabase
       .from('coaching_messages')
       .select('*')
-      .eq('student_id', studentId)
+      .eq('student_id', user.id)
       .order('created_at', { ascending: false });
 
     if (error) throw error;

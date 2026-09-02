@@ -25,7 +25,19 @@ export default function StudentCoachingPage() {
     setIsLoading(true);
     setError('');
     try {
-      const res = await fetch(`/api/student/messages?studentId=${user.id}`);
+      // Get the session token
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+
+      if (!token) {
+        throw new Error('Non authentifié');
+      }
+
+      const res = await fetch('/api/student/messages', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
       const data = await res.json();
 
       if (!res.ok || data.error) throw new Error(data.error || 'Erreur de chargement');
