@@ -67,3 +67,78 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: #e0453a;
 }
+
+/* ===== Thème clair (html.light, activé par le bouton Navbar) =====
+   Règles non-layered : elles priment sur les utilitaires Tailwind. */
+html.light {
+  color-scheme: light;
+  /* Accents plus profonds pour rester lisibles sur fond clair */
+  --color-purple-400: #c22a2e;
+  --color-cyan-400: #3a4b8f;
+}
+
+/* Transition douce appliquée uniquement pendant le basculement de thème
+   (classe posée puis retirée par ThemeToggle) ; n'affecte pas les
+   animations framer-motion (opacity/transform non listées). */
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease,
+    fill 0.4s ease, stroke 0.4s ease, box-shadow 0.4s ease !important;
+}
+
+html.light body {
+  background-color: #f1ede5;
+  color: #2a2f3c;
+}
+
+/* Textes */
+html.light .text-white {
+  color: #262b38;
+}
+html.light .hover\:text-white:hover {
+  color: #262b38;
+}
+html.light .text-gray-100 { color: #2a2f3c; }
+html.light .text-gray-200 { color: #343a49; }
+html.light .text-gray-300 { color: #454b5c; }
+html.light .text-gray-400 { color: #626879; }
+html.light .text-gray-500 { color: #6f7480; }
+html.light .text-gray-600 { color: #565d6d; }
+html.light .text-white\/5 { color: rgba(38, 43, 56, 0.06); }
+html.light .text-white\/10 { color: rgba(38, 43, 56, 0.1); }
+html.light .placeholder-gray-500::placeholder { color: #6f7480; }
+
+/* Surfaces verre, tons chauds adoucis */
+html.light .glass {
+  background-color: rgba(252, 250, 245, 0.55);
+  border-color: rgba(38, 43, 56, 0.07);
+}
+html.light .glass-dark {
+  background-color: rgba(252, 250, 246, 0.75);
+  border-color: rgba(38, 43, 56, 0.08);
+  box-shadow: 0 8px 28px rgba(38, 43, 56, 0.06);
+}
+html.light .bg-white\/5 { background-color: rgba(38, 43, 56, 0.035); }
+html.light .bg-white\/10 { background-color: rgba(38, 43, 56, 0.06); }
+html.light .bg-white\/20 { background-color: rgba(38, 43, 56, 0.1); }
+html.light .hover\:bg-white\/5:hover { background-color: rgba(38, 43, 56, 0.045); }
+html.light .hover\:bg-white\/10:hover { background-color: rgba(38, 43, 56, 0.075); }
+html.light .border-white\/5 { border-color: rgba(38, 43, 56, 0.055); }
+html.light .border-white\/10 { border-color: rgba(38, 43, 56, 0.09); }
+html.light .bg-black\/20 { background-color: rgba(38, 43, 56, 0.06); }
+html.light .bg-black\/30 { background-color: rgba(38, 43, 56, 0.09); }
+html.light .bg-black\/40 { background-color: rgba(38, 43, 56, 0.09); }
+/* Fond du menu mobile plein écran */
+html.light .bg-black\/80 { background-color: rgba(241, 237, 229, 0.92); }
+
+/* Texte blanc imposé sur les boutons/fonds en dégradé, dans les deux thèmes */
+html.light [class*="bg-gradient-to"]:not([class*="text-black"]) {
+  color: #ffffff;
+}
+
+/* Scrollbar */
+html.light ::-webkit-scrollbar-track {
+  background: #f1ede5;
+}

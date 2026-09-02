@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Menu, X, User, LogOut, ChevronDown, Settings, Shield, BarChart2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
+import ThemeToggle from './ThemeToggle';
 
 export default function Navbar() {
   const { user, logout, isLoading } = useAuth();
@@ -124,7 +125,7 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                     activeSection === link.id
                       ? 'text-white bg-white/10 shadow-lg shadow-purple-500/20'
                       : 'text-gray-300 hover:text-white hover:bg-white/5'
@@ -135,8 +136,9 @@ export default function Navbar() {
               ))}
             </div>
 
-            {/* Right side - Auth or User Menu */}
+            {/* Right side - Theme toggle + Auth or User Menu */}
             <div className="hidden lg:flex items-center gap-4">
+              <ThemeToggle />
               {user ? (
                 <div className="relative profile-menu">
                   {/* Profile Button */}
@@ -230,7 +232,7 @@ export default function Navbar() {
                   </Link>
                   <Link
                     href="/#booking"
-                    className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-lg text-sm font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all hover:scale-105"
+                    className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-lg text-sm font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all hover:scale-105 whitespace-nowrap"
                   >
                     Réserver une session →
                   </Link>
@@ -238,13 +240,16 @@ export default function Navbar() {
               )}
             </div>
 
-            {/* Mobile menu button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 rounded-lg hover:bg-white/5 transition-colors"
-            >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+            {/* Mobile: theme toggle + menu button */}
+            <div className="flex items-center gap-2 lg:hidden">
+              <ThemeToggle />
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="p-2 rounded-lg hover:bg-white/5 transition-colors"
+              >
+                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
           </div>
         </div>
       </motion.nav>
