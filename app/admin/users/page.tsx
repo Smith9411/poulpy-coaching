@@ -2,30 +2,72 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Shield, ArrowLeft, User, Mail, Trash2, MoreVertical, Search, Filter } from 'lucide-react';
+import { Shield, ArrowLeft, User, Mail, Search, ShieldOff, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import Navbar from '@/components/Navbar';
-import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import { useState, useEffect, useCallback } from 'react';
 
-interface StoredUser {
-  email: string;
-  username: string;
-  password: string;
-  createdAt?: string;
+interface ProfileRow {
+  id: string;
+  username: string | null;
+  email: string | null;
+  is_admin: boolean | null;
+  created_at: string | null;
 }
 
-interface UserWithMeta extends StoredUser {
-  initial: string;
+interface UserRow {
+  id: string;
+  username: string;
+  email: string;
   isAdmin: boolean;
+  createdAt: string;
+  initial: string;
 }
 
 export default function AdminUsers() {
   const { user } = useAuth();
-  const [users, setUsers] = useState<UserWithMeta[]>([]);
+  const [users, setUsers] = useState<UserRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<keyof UserWithMeta>('createdAt');
+  const [sortBy, setSortBy] = useState<'username' | 'email' | 'createdAt'>('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  const fetchUsers = useCallback(async () => {
+    setIsLoading(true);
+    setLoadError('');
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, username, email, is_admin, created_at');
+    if (error) {
+      setLoadError(
+        error.message.includes('recursion')
+          ? "Impossible de lire les profils : le correctif SQL des politiques RLS n'a pas encore été appliqué dans Supabase."
+          : error.message
+      );
+      setUsers([]);
+    } else {
+      setUsers(
+        (data as ProfileRow[]).map((p) => ({
+          id: p.id,
+          username: p.username || p.email?.split('@')[0] || 'Joueur',
+          email: p.email || '—',
+          isAdmin: p.is_admin === true,
+          createdAt: p.created_at || '',
+          initial: (p.username || p.email?.[0] || 'J').charAt(0).toUpperCase(),
+        }))
+      );
+    }
+    setIsLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (user?.isAdmin) {
+      fetchUsers();
+    }
+  }, [user?.isAdmin, fetchUsers]);
 
   if (!user || !user.isAdmin) {
     return (
@@ -52,24 +94,25 @@ export default function AdminUsers() {
     );
   }
 
-  useEffect(() => {
-    const storedUsers = localStorage.getItem('poulpy_users');
-    if (storedUsers) {
-      const parsed: Record<string, StoredUser> = JSON.parse(storedUsers);
-      const userList: UserWithMeta[] = Object.values(parsed).map(u => ({
-        ...u,
-        initial: u.username.charAt(0).toUpperCase(),
-        isAdmin: u.email === 'tborgesbessonnet@gmail.com',
-        createdAt: u.createdAt || new Date().toISOString(),
-      }));
-      setUsers(userList);
+  const toggleAdmin = async (u: UserRow) => {
+    setBusyId(u.id);
+    const { error } = await supabase
+      .from('profiles')
+      .update({ is_admin: !u.isAdmin })
+      .eq('id', u.id);
+    if (error) {
+      setLoadError(error.message.includes('recursion')
+        ? "Modification impossible : applique d'abord le correctif SQL des politiques RLS dans Supabase."
+        : error.message);
+    } else {
+      setUsers((prev) => prev.map((p) => (p.id === u.id ? { ...p, isAdmin: !p.isAdmin } : p)));
     }
-    setIsLoading(false);
-  }, []);
+    setBusyId(null);
+  };
 
-  const handleSort = (field: keyof UserWithMeta) => {
+  const handleSort = (field: 'username' | 'email' | 'createdAt') => {
     if (sortBy === field) {
-      setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+      setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
     } else {
       setSortBy(field);
       setSortOrder('desc');
@@ -77,16 +120,14 @@ export default function AdminUsers() {
   };
 
   const filteredUsers = users
-    .filter(u =>
-      u.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      u.email.toLowerCase().includes(searchQuery.toLowerCase())
+    .filter(
+      (u) =>
+        u.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        u.email.toLowerCase().includes(searchQuery.toLowerCase())
     )
     .sort((a, b) => {
       const aVal = a[sortBy];
       const bVal = b[sortBy];
-      if (aVal == null && bVal == null) return 0;
-      if (aVal == null) return sortOrder === 'asc' ? 1 : -1;
-      if (bVal == null) return sortOrder === 'asc' ? -1 : 1;
       if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
       if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
       return 0;
@@ -129,9 +170,20 @@ export default function AdminUsers() {
               Gestion des <span className="text-gradient">utilisateurs</span>
             </h1>
             <p className="text-xl text-gray-300 max-w-2xl">
-              Vue d'ensemble de tous les comptes enregistrés sur la plateforme
+              Comptes enregistrés sur la plateforme, synchronisés en direct avec la base de données
             </p>
           </motion.div>
+
+          {loadError && (
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="mb-8 p-4 rounded-xl bg-red-500/20 border border-red-500/30 text-red-400 text-sm flex items-start gap-3"
+            >
+              <AlertTriangle size={18} className="mt-0.5 flex-shrink-0" />
+              <span>{loadError}</span>
+            </motion.div>
+          )}
 
           {/* Search & Stats */}
           <motion.div
@@ -153,8 +205,8 @@ export default function AdminUsers() {
               </div>
               <div className="flex items-center gap-4 text-sm text-gray-400">
                 <span>{users.length} utilisateur{users.length > 1 ? 's' : ''} au total</span>
-                <span className="text-green-400">{users.filter(u => u.isAdmin).length} admin</span>
-                <span className="text-blue-400">{users.filter(u => !u.isAdmin).length} membres</span>
+                <span className="text-green-400">{users.filter((u) => u.isAdmin).length} admin</span>
+                <span className="text-blue-400">{users.filter((u) => !u.isAdmin).length} membres</span>
               </div>
             </div>
           </motion.div>
@@ -192,6 +244,7 @@ export default function AdminUsers() {
                       <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-white transition-colors"
                           onClick={() => handleSort('email')}>
                         <div className="flex items-center gap-2">
+                          <Mail size={12} />
                           Email
                           {sortBy === 'email' && (sortOrder === 'asc' ? <span>↑</span> : <span>↓</span>)}
                         </div>
@@ -210,7 +263,7 @@ export default function AdminUsers() {
                   <tbody className="divide-y divide-white/5">
                     {filteredUsers.map((u, index) => (
                       <motion.tr
-                        key={u.email}
+                        key={u.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.05 * index }}
@@ -221,16 +274,14 @@ export default function AdminUsers() {
                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white font-bold text-sm">
                               {u.initial}
                             </div>
-                            <div>
-                              <p className="font-medium text-white">{u.username}</p>
-                            </div>
+                            <p className="font-medium text-white">{u.username}</p>
                           </div>
                         </td>
                         <td className="px-6 py-4">
                           <p className="text-gray-300">{u.email}</p>
                         </td>
                         <td className="px-6 py-4">
-                          <p className="text-gray-400">{formatDate(u.createdAt || '')}</p>
+                          <p className="text-gray-400">{formatDate(u.createdAt)}</p>
                         </td>
                         <td className="px-6 py-4">
                           {u.isAdmin ? (
@@ -247,12 +298,14 @@ export default function AdminUsers() {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center justify-end gap-2">
-                            <button className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400 hover:text-white" aria-label="Voir détails">
-                              <MoreVertical size={18} />
-                            </button>
-                            {!u.isAdmin && u.email !== user.email && (
-                              <button className="p-2 rounded-lg hover:bg-red-500/10 transition-colors text-gray-400 hover:text-red-400" aria-label="Supprimer">
-                                <Trash2 size={18} />
+                            {u.email !== user.email && (
+                              <button
+                                onClick={() => toggleAdmin(u)}
+                                disabled={busyId === u.id}
+                                title={u.isAdmin ? 'Retirer le rôle admin' : 'Promouvoir admin'}
+                                className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400 hover:text-white disabled:opacity-50"
+                              >
+                                {u.isAdmin ? <ShieldOff size={18} /> : <ShieldCheck size={18} />}
                               </button>
                             )}
                           </div>

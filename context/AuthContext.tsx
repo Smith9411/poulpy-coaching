@@ -1,8 +1,8 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-
-const ADMIN_EMAIL = 'tborgesbessonnet@gmail.com';
+import { type Session } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase';
 
 interface User {
   email: string;
@@ -15,76 +15,102 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, username: string, password: string) => Promise<void>;
-  logout: () => void;
+  register: (email: string, username: string, password: string) => Promise<{ needsEmailConfirmation: boolean }>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Construit le User affiché par le site depuis la session Supabase
+// + la ligne correspondante dans la table profiles (username, is_admin).
+async function buildUser(session: Session): Promise<User> {
+  const meta = session.user.user_metadata || {};
+  let username: string = meta.username || session.user.email?.split('@')[0] || 'Joueur';
+  let isAdmin = false;
+
+  try {
+    const { data } = await supabase
+      .from('profiles')
+      .select('username, is_admin')
+      .eq('id', session.user.id)
+      .single();
+    if (data) {
+      if (data.username) username = data.username;
+      isAdmin = data.is_admin === true;
+    }
+  } catch {
+    // profiles momentanément indisponible : on retombe sur les métadonnées
+  }
+
+  return {
+    email: session.user.email || '',
+    username,
+    initial: username.charAt(0).toUpperCase(),
+    isAdmin,
+  };
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('poulpy_user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-    setIsLoading(false);
+    // Session existante au chargement de la page
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (data.session) {
+        setUser(await buildUser(data.session));
+      }
+      setIsLoading(false);
+    });
+
+    // Reste synchronisé : connexion/déconnexion, autre onglet, rafraîchissement de session
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        buildUser(session).then(setUser);
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => sub.subscription.unsubscribe();
   }, []);
 
   const login = async (email: string, password: string) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    const users = JSON.parse(localStorage.getItem('poulpy_users') || '{}');
-    const userData = users[email];
-
-    if (!userData || userData.password !== password) {
-      throw new Error('Email ou mot de passe incorrect');
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      if (error.message === 'Invalid login credentials') {
+        throw new Error('Email ou mot de passe incorrect');
+      }
+      if (error.message === 'Email not confirmed') {
+        throw new Error('Confirme ton adresse email avant de te connecter (vérifie ta boîte mail).');
+      }
+      throw new Error(error.message);
     }
-
-    const isAdmin = email === ADMIN_EMAIL;
-    const userObj = {
-      email: userData.email,
-      username: userData.username,
-      initial: userData.username.charAt(0).toUpperCase(),
-      isAdmin,
-    };
-
-    setUser(userObj);
-    localStorage.setItem('poulpy_user', JSON.stringify(userObj));
+    // onAuthStateChange met à jour l'utilisateur
   };
 
   const register = async (email: string, username: string, password: string) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 500));
-
-    const users = JSON.parse(localStorage.getItem('poulpy_users') || '{}');
-
-    if (users[email]) {
-      throw new Error('Cet email est déjà utilisé');
-    }
-
-    const isAdmin = email === ADMIN_EMAIL;
-    const userData = { email, username, password, createdAt: new Date().toISOString() };
-    users[email] = userData;
-    localStorage.setItem('poulpy_users', JSON.stringify(users));
-
-    const userObj = {
+    const { data, error } = await supabase.auth.signUp({
       email,
-      username,
-      initial: username.charAt(0).toUpperCase(),
-      isAdmin,
-    };
-
-    setUser(userObj);
-    localStorage.setItem('poulpy_user', JSON.stringify(userObj));
+      password,
+      options: { data: { username, email } },
+    });
+    if (error) {
+      if (error.message.includes('already registered')) {
+        throw new Error('Cet email est déjà utilisé');
+      }
+      if (error.message.includes('Password')) {
+        throw new Error('Le mot de passe doit contenir au moins 6 caractères');
+      }
+      throw new Error(error.message);
+    }
+    // Si la confirmation d'email est exigée dans Supabase, aucune session n'est renvoyée :
+    // le compte existe mais l'utilisateur doit confirmer avant de se connecter.
+    return { needsEmailConfirmation: !data.session };
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('poulpy_user');
+  const logout = async () => {
+    await supabase.auth.signOut();
   };
 
   return (

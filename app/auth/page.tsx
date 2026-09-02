@@ -29,9 +29,14 @@ export default function Auth() {
         setSuccess('Connexion réussie ! Redirection...');
         setTimeout(() => window.location.href = '/', 1000);
       } else {
-        await register(email, username, password);
-        setSuccess('Inscription réussie ! Redirection...');
-        setTimeout(() => window.location.href = '/', 1000);
+        const { needsEmailConfirmation } = await register(email, username, password);
+        if (needsEmailConfirmation) {
+          setSuccess('Compte créé ! Vérifie ta boîte mail pour confirmer ton adresse, puis connecte-toi.');
+          setIsLogin(true);
+        } else {
+          setSuccess('Inscription réussie ! Redirection...');
+          setTimeout(() => window.location.href = '/', 1000);
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');
