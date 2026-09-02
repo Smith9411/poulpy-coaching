@@ -82,6 +82,20 @@ function NotificationsBell({ href }: { href: string }) {
 
   const unreadCount = items.filter((i) => i.is_unread).length;
 
+  // Pour l'admin : grouper par conversation (un élève = une ligne avec son dernier message non lu)
+  const groupedByStudent = isAdmin
+    ? (() => {
+        const map = new Map<string, NotificationItem>();
+        for (const item of items) {
+          const existing = map.get(item.student_id);
+          if (!existing || new Date(item.created_at) > new Date(existing.created_at)) {
+            map.set(item.student_id, item);
+          }
+        }
+        return Array.from(map.values());
+      })()
+    : items;
+
   return (
     <div ref={wrapperRef} className="relative">
       <button
@@ -108,41 +122,37 @@ function NotificationsBell({ href }: { href: string }) {
             className="absolute right-0 top-full mt-2 w-80 bg-gray-900/90 backdrop-blur-md border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50"
           >
             <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
-              <p className="font-semibold text-white">Derniers messages</p>
+              <p className="font-semibold text-white">
+                {isAdmin ? 'Conversations non lues' : 'Derniers messages'}
+              </p>
               {unreadCount > 0 && (
                 <span className="text-xs text-gray-400">{unreadCount} non lu{unreadCount > 1 ? 's' : ''}</span>
               )}
             </div>
 
             <div className="max-h-80 overflow-y-auto">
-              {items.length === 0 ? (
+              {groupedByStudent.length === 0 ? (
                 <div className="px-4 py-8 text-center text-gray-500 text-sm">
                   <Bell size={28} className="mx-auto mb-2 opacity-40" />
                   Aucun message pour le moment
                 </div>
               ) : (
-                items.map((item) => (
-                  <div
-                    key={item.id}
-                    className={`px-4 py-3 border-b border-white/5 hover:bg-white/5 transition-colors ${
+                groupedByStudent.map((item) => (
+                  <Link
+                    key={item.student_id}
+                    href={isAdmin ? `/admin/coaching/${item.student_id}` : href}
+                    onClick={() => setIsOpen(false)}
+                    className={`block px-4 py-3 border-b border-white/5 hover:bg-white/5 transition-colors ${
                       item.is_unread ? 'bg-purple-500/5' : ''
                     }`}
                   >
                     <div className="flex items-start gap-3">
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0 ${
-                          item.is_mine
-                            ? 'bg-gradient-to-br from-cyan-500 to-purple-500'
-                            : 'bg-gradient-to-br from-purple-600 to-cyan-500'
-                        }`}
-                      >
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
                         {item.sender_name.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
-                          <p className="text-sm font-semibold text-white truncate">
-                            {item.is_mine ? 'Moi' : item.sender_name}
-                          </p>
+                          <p className="text-sm font-semibold text-white truncate">{item.sender_name}</p>
                           <span className="text-[10px] text-gray-500 shrink-0">
                             {new Date(item.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
                           </span>
@@ -155,18 +165,20 @@ function NotificationsBell({ href }: { href: string }) {
                         <span className="w-2 h-2 rounded-full bg-purple-500 shrink-0 mt-2" aria-label="Non lu" />
                       )}
                     </div>
-                  </div>
+                  </Link>
                 ))
               )}
             </div>
 
-            <Link
-              href={href}
-              onClick={() => setIsOpen(false)}
-              className="block px-4 py-3 text-center text-sm font-semibold text-purple-400 hover:bg-purple-500/10 transition-colors border-t border-white/10"
-            >
-              Accéder au chat →
-            </Link>
+            {!isAdmin && (
+              <Link
+                href={href}
+                onClick={() => setIsOpen(false)}
+                className="block px-4 py-3 text-center text-sm font-semibold text-purple-400 hover:bg-purple-500/10 transition-colors border-t border-white/10"
+              >
+                Accéder au chat →
+              </Link>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
