@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { User, Mail, Settings, LogOut, Shield, Clock, Award, Camera, Trash2, Edit2, Check, X, Loader2 } from 'lucide-react';
+import { User, Mail, Settings, LogOut, Shield, Clock, Award, Camera, Trash2, Edit2, Check, X, Loader2, MessageSquare } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { useState, useRef } from 'react';
@@ -291,8 +291,18 @@ export default function Profile() {
           </div>
         </div>
 
-        {/* Stats / Upcoming sections placeholder */}
+        {/* Stats / Upcoming sections */}
         <div className="grid sm:grid-cols-3 gap-6 mb-12">
+          <Link
+            href="/profile/coaching"
+            className="card rounded-2xl p-6 text-center hover:bg-white/5 transition-all group cursor-pointer"
+          >
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+              <MessageSquare size={24} className="text-white" />
+            </div>
+            <h3 className="font-bold mb-1">Messages Coaching</h3>
+            <p className="text-sm text-gray-400">Retours de ton coach</p>
+          </Link>
           <div className="card rounded-2xl p-6 text-center hover:bg-white/5 transition-all group">
             <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
               <Clock size={24} className="text-white" />

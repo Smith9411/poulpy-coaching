@@ -1,6 +1,6 @@
 'use client';
 
-import { Shield, Users, DollarSign, BarChart2, Settings, LogOut, Mail, Award } from 'lucide-react';
+import { Shield, Users, DollarSign, BarChart2, Settings, LogOut, Mail, Award, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -52,6 +52,7 @@ export default function AdminDashboard() {
 
   const quickActions = [
     { label: 'Gérer utilisateurs', href: '/admin/users', icon: Users, cls: 'border-purple-500/30 hover:bg-purple-500/10 text-purple-400' },
+    { label: 'Gérer coaching', href: '/admin/coaching', icon: MessageSquare, cls: 'border-green-500/30 hover:bg-green-500/10 text-green-400' },
     { label: 'Voir statistiques', href: '/admin/stats', icon: BarChart2, cls: 'border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-400' },
     { label: 'Paramètres site', href: '/admin/settings', icon: Settings, cls: 'border-yellow-500/30 hover:bg-yellow-500/10 text-yellow-400' },
     { label: 'Déconnexion', href: '#', icon: LogOut, cls: 'border-red-500/30 hover:bg-red-500/10 text-red-400', onClick: logout },
