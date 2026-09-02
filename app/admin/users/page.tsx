@@ -1,23 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { Shield, ArrowLeft, User, Search, ShieldOff, ShieldCheck, AlertTriangle, Trash2, RefreshCw, Edit2, Check, X, Loader2 } from 'lucide-react';
+import { Shield, ArrowLeft, User, Search, ShieldOff, ShieldCheck, AlertTriangle, Trash2, RefreshCw, Edit2, Check, X, Loader2, ImageOff, Mail } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { useState, useEffect, useCallback } from 'react';
 
-interface ProfileRow {
-  id: string;
-  username: string | null;
-  is_admin: boolean | null;
-  created_at: string | null;
-}
-
 interface UserRow {
   id: string;
   username: string;
+  email: string;
   isAdmin: boolean;
   createdAt: string;
+  avatarUrl?: string | null;
   initial: string;
 }
 
@@ -27,10 +22,11 @@ export default function AdminUsers() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<'username' | 'createdAt'>('createdAt');
+  const [sortBy, setSortBy] = useState<'username' | 'email' | 'createdAt'>('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [busyId, setBusyId] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [confirmRemoveAvatar, setConfirmRemoveAvatar] = useState<string | null>(null);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [editingUsername, setEditingUsername] = useState('');
   const [isSavingEdit, setIsSavingEdit] = useState(false);
@@ -44,29 +40,44 @@ export default function AdminUsers() {
   const fetchUsers = useCallback(async () => {
     setIsLoading(true);
     setLoadError('');
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('id, username, is_admin, created_at')
-      .order('created_at', { ascending: false });
+    try {
+      const res = await fetch('/api/admin/users');
+      const data = await res.json();
 
-    if (error) {
-      setLoadError(error.message);
-      setUsers([]);
-    } else {
-      setUsers(
-        (data as ProfileRow[] || []).map((p) => {
-          const name = p.username || 'Joueur';
-          return {
-            id: p.id,
-            username: name,
-            isAdmin: p.is_admin === true,
-            createdAt: p.created_at || '',
-            initial: name.charAt(0).toUpperCase(),
-          };
-        })
-      );
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Erreur de chargement');
+      }
+
+      setUsers(data.users || []);
+    } catch {
+      // Fallback direct sur Supabase profiles si l'API est momentanément indisponible
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, username, is_admin, created_at')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        setLoadError(error.message);
+        setUsers([]);
+      } else {
+        setUsers(
+          (data || []).map((p) => {
+            const name = p.username || 'Joueur';
+            return {
+              id: p.id,
+              username: name,
+              email: '—',
+              isAdmin: p.is_admin === true,
+              createdAt: p.created_at || '',
+              avatarUrl: null,
+              initial: name.charAt(0).toUpperCase(),
+            };
+          })
+        );
+      }
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, []);
 
   useEffect(() => {
@@ -146,20 +157,51 @@ export default function AdminUsers() {
     setIsSavingEdit(false);
   };
 
-  const deleteUser = async (u: UserRow) => {
+  const handleRemoveAvatar = async (u: UserRow) => {
     setBusyId(u.id);
-    const { error } = await supabase.from('profiles').delete().eq('id', u.id);
-    if (error) {
-      setLoadError(error.message);
-    } else {
-      setUsers((prev) => prev.filter((p) => p.id !== u.id));
-      showSuccess(`${u.username} a été supprimé`);
+    try {
+      const res = await fetch('/api/admin/users/remove-avatar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: u.id }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || 'Erreur');
+
+      setUsers((prev) =>
+        prev.map((p) => (p.id === u.id ? { ...p, avatarUrl: null } : p))
+      );
+      showSuccess(`Photo de profil de ${u.username} retirée avec succès !`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erreur';
+      setLoadError(msg);
+    } finally {
+      setConfirmRemoveAvatar(null);
+      setBusyId(null);
     }
-    setConfirmDelete(null);
-    setBusyId(null);
   };
 
-  const handleSort = (field: 'username' | 'createdAt') => {
+  const deleteUser = async (u: UserRow) => {
+    setBusyId(u.id);
+    try {
+      const res = await fetch(`/api/admin/users?userId=${u.id}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || 'Erreur');
+
+      setUsers((prev) => prev.filter((p) => p.id !== u.id));
+      showSuccess(`Le compte de ${u.username} a été supprimé`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erreur';
+      setLoadError(msg);
+    } finally {
+      setConfirmDelete(null);
+      setBusyId(null);
+    }
+  };
+
+  const handleSort = (field: 'username' | 'email' | 'createdAt') => {
     if (sortBy === field) {
       setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
     } else {
@@ -169,7 +211,11 @@ export default function AdminUsers() {
   };
 
   const filteredUsers = users
-    .filter((u) => u.username.toLowerCase().includes(searchQuery.toLowerCase()))
+    .filter(
+      (u) =>
+        u.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        u.email.toLowerCase().includes(searchQuery.toLowerCase())
+    )
     .sort((a, b) => {
       const aVal = a[sortBy];
       const bVal = b[sortBy];
@@ -208,7 +254,7 @@ export default function AdminUsers() {
               Gestion des <span className="text-gradient">utilisateurs</span>
             </h1>
             <p className="text-xl text-gray-300 max-w-2xl">
-              Modifie les pseudos, gère les rôles et administre les comptes de la plateforme en direct.
+              Modifie les pseudos, retire les photos inappropriées, gère les rôles et administre les comptes en direct.
             </p>
           </div>
         </div>
@@ -234,7 +280,7 @@ export default function AdminUsers() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 size-5" />
               <input
                 type="text"
-                placeholder="Rechercher par pseudo..."
+                placeholder="Rechercher par pseudo ou email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all pl-12 pr-4 py-3"
@@ -276,6 +322,9 @@ export default function AdminUsers() {
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-white transition-colors" onClick={() => handleSort('username')}>
                       <div className="flex items-center gap-2">Utilisateur <SortIcon field="username" /></div>
                     </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-white transition-colors" onClick={() => handleSort('email')}>
+                      <div className="flex items-center gap-2"><Mail size={12} /> Email <SortIcon field="email" /></div>
+                    </th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-white transition-colors hidden md:table-cell" onClick={() => handleSort('createdAt')}>
                       <div className="flex items-center gap-2">Inscrit le <SortIcon field="createdAt" /></div>
                     </th>
@@ -292,8 +341,12 @@ export default function AdminUsers() {
                       {/* Avatar + pseudo (avec édition inline) */}
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                            {u.initial}
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 overflow-hidden">
+                            {u.avatarUrl ? (
+                              <img src={u.avatarUrl} alt={u.username} className="w-full h-full object-cover" />
+                            ) : (
+                              u.initial
+                            )}
                           </div>
                           <div>
                             {editingUserId === u.id ? (
@@ -340,6 +393,11 @@ export default function AdminUsers() {
                         </div>
                       </td>
 
+                      {/* Email */}
+                      <td className="px-6 py-4">
+                        <p className="text-gray-300 text-sm">{u.email}</p>
+                      </td>
+
                       {/* Date */}
                       <td className="px-6 py-4 hidden md:table-cell">
                         <p className="text-gray-400 text-sm">{formatDate(u.createdAt)}</p>
@@ -361,6 +419,36 @@ export default function AdminUsers() {
                       {/* Actions */}
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-end gap-1">
+
+                          {/* Retirer la photo de profil si présente */}
+                          {u.avatarUrl && (
+                            confirmRemoveAvatar === u.id ? (
+                              <div className="flex items-center gap-1 mr-1">
+                                <button
+                                  onClick={() => handleRemoveAvatar(u)}
+                                  disabled={busyId === u.id}
+                                  className="px-2 py-1 text-xs rounded-lg bg-orange-500/20 text-orange-400 hover:bg-orange-500/40 transition-colors disabled:opacity-40"
+                                >
+                                  Retirer photo
+                                </button>
+                                <button
+                                  onClick={() => setConfirmRemoveAvatar(null)}
+                                  className="px-2 py-1 text-xs rounded-lg bg-white/5 text-gray-400 hover:bg-white/10 transition-colors"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => setConfirmRemoveAvatar(u.id)}
+                                title="Retirer la photo de profil de cet utilisateur"
+                                className="p-2 rounded-lg hover:bg-orange-500/10 transition-colors text-gray-400 hover:text-orange-400"
+                              >
+                                <ImageOff size={16} />
+                              </button>
+                            )
+                          )}
+
                           {/* Toggle admin — désactivé pour soi-même */}
                           {u.username !== user.username && (
                             <button
@@ -416,7 +504,7 @@ export default function AdminUsers() {
 
         {/* Légende */}
         <p className="text-xs text-gray-500 text-center mt-4">
-          Les données sont synchronisées en direct avec Supabase · Cliquer sur le crayon pour modifier un pseudo
+          Les données sont synchronisées en direct avec Supabase · Cliquer sur le crayon pour modifier un pseudo ou sur l&apos;icône photo pour retirer un avatar
         </p>
 
       </div>
