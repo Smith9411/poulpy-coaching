@@ -91,6 +91,7 @@ html.theme-transition *::after {
 html.light body {
   background-color: #f1ede5;
   color: #2a2f3c;
+  --page-bg: #f1ede5;
 }
 
 /* Textes */
