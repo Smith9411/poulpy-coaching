@@ -12,10 +12,10 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { studentId: string } }
+  { params }: { params: Promise<{ studentId: string }> }
 ) {
   try {
-    const { studentId } = params;
+    const { studentId } = await params;
 
     const { data: messages, error } = await supabase
       .from('coaching_messages')
