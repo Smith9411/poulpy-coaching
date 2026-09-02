@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { Mail, Lock, User, Eye, EyeOff, ArrowRight, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import Navbar from '@/components/Navbar';
 
 export default function Auth() {
   const { login, register } = useAuth();
@@ -52,7 +51,6 @@ export default function Auth() {
 
   return (
     <>
-      <Navbar />
       <main className="min-h-screen bg-[#0a0a0f] dark:bg-[#0a0a0f] py-20" style={{backgroundColor: 'var(--page-bg, #0a0a0f)'}}>
         <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
