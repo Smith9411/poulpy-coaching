@@ -3,7 +3,7 @@
 import { MessageSquare, Send, Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 
 interface Message {
@@ -84,11 +84,19 @@ export default function StudentCoachingPage() {
     return () => clearInterval(interval);
   }, [user?.id, fetchMessages]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  useEffect(() => {
+    if (!isLoading && scrollRef.current) {
+      requestAnimationFrame(() => {
+        if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      });
+    }
+  }, [isLoading]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();

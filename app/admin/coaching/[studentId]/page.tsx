@@ -237,43 +237,54 @@ export default function StudentCoachingPage() {
           </div>
 
           <form onSubmit={handleSendMessage} className="border-t border-white/10 p-4 space-y-3">
-            <div className="flex gap-2">
-              {[
-                { value: 'progression', label: 'Progression' },
-                { value: 'feedback', label: 'Feedback' },
-                { value: 'tip', label: 'Conseil' },
-              ].map((type) => (
-                <button
-                  key={type.value}
-                  type="button"
-                  onClick={() => setMessageType(type.value as 'progression' | 'feedback' | 'tip')}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                    messageType === type.value
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-white/5 text-gray-400 hover:bg-white/10'
-                  }`}
-                >
+            {([
+              { value: 'progression', label: 'Progression', placeholder: 'Note de progression...' },
+              { value: 'feedback', label: 'Feedback', placeholder: 'Feedback sur la game...' },
+              { value: 'tip', label: 'Conseil', placeholder: 'Conseil personnalisé...' },
+            ] as const).map((type) => (
+              <div key={type.value} className="flex gap-2 items-center">
+                <span className={`shrink-0 w-24 text-xs font-semibold uppercase tracking-wide px-2 py-1 rounded-md ${
+                  messageType === type.value
+                    ? 'bg-purple-500/20 text-purple-300'
+                    : 'bg-white/5 text-gray-500'
+                }`}>
                   {type.label}
+                </span>
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => {
+                    setNewMessage(e.target.value);
+                    setMessageType(type.value);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      setMessageType(type.value);
+                      handleSendMessage(e as unknown as React.FormEvent);
+                    }
+                  }}
+                  placeholder={type.placeholder}
+                  disabled={isSending}
+                  className={`flex-1 px-4 py-2 rounded-xl bg-white/5 border text-inherit placeholder-gray-500 focus:outline-none disabled:opacity-50 transition-colors ${
+                    messageType === type.value
+                      ? 'border-purple-500/50 focus:border-purple-500'
+                      : 'border-white/10 focus:border-white/30'
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMessageType(type.value);
+                    handleSendMessage({ preventDefault: () => {} } as React.FormEvent);
+                  }}
+                  disabled={isSending || !newMessage.trim() || messageType !== type.value}
+                  className="px-3 py-2 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40 transition-all disabled:opacity-50 flex items-center gap-2"
+                >
+                  {isSending && messageType === type.value ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
                 </button>
-              ))}
-            </div>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Écris un message à l'élève..."
-                disabled={isSending}
-                className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500 disabled:opacity-50"
-              />
-              <button
-                type="submit"
-                disabled={isSending || !newMessage.trim()}
-                className="px-5 py-3 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40 transition-all disabled:opacity-50 flex items-center gap-2"
-              >
-                {isSending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-              </button>
-            </div>
+              </div>
+            ))}
           </form>
         </div>
       </div>

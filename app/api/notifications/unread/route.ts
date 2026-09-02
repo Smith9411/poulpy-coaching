@@ -32,12 +32,9 @@ export async function GET(req: NextRequest) {
 
     const isAdmin = profile?.is_admin === true;
 
-    // Service role bypasses RLS, so we filter in code based on role.
-    // For student: only messages where they are the recipient and didn't send.
-    // For admin: any message not sent by them, with student info attached.
     let query = supabase
       .from('coaching_messages')
-      .select('id, message, created_at, sender_id, student_id')
+      .select('id, message, created_at, sender_id, student_id, read_at')
       .neq('sender_id', user.id)
       .is('read_at', null)
       .order('created_at', { ascending: false })
@@ -67,6 +64,7 @@ export async function GET(req: NextRequest) {
       created_at: string;
       sender_id: string;
       student_id: string;
+      read_at: string | null;
     }) => ({
       id: m.id,
       message: m.message,
@@ -74,6 +72,8 @@ export async function GET(req: NextRequest) {
       sender_id: m.sender_id,
       student_id: m.student_id,
       sender_name: senderMap.get(m.sender_id) || (isAdmin ? 'Élève' : 'Coach'),
+      is_mine: m.sender_id === user.id,
+      is_unread: !m.read_at,
     }));
 
     return NextResponse.json({ items });

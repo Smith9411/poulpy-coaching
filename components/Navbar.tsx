@@ -19,7 +19,7 @@ interface NotificationItem {
   is_unread: boolean;
 }
 
-function useRecentMessages(userId: string | undefined, isAdmin: boolean) {
+function useUnreadNotifications(userId: string | undefined, isAdmin: boolean) {
   const [items, setItems] = useState<NotificationItem[]>([]);
 
   useEffect(() => {
@@ -39,7 +39,7 @@ function useRecentMessages(userId: string | undefined, isAdmin: boolean) {
           return;
         }
 
-        const res = await fetch('/api/notifications/recent', {
+        const res = await fetch('/api/notifications/unread', {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error('Erreur notifs');
@@ -65,7 +65,7 @@ function useRecentMessages(userId: string | undefined, isAdmin: boolean) {
 function NotificationsBell({ href }: { href: string }) {
   const { user } = useAuth();
   const isAdmin = user?.isAdmin ?? false;
-  const items = useRecentMessages(user?.id, isAdmin);
+  const items = useUnreadNotifications(user?.id, isAdmin);
   const [isOpen, setIsOpen] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -330,7 +330,7 @@ export default function Navbar() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
                         transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                        className="absolute right-0 top-full mt-2 w-56 bg-gray-900/95 backdrop-blur-md rounded-xl border border-white/10 shadow-2xl overflow-hidden py-2 z-50"
+                        className="absolute right-0 top-full mt-2 w-56 bg-black/95 backdrop-blur-md rounded-xl border border-white/10 shadow-2xl overflow-hidden py-2 z-50"
                       >
                         <div className="px-4 py-3 border-b border-white/5">
                           <p className="font-semibold text-white">{user.username}</p>
