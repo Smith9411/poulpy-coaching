@@ -2,10 +2,88 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, User, LogOut, ChevronDown, Settings, Shield, BarChart2 } from 'lucide-react';
+import { Menu, X, User, LogOut, ChevronDown, Settings, Shield, BarChart2, Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabase';
 import ThemeToggle from './ThemeToggle';
+
+function useUnreadCount(userId: string | undefined, isAdmin: boolean) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!userId) {
+      setCount(0);
+      return;
+    }
+
+    let cancelled = false;
+
+    const fetchCount = async () => {
+      try {
+        if (isAdmin) {
+          const { data } = await supabase
+            .from('coaching_messages')
+            .select('student_id, read_at, sender_id')
+            .neq('sender_id', userId)
+            .is('read_at', null);
+          if (cancelled || !data) return;
+          const distinct = new Set(data.map((m) => m.student_id));
+          setCount(distinct.size);
+        } else {
+          const { count: c } = await supabase
+            .from('coaching_messages')
+            .select('*', { count: 'exact', head: true })
+            .eq('student_id', userId)
+            .neq('sender_id', userId)
+            .is('read_at', null);
+          if (cancelled) return;
+          setCount(c ?? 0);
+        }
+      } catch (err) {
+        console.error('Erreur compteur notifs:', err);
+      }
+    };
+
+    fetchCount();
+
+    const channel = supabase
+      .channel(`navbar-unread-${userId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'coaching_messages' },
+        () => fetchCount()
+      )
+      .subscribe();
+
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(channel);
+    };
+  }, [userId, isAdmin]);
+
+  return count;
+}
+
+function NotificationsBell({ href }: { href: string }) {
+  const { user } = useAuth();
+  const count = useUnreadCount(user?.id, user?.isAdmin ?? false);
+
+  return (
+    <Link
+      href={href}
+      className="relative p-2 rounded-lg hover:bg-white/5 transition-colors"
+      aria-label={`Notifications${count > 0 ? ` (${count} non lues)` : ''}`}
+    >
+      <Bell size={20} className="text-gray-300" />
+      {count > 0 && (
+        <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+          {count > 99 ? '99+' : count}
+        </span>
+      )}
+    </Link>
+  );
+}
 
 export default function Navbar() {
   const { user, logout, isLoading } = useAuth();
@@ -135,6 +213,7 @@ export default function Navbar() {
             {/* Right side - Theme toggle + Auth or User Menu */}
             <div className="hidden lg:flex items-center gap-4">
               <ThemeToggle />
+              {user && <NotificationsBell href={user.isAdmin ? '/admin/coaching' : '/profile/coaching'} />}
               {user ? (
                 <div className="relative profile-menu">
                   {/* Profile Button */}
@@ -243,6 +322,7 @@ export default function Navbar() {
             {/* Mobile: theme toggle + menu button */}
             <div className="flex items-center gap-2 lg:hidden">
               <ThemeToggle />
+              {user && <NotificationsBell href={user.isAdmin ? '/admin/coaching' : '/profile/coaching'} />}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="p-2 rounded-lg hover:bg-white/5 transition-colors"

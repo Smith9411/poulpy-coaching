@@ -1,9 +1,10 @@
 'use client';
 
-import { MessageSquare, Calendar, Check, Loader2, AlertCircle } from 'lucide-react';
+import { MessageSquare, Send, Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import Link from 'next/link';
 
 interface Message {
   id: string;
@@ -11,69 +12,123 @@ interface Message {
   message_type: string;
   created_at: string;
   read_at: string | null;
-  admin_name: string;
+  sender_id: string;
+  admin_name?: string;
 }
 
 export default function StudentCoachingPage() {
   const { user, isLoading: authLoading } = useAuth();
   const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState('');
+  const scrollRef = useRef<HTMLDivElement>(null);
 
-  const fetchMessages = useCallback(async () => {
+  const fetchMessages = useCallback(async (markAsRead = true) => {
     if (!user?.id) return;
 
-    setIsLoading(true);
-    setError('');
     try {
-      // Get the session token
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
-
-      if (!token) {
-        throw new Error('Non authentifié');
-      }
+      if (!token) throw new Error('Non authentifié');
 
       const res = await fetch('/api/student/messages', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-
       if (!res.ok || data.error) throw new Error(data.error || 'Erreur de chargement');
 
-      // Get admin names
-      const adminIds = data.messages?.map((m: any) => m.admin_id) || [];
-      const adminNamesResponse = await fetch('/api/admin/users');
-      const usersData = await adminNamesResponse.json();
-      const adminMap = new Map(
-        usersData.users?.map((u: any) => [u.id, u.username]) || []
-      );
+      const adminIds = (data.messages || []).map((m: Message) => m.sender_id).filter(Boolean);
+      const uniqueAdminIds = Array.from(new Set(adminIds));
+      const adminMap = new Map<string, string>();
 
-      const formattedMessages = (data.messages || []).map((m: any) => ({
-        id: m.id,
-        message: m.message,
-        message_type: m.message_type,
-        created_at: m.created_at,
-        read_at: m.read_at,
-        admin_name: adminMap.get(m.admin_id) || 'Coach',
+      if (uniqueAdminIds.length > 0) {
+        const { data: admins } = await supabase
+          .from('profiles')
+          .select('id, username')
+          .in('id', uniqueAdminIds);
+        admins?.forEach((a) => adminMap.set(a.id, a.username));
+      }
+
+      const formatted = (data.messages || []).map((m: Message) => ({
+        ...m,
+        admin_name: adminMap.get(m.sender_id) || 'Coach',
       }));
+      setMessages(formatted);
 
-      setMessages(formattedMessages);
-    } catch (error) {
-      console.error('Erreur chargement messages:', error);
-      setError('Erreur lors du chargement des messages');
+      if (markAsRead) {
+        const unread = formatted.filter((m: Message) => !m.read_at && m.sender_id !== user.id);
+        if (unread.length > 0) {
+          await supabase
+            .from('coaching_messages')
+            .update({ read_at: new Date().toISOString() })
+            .in('id', unread.map((m: Message) => m.id));
+        }
+      }
+    } catch (err) {
+      console.error('Erreur chargement messages:', err);
+      setError(err instanceof Error ? err.message : 'Erreur lors du chargement');
     } finally {
       setIsLoading(false);
     }
   }, [user?.id]);
 
   useEffect(() => {
-    if (user) {
-      fetchMessages();
-    }
+    if (user) fetchMessages();
   }, [user, fetchMessages]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    const channel = supabase
+      .channel(`student-chat-${user.id}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'coaching_messages', filter: `student_id=eq.${user.id}` },
+        () => fetchMessages(false)
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, fetchMessages]);
+
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
+
+  const handleSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMessage.trim() || !user?.id) return;
+    setIsSending(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('Non authentifié');
+
+      const res = await fetch('/api/coaching/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          studentId: user.id,
+          message: newMessage,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || 'Erreur envoi');
+      setNewMessage('');
+    } catch (err) {
+      console.error('Erreur envoi:', err);
+      setError(err instanceof Error ? err.message : 'Erreur envoi');
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   if (authLoading) {
     return (
@@ -89,7 +144,7 @@ export default function StudentCoachingPage() {
         <div className="text-center">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2">Non connecté</h1>
-          <p className="text-gray-400">Connecte-toi pour voir tes messages de coaching.</p>
+          <p className="text-gray-400">Connecte-toi pour discuter avec ton coach.</p>
         </div>
       </div>
     );
@@ -98,77 +153,83 @@ export default function StudentCoachingPage() {
   return (
     <main className="min-h-screen page-bg py-24">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6">
+          <Link href="/profile" className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-4 transition-colors">
+            <ArrowLeft size={20} />
+            Retour au profil
+          </Link>
           <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
             <MessageSquare className="text-purple-400" />
-            Messages de Coaching
+            Chat avec ton coach
           </h1>
-          <p className="text-gray-400">Retours et conseils de ton coach</p>
+          <p className="text-gray-400">Échange en direct avec ton coach Poulpy</p>
         </div>
 
-        {/* Messages */}
-        {isLoading ? (
-          <div className="p-20 text-center">
-            <Loader2 className="w-10 h-10 animate-spin text-purple-500 mx-auto mb-4" />
-            <p className="text-gray-400">Chargement des messages...</p>
-          </div>
-        ) : error ? (
-          <div className="text-center py-20">
-            <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <p className="text-gray-400">{error}</p>
-          </div>
-        ) : messages.length === 0 ? (
-          <div className="text-center py-20">
-            <MessageSquare size={48} className="mx-auto mb-4 text-gray-600" />
-            <p className="text-gray-400">Aucun message de coaching pour le moment</p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`card rounded-xl p-6 border transition-all ${
-                  !msg.read_at
-                    ? 'border-purple-500/30 bg-purple-500/5'
-                    : 'border-white/5 bg-white/5'
-                }`}
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center text-white font-bold">
-                      {msg.admin_name.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <div className="font-semibold text-purple-400">{msg.admin_name}</div>
-                      <div className="text-xs text-gray-500 flex items-center gap-1">
-                        <Calendar size={12} />
-                        {new Date(msg.created_at).toLocaleDateString('fr-FR', {
-                          day: 'numeric',
+        <div className="card rounded-2xl overflow-hidden flex flex-col h-[70vh]">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-4">
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full">
+                <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+              </div>
+            ) : error ? (
+              <div className="flex items-center justify-center h-full text-red-400">
+                <AlertCircle className="w-5 h-5 mr-2" />
+                {error}
+              </div>
+            ) : messages.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                <MessageSquare size={48} className="mb-4 opacity-30" />
+                <p>Aucun message pour le moment. Démarre la conversation !</p>
+              </div>
+            ) : (
+              messages.map((msg) => {
+                const isMine = msg.sender_id === user.id;
+                return (
+                  <div key={msg.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
+                    <div
+                      className={`max-w-[75%] rounded-2xl px-4 py-3 ${
+                        isMine
+                          ? 'bg-gradient-to-br from-purple-600 to-cyan-500 text-white'
+                          : 'bg-white/5 border border-white/10 text-gray-200'
+                      }`}
+                    >
+                      {!isMine && (
+                        <div className="text-xs font-semibold text-purple-400 mb-1">{msg.admin_name}</div>
+                      )}
+                      <p className="whitespace-pre-wrap break-words">{msg.message}</p>
+                      <div className={`text-[10px] mt-1 ${isMine ? 'text-white/70' : 'text-gray-500'}`}>
+                        {new Date(msg.created_at).toLocaleString('fr-FR', {
+                          day: '2-digit',
                           month: 'short',
-                          year: 'numeric',
                           hour: '2-digit',
                           minute: '2-digit',
                         })}
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs px-2 py-1 rounded-full bg-purple-500/20 text-purple-300">
-                      {msg.message_type}
-                    </span>
-                    {msg.read_at && (
-                      <div className="text-green-400" title="Lu">
-                        <Check size={16} />
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <p className="text-gray-200 leading-relaxed">{msg.message}</p>
-              </div>
-            ))}
+                );
+              })
+            )}
           </div>
-        )}
+
+          <form onSubmit={handleSend} className="border-t border-white/10 p-4 flex gap-2">
+            <input
+              type="text"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Écris un message à ton coach..."
+              disabled={isSending}
+              className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500 disabled:opacity-50"
+            />
+            <button
+              type="submit"
+              disabled={isSending || !newMessage.trim()}
+              className="px-5 py-3 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40 transition-all disabled:opacity-50 flex items-center gap-2"
+            >
+              {isSending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+            </button>
+          </form>
+        </div>
       </div>
     </main>
   );
