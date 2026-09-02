@@ -53,7 +53,7 @@ export default function Auth() {
   return (
     <>
       <Navbar />
-      <main className="min-h-screen bg-[#0a0a0f] py-20">
+      <main className="min-h-screen bg-[#0a0a0f] dark:bg-[#0a0a0f] py-20" style={{backgroundColor: 'var(--page-bg, #0a0a0f)'}}>
         <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <motion.div
