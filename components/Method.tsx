@@ -65,7 +65,7 @@ export default function Method() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className="glass-dark rounded-2xl p-6 hover:bg-white/10 transition-all group relative overflow-hidden"
+              className="glass-dark rounded-2xl p-6 hover:bg-white/10 transition-colors group relative overflow-hidden"
             >
               {/* Background number */}
               <div className="absolute top-4 right-4 text-6xl font-bold text-white/5 group-hover:text-white/10 transition-colors">

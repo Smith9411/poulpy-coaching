@@ -180,7 +180,7 @@ export default function About() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="glass-dark rounded-2xl p-6 hover:bg-white/5 transition-all group"
+                className="glass-dark rounded-2xl p-6 hover:bg-white/5 transition-colors group"
               >
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
                   style={{ background: `linear-gradient(135deg, ${value.color}/20, ${value.color}/10)` }}

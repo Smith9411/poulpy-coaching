@@ -88,7 +88,7 @@ export default function Games() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.15 }}
-              className="glass-dark rounded-2xl p-8 hover:bg-white/5 transition-all group"
+              className="glass-dark rounded-2xl p-8 hover:bg-white/5 transition-colors group"
             >
               {/* Header */}
               <div className="flex items-start justify-between mb-6">

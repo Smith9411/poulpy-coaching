@@ -61,7 +61,7 @@ export default function WhyPoulpy() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className="glass-dark rounded-2xl p-6 hover:bg-white/10 transition-all group cursor-pointer"
+              className="glass-dark rounded-2xl p-6 hover:bg-white/10 transition-colors group cursor-pointer"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center group-hover:scale-110 transition-transform">

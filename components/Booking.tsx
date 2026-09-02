@@ -180,7 +180,7 @@ export default function Booking() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className={`relative glass-dark rounded-2xl p-8 transition-all hover:bg-white/5 flex flex-col ${
+                className={`relative glass-dark rounded-2xl p-8 transition-colors hover:bg-white/5 flex flex-col ${
                   plan.popular ? 'border-2 border-purple-500/50 scale-105' : ''
                 } cursor-pointer`}
                 onClick={() => handlePlanSelect(plan.id)}

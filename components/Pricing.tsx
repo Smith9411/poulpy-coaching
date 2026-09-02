@@ -72,7 +72,7 @@ export default function Pricing() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className={`relative glass-dark rounded-2xl p-8 hover:bg-white/5 transition-all flex flex-col ${
+              className={`relative glass-dark rounded-2xl p-8 hover:bg-white/5 transition-colors flex flex-col ${
                 plan.popular ? 'border-2 border-purple-500/50 scale-105' : ''
               }`}
             >
