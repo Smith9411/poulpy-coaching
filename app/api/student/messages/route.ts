@@ -12,23 +12,26 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 export async function GET(req: NextRequest) {
   try {
-    // Get the authorization header
     const authHeader = req.headers.get('authorization');
     if (!authHeader) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     }
 
-    // Extract the token (format: "Bearer <token>")
     const token = authHeader.replace('Bearer ', '');
 
-    // Verify the token and get user
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     if (authError || !user) {
       return NextResponse.json({ error: 'Token invalide' }, { status: 401 });
     }
 
-    // Get messages for this user
-    const { data: messages, error } = await supabase
+    // Bind the client to the user's JWT so RLS sees auth.role() = 'authenticated'
+    // and auth.uid() = this user, allowing the row-level policy to match.
+    const userClient = createClient(supabaseUrl!, supabaseAnonKey!, {
+      global: { headers: { Authorization: `Bearer ${token}` } },
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+
+    const { data: messages, error } = await userClient
       .from('coaching_messages')
       .select('*')
       .eq('student_id', user.id)
@@ -36,13 +39,12 @@ export async function GET(req: NextRequest) {
 
     if (error) throw error;
 
-    // Mark messages as read
-    const unreadMessages = messages?.filter((m: any) => !m.read_at) || [];
+    const unreadMessages = messages?.filter((m: { read_at: string | null }) => !m.read_at) || [];
     if (unreadMessages.length > 0) {
-      await supabase
+      await userClient
         .from('coaching_messages')
         .update({ read_at: new Date().toISOString() })
-        .in('id', unreadMessages.map((m: any) => m.id));
+        .in('id', unreadMessages.map((m: { id: string }) => m.id));
     }
 
     return NextResponse.json({ messages: messages || [] });
