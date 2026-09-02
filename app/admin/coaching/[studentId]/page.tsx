@@ -95,14 +95,32 @@ export default function StudentCoachingPage() {
   }, [studentId, user?.id]);
 
   useEffect(() => {
-    if (user?.isAdmin && studentId) fetchStudentData(true);
+    if (user?.isAdmin && studentId) fetchStudentData(false);
   }, [user, studentId, fetchStudentData]);
 
   useEffect(() => {
     if (!user?.id || !studentId) return;
-    const interval = setInterval(() => fetchStudentData(true), 8000);
+    const interval = setInterval(() => fetchStudentData(false), 8000);
     return () => clearInterval(interval);
   }, [studentId, user?.id, fetchStudentData]);
+
+  // Marquer les messages non lus comme lus quand l'admin quitte la page
+  useEffect(() => {
+    return () => {
+      if (!user?.id || !studentId) return;
+      supabase.auth.getSession().then(({ data }) => {
+        const uid = data.session?.user.id;
+        if (!uid) return;
+        supabase
+          .from('coaching_messages')
+          .update({ read_at: new Date().toISOString() })
+          .eq('student_id', studentId)
+          .neq('sender_id', uid)
+          .is('read_at', null)
+          .then(() => {});
+      });
+    };
+  }, [studentId, user?.id]);
 
   useEffect(() => {
     if (scrollRef.current) {

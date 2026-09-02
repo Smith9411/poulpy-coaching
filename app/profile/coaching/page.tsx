@@ -78,6 +78,24 @@ export default function StudentCoachingPage() {
     if (user) fetchMessages();
   }, [user, fetchMessages]);
 
+  // Marque les messages non lus comme lus quand l'élève quitte la page
+  useEffect(() => {
+    return () => {
+      if (!user?.id) return;
+      supabase.auth.getSession().then(({ data }) => {
+        const uid = data.session?.user.id;
+        if (!uid) return;
+        supabase
+          .from('coaching_messages')
+          .update({ read_at: new Date().toISOString() })
+          .eq('student_id', uid)
+          .neq('sender_id', uid)
+          .is('read_at', null)
+          .then(() => {});
+      });
+    };
+  }, [user?.id]);
+
   useEffect(() => {
     if (!user?.id) return;
     const interval = setInterval(() => fetchMessages(false), 8000);
