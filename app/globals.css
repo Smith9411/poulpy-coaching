@@ -1,8 +1,26 @@
 @import 'tailwindcss';
 
+/* Palette Poulpy — extraite du personnage (poulpe rouge, écharfe bleue) :
+   rouge #E0453A / #C22A2E, corail #F2A488, pêche #F6C1AC,
+   bleu écharfe #A9C4D9, bleu-violet #3A4B8F, marine #2B2F3A */
+@theme {
+  /* Rouges du personnage (remplacent purple) */
+  --color-purple-300: #f6c1ac;
+  --color-purple-400: #ed6a5e;
+  --color-purple-500: #e0453a;
+  --color-purple-600: #c22a2e;
+  --color-purple-900: #521a1d;
+
+  /* Bleus de l'écharfe et des yeux (remplacent cyan) */
+  --color-cyan-300: #d8e6f2;
+  --color-cyan-400: #a9c4d9;
+  --color-cyan-500: #6e8fc7;
+  --color-cyan-600: #3a4b8f;
+}
+
 @layer base {
   body {
-    @apply bg-[#0a0a0f] text-gray-100 antialiased;
+    @apply bg-[#13161e] text-gray-100 antialiased;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
       'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
       sans-serif;
@@ -34,14 +52,14 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0a0f;
+  background: #13161e;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #6366f1;
+  background: #c22a2e;
   border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #818cf8;
+  background: #e0453a;
 }
