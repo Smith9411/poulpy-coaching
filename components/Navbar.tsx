@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Menu, X, User, LogOut, ChevronDown, Settings, Shield, BarChart2, Bell } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -57,23 +57,161 @@ function useUnreadCount(userId: string | undefined, isAdmin: boolean) {
   return count;
 }
 
+interface NotificationItem {
+  id: string;
+  message: string;
+  created_at: string;
+  sender_id: string;
+  sender_name: string;
+  student_id: string;
+}
+
+function useUnreadNotifications(userId: string | undefined, isAdmin: boolean) {
+  const [items, setItems] = useState<NotificationItem[]>([]);
+
+  useEffect(() => {
+    if (!userId) {
+      setItems([]);
+      return;
+    }
+
+    let cancelled = false;
+
+    const fetchItems = async () => {
+      try {
+        const { data } = await supabase
+          .from('coaching_messages')
+          .select('id, message, created_at, sender_id, student_id')
+          .neq('sender_id', userId)
+          .is('read_at', null)
+          .order('created_at', { ascending: false })
+          .limit(10);
+        if (cancelled || !data) return;
+
+        const senderIds = Array.from(new Set(data.map((m) => m.sender_id)));
+        const { data: senders } = await supabase
+          .from('profiles')
+          .select('id, username')
+          .in('id', senderIds);
+        const senderMap = new Map(senders?.map((s) => [s.id, s.username]) || []);
+
+        setItems(
+          data.map((m) => ({
+            id: m.id,
+            message: m.message,
+            created_at: m.created_at,
+            sender_id: m.sender_id,
+            student_id: m.student_id,
+            sender_name: senderMap.get(m.sender_id) || (isAdmin ? 'Élève' : 'Coach'),
+          }))
+        );
+      } catch (err) {
+        console.error('Erreur notifs:', err);
+      }
+    };
+
+    fetchItems();
+    const interval = setInterval(fetchItems, 15000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [userId, isAdmin]);
+
+  return items;
+}
+
 function NotificationsBell({ href }: { href: string }) {
   const { user } = useAuth();
-  const count = useUnreadCount(user?.id, user?.isAdmin ?? false);
+  const isAdmin = user?.isAdmin ?? false;
+  const items = useUnreadNotifications(user?.id, isAdmin);
+  const [isOpen, setIsOpen] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
+
+  const count = items.length;
 
   return (
-    <Link
-      href={href}
-      className="relative p-2 rounded-lg hover:bg-white/5 transition-colors"
-      aria-label={`Notifications${count > 0 ? ` (${count} non lues)` : ''}`}
-    >
-      <Bell size={20} className="text-gray-300" />
-      {count > 0 && (
-        <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
-          {count > 99 ? '99+' : count}
-        </span>
-      )}
-    </Link>
+    <div ref={wrapperRef} className="relative">
+      <button
+        onClick={() => setIsOpen((v) => !v)}
+        className="relative p-2 rounded-lg hover:bg-white/5 transition-colors"
+        aria-label={`Notifications${count > 0 ? ` (${count} non lues)` : ''}`}
+        aria-expanded={isOpen}
+      >
+        <Bell size={20} className="text-gray-300" />
+        {count > 0 && (
+          <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center">
+            {count > 99 ? '99+' : count}
+          </span>
+        )}
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
+            className="absolute right-0 top-full mt-2 w-80 bg-gray-900 border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50"
+          >
+            <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
+              <p className="font-semibold text-white">Notifications</p>
+              {count > 0 && (
+                <span className="text-xs text-gray-400">{count} non lue{count > 1 ? 's' : ''}</span>
+              )}
+            </div>
+
+            <div className="max-h-80 overflow-y-auto">
+              {count === 0 ? (
+                <div className="px-4 py-8 text-center text-gray-500 text-sm">
+                  <Bell size={28} className="mx-auto mb-2 opacity-40" />
+                  Aucun message non lu
+                </div>
+              ) : (
+                items.map((item) => (
+                  <div key={item.id} className="px-4 py-3 border-b border-white/5 hover:bg-white/5 transition-colors">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                        {item.sender_name.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-sm font-semibold text-white truncate">{item.sender_name}</p>
+                          <span className="text-[10px] text-gray-500 shrink-0">
+                            {new Date(item.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-300 line-clamp-2 mt-0.5">{item.message}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <Link
+              href={href}
+              onClick={() => setIsOpen(false)}
+              className="block px-4 py-3 text-center text-sm font-semibold text-purple-400 hover:bg-purple-500/10 transition-colors border-t border-white/10"
+            >
+              Accéder au chat →
+            </Link>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -233,7 +371,7 @@ export default function Navbar() {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: 10, scale: 0.95 }}
                         transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                        className="absolute right-0 top-full mt-2 w-56 glass-dark rounded-xl border border-white/10 shadow-2xl overflow-hidden py-2 z-50"
+                        className="absolute right-0 top-full mt-2 w-56 bg-gray-900/95 backdrop-blur-md rounded-xl border border-white/10 shadow-2xl overflow-hidden py-2 z-50"
                       >
                         <div className="px-4 py-3 border-b border-white/5">
                           <p className="font-semibold text-white">{user.username}</p>
