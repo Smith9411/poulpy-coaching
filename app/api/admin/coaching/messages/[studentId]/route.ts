@@ -17,9 +17,42 @@ export async function GET(
   try {
     const { studentId } = await params;
 
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(studentId)) {
+      return NextResponse.json({ error: 'studentId invalide' }, { status: 400 });
+    }
+
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
+      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Token invalide' }, { status: 401 });
+    }
+
+    const { data: callerProfile } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .single();
+
+    const isAdmin = callerProfile?.is_admin === true;
+    const isSelf = user.id === studentId;
+
+    if (!isAdmin && !isSelf) {
+      return NextResponse.json(
+        { error: 'Non autorisé' },
+        { status: 403 }
+      );
+    }
+
     const { data: messages, error } = await supabase
       .from('coaching_messages')
-      .select('*')
+      .select('id, message, message_type, created_at, read_at, sender_id, student_id, admin_id')
       .eq('student_id', studentId)
       .order('created_at', { ascending: false });
 
