@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { ArrowLeft, Shield, Loader2, Search, MessageSquare, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Shield, Loader2, Search, MessageSquare, ChevronRight, Quote } from 'lucide-react';
 
 interface AdminUser {
   id: string;
@@ -16,6 +16,7 @@ interface AdminUser {
   favoriteGame?: 'valorant' | 'apex' | null;
   valorantRank?: string | null;
   apexRank?: string | null;
+  bio?: string | null;
 }
 
 export default function AdminStudentsPage() {
@@ -157,6 +158,7 @@ export default function AdminStudentsPage() {
                     <th className="px-4 py-3 font-semibold">Email</th>
                     <th className="px-4 py-3 font-semibold">🔫 Valorant</th>
                     <th className="px-4 py-3 font-semibold">⚡ Apex</th>
+                    <th className="px-4 py-3 font-semibold">Bio</th>
                     <th className="px-4 py-3 font-semibold text-right">Action</th>
                   </tr>
                 </thead>
@@ -196,6 +198,21 @@ export default function AdminStudentsPage() {
                           <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-300 text-xs font-medium">
                             {u.apexRank}
                           </span>
+                        ) : (
+                          <span className="text-gray-600 text-xs">—</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 max-w-xs">
+                        {u.bio ? (
+                          <div className="flex items-start gap-2">
+                            <Quote size={12} className="text-purple-400 mt-0.5 shrink-0" />
+                            <span
+                              className="text-xs text-gray-300 line-clamp-2"
+                              title={u.bio}
+                            >
+                              {u.bio}
+                            </span>
+                          </div>
                         ) : (
                           <span className="text-gray-600 text-xs">—</span>
                         )}

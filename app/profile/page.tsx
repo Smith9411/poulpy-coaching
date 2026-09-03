@@ -2,19 +2,22 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { User, Mail, Settings, LogOut, Shield, Clock, Award, Camera, Trash2, Edit2, Check, X, Loader2, MessageSquare } from 'lucide-react';
+import { User, Mail, Settings, LogOut, Shield, Clock, Award, Camera, Trash2, Edit2, Check, X, Loader2, MessageSquare, Quote } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { useState, useRef } from 'react';
 import FavoriteGames from '@/components/FavoriteGames';
 
 export default function Profile() {
-  const { user, logout, updateAvatar, updateUsername, isLoading: authLoading } = useAuth();
+  const { user, logout, updateAvatar, updateUsername, updateBio, isLoading: authLoading } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [isEditingName, setIsEditingName] = useState(false);
   const [newName, setNewName] = useState('');
   const [isSavingName, setIsSavingName] = useState(false);
+  const [isEditingBio, setIsEditingBio] = useState(false);
+  const [bioDraft, setBioDraft] = useState('');
+  const [isSavingBio, setIsSavingBio] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const showStatus = (type: 'success' | 'error', text: string) => {
@@ -120,6 +123,30 @@ export default function Profile() {
       showStatus('error', msg);
     } finally {
       setIsSavingName(false);
+    }
+  };
+
+  const handleSaveBio = async () => {
+    const trimmed = bioDraft.trim();
+    const current = (user.bio || '').trim();
+    if (trimmed === current) {
+      setIsEditingBio(false);
+      return;
+    }
+    if (trimmed.length > 280) {
+      showStatus('error', 'La bio ne doit pas dépasser 280 caractères.');
+      return;
+    }
+    setIsSavingBio(true);
+    try {
+      await updateBio(trimmed);
+      showStatus('success', trimmed ? 'Bio mise à jour avec succès !' : 'Bio supprimée.');
+      setIsEditingBio(false);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erreur';
+      showStatus('error', msg);
+    } finally {
+      setIsSavingBio(false);
     }
   };
 
@@ -290,6 +317,80 @@ export default function Profile() {
               Déconnexion
             </button>
           </div>
+        </div>
+
+        {/* Bio */}
+        <div className="card rounded-2xl p-8 mb-12">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
+                <Quote size={20} className="text-white" />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg">Ma bio</h3>
+                <p className="text-xs text-gray-500">Visible par l&apos;équipe de coaching</p>
+              </div>
+            </div>
+            {!isEditingBio && (
+              <button
+                type="button"
+                onClick={() => {
+                  setBioDraft(user.bio || '');
+                  setIsEditingBio(true);
+                }}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-medium text-gray-300 transition-colors"
+                title={user.bio ? 'Modifier ma bio' : 'Ajouter une bio'}
+              >
+                <Edit2 size={14} />
+                {user.bio ? 'Modifier' : 'Ajouter'}
+              </button>
+            )}
+          </div>
+
+          {isEditingBio ? (
+            <div>
+              <textarea
+                value={bioDraft}
+                onChange={(e) => setBioDraft(e.target.value.slice(0, 280))}
+                placeholder="Présente-toi en quelques lignes : ton jeu principal, ton rang, tes objectifs, ce que tu attends du coaching…"
+                rows={4}
+                maxLength={280}
+                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500 resize-none"
+                autoFocus
+              />
+              <div className="flex items-center justify-between mt-3">
+                <span className={`text-xs ${bioDraft.length >= 260 ? 'text-orange-400' : 'text-gray-500'}`}>
+                  {bioDraft.length} / 280
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingBio(false)}
+                    disabled={isSavingBio}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-medium text-gray-300 transition-colors disabled:opacity-50"
+                  >
+                    <X size={14} />
+                    Annuler
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSaveBio}
+                    disabled={isSavingBio}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-500/20 hover:bg-green-500/30 text-xs font-medium text-green-400 transition-colors disabled:opacity-50"
+                  >
+                    {isSavingBio ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                    Enregistrer
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : user.bio ? (
+            <p className="text-gray-200 whitespace-pre-wrap leading-relaxed">{user.bio}</p>
+          ) : (
+            <p className="text-sm text-gray-500 italic">
+              Aucune bio pour l&apos;instant. Ajoute quelques lignes pour que ton coach puisse mieux te connaître.
+            </p>
+          )}
         </div>
 
         {/* Favorite Games */}

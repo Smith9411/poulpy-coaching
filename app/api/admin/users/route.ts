@@ -12,7 +12,7 @@ export async function GET() {
   try {
     const [{ data: authUsers, error: authErr }, { data: profiles, error: profErr }] = await Promise.all([
       supabaseAdmin.auth.admin.listUsers(),
-      supabaseAdmin.from('profiles').select('id, username, is_admin, created_at, favorite_game, valorant_rank, apex_rank'),
+      supabaseAdmin.from('profiles').select('id, username, is_admin, created_at, favorite_game, valorant_rank, apex_rank, bio'),
     ]);
 
     if (authErr) throw authErr;
@@ -24,6 +24,7 @@ export async function GET() {
       const meta = u.user_metadata || {};
       const username = p?.username || meta.username || u.email?.split('@')[0] || 'Joueur';
       const avatarUrl = meta.avatar_url || null;
+      const bio = (p?.bio && typeof p.bio === 'string') ? p.bio : null;
 
       return {
         id: u.id,
@@ -36,6 +37,7 @@ export async function GET() {
         favoriteGame: p?.favorite_game || null,
         valorantRank: p?.valorant_rank || null,
         apexRank: p?.apex_rank || null,
+        bio,
       };
     });
 

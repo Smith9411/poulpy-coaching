@@ -11,6 +11,7 @@ export interface User {
   initial: string;
   isAdmin: boolean;
   avatarUrl?: string | null;
+  bio?: string | null;
 }
 
 interface AuthContextType {
@@ -21,6 +22,7 @@ interface AuthContextType {
   logout: () => Promise<void>;
   updateAvatar: (avatarUrl: string | null) => Promise<void>;
   updateUsername: (newUsername: string) => Promise<void>;
+  updateBio: (newBio: string) => Promise<void>;
   refreshUser: () => Promise<void>;
 }
 
@@ -34,15 +36,17 @@ async function buildUser(session: Session): Promise<User> {
   let isAdmin = false;
   const avatarUrl: string | null = (meta.avatar_url && typeof meta.avatar_url === 'string' && meta.avatar_url.trim() !== '') ? meta.avatar_url : null;
 
+  let bio: string | null = null;
   try {
     const { data } = await supabase
       .from('profiles')
-      .select('username, is_admin')
+      .select('username, is_admin, bio')
       .eq('id', session.user.id)
       .single();
     if (data) {
       if (data.username) username = data.username;
       isAdmin = data.is_admin === true;
+      if (typeof data.bio === 'string') bio = data.bio;
     }
   } catch {
     // profiles momentanément indisponible : on retombe sur les métadonnées
@@ -55,6 +59,7 @@ async function buildUser(session: Session): Promise<User> {
     initial: username.charAt(0).toUpperCase(),
     isAdmin,
     avatarUrl,
+    bio,
   };
 }
 
@@ -144,8 +149,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser((prev) => (prev ? { ...prev, username: newUsername, initial: newUsername.charAt(0).toUpperCase() } : null));
   };
 
+  const updateBio = async (newBio: string) => {
+    if (!user) return;
+    const trimmed = newBio.trim();
+    const { error } = await supabase
+      .from('profiles')
+      .update({ bio: trimmed || null })
+      .eq('id', user.id);
+    if (error) throw error;
+    setUser((prev) => (prev ? { ...prev, bio: trimmed || null } : null));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout, updateAvatar, updateUsername, refreshUser }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register, logout, updateAvatar, updateUsername, updateBio, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
