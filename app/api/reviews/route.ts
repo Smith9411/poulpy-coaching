@@ -249,16 +249,65 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'Aucun champ à modifier' }, { status: 400 });
     }
 
+    // Tenter d'ajouter updated_at ; si la colonne n'existe pas, on l'ignore
     updates.updated_at = new Date().toISOString();
 
-    const { data, error } = await supabase
-      .from('reviews')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
+    let data, error;
+    try {
+      const result = await supabase
+        .from('reviews')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+      data = result.data;
+      error = result.error;
+    } catch (e) {
+      console.error('Erreur update PATCH:', e);
+      throw e;
+    }
 
-    if (error) throw error;
+    if (error) {
+      console.error('Erreur Supabase PATCH:', { id, updates, error });
+
+      // Si la colonne updated_at n'existe pas, on retry sans
+      if (error.message?.includes('updated_at') || error.message?.includes('schema cache')) {
+        const { updated_at, ...updatesNoTimestamp } = updates;
+        const retry = await supabase
+          .from('reviews')
+          .update(updatesNoTimestamp)
+          .eq('id', id)
+          .select()
+          .single();
+
+        if (retry.error) {
+          console.error('Erreur PATCH sans updated_at:', retry.error);
+          return NextResponse.json(
+            {
+              error: `La colonne 'updated_at' n'existe pas. Exécute le SQL 'add-review-updated-at-column.sql' dans Supabase. Détail : ${retry.error.message}`,
+            },
+            { status: 500 }
+          );
+        }
+
+        return NextResponse.json({
+          review: retry.data,
+          warning: 'Colonne updated_at manquante, exécution sans timestamp.',
+          success: true,
+        });
+      }
+
+      throw error;
+    }
+
+    // Si .single() a réussi mais data est null (PGRST116), l'UPDATE n'a touché aucune ligne
+    if (!data) {
+      console.error('PATCH: aucune ligne mise à jour pour id =', id);
+      return NextResponse.json(
+        { error: 'Mise à jour échouée : avis introuvable ou déjà supprimé.' },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json({ review: data, success: true });
   } catch (err: unknown) {
