@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { Menu, X, User, LogOut, ChevronDown, Settings, Shield, BarChart2, Bell } from 'lucide-react';
+import { Menu, X, User, LogOut, ChevronDown, Settings, Shield, BarChart2, Bell, UserPlus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -371,6 +371,16 @@ export default function Navbar() {
                             </span>
                           )}
                         </div>
+                        {user.needsUsername && (
+                          <Link
+                            href="/auth/complete"
+                            className="flex items-center gap-3 px-4 py-3 text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 transition-colors border-b border-white/5"
+                            onClick={() => setIsProfileMenuOpen(false)}
+                          >
+                            <UserPlus size={18} />
+                            Choisis ton pseudo →
+                          </Link>
+                        )}
                         <Link
                           href="/profile"
                           className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
@@ -509,6 +519,16 @@ export default function Navbar() {
                           )}
                         </div>
                       </div>
+                      {user.needsUsername && (
+                        <Link
+                          href="/auth/complete"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="flex items-center justify-center gap-2 px-6 py-3 glass rounded-lg border border-purple-500/30 text-lg font-medium text-purple-400 hover:bg-purple-500/10 transition-all"
+                        >
+                          <UserPlus size={20} />
+                          Choisis ton pseudo →
+                        </Link>
+                      )}
                       <Link
                         href="/profile"
                         onClick={() => setIsMobileMenuOpen(false)}

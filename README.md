@@ -59,8 +59,10 @@ app/
     coaching/             # Chat élève
   avis/                   # Reviews
   auth/                   # Login/register
+    callback/             # Retour OAuth Google (session → redirection)
+    complete/             # Choix du pseudo après connexion Google
 components/                # Composants partagés
-context/AuthContext.tsx    # Auth provider
+context/AuthContext.tsx    # Auth provider (User.needsUsername, signInWithGoogle)
 lib/supabase.ts             # Client Supabase (anon key)
 ```
 
@@ -90,6 +92,7 @@ lib/supabase.ts             # Client Supabase (anon key)
 - **`/api/notifications/*`** : service_role key, validation token
 - **`/api/student/messages`** : service_role key
 - **Magic bytes** : validation PNG/JPEG/GIF/WEBP côté client avant upload avatar
+- **`/api/auth/check-username`** : auth obligatoire (Bearer token), pseudo validé par regex + jokers LIKE échappés, lecture service_role (RLS bloque sinon)
 
 ### Restriction
 
@@ -147,7 +150,9 @@ npm run start        # Serveur production
 ## URLs de dev (localhost:3000)
 
 - `/` — Landing
-- `/auth` — Login/register
+- `/auth` — Login/register (+ bouton « Continuer avec Google »)
+- `/auth/callback` — Retour OAuth Google (ne pas ouvrir directement)
+- `/auth/complete` — Choix du pseudo (Google uniquement, garde de session)
 - `/profile` — Profil élève
 - `/profile/coaching` — Chat élève
 - `/avis` — Reviews
@@ -169,6 +174,29 @@ npm run start        # Serveur production
 
 - `profiles.bio` (TEXT) — ajouté par ALTER TABLE pour la feature bio
 - (les autres tables existent déjà)
+
+## Connexion Google OAuth — configuration (une seule fois)
+
+Le code est en place (bouton Google sur `/auth`, retour sur `/auth/callback`, choix de pseudo obligatoire sur `/auth/complete`). Pour l'activer, la config ci-dessous est **à faire dans les consoles Google Cloud et Supabase** (pas dans le repo) :
+
+1. **Google Cloud Console** ([console.cloud.google.com](https://console.cloud.google.com)) :
+   - Créer un projet (ex: `Poulpy Coaching`) ou en réutiliser un.
+   - Écran de consentement OAuth : type *External*, ajouter les scopes par défaut (`email`, `profile`, `openid`).
+   - **Identifiants → Créer → ID client OAuth → Application Web** :
+     - *Authorized redirect URI* : `https://gxomzlbmgqhgeegzcafl.supabase.co/auth/v1/callback` (URL de callback Supabase, **celle-là et pas une autre**)
+   - Noter le **Client ID** et le **Client Secret**.
+2. **Supabase Dashboard** ([supabase.com/dashboard](https://supabase.com/dashboard), projet `gxomzlbmgqhgeegzcafl`) :
+   - **Authentication → Sign In / Providers → Google** : activer, coller Client ID + Client Secret, sauvegarder.
+   - **Authentication → URL Configuration → Redirect URLs** : ajouter
+     - `http://localhost:3000/auth/callback`
+     - `https://<domaine-de-production>/auth/callback` (le domaine Vercel custom)
+3. **(Recommandé) SQL Editor** — index unique sur le pseudo pour garantir l'unicité même en cas de course :
+   ```sql
+   CREATE UNIQUE INDEX CONCURRENTLY IF NOT EXISTS profiles_username_lower_unique
+     ON profiles (LOWER(username));
+   ```
+
+Fonctionnement côté app : après le retour Google, `/auth/callback` vérifie la session et redirige vers `/auth/complete` si l'utilisateur n'a pas de pseudo (comptes Google). Le pseudo est vérifié via `/api/auth/check-username` (service_role + token, insensible à la casse). `User.needsUsername` dans AuthContext pilote le rappel dans la Navbar. Les comptes email/mot de passe existants ne sont pas affectés (pseudo déjà renseigné à l'inscription).
 
 ## Points d'attention pour le prochain
 
@@ -196,3 +224,11 @@ npm run start        # Serveur production
   - **Notifications** : pastille rouge fonctionnelle, cloche refactor — voir historique git
   - **Mdp admin smith94** changé en `Poulpyacq7gm!` (via script Node, à noter pour futures connexions)
   - **Reste à faire** : race condition clear/fetch (cas rare), Page Visibility API pour polling, RLS policies Supabase, magic bytes validation côté serveur
+- 2026-09-03 (session connexion Google + pseudo) :
+  - **Connexion Google OAuth** : bouton « Continuer avec Google » (logo officiel) sur `/auth` + séparateur « ou par email » — `AuthContext.signInWithGoogle()`
+  - **`/auth/callback`** : page de retour OAuth (attente session, gestion erreurs URL, timeout 10s) → redirige `/` ou `/auth/complete`
+  - **`/auth/complete`** : étape choix de pseudo obligatoire après inscription Google (avatar Google + anneau dégradé, suggestions auto depuis email/nom Google, vérif dispo en direct avec debounce + AbortController, thèmes clair/sombre)
+  - **`/api/auth/check-username`** : vérif dispo pseudo via service_role + token, regex + échappement jokers LIKE, insensible à la casse
+  - **`User.needsUsername`** ajouté dans AuthContext (pseudo absent → rappel « Choisis ton pseudo » dans la Navbar desktop + mobile)
+  - **Google pas encore activé côté Supabase** : voir section « Connexion Google OAuth — configuration » ci-dessus (Google Cloud + Supabase Dashboard, callback `https://gxomzlbmgqhgeegzcafl.supabase.co/auth/v1/callback`)
+  - Testé en local : rendu 2 thèmes, redirection OAuth correcte (`provider is not enabled` attendu tant que la config n'est pas faite), garde `/auth/complete` sans session, lint propre, build OK

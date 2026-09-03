@@ -12,6 +12,9 @@ export interface User {
   isAdmin: boolean;
   avatarUrl?: string | null;
   bio?: string | null;
+  // true quand l'utilisateur est connecté (ex: via Google) mais n'a pas
+  // encore choisi de pseudo → doit passer par /auth/complete
+  needsUsername: boolean;
 }
 
 interface AuthContextType {
@@ -19,6 +22,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, username: string, password: string) => Promise<{ needsEmailConfirmation: boolean }>;
+  signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
   updateAvatar: (avatarUrl: string | null) => Promise<void>;
   updateUsername: (newUsername: string) => Promise<void>;
@@ -37,6 +41,7 @@ async function buildUser(session: Session): Promise<User> {
   const avatarUrl: string | null = (meta.avatar_url && typeof meta.avatar_url === 'string' && meta.avatar_url.trim() !== '') ? meta.avatar_url : null;
 
   let bio: string | null = null;
+  let profileUsername: string | null = null;
   try {
     const { data } = await supabase
       .from('profiles')
@@ -44,13 +49,21 @@ async function buildUser(session: Session): Promise<User> {
       .eq('id', session.user.id)
       .single();
     if (data) {
-      if (data.username) username = data.username;
+      if (data.username) {
+        username = data.username;
+        profileUsername = data.username;
+      }
       isAdmin = data.is_admin === true;
       if (typeof data.bio === 'string') bio = data.bio;
     }
   } catch {
     // profiles momentanément indisponible : on retombe sur les métadonnées
   }
+
+  const metaUsername = typeof meta.username === 'string' ? meta.username.trim() : '';
+  // Les comptes email renseignent le pseudo à l'inscription (user_metadata).
+  // Les comptes Google n'ont pas de pseudo → il faut passer par /auth/complete.
+  const needsUsername = !profileUsername && !metaUsername;
 
   return {
     id: session.user.id,
@@ -60,6 +73,7 @@ async function buildUser(session: Session): Promise<User> {
     isAdmin,
     avatarUrl,
     bio,
+    needsUsername,
   };
 }
 
@@ -126,6 +140,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { needsEmailConfirmation: !data.session };
   };
 
+  const signInWithGoogle = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        // Retour OAuth traité par /auth/callback (session dans le fragment URL)
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+    if (error) {
+      if (/provider/i.test(error.message) && /not enabled|unsupported/i.test(error.message)) {
+        throw new Error(
+          "La connexion Google n'est pas encore activée. Configuration requise côté Supabase (voir README, section Google OAuth)."
+        );
+      }
+      throw new Error(error.message);
+    }
+    // En cas de succès, le navigateur quitte la page vers Google : rien à faire ici.
+  };
+
   const logout = async () => {
     await supabase.auth.signOut();
   };
@@ -161,7 +194,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout, updateAvatar, updateUsername, updateBio, refreshUser }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register, signInWithGoogle, logout, updateAvatar, updateUsername, updateBio, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
