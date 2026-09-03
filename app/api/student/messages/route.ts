@@ -2,13 +2,15 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!supabaseUrl || !supabaseAnonKey) {
+if (!supabaseUrl || !supabaseServiceKey) {
   throw new Error('Variables Supabase manquantes');
 }
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: { persistSession: false, autoRefreshToken: false },
+});
 
 export async function GET(req: NextRequest) {
   try {
@@ -24,14 +26,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Token invalide' }, { status: 401 });
     }
 
-    // Bind the client to the user's JWT so RLS sees auth.role() = 'authenticated'
-    // and auth.uid() = this user, allowing the row-level policy to match.
-    const userClient = createClient(supabaseUrl!, supabaseAnonKey!, {
-      global: { headers: { Authorization: `Bearer ${token}` } },
-      auth: { persistSession: false, autoRefreshToken: false },
-    });
-
-    const { data: messages, error } = await userClient
+    const { data: messages, error } = await supabase
       .from('coaching_messages')
       .select('*')
       .eq('student_id', user.id)
@@ -41,7 +36,7 @@ export async function GET(req: NextRequest) {
 
     const unreadMessages = messages?.filter((m: { read_at: string | null }) => !m.read_at) || [];
     if (unreadMessages.length > 0) {
-      await userClient
+      await supabase
         .from('coaching_messages')
         .update({ read_at: new Date().toISOString() })
         .in('id', unreadMessages.map((m: { id: string }) => m.id));
