@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, ArrowRight, MessageSquarePlus, Trash2, Check, X, Loader2, Shield, User as UserIcon } from 'lucide-react';
+import { Star, ArrowRight, MessageSquarePlus, Trash2, Check, X, Loader2, Shield, User as UserIcon, MessageSquare, Send } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -16,6 +16,8 @@ interface Review {
   rating: number;
   user_id?: string;
   created_at: string;
+  admin_response?: string;
+  admin_response_at?: string;
 }
 
 const GAME_OPTIONS = [
@@ -57,6 +59,15 @@ export default function Avis() {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  
+  // Sorting states
+  const [sortBy, setSortBy] = useState<'date' | 'name' | 'rating'>('date');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  
+  // Admin response states
+  const [respondingToId, setRespondingToId] = useState<string | null>(null);
+  const [responseText, setResponseText] = useState('');
+  const [isSubmittingResponse, setIsSubmittingResponse] = useState(false);
 
   useEffect(() => {
     return () => {
@@ -84,7 +95,7 @@ export default function Avis() {
   const fetchReviews = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await fetch('/api/reviews');
+      const res = await fetch(`/api/reviews?sortBy=${sortBy}&sortOrder=${sortOrder}`);
       const data = await res.json();
       if (data.reviews) {
         setReviews(data.reviews);
@@ -115,7 +126,7 @@ export default function Avis() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [sortBy, sortOrder]);
 
   useEffect(() => {
     fetchReviews();
@@ -209,6 +220,55 @@ export default function Avis() {
       showStatus('error', msg);
     } finally {
       setConfirmDeleteId(null);
+    }
+  };
+
+  const handleAdminResponse = async (reviewId: string) => {
+    if (!responseText.trim()) {
+      showStatus('error', 'Veuillez écrire une réponse.');
+      return;
+    }
+    
+    if (responseText.trim().length > 1000) {
+      showStatus('error', 'La réponse ne doit pas dépasser 1000 caractères.');
+      return;
+    }
+
+    setIsSubmittingResponse(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('Non authentifié');
+
+      const res = await fetch('/api/reviews/respond', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          reviewId,
+          response: responseText.trim(),
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || 'Erreur');
+
+      setReviews((prev) => prev.map((r) => 
+        r.id === reviewId 
+          ? { ...r, admin_response: data.response, admin_response_at: data.response_at }
+          : r
+      ));
+      
+      showStatus('success', 'Réponse publiée avec succès !');
+      setResponseText('');
+      setRespondingToId(null);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erreur lors de la publication';
+      showStatus('error', msg);
+    } finally {
+      setIsSubmittingResponse(false);
     }
   };
 
@@ -528,6 +588,53 @@ export default function Avis() {
           )}
         </AnimatePresence>
 
+        {/* Sort Controls */}
+        {!isLoading && reviews.length > 0 && (
+          <div className="max-w-4xl mx-auto mb-8 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-gray-400">Trier par :</span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setSortBy('date')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    sortBy === 'date'
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                  }`}
+                >
+                  Date
+                </button>
+                <button
+                  onClick={() => setSortBy('name')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    sortBy === 'name'
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                  }`}
+                >
+                  Nom
+                </button>
+                <button
+                  onClick={() => setSortBy('rating')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    sortBy === 'rating'
+                      ? 'bg-purple-600 text-white'
+                      : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                  }`}
+                >
+                  Note
+                </button>
+              </div>
+            </div>
+            <button
+              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-gray-400 hover:bg-white/10 text-sm font-medium transition-all"
+            >
+              {sortOrder === 'asc' ? '↑ Croissant' : '↓ Décroissant'}
+            </button>
+          </div>
+        )}
+
         {/* Testimonials Grid */}
         {isLoading ? (
           <div className="p-20 text-center">
@@ -609,10 +716,80 @@ export default function Avis() {
                       <div className="text-purple-400 text-xs font-medium">{testimonial.game}</div>
                     </div>
                   </div>
-                  <div className="text-xs px-2.5 py-1 rounded-full bg-white/5 text-gray-400">
-                    {testimonial.rank}
+                  <div className="flex flex-col items-end gap-1">
+                    <div className="text-xs px-2.5 py-1 rounded-full bg-white/5 text-gray-400">
+                      {testimonial.rank}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {new Date(testimonial.created_at).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                      })}
+                    </div>
                   </div>
                 </div>
+
+                {/* Admin Response Section */}
+                {testimonial.admin_response ? (
+                  <div className="mt-4 p-4 rounded-xl bg-purple-500/10 border border-purple-500/30">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Shield size={16} className="text-purple-400" />
+                      <span className="text-xs font-medium text-purple-400">Réponse de l&apos;équipe Poulpy</span>
+                    </div>
+                    <p className="text-sm text-gray-300">{testimonial.admin_response}</p>
+                  </div>
+                ) : user?.isAdmin && (
+                  <div className="mt-4">
+                    {respondingToId === testimonial.id ? (
+                      <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                        <textarea
+                          rows={3}
+                          placeholder="Votre réponse..."
+                          value={responseText}
+                          onChange={(e) => setResponseText(e.target.value)}
+                          className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500 text-sm mb-3"
+                        />
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => {
+                              setRespondingToId(null);
+                              setResponseText('');
+                            }}
+                            className="px-3 py-1.5 rounded-lg bg-white/5 text-gray-400 hover:bg-white/10 text-sm transition-colors"
+                          >
+                            Annuler
+                          </button>
+                          <button
+                            onClick={() => handleAdminResponse(testimonial.id)}
+                            disabled={isSubmittingResponse}
+                            className="inline-flex items-center gap-2 px-4 py-1.5 bg-purple-600 rounded-lg text-white text-sm font-medium hover:bg-purple-700 transition-colors disabled:opacity-50"
+                          >
+                            {isSubmittingResponse ? (
+                              <>
+                                <Loader2 size={14} className="animate-spin" />
+                                Envoi...
+                              </>
+                            ) : (
+                              <>
+                                <Send size={14} />
+                                Répondre
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setRespondingToId(testimonial.id)}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-white/5 text-gray-400 hover:bg-white/10 text-sm font-medium transition-colors"
+                      >
+                        <MessageSquare size={16} />
+                        Répondre à cet avis
+                      </button>
+                    )}
+                  </div>
+                )}
               </article>
             ))}
           </div>

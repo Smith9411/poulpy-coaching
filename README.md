@@ -126,6 +126,10 @@ CREATE POLICY "Reviews are public" ON reviews FOR SELECT USING (true);
 CREATE POLICY "Authenticated post reviews" ON reviews FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
 CREATE POLICY "Admins delete reviews" ON reviews FOR DELETE
   USING (EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = true));
+
+-- Ajouter les colonnes pour les réponses admin (si pas déjà fait)
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS admin_response TEXT;
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS admin_response_at TIMESTAMP WITH TIME ZONE;
 ```
 
 ## Comptes de test
@@ -173,6 +177,8 @@ npm run start        # Serveur production
 ## Variables Supabase à configurer manuellement
 
 - `profiles.bio` (TEXT) — ajouté par ALTER TABLE pour la feature bio
+- `reviews.admin_response` (TEXT) — ajouté pour les réponses admin aux avis
+- `reviews.admin_response_at` (TIMESTAMP WITH TIME ZONE) — ajouté pour la date de réponse admin
 - (les autres tables existent déjà)
 
 ## Connexion Google OAuth — configuration (une seule fois)
@@ -224,6 +230,12 @@ Fonctionnement côté app : après le retour Google, `/auth/callback` vérifie l
   - **Notifications** : pastille rouge fonctionnelle, cloche refactor — voir historique git
   - **Mdp admin smith94** changé en `Poulpyacq7gm!` (via script Node, à noter pour futures connexions)
   - **Reste à faire** : race condition clear/fetch (cas rare), Page Visibility API pour polling, RLS policies Supabase, magic bytes validation côté serveur
+- 2026-09-03 (session tri et réponse avis) :
+  - **Tri des avis** : ajouts filtres de tri par date, nom, note (croissant/décroissant) sur la page `/avis` — modification API `/api/reviews` (GET) pour accepter paramètres `sortBy` et `sortOrder`
+  - **Réponses admin** : possibilité pour les admins de répondre aux avis via nouveau bouton « Répondre à cet avis » + formulaire inline — création API `/api/reviews/respond` (POST) avec auth + is_admin, stockage dans `admin_response` et `admin_response_at`
+  - **UI** : affichage des réponses admin avec badge « Réponse de l'équipe Poulpy » dans les cartes d'avis
+  - **Schema** : mise à jour interface `Review` pour inclure `admin_response` et `admin_response_at`
+  - Testé en local : build OK, tri fonctionnel, interface réponse admin visible uniquement pour les admins
 - 2026-09-03 (session connexion Google + pseudo) :
   - **Connexion Google OAuth** : bouton « Continuer avec Google » (logo officiel) sur `/auth` + séparateur « ou par email » — `AuthContext.signInWithGoogle()`
   - **`/auth/callback`** : page de retour OAuth (attente session, gestion erreurs URL, timeout 10s) → redirige `/` ou `/auth/complete`

@@ -19,14 +19,39 @@ interface ReviewItem {
   rating: number;
   user_id?: string;
   created_at: string;
+  admin_response?: string;
+  admin_response_at?: string;
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const { searchParams } = new URL(req.url);
+    const sortBy = searchParams.get('sortBy') || 'date';
+    const sortOrder = searchParams.get('sortOrder') || 'desc';
+
+    let orderByColumn: string = 'created_at';
+    let ascending: boolean = false;
+
+    switch (sortBy) {
+      case 'name':
+        orderByColumn = 'name';
+        ascending = sortOrder === 'asc';
+        break;
+      case 'rating':
+        orderByColumn = 'rating';
+        ascending = sortOrder === 'asc';
+        break;
+      case 'date':
+      default:
+        orderByColumn = 'created_at';
+        ascending = sortOrder === 'asc';
+        break;
+    }
+
     const { data: reviews, error } = await supabase
       .from('reviews')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order(orderByColumn, { ascending });
 
     if (error) throw error;
 
