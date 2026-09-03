@@ -1,6 +1,6 @@
 'use client';
 
-import { Shield, Users, DollarSign, BarChart2, Settings, LogOut, Mail, Award, MessageSquare } from 'lucide-react';
+import { Shield, Users, DollarSign, BarChart2, Settings, LogOut, Mail, Award, MessageSquare, Zap } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -51,6 +51,7 @@ export default function AdminDashboard() {
   ];
 
   const quickActions = [
+    { label: 'Actions rapides', href: '/admin/students', icon: Zap, cls: 'border-orange-500/30 hover:bg-orange-500/10 text-orange-400' },
     { label: 'Gérer utilisateurs', href: '/admin/users', icon: Users, cls: 'border-purple-500/30 hover:bg-purple-500/10 text-purple-400' },
     { label: 'Gérer coaching', href: '/admin/coaching', icon: MessageSquare, cls: 'border-green-500/30 hover:bg-green-500/10 text-green-400' },
     { label: 'Voir statistiques', href: '/admin/stats', icon: BarChart2, cls: 'border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-400' },

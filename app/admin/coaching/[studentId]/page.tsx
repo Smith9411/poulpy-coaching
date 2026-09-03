@@ -220,21 +220,21 @@ export default function StudentCoachingPage() {
         </div>
 
         {/* Jeux & Rang */}
-        {student && (student.favoriteGame || student.valorantRank || student.apexRank) && (
+        {student && (student.valorantRank || student.apexRank) && (
           <div className="card rounded-2xl p-4 mb-6 flex flex-wrap items-center gap-3">
             <span className="text-xs uppercase tracking-wide text-gray-500 font-semibold">Jeux & rang</span>
-            {student.favoriteGame === 'valorant' && (
+            {student.valorantRank && (
               <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/15 border border-red-500/30 text-red-300 text-sm font-medium">
-                🔫 Valorant · <span className="font-bold">{student.valorantRank || 'Non classé'}</span>
+                🔫 Valorant · <span className="font-bold">{student.valorantRank}</span>
               </span>
             )}
-            {student.favoriteGame === 'apex' && (
+            {student.apexRank && (
               <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-300 text-sm font-medium">
-                ⚡ Apex Legends · <span className="font-bold">{student.apexRank || 'Non classé'}</span>
+                ⚡ Apex Legends · <span className="font-bold">{student.apexRank}</span>
               </span>
             )}
-            {!student.favoriteGame && (
-              <span className="text-sm text-gray-500 italic">Aucun jeu favori sélectionné</span>
+            {!student.valorantRank && !student.apexRank && (
+              <span className="text-sm text-gray-500 italic">Aucun rang renseigné</span>
             )}
           </div>
         )}
