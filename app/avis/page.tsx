@@ -1,11 +1,12 @@
 ﻿'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, ArrowRight, MessageSquarePlus, Trash2, Check, X, Loader2, Shield, User as UserIcon, MessageSquare, Send, ChevronDown, Edit3, Clock, Save } from 'lucide-react';
+import { Star, ArrowRight, MessageSquarePlus, Trash2, Check, X, Loader2, Shield, User as UserIcon, MessageSquare, Send, ChevronDown, Edit3, Clock, Save, Gamepad2 } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
+import Select from '@/components/Select';
 
 interface Review {
   id: string;
@@ -1087,50 +1088,61 @@ export default function Avis() {
                   </div>
                 )}
 
-                {/* Edit Form - inline replacement */}
+                {/* Edit Form - styled like profile bio edit */}
                 {editingId === testimonial.id && (
-                  <div className='mt-4 p-4 rounded-xl bg-purple-500/10 border border-purple-500/30'>
-                    <div className='flex items-center justify-between mb-3'>
-                      <h4 className='text-sm font-semibold text-purple-300 flex items-center gap-2'>
-                        <Edit3 size={16} />
-                        Modifier votre avis
-                      </h4>
-                      <div className='text-xs text-gray-500 flex items-center gap-1'>
-                        <Clock size={12} />
-                        {formatRemaining(editTimeRemaining(testimonial))} restantes
+                  <div className='mt-4 p-4 rounded-xl bg-purple-500/10 border border-purple-500/30 relative z-20'>
+                    <div className='flex items-center justify-between mb-4'>
+                      <div className='flex items-center gap-3'>
+                        <div className='w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center'>
+                          <Edit3 size={16} className='text-white' />
+                        </div>
+                        <div>
+                          <h4 className='font-bold text-sm'>Modifier votre avis</h4>
+                          <div className='text-xs text-gray-500 flex items-center gap-1'>
+                            <Clock size={11} />
+                            <span>{formatRemaining(editTimeRemaining(testimonial))} restantes</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Game select */}
-                    <div className='mb-3'>
-                      <label className='block text-xs font-medium text-gray-400 mb-1'>Jeu</label>
-                      <select
+                    {/* Game select — same style as FavoriteGames */}
+                    <div className='space-y-2 mb-4'>
+                      <label className='block text-sm font-medium text-gray-300'>Jeu</label>
+                      <Select
                         value={editGame}
-                        onChange={(e) => setEditGame(e.target.value)}
-                        className='w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-inherit text-sm focus:outline-none focus:border-purple-500'
-                      >
-                        {GAME_OPTIONS.map((g) => (
-                          <option key={g} value={g} className='bg-[#13161e] text-white'>{g}</option>
-                        ))}
-                      </select>
+                        onChange={setEditGame}
+                        options={GAME_OPTIONS.map((g) => ({ value: g, label: g }))}
+                        accent='purple'
+                      />
                     </div>
 
                     {/* Rank Type toggle */}
                     {editGame !== 'Autre' && (
-                      <div className='mb-3'>
-                        <label className='block text-xs font-medium text-gray-400 mb-1'>Type de renseignement</label>
+                      <div className='mb-4'>
+                        <label className='block text-sm font-medium text-gray-300 mb-2'>
+                          Type de renseignement
+                        </label>
                         <div className='flex gap-2'>
                           <button
                             type='button'
                             onClick={() => setEditRankType('rank')}
-                            className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${editRankType === 'rank' ? 'bg-purple-600 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
+                            className={`flex-1 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                              editRankType === 'rank'
+                                ? 'bg-purple-600 text-white'
+                                : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                            }`}
                           >
                             Rang actuel
                           </button>
                           <button
                             type='button'
                             onClick={() => setEditRankType('progression')}
-                            className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${editRankType === 'progression' ? 'bg-purple-600 text-white' : 'bg-white/5 text-gray-400 hover:bg-white/10'}`}
+                            className={`flex-1 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                              editRankType === 'progression'
+                                ? 'bg-purple-600 text-white'
+                                : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                            }`}
                           >
                             Progression
                           </button>
@@ -1140,70 +1152,76 @@ export default function Avis() {
 
                     {/* Custom rank for Autre */}
                     {editGame === 'Autre' && (
-                      <div className='mb-3'>
-                        <label className='block text-xs font-medium text-gray-400 mb-1'>Rang / Niveau</label>
+                      <div className='space-y-2 mb-4'>
+                        <label className='block text-sm font-medium text-gray-300'>Rang / Niveau</label>
                         <input
                           type='text'
                           value={editCustomRank}
                           onChange={(e) => setEditCustomRank(e.target.value)}
                           placeholder='Ex: Master 1000 points'
-                          className='w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-inherit placeholder-gray-500 text-sm focus:outline-none focus:border-purple-500'
+                          className='w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500'
                         />
                       </div>
                     )}
 
                     {/* Rank select for Valorant / Apex */}
                     {editGame !== 'Autre' && editRankType === 'rank' && (
-                      <div className='mb-3'>
-                        <label className='block text-xs font-medium text-gray-400 mb-1'>Rang actuel</label>
-                        <select
+                      <div className='space-y-2 mb-4'>
+                        <label className='block text-sm font-medium text-gray-300'>Rang actuel</label>
+                        <Select
                           value={editRank}
-                          onChange={(e) => setEditRank(e.target.value)}
-                          className='w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-inherit text-sm focus:outline-none focus:border-purple-500'
-                        >
-                          <option value='' className='bg-[#13161e] text-white'>Sélectionne ton rang</option>
-                          {(editGame === 'Valorant' ? VALORANT_RANKS : APEX_RANKS).map((r) => (
-                            <option key={r} value={r} className='bg-[#13161e] text-white'>{r}</option>
-                          ))}
-                        </select>
+                          onChange={setEditRank}
+                          options={[
+                            { value: '', label: '— Rang —' },
+                            ...(editGame === 'Valorant' ? VALORANT_RANKS : APEX_RANKS).map((r) => ({
+                              value: r,
+                              label: r,
+                            })),
+                          ]}
+                          accent={editGame === 'Valorant' ? 'red' : 'orange'}
+                        />
                       </div>
                     )}
 
                     {/* Progression inputs */}
                     {editGame !== 'Autre' && editRankType === 'progression' && (
-                      <div className='grid sm:grid-cols-2 gap-3 mb-3'>
-                        <div>
-                          <label className='block text-xs font-medium text-gray-400 mb-1'>Rang de départ</label>
-                          <select
+                      <div className='grid sm:grid-cols-2 gap-3 mb-4'>
+                        <div className='space-y-2'>
+                          <label className='block text-sm font-medium text-gray-300'>Rang de départ</label>
+                          <Select
                             value={editRankFrom}
-                            onChange={(e) => setEditRankFrom(e.target.value)}
-                            className='w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-inherit text-sm focus:outline-none focus:border-purple-500'
-                          >
-                            <option value='' className='bg-[#13161e] text-white'>Départ</option>
-                            {(editGame === 'Valorant' ? VALORANT_RANKS : APEX_RANKS).map((r) => (
-                              <option key={r} value={r} className='bg-[#13161e] text-white'>{r}</option>
-                            ))}
-                          </select>
+                            onChange={setEditRankFrom}
+                            options={[
+                              { value: '', label: '— Départ —' },
+                              ...(editGame === 'Valorant' ? VALORANT_RANKS : APEX_RANKS).map((r) => ({
+                                value: r,
+                                label: r,
+                              })),
+                            ]}
+                            accent={editGame === 'Valorant' ? 'red' : 'orange'}
+                          />
                         </div>
-                        <div>
-                          <label className='block text-xs font-medium text-gray-400 mb-1'>Rang d&apos;arrivée</label>
-                          <select
+                        <div className='space-y-2'>
+                          <label className='block text-sm font-medium text-gray-300'>Rang d&apos;arrivée</label>
+                          <Select
                             value={editRankTo}
-                            onChange={(e) => setEditRankTo(e.target.value)}
-                            className='w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-inherit text-sm focus:outline-none focus:border-purple-500'
-                          >
-                            <option value='' className='bg-[#13161e] text-white'>Arrivée</option>
-                            {(editGame === 'Valorant' ? VALORANT_RANKS : APEX_RANKS).map((r) => (
-                              <option key={r} value={r} className='bg-[#13161e] text-white'>{r}</option>
-                            ))}
-                          </select>
+                            onChange={setEditRankTo}
+                            options={[
+                              { value: '', label: '— Arrivée —' },
+                              ...(editGame === 'Valorant' ? VALORANT_RANKS : APEX_RANKS).map((r) => ({
+                                value: r,
+                                label: r,
+                              })),
+                            ]}
+                            accent={editGame === 'Valorant' ? 'red' : 'orange'}
+                          />
                         </div>
                       </div>
                     )}
 
                     {/* Rating */}
-                    <div className='mb-3'>
-                      <label className='block text-xs font-medium text-gray-400 mb-1'>Note</label>
+                    <div className='mb-4'>
+                      <label className='block text-sm font-medium text-gray-300 mb-2'>Note</label>
                       <div className='flex items-center gap-1'>
                         {[1, 2, 3, 4, 5].map((star) => (
                           <button
@@ -1212,11 +1230,15 @@ export default function Avis() {
                             onClick={() => setEditRating(star)}
                             onMouseEnter={() => setEditHoverRating(star)}
                             onMouseLeave={() => setEditHoverRating(0)}
-                            className='p-0.5 hover:scale-110 transition-transform'
+                            className='p-1 hover:scale-110 transition-transform'
                           >
                             <Star
-                              size={20}
-                              className={`${(editHoverRating || editRating) >= star ? 'fill-yellow-400 text-yellow-400' : 'text-gray-600'} transition-colors`}
+                              size={22}
+                              className={`${
+                                (editHoverRating || editRating) >= star
+                                  ? 'fill-yellow-400 text-yellow-400'
+                                  : 'text-gray-600'
+                              } transition-colors`}
                             />
                           </button>
                         ))}
@@ -1224,45 +1246,53 @@ export default function Avis() {
                       </div>
                     </div>
 
-                    {/* Text */}
-                    <div className='mb-3'>
-                      <label className='block text-xs font-medium text-gray-400 mb-1'>Ton retour d&apos;expérience</label>
+                    {/* Text — same textarea style as bio edit */}
+                    <div className='mb-4'>
+                      <label className='block text-sm font-medium text-gray-300 mb-2'>
+                        Ton retour d&apos;expérience
+                      </label>
                       <textarea
                         rows={4}
                         value={editText}
                         onChange={(e) => setEditText(e.target.value)}
                         maxLength={2000}
-                        className='w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-inherit placeholder-gray-500 text-sm focus:outline-none focus:border-purple-500 resize-none'
+                        placeholder='Comment s&apos;est passée ta session ?'
+                        className='w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500 resize-none'
                       />
-                      <div className='text-xs text-gray-500 mt-1 text-right'>{editText.length}/2000</div>
+                      <div className='flex items-center justify-between mt-2'>
+                        <span
+                          className={`text-xs ${
+                            editText.length >= 1800 ? 'text-orange-400' : 'text-gray-500'
+                          }`}
+                        >
+                          {editText.length} / 2000
+                        </span>
+                      </div>
                     </div>
 
-                    <div className='flex items-center justify-end gap-2 mt-3'>
+                    {/* Actions — same as profile bio edit (Cancel + Save green) */}
+                    <div className='flex items-center justify-end gap-2 pt-2 border-t border-white/5'>
                       <button
                         type='button'
                         onClick={handleCancelEdit}
                         disabled={isSubmittingEdit}
-                        className='px-3 py-1.5 rounded-lg bg-white/5 text-gray-400 hover:bg-white/10 text-sm transition-colors disabled:opacity-50'
+                        className='inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-sm font-medium text-gray-300 transition-colors disabled:opacity-50'
                       >
+                        <X size={14} />
                         Annuler
                       </button>
                       <button
                         type='button'
                         onClick={() => handleSubmitEdit(testimonial.id)}
                         disabled={isSubmittingEdit || !editText.trim()}
-                        className='inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-lg text-white text-sm font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-all disabled:opacity-50'
+                        className='inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-green-500/20 hover:bg-green-500/30 text-sm font-medium text-green-400 transition-colors disabled:opacity-50'
                       >
                         {isSubmittingEdit ? (
-                          <>
-                            <Loader2 size={14} className='animate-spin' />
-                            Enregistrement...
-                          </>
+                          <Loader2 size={14} className='animate-spin' />
                         ) : (
-                          <>
-                            <Save size={14} />
-                            Enregistrer
-                          </>
+                          <Check size={14} />
                         )}
+                        Enregistrer
                       </button>
                     </div>
                   </div>
