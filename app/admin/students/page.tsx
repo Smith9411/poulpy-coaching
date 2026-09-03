@@ -82,7 +82,7 @@ export default function AdminStudentsPage() {
             <ArrowLeft size={20} />
             Retour admin
           </Link>
-          <h1 className="text-3xl font-bold mb-2">Actions rapides — Élèves</h1>
+          <h1 className="text-3xl font-bold mb-2">Rangs des élèves</h1>
           <p className="text-gray-400">Vue d'ensemble des élèves et de leurs rangs</p>
         </div>
 
