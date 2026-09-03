@@ -29,6 +29,16 @@ const GAME_OPTIONS = [
   'Autre',
 ];
 
+const GAME_LABELS: Record<string, string> = {
+  valorant: 'Valorant',
+  apex: 'Apex Legends',
+  aim: 'Autre',
+};
+
+function formatGameName(game: string): string {
+  return GAME_LABELS[game?.toLowerCase()] ?? game ?? '';
+}
+
 const VALORANT_RANKS = [
   'Iron 1', 'Iron 2', 'Iron 3',
   'Bronze 1', 'Bronze 2', 'Bronze 3',
@@ -187,7 +197,7 @@ export default function Avis() {
       showStatus('error', `"L'avis ne doit pas dépasser 2000 caractères.`);
       return;
     }
-    if (!['valorant', 'apex', 'aim'].includes(game)) {
+    if (!['Valorant', 'Apex Legends', 'Autre'].includes(game)) {
       showStatus('error', 'Jeu invalide.');
       return;
     }
@@ -908,7 +918,7 @@ export default function Avis() {
                     )}
                     <div>
                       <div className="font-bold text-base mb-0.5">{testimonial.name}</div>
-                      <div className="text-purple-400 text-xs font-medium">{testimonial.game}</div>
+                      <div className="text-purple-400 text-xs font-medium">{formatGameName(testimonial.game)}</div>
                     </div>
                   </div>
                   <div className="flex flex-col items-end gap-1">
