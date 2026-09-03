@@ -147,7 +147,7 @@ function NotificationsBell({ href }: { href: string }) {
               ) : (
                 groupedByStudent.map((item) => (
                   <Link
-                    key={item.student_id}
+                    key={`${item.student_id}-${item.id}`}
                     href={isAdmin ? `/admin/coaching/${item.student_id}` : href}
                     onClick={() => setIsOpen(false)}
                     className={`block px-4 py-3 border-b border-white/5 hover:bg-white/5 transition-colors ${
