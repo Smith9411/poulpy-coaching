@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
       rank: rankTrimmed,
       text: textTrimmed,
       rating: Math.min(5, Math.max(1, Number(rating) || 5)),
-      user_id: typeof userId === 'string' && userId.length > 0 ? userId : null,
+      user_id: typeof userId === 'string' && userId.length > 0 ? userId : undefined,
       created_at: new Date().toISOString(),
     };
 
