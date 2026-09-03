@@ -1,7 +1,7 @@
 ﻿'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, ArrowRight, MessageSquarePlus, Trash2, Check, X, Loader2, Shield, User as UserIcon, MessageSquare, Send, ChevronDown } from 'lucide-react';
+import { Star, ArrowRight, MessageSquarePlus, Trash2, Check, X, Loader2, Shield, User as UserIcon, MessageSquare, Send, ChevronDown, Edit3, Clock, Save } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -16,9 +16,12 @@ interface Review {
   rating: number;
   user_id?: string;
   created_at: string;
+  updated_at?: string;
   admin_response?: string;
   admin_response_at?: string;
 }
+
+const EDIT_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
 
 const GAME_OPTIONS = [
   'Valorant',
@@ -71,6 +74,43 @@ export default function Avis() {
   
   // Expanded response states
   const [expandedResponseId, setExpandedResponseId] = useState<string | null>(null);
+
+  // Edit states
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editText, setEditText] = useState('');
+  const [editRating, setEditRating] = useState(5);
+  const [editHoverRating, setEditHoverRating] = useState(0);
+  const [editRank, setEditRank] = useState('');
+  const [editGame, setEditGame] = useState('Valorant');
+  const [isSubmittingEdit, setIsSubmittingEdit] = useState(false);
+
+  // Tick pour rafraîchir les compteurs d'édition toutes les 30s
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => setTick((t) => t + 1), 30_000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Helper : peut-on encore éditer cet avis (owner + < 5 min) ?
+  const canEdit = (review: Review): boolean => {
+    if (!user) return false;
+    if (user.isAdmin) return true;
+    if (review.user_id !== user.id) return false;
+    const created = new Date(review.created_at).getTime();
+    return Date.now() - created < EDIT_WINDOW_MS;
+  };
+
+  const editTimeRemaining = (review: Review): number => {
+    const created = new Date(review.created_at).getTime();
+    return Math.max(0, EDIT_WINDOW_MS - (Date.now() - created));
+  };
+
+  const formatRemaining = (ms: number): string => {
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
 
   useEffect(() => {
     return () => {
@@ -140,11 +180,11 @@ export default function Avis() {
     if (!user) return;
     const trimmedText = text.trim();
     if (!trimmedText) {
-      showStatus('error', "Merci d'écrire un message pour ton avis.");
+      showStatus('error', `"Merci d'écrire un message pour ton avis.`);
       return;
     }
     if (trimmedText.length > 2000) {
-      showStatus('error', "L'avis ne doit pas dépasser 2000 caractères.");
+      showStatus('error', `"L'avis ne doit pas dépasser 2000 caractères.`);
       return;
     }
     if (!['valorant', 'apex', 'aim'].includes(game)) {
@@ -204,10 +244,19 @@ export default function Avis() {
   };
 
   const handleDeleteReview = async (id: string) => {
+    setIsSubmitting(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      if (!token) throw new Error('Non authentifié');
+      let { data: { session } } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        const { data: refreshData, error: refreshErr } = await supabase.auth.refreshSession();
+        if (refreshErr || !refreshData.session) {
+          throw new Error('Session expirée, reconnectez-vous.');
+        }
+        session = refreshData.session;
+      }
+      const token = session.access_token;
+      if (!token) throw new Error('Session expirée, reconnectez-vous.');
 
       const res = await fetch(`/api/reviews?id=${id}`, {
         method: 'DELETE',
@@ -217,12 +266,96 @@ export default function Avis() {
       if (!res.ok || data.error) throw new Error(data.error || 'Erreur');
 
       setReviews((prev) => prev.filter((r) => r.id !== id));
-      showStatus('success', "L'avis a été supprimé.");
+      showStatus('success', `"L'avis a été supprimé.`);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erreur de suppression';
       showStatus('error', msg);
     } finally {
       setConfirmDeleteId(null);
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleStartEdit = (review: Review) => {
+    setEditingId(review.id);
+    setEditText(review.text);
+    setEditRating(review.rating);
+    setEditHoverRating(0);
+    setEditGame(
+      review.game === 'valorant' ? 'Valorant' :
+      review.game === 'apex' ? 'Apex Legends' : 'Autre'
+    );
+    setEditRank(review.rank);
+    setTimeout(() => {
+      const el = document.getElementById(`review-${review.id}`);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditText('');
+    setEditRating(5);
+    setEditHoverRating(0);
+    setEditRank('');
+    setEditGame('Valorant');
+  };
+
+  const handleSubmitEdit = async (reviewId: string) => {
+    const trimmedText = editText.trim();
+    if (!trimmedText) {
+      showStatus('error', `"Merci d'écrire un message pour ton avis.`);
+      return;
+    }
+    if (trimmedText.length > 2000) {
+      showStatus('error', `"L'avis ne doit pas dépasser 2000 caractères.`);
+      return;
+    }
+
+    setIsSubmittingEdit(true);
+    try {
+      let { data: { session } } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        const { data: refreshData, error: refreshErr } = await supabase.auth.refreshSession();
+        if (refreshErr || !refreshData.session) {
+          throw new Error('Session expirée, reconnectez-vous.');
+        }
+        session = refreshData.session;
+      }
+      const token = session.access_token;
+      if (!token) throw new Error('Session expirée, reconnectez-vous.');
+
+      const gameNormalized =
+        editGame === 'Valorant' ? 'valorant' :
+        editGame === 'Apex Legends' ? 'apex' : 'aim';
+
+      const res = await fetch('/api/reviews', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          id: reviewId,
+          text: trimmedText,
+          rating: editRating,
+          rank: editRank.trim() || 'Membre Poulpy',
+          game: gameNormalized,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || 'Erreur');
+
+      setReviews((prev) => prev.map((r) => (r.id === reviewId ? { ...r, ...data.review } : r)));
+      showStatus('success', 'Avis mis à jour avec succès !');
+      handleCancelEdit();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erreur lors de la modification';
+      showStatus('error', msg);
+    } finally {
+      setIsSubmittingEdit(false);
     }
   };
 
@@ -662,7 +795,7 @@ export default function Avis() {
           <div className="grid sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-16">
             {reviews.map((testimonial) => (
               <article
-                key={testimonial.id}
+                id={`review-${testimonial.id}`} key={testimonial.id}
                 className="card rounded-2xl p-8 hover:bg-white/5 transition-all group flex flex-col justify-between relative"
               >
                 <div>
@@ -674,20 +807,33 @@ export default function Avis() {
                       ))}
                     </div>
 
-                    {/* Admin Delete Action */}
-                    {user?.isAdmin && (
-                      <div>
+
+                    {/* Owner Actions (Edit within 5 min) + Admin Actions */}
+                    {user && (user.id === testimonial.user_id || user.isAdmin) && (
+                      <div className='flex items-center gap-1'>
+                        {/* Edit button (owner only, within 5 min OR admin) */}
+                        {editingId !== testimonial.id && canEdit(testimonial) && (
+                          <button
+                            onClick={() => handleStartEdit(testimonial)}
+                            title={user.isAdmin && testimonial.user_id !== user.id ? 'Modifier (Admin)' : 'Modifier (5 min)'}
+                            className='p-1.5 rounded-lg hover:bg-purple-500/10 text-gray-500 hover:text-purple-400 transition-colors'
+                          >
+                            <Edit3 size={16} />
+                          </button>
+                        )}
+
+                        {/* Owner delete OR Admin delete */}
                         {confirmDeleteId === testimonial.id ? (
-                          <div className="flex items-center gap-1">
+                          <div className='flex items-center gap-1'>
                             <button
                               onClick={() => handleDeleteReview(testimonial.id)}
-                              className="px-2 py-1 text-xs rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/40 transition-colors font-medium"
+                              className='px-2 py-1 text-xs rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/40 transition-colors font-medium'
                             >
                               Supprimer
                             </button>
                             <button
                               onClick={() => setConfirmDeleteId(null)}
-                              className="px-2 py-1 text-xs rounded-lg bg-white/5 text-gray-400 hover:bg-white/10"
+                              className='px-2 py-1 text-xs rounded-lg bg-white/5 text-gray-400 hover:bg-white/10'
                             >
                               ✕
                             </button>
@@ -695,8 +841,8 @@ export default function Avis() {
                         ) : (
                           <button
                             onClick={() => setConfirmDeleteId(testimonial.id)}
-                            title="Supprimer cet avis (Admin)"
-                            className="p-1.5 rounded-lg hover:bg-red-500/10 text-gray-500 hover:text-red-400 transition-colors"
+                            title={user.isAdmin && testimonial.user_id !== user.id ? 'Supprimer (Admin)' : 'Supprimer votre avis'}
+                            className='p-1.5 rounded-lg hover:bg-red-500/10 text-gray-500 hover:text-red-400 transition-colors'
                           >
                             <Trash2 size={16} />
                           </button>
@@ -711,6 +857,38 @@ export default function Avis() {
                   </blockquote>
                 </div>
 
+
+                {/* Owner badge + edit countdown */}
+                {user && testimonial.user_id === user.id && !user.isAdmin && (
+                  <div className='flex items-center gap-2 mb-3'>
+                    <span className='inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-xs font-medium'>
+                      <UserIcon size={11} />
+                      Votre avis
+                    </span>
+                    {canEdit(testimonial) && (
+                      <span className='inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-xs'>
+                        <Clock size={11} />
+                        Modifiable {formatRemaining(editTimeRemaining(testimonial))}
+                      </span>
+                    )}
+                    {testimonial.updated_at && testimonial.updated_at !== testimonial.created_at && (
+                      <span className='text-xs text-gray-500 italic'>modifié</span>
+                    )}
+                  </div>
+                )}
+
+                {/* Admin viewing someone's review */}
+                {user?.isAdmin && testimonial.user_id !== user.id && (
+                  <div className='flex items-center gap-2 mb-3'>
+                    <span className='inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-500/15 border border-purple-500/30 text-purple-300 text-xs font-medium'>
+                      <Shield size={11} />
+                      Vue Admin
+                    </span>
+                    {testimonial.updated_at && testimonial.updated_at !== testimonial.created_at && (
+                      <span className='text-xs text-gray-500 italic'>modifié</span>
+                    )}
+                  </div>
+                )}
                 {/* Author Info */}
                 <div className="pt-4 border-t border-white/5 flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -854,6 +1032,98 @@ export default function Avis() {
                     )}
                   </div>
                 )}
+
+                {/* Edit Form - inline replacement */}
+                {editingId === testimonial.id && (
+                  <div className='mt-4 p-4 rounded-xl bg-purple-500/10 border border-purple-500/30'>
+                    <div className='flex items-center justify-between mb-3'>
+                      <h4 className='text-sm font-semibold text-purple-300 flex items-center gap-2'>
+                        <Edit3 size={16} />
+                        Modifier votre avis
+                      </h4>
+                      <div className='text-xs text-gray-500 flex items-center gap-1'>
+                        <Clock size={12} />
+                        {formatRemaining(editTimeRemaining(testimonial))} restantes
+                      </div>
+                    </div>
+
+                    <div className='grid sm:grid-cols-2 gap-3 mb-3'>
+                      <select
+                        value={editGame}
+                        onChange={(e) => setEditGame(e.target.value)}
+                        className='px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-inherit text-sm focus:outline-none focus:border-purple-500'
+                      >
+                        {GAME_OPTIONS.map((g) => (
+                          <option key={g} value={g} className='bg-[#13161e] text-white'>{g}</option>
+                        ))}
+                      </select>
+                      <input
+                        type='text'
+                        value={editRank}
+                        onChange={(e) => setEditRank(e.target.value)}
+                        placeholder='Rang / Niveau'
+                        className='px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-inherit placeholder-gray-500 text-sm focus:outline-none focus:border-purple-500'
+                      />
+                    </div>
+
+                    <div className='flex items-center gap-1 mb-3'>
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          type='button'
+                          onClick={() => setEditRating(star)}
+                          onMouseEnter={() => setEditHoverRating(star)}
+                          onMouseLeave={() => setEditHoverRating(0)}
+                          className='p-0.5 hover:scale-110 transition-transform'
+                        >
+                          <Star
+                            size={20}
+                            className={`${(editHoverRating || editRating) >= star ? 'fill-yellow-400 text-yellow-400' : 'text-gray-600'} transition-colors`}
+                          />
+                        </button>
+                      ))}
+                      <span className='text-xs text-gray-500 ml-2'>{editRating}/5</span>
+                    </div>
+
+                    <textarea
+                      rows={4}
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      maxLength={2000}
+                      className='w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-inherit placeholder-gray-500 text-sm focus:outline-none focus:border-purple-500 resize-none'
+                    />
+                    <div className='text-xs text-gray-500 mt-1 text-right'>{editText.length}/2000</div>
+
+                    <div className='flex items-center justify-end gap-2 mt-3'>
+                      <button
+                        type='button'
+                        onClick={handleCancelEdit}
+                        disabled={isSubmittingEdit}
+                        className='px-3 py-1.5 rounded-lg bg-white/5 text-gray-400 hover:bg-white/10 text-sm transition-colors disabled:opacity-50'
+                      >
+                        Annuler
+                      </button>
+                      <button
+                        type='button'
+                        onClick={() => handleSubmitEdit(testimonial.id)}
+                        disabled={isSubmittingEdit || !editText.trim()}
+                        className='inline-flex items-center gap-2 px-4 py-1.5 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-lg text-white text-sm font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-all disabled:opacity-50'
+                      >
+                        {isSubmittingEdit ? (
+                          <>
+                            <Loader2 size={14} className='animate-spin' />
+                            Enregistrement...
+                          </>
+                        ) : (
+                          <>
+                            <Save size={14} />
+                            Enregistrer
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </article>
             ))}
           </div>
@@ -904,4 +1174,6 @@ export default function Avis() {
     </main>
   );
 }
+
+
 

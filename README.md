@@ -220,6 +220,22 @@ Fonctionnement côté app : après le retour Google, `/auth/callback` vérifie l
 > `YYYY-MM-DD : [brève description des changements]`
 > Le prochain intervenant lira ces lignes pour comprendre l'évolution.
 
+- 2026-09-04 (édition et suppression de son propre avis) :
+  - **Édition d'avis par le propriétaire** : un user peut modifier son propre avis pendant 5 minutes après publication. Bouton "Modifier" avec icône Edit3 apparaît automatiquement sur ses cartes
+  - **Compte à rebours visuel** : badge `Modifiable 4:32` qui s'actualise toutes les 30s
+  - **Formulaire d'édition inline** : la carte se transforme en formulaire pré-rempli (texte, note, jeu, rang) avec validation des longueurs et compte de caractères (2000 max)
+  - **Auto-scroll** vers la carte éditée + annulation possible
+  - **Admin peut toujours éditer** n'importe quel avis sans limite de temps
+  - **Suppression par le propriétaire** : un user peut supprimer son propre avis n'importe quand (utile pour corriger une erreur)
+  - **Suppression par admin** : fonctionne comme avant, en plus de l'édition
+  - **Permission checks serveur** : nouvelle méthode PATCH sur `/api/reviews` avec auth, vérification owner OU admin, fenêtre 5 min enforced côté serveur
+  - **DELETE durci** : vérifie maintenant que l'user est owner OU admin avant de supprimer (plus seulement admin)
+  - **Colonne `updated_at`** : ajoutée à la table reviews pour tracker les modifications (SQL fourni)
+  - **Badge "Votre avis"** : affichage cyan sur les cartes du user connecté
+  - **Badge "Vue Admin"** : affichage purple sur les cartes d'autres users quand l'admin regarde
+  - **Indicateur "modifié"** : italique gris si `updated_at !== created_at`
+  - **SQL** : `add-review-updated-at-column.sql` fourni pour ajouter la colonne
+  - Testé en local : build OK
 - 2026-09-04 (fix persistance paramètres admin) :
   - **Persistance réelle** : les changements dans `/admin/settings` sont maintenant vraiment sauvegardés en base Supabase (table `settings`). Suppression du message trompeur "mémoire locale uniquement"
   - **API `/api/settings` durcie** : validation des clés autorisées, validation des URLs (http/https uniquement), gestion d'erreurs améliorée, refresh de session si token expiré, message d'erreur explicite si la table n'existe pas
