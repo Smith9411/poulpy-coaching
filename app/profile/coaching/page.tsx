@@ -23,18 +23,30 @@ export default function StudentCoachingPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState('');
+  const [sessionExpired, setSessionExpired] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const fetchMessages = useCallback(async (markAsRead = true) => {
     if (!user?.id) return;
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      if (!token) throw new Error('Non authentifié');
+      let { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        setSessionExpired(true);
+        throw new Error('Non authentifié');
+      }
+
+      if (session.expires_at && new Date(session.expires_at * 1000) <= new Date()) {
+        const { data: refreshed } = await supabase.auth.refreshSession();
+        session = refreshed.session ?? session;
+        if (!session?.access_token || (session.expires_at && new Date(session.expires_at * 1000) <= new Date())) {
+          setSessionExpired(true);
+          throw new Error('Session expirée, reconnecte-toi.');
+        }
+      }
 
       const res = await fetch('/api/student/messages', {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${session.access_token}` },
       });
       const data = await res.json();
       if (!res.ok || data.error) throw new Error(data.error || 'Erreur de chargement');
@@ -97,10 +109,10 @@ export default function StudentCoachingPage() {
   }, [user?.id]);
 
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id || sessionExpired) return;
     const interval = setInterval(() => fetchMessages(false), 8000);
     return () => clearInterval(interval);
-  }, [user?.id, fetchMessages]);
+  }, [user?.id, fetchMessages, sessionExpired]);
 
   useLayoutEffect(() => {
     if (scrollRef.current) {
@@ -122,8 +134,17 @@ export default function StudentCoachingPage() {
     setIsSending(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
+      let token = session?.access_token;
       if (!token) throw new Error('Non authentifié');
+
+      if (session!.expires_at && new Date(session!.expires_at * 1000) <= new Date()) {
+        const { data: refreshed } = await supabase.auth.refreshSession();
+        token = refreshed.session?.access_token ?? token;
+        if (!token) {
+          setSessionExpired(true);
+          throw new Error('Session expirée, reconnecte-toi.');
+        }
+      }
 
       const res = await fetch('/api/coaching/send', {
         method: 'POST',
@@ -235,13 +256,13 @@ export default function StudentCoachingPage() {
               type="text"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Écris un message à ton coach..."
-              disabled={isSending}
+              placeholder={sessionExpired ? 'Session expirée — reconnecte-toi pour envoyer un message' : 'Écris un message à ton coach...'}
+              disabled={isSending || sessionExpired}
               className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500 disabled:opacity-50"
             />
             <button
               type="submit"
-              disabled={isSending || !newMessage.trim()}
+              disabled={isSending || !newMessage.trim() || sessionExpired}
               className="px-5 py-3 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40 transition-all disabled:opacity-50 flex items-center gap-2"
             >
               {isSending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}

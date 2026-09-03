@@ -32,15 +32,23 @@ function useUnreadNotifications(userId: string | undefined, isAdmin: boolean) {
 
     const fetchItems = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const token = session?.access_token;
-        if (!token) {
+        let { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) {
           if (!cancelled) setItems([]);
           return;
         }
 
+        if (session.expires_at && new Date(session.expires_at * 1000) <= new Date()) {
+          const { data: refreshed } = await supabase.auth.refreshSession();
+          session = refreshed.session ?? session;
+          if (!session?.access_token) {
+            if (!cancelled) setItems([]);
+            return;
+          }
+        }
+
         const res = await fetch('/api/notifications/unread', {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${session.access_token}` },
         });
         if (!res.ok) throw new Error('Erreur notifs');
         const data = await res.json();
