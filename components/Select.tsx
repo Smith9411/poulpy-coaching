@@ -89,7 +89,7 @@ export default function Select({ value, onChange, options, placeholder = 'Sélec
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.98 }}
             transition={{ duration: 0.12 }}
-            className="absolute left-0 right-0 top-full z-50 max-h-64 overflow-y-auto bg-gray-900/95 backdrop-blur-xl border border-t-0 border-white/10 rounded-b-xl shadow-2xl"
+            className="absolute left-0 right-0 top-full z-[100] max-h-64 overflow-y-auto bg-gray-900/95 backdrop-blur-xl border border-t-0 border-white/10 rounded-b-xl shadow-2xl"
           >
             {options.map((opt) => {
               const isSelected = opt.value === value;

@@ -105,12 +105,12 @@ export default function FavoriteGames() {
     { value: '', label: '— Rang —' },
     ...VALORANT_RANKS.map((r) => ({ value: r, label: r })),
   ];
-  const valorantTierOptions = VALORANT_TIERS.map((t) => ({ value: t, label: `Tier ${t}` }));
+  const valorantTierOptions = VALORANT_TIERS.map((t) => ({ value: t, label: t }));
   const apexRankOptions = APEX_RANKS.map((r) => ({ value: r, label: r }));
-  const apexTierOptions = APEX_TIERS.map((t) => ({ value: t, label: `Tier ${t}` }));
+  const apexTierOptions = APEX_TIERS.map((t) => ({ value: t, label: t }));
 
   return (
-    <div className="card rounded-2xl p-8">
+    <div className="card rounded-2xl p-8 relative z-30">
       <div className="flex items-center gap-3 mb-6">
         <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center">
           <Gamepad2 size={22} className="text-white" />
@@ -146,6 +146,15 @@ export default function FavoriteGames() {
 
       {favorite === 'valorant' && (
         <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="space-y-2 col-span-2">
+            <label className="block text-sm font-medium text-gray-300">Rang</label>
+            <Select
+              value={valorantRank}
+              onChange={setValorantRank}
+              options={valorantRankOptions}
+              accent="red"
+            />
+          </div>
           <div className="space-y-2 col-span-1">
             <label className="block text-sm font-medium text-gray-300">Tier</label>
             <Select
@@ -156,35 +165,26 @@ export default function FavoriteGames() {
               disabled={valorantRank === 'Radiant'}
             />
           </div>
-          <div className="space-y-2 col-span-2">
-            <label className="block text-sm font-medium text-gray-300">Rang</label>
-            <Select
-              value={valorantRank}
-              onChange={setValorantRank}
-              options={valorantRankOptions}
-              accent="red"
-            />
-          </div>
         </div>
       )}
 
       {favorite === 'apex' && (
         <div className="grid grid-cols-3 gap-3 mb-6">
-          <div className="space-y-2 col-span-1">
-            <label className="block text-sm font-medium text-gray-300">Tier</label>
-            <Select
-              value={apexTier}
-              onChange={setApexTier}
-              options={apexTierOptions}
-              accent="orange"
-            />
-          </div>
           <div className="space-y-2 col-span-2">
             <label className="block text-sm font-medium text-gray-300">Rang</label>
             <Select
               value={apexRank}
               onChange={setApexRank}
               options={apexRankOptions}
+              accent="orange"
+            />
+          </div>
+          <div className="space-y-2 col-span-1">
+            <label className="block text-sm font-medium text-gray-300">Tier</label>
+            <Select
+              value={apexTier}
+              onChange={setApexTier}
+              options={apexTierOptions}
               accent="orange"
             />
           </div>
