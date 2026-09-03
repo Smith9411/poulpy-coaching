@@ -226,12 +226,14 @@ export default function Avis() {
 
     setIsSubmitting(true);
     try {
+      const gameNormalized = game === 'Valorant' ? 'valorant' : game === 'Apex Legends' ? 'apex' : 'aim';
+
       const res = await fetch('/api/reviews', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: user.username,
-          game,
+          game: gameNormalized,
           rank: finalRank,
           rating,
           text: text.trim(),
@@ -242,14 +244,27 @@ export default function Avis() {
       const data = await res.json();
       if (!res.ok || data.error) throw new Error(data.error || "Erreur lors de l'envoi");
 
+      // Update local state immediately so the user sees the new review
       setReviews((prev) => [data.review, ...prev]);
-      showStatus('success', 'Ton avis a été publié avec succès ! Merci pour ton retour.');
+
+      // Reset form fields
       setText('');
       setRank('');
       setRankFrom('');
       setRankTo('');
       setCustomRank('');
-      setIsFormOpen(false);
+      setRating(5);
+      setHoverRating(0);
+
+      // Show success message FIRST, then close form with a small delay
+      // so the user has time to see the confirmation
+      showStatus('success', 'Ton avis a été publié avec succès ! Merci pour ton retour.');
+
+      // Use requestAnimationFrame to ensure the review appears in the DOM
+      // before we close the form (avoids perceived lag)
+      requestAnimationFrame(() => {
+        setIsFormOpen(false);
+      });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erreur lors de la publication';
       showStatus('error', msg);
@@ -689,7 +704,7 @@ export default function Avis() {
                           accent={game === 'Valorant' ? 'red' : 'orange'}
                         />
                       </div>
-                      <div>
+                      <div className="space-y-2">
                         <label className="block text-sm font-medium text-gray-300">
                           Rang d'arrivée
                         </label>
