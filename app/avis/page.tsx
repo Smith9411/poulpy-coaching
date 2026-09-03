@@ -68,6 +68,9 @@ export default function Avis() {
   const [respondingToId, setRespondingToId] = useState<string | null>(null);
   const [responseText, setResponseText] = useState('');
   const [isSubmittingResponse, setIsSubmittingResponse] = useState(false);
+  
+  // Expanded response states
+  const [expandedResponseId, setExpandedResponseId] = useState<string | null>(null);
 
   useEffect(() => {
     return () => {
@@ -732,12 +735,35 @@ export default function Avis() {
 
                 {/* Admin Response Section */}
                 {testimonial.admin_response ? (
-                  <div className="mt-4 p-4 rounded-xl bg-purple-500/10 border border-purple-500/30">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Shield size={16} className="text-purple-400" />
-                      <span className="text-xs font-medium text-purple-400">Réponse de l&apos;équipe Poulpy</span>
-                    </div>
-                    <p className="text-sm text-gray-300">{testimonial.admin_response}</p>
+                  <div className="mt-4">
+                    <button
+                      onClick={() => setExpandedResponseId(
+                        expandedResponseId === testimonial.id ? null : testimonial.id
+                      )}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-purple-500/10 border border-purple-500/30 text-purple-400 hover:bg-purple-500/20 text-sm font-medium transition-colors"
+                    >
+                      <Shield size={16} />
+                      {expandedResponseId === testimonial.id 
+                        ? 'Masquer la réponse de Poulpy' 
+                        : 'Voir la réponse de Poulpy'}
+                    </button>
+                    <AnimatePresence>
+                      {expandedResponseId === testimonial.id && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className="mt-3 p-4 rounded-xl bg-purple-500/10 border border-purple-500/30"
+                        >
+                          <div className="flex items-center gap-2 mb-2">
+                            <Shield size={16} className="text-purple-400" />
+                            <span className="text-xs font-medium text-purple-400">Réponse de l&apos;équipe Poulpy</span>
+                          </div>
+                          <p className="text-sm text-gray-300">{testimonial.admin_response}</p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 ) : user?.isAdmin && (
                   <div className="mt-4">

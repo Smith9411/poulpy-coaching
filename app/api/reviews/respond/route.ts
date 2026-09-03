@@ -62,7 +62,10 @@ export async function POST(req: NextRequest) {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Erreur Supabase:', error);
+      throw error;
+    }
 
     return NextResponse.json({ 
       response: data.admin_response, 
