@@ -49,14 +49,32 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const nameTrimmed = String(name).trim();
+    const textTrimmed = String(text).trim();
+    const gameTrimmed = String(game).trim();
+    const rankTrimmed = String(rank || 'Membre Poulpy').trim();
+
+    if (nameTrimmed.length < 1 || nameTrimmed.length > 60) {
+      return NextResponse.json({ error: 'Le nom doit faire entre 1 et 60 caractères' }, { status: 400 });
+    }
+    if (textTrimmed.length < 1 || textTrimmed.length > 2000) {
+      return NextResponse.json({ error: "L'avis doit faire entre 1 et 2000 caractères" }, { status: 400 });
+    }
+    if (!['valorant', 'apex', 'aim'].includes(gameTrimmed.toLowerCase())) {
+      return NextResponse.json({ error: 'Jeu invalide' }, { status: 400 });
+    }
+    if (rankTrimmed.length > 60) {
+      return NextResponse.json({ error: 'Le rang ne doit pas dépasser 60 caractères' }, { status: 400 });
+    }
+
     const newReview: ReviewItem = {
       id: `review-${Date.now()}`,
-      name: name.trim(),
-      game: game.trim(),
-      rank: (rank || 'Membre Poulpy').trim(),
-      text: text.trim(),
+      name: nameTrimmed,
+      game: gameTrimmed,
+      rank: rankTrimmed,
+      text: textTrimmed,
       rating: Math.min(5, Math.max(1, Number(rating) || 5)),
-      user_id: userId || null,
+      user_id: typeof userId === 'string' && userId.length > 0 ? userId : null,
       created_at: new Date().toISOString(),
     };
 

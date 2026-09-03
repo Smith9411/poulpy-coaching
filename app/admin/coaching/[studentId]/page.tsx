@@ -156,7 +156,12 @@ export default function StudentCoachingPage() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !user?.id) return;
+    const trimmed = newMessage.trim();
+    if (!trimmed || !user?.id) return;
+    if (trimmed.length > 2000) {
+      setError('Le message ne doit pas dépasser 2000 caractères.');
+      return;
+    }
 
     setIsSending(true);
     try {
@@ -370,6 +375,7 @@ export default function StudentCoachingPage() {
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder="Écris un message à l'élève..."
               disabled={isSending}
+              maxLength={2000}
               className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500 disabled:opacity-50"
             />
             <button

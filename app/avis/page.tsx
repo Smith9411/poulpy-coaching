@@ -116,8 +116,17 @@ export default function Avis() {
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) return;
-    if (!text.trim()) {
+    const trimmedText = text.trim();
+    if (!trimmedText) {
       showStatus('error', "Merci d'écrire un message pour ton avis.");
+      return;
+    }
+    if (trimmedText.length > 2000) {
+      showStatus('error', "L'avis ne doit pas dépasser 2000 caractères.");
+      return;
+    }
+    if (!['valorant', 'apex', 'aim'].includes(game)) {
+      showStatus('error', 'Jeu invalide.');
       return;
     }
 
