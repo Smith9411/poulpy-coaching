@@ -1,7 +1,7 @@
-'use client';
+﻿'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, ArrowRight, MessageSquarePlus, Trash2, Check, X, Loader2, Shield, User as UserIcon, MessageSquare, Send } from 'lucide-react';
+import { Star, ArrowRight, MessageSquarePlus, Trash2, Check, X, Loader2, Shield, User as UserIcon, MessageSquare, Send, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -227,13 +227,11 @@ export default function Avis() {
   };
 
   const handleAdminResponse = async (reviewId: string) => {
-    console.log('handleAdminResponse appelé pour:', reviewId);
-    
     if (!responseText.trim()) {
       showStatus('error', 'Veuillez écrire une réponse.');
       return;
     }
-    
+
     if (responseText.trim().length > 1000) {
       showStatus('error', 'La réponse ne doit pas dépasser 1000 caractères.');
       return;
@@ -241,17 +239,22 @@ export default function Avis() {
 
     setIsSubmittingResponse(true);
     try {
-      console.log('Récupération session...');
-      const { data: { session } } = await supabase.auth.getSession();
-      const token = session?.access_token;
-      console.log('Token:', token ? 'Présent' : 'Absent', 'User:', session?.user?.id);
-      
-      if (!token) throw new Error('Non authentifié');
+      let { data: { session } } = await supabase.auth.getSession();
 
-      console.log('Envoi requête API...');
+      if (!session?.access_token) {
+        const { data: refreshData, error: refreshErr } = await supabase.auth.refreshSession();
+        if (refreshErr || !refreshData.session) {
+          throw new Error('Session expirée, reconnectez-vous.');
+        }
+        session = refreshData.session;
+      }
+
+      const token = session.access_token;
+      if (!token) throw new Error('Session expirée, reconnectez-vous.');
+
       const res = await fetch('/api/reviews/respond', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
@@ -261,24 +264,25 @@ export default function Avis() {
         }),
       });
 
-      console.log('Réponse API reçue, status:', res.status);
       const data = await res.json();
-      console.log('Données API:', data);
-      
-      if (!res.ok || data.error) throw new Error(data.error || 'Erreur');
 
-      setReviews((prev) => prev.map((r) => 
-        r.id === reviewId 
-          ? { ...r, admin_response: data.response, admin_response_at: data.response_at }
+      if (!res.ok || data.error) throw new Error(data.error || 'Erreur serveur');
+
+      setReviews((prev) => prev.map((r) =>
+        r.id === reviewId
+          ? {
+              ...r,
+              admin_response: data.response ?? r.admin_response,
+              admin_response_at: data.response_at ?? r.admin_response_at,
+            }
           : r
       ));
-      
+
       showStatus('success', 'Réponse publiée avec succès !');
       setResponseText('');
       setRespondingToId(null);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erreur lors de la publication';
-      console.error('Erreur handleAdminResponse:', err);
       showStatus('error', msg);
     } finally {
       setIsSubmittingResponse(false);
@@ -745,32 +749,56 @@ export default function Avis() {
 
                 {/* Admin Response Section */}
                 {testimonial.admin_response ? (
-                  <div className="mt-4">
+                  <div className="mt-5 pt-4 border-t border-purple-500/20">
                     <button
                       onClick={() => setExpandedResponseId(
                         expandedResponseId === testimonial.id ? null : testimonial.id
                       )}
-                      className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-purple-500/10 border border-purple-500/30 text-purple-400 hover:bg-purple-500/20 text-sm font-medium transition-colors"
+                      className="w-full flex items-center justify-between gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-purple-500/15 to-cyan-500/10 border border-purple-500/40 text-purple-300 hover:from-purple-500/25 hover:to-cyan-500/15 text-sm font-medium transition-all"
+                      aria-expanded={expandedResponseId === testimonial.id}
                     >
-                      <Shield size={16} />
-                      {expandedResponseId === testimonial.id 
-                        ? 'Masquer la réponse de Poulpy' 
-                        : 'Voir la réponse de Poulpy'}
+                      <span className="flex items-center gap-2">
+                        <Shield size={16} className="text-purple-400" />
+                        <span>Réponse de l'équipe Poulpy</span>
+                      </span>
+                      <ChevronDown
+                        size={16}
+                        className={expandedResponseId === testimonial.id ? 'text-purple-400 transition-transform duration-300 rotate-180' : 'text-purple-400 transition-transform duration-300'}
+                      />
                     </button>
-                    <AnimatePresence>
+                    <AnimatePresence initial={false}>
                       {expandedResponseId === testimonial.id && (
                         <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: 'auto' }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.3 }}
-                          className="mt-3 p-4 rounded-xl bg-purple-500/10 border border-purple-500/30"
+                          initial={{ opacity: 0, height: 0, marginTop: 0 }}
+                          animate={{ opacity: 1, height: 'auto', marginTop: 12 }}
+                          exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                          transition={{ duration: 0.3, ease: 'easeInOut' }}
+                          className="overflow-hidden"
                         >
-                          <div className="flex items-center gap-2 mb-2">
-                            <Shield size={16} className="text-purple-400" />
-                            <span className="text-xs font-medium text-purple-400">Réponse de l&apos;équipe Poulpy</span>
+                          <div className="p-4 rounded-xl bg-purple-500/10 border border-purple-500/30">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-2">
+                                <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center">
+                                  <Shield size={14} className="text-white" />
+                                </div>
+                                <div>
+                                  <div className="text-xs font-semibold text-purple-300">Équipe Poulpy</div>
+                                  {testimonial.admin_response_at && (
+                                    <div className="text-[10px] text-gray-500">
+                                      {new Date(testimonial.admin_response_at).toLocaleDateString('fr-FR', {
+                                        day: 'numeric',
+                                        month: 'short',
+                                        year: 'numeric',
+                                      })}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <p className="text-sm text-gray-200 leading-relaxed whitespace-pre-wrap">
+                              {testimonial.admin_response}
+                            </p>
                           </div>
-                          <p className="text-sm text-gray-300">{testimonial.admin_response}</p>
                         </motion.div>
                       )}
                     </AnimatePresence>
@@ -876,3 +904,4 @@ export default function Avis() {
     </main>
   );
 }
+

@@ -220,6 +220,13 @@ Fonctionnement côté app : après le retour Google, `/auth/callback` vérifie l
 > `YYYY-MM-DD : [brève description des changements]`
 > Le prochain intervenant lira ces lignes pour comprendre l'évolution.
 
+- 2026-09-04 (fix erreur serveur réponse admin + mode déroulant) :
+  - **Erreur serveur réponse admin corrigée** : suppression du `.select().single()` final dans l'API `/api/reviews/respond` qui pouvait faire échouer l'update si la lecture post-écriture retournait 0 lignes — on renvoie maintenant directement les valeurs écrites
+  - **Détection colonnes manquantes** : ajout de la détection "schema cache" dans le message d'erreur si les colonnes `admin_response`/`admin_response_at` n'existent pas
+  - **Token expiré géré côté client** : ajout `supabase.auth.refreshSession()` automatique dans `handleAdminResponse` quand le token est expiré, avec message clair "Session expirée, reconnectez-vous"
+  - **UI mode déroulant améliorée** : bouton "Réponse de l'équipe Poulpy" avec gradient purple→cyan bien visible, **chevron rotatif** (ChevronDown + rotate-180 quand déployé), animation framer-motion easeInOut, **avatar "Équipe Poulpy" + date de réponse** dans le panneau déplié
+  - **Fix build** : `discordUrl` manquant dans `setSettings` de `components/About.tsx` (erreur TS2345)
+  - Testé en local : build OK (TS strict), routes API bien générées
 - 2026-09-03 (session audit complet) :
   - Ajout feature **bio** élève (visible par admin) — `0f16a7e`
   - **Sécurité** : auth + admin sur tous les endpoints sensibles — `61eb82d`

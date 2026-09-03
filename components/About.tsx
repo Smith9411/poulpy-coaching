@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { Target, Heart, Shield, MessageCircle, Tv } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const YoutubeIcon = ({ size = 20, className = '' }: { size?: number; className?: string }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
@@ -12,6 +12,32 @@ const YoutubeIcon = ({ size = 20, className = '' }: { size?: number; className?:
 
 export default function About() {
   const [activePlatform, setActivePlatform] = useState<'youtube' | 'twitch'>('youtube');
+  const [settings, setSettings] = useState({
+    youtubeUrl: 'https://www.youtube.com/watch?v=4gfWbGCA5q0',
+    twitchUrl: 'https://www.twitch.tv/poulpy_coaching',
+    discordUrl: 'https://discord.gg/rJMg3ZZRkp',
+  });
+
+  // Fetch settings from API
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch('/api/settings');
+        const data = await res.json();
+        if (data.settings) {
+          setSettings({
+            youtubeUrl: data.settings.youtube_url || 'https://www.youtube.com/watch?v=4gfWbGCA5q0',
+            twitchUrl: data.settings.twitch_url || 'https://www.twitch.tv/poulpy_coaching',
+            discordUrl: data.settings.discord_url || 'https://discord.gg/rJMg3ZZRkp',
+          });
+        }
+      } catch (error) {
+        console.error('Erreur chargement settings:', error);
+      }
+    };
+
+    fetchSettings();
+  }, []);
   
   const values = [
     {
@@ -199,7 +225,7 @@ export default function About() {
             <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
               {activePlatform === 'youtube' ? (
                 <iframe
-                  src="https://www.youtube.com/embed/4gfWbGCA5q0"
+                  src={settings.youtubeUrl.replace('watch?v=', 'embed/')}
                   title="Poulpy YouTube"
                   className="absolute top-0 left-0 w-full h-full rounded-xl"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -207,7 +233,7 @@ export default function About() {
                 />
               ) : (
                 <iframe
-                  src="https://player.twitch.tv/?channel=poulpy_coaching&parent=localhost&parent=poulpy-coaching.vercel.app&parent=www.poulpy-coaching.com"
+                  src={`https://player.twitch.tv/?channel=${settings.twitchUrl.split('/').pop()}&parent=localhost&parent=poulpy-coaching.vercel.app&parent=www.poulpy-coaching.com`}
                   title="Poulpy Twitch"
                   className="absolute top-0 left-0 w-full h-full rounded-xl"
                   allowFullScreen
@@ -218,9 +244,7 @@ export default function About() {
             {/* External Link */}
             <div className="mt-4 text-center">
               <a
-                href={activePlatform === 'youtube' 
-                  ? 'https://www.youtube.com/watch?v=4gfWbGCA5q0' 
-                  : 'https://www.twitch.tv/poulpy_coaching'}
+                href={activePlatform === 'youtube' ? settings.youtubeUrl : settings.twitchUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-sm text-gray-400 transition-colors"
