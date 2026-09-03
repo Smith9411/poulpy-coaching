@@ -230,6 +230,14 @@ Fonctionnement côté app : après le retour Google, `/auth/callback` vérifie l
   - **Notifications** : pastille rouge fonctionnelle, cloche refactor — voir historique git
   - **Mdp admin smith94** changé en `Poulpyacq7gm!` (via script Node, à noter pour futures connexions)
   - **Reste à faire** : race condition clear/fetch (cas rare), Page Visibility API pour polling, RLS policies Supabase, magic bytes validation côté serveur
+- 2026-09-03 (session admin settings + media section) :
+  - **Admin Settings** : refactor page `/admin/settings` — suppression sections inutiles (Sécurité, Apparence, Notifications), section Général fonctionnelle avec state management React
+  - **Champs YouTube/Twitch** : ajout des champs de modification pour les liens YouTube et Twitch dans les settings, avec tooltips explicatifs au survol (icône HelpCircle)
+  - **Section média About** : ajout section média sous présentation Poulpy avec toggle YouTube/Twitch, lecteurs intégrés (video 4gfWbGCA5q0, channel poulpy_coaching), format 16:9 responsive
+  - **UI Settings** : formulaire avec gestion d'état, bouton Réinitialiser fonctionnel, tooltips interactifs
+  - **Debug réponse admin** : logging détaillé API, vérification existence review avant update, message d'erreur spécifique si colonnes manquantes, script SQL fourni (`add-review-response-columns.sql`)
+  - **Mode déroulante** : réponses admin en mode déroulante (bouton "Voir/Masquer la réponse de Poulpy") avec animation framer-motion
+  - Testé en local : build OK, settings fonctionnels, section média responsive
 - 2026-09-03 (session tri et réponse avis) :
   - **Tri des avis** : ajouts filtres de tri par date, nom, note (croissant/décroissant) sur la page `/avis` — modification API `/api/reviews` (GET) pour accepter paramètres `sortBy` et `sortOrder`
   - **Réponses admin** : possibilité pour les admins de répondre aux avis via nouveau bouton « Répondre à cet avis » + formulaire inline — création API `/api/reviews/respond` (POST) avec auth + is_admin, stockage dans `admin_response` et `admin_response_at`
