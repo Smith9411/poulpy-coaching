@@ -220,7 +220,14 @@ export default function StudentCoachingPage() {
         </div>
 
         <div className="card rounded-2xl overflow-hidden flex flex-col h-[70vh]">
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-4">
+          <div
+            ref={scrollRef}
+            role="log"
+            aria-live="polite"
+            aria-relevant="additions"
+            aria-label="Messages du chat"
+            className="flex-1 overflow-y-auto p-6 space-y-4"
+          >
             {isLoading ? (
               <div className="flex items-center justify-center h-full">
                 <Loader2 className="w-8 h-8 animate-spin text-purple-500" />

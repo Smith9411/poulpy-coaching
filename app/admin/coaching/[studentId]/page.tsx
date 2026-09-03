@@ -342,7 +342,14 @@ export default function StudentCoachingPage() {
         )}
 
         <div className="card rounded-2xl overflow-hidden flex flex-col h-[70vh]">
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-4">
+          <div
+            ref={scrollRef}
+            role="log"
+            aria-live="polite"
+            aria-relevant="additions"
+            aria-label="Messages du chat avec l'élève"
+            className="flex-1 overflow-y-auto p-6 space-y-4"
+          >
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-gray-500">
                 <MessageSquare size={48} className="mb-4 opacity-30" />
