@@ -25,6 +25,9 @@ interface StudentProfile {
   createdAt: string;
   avatarUrl?: string | null;
   initial: string;
+  favoriteGame?: 'valorant' | 'apex' | null;
+  valorantRank?: string | null;
+  apexRank?: string | null;
 }
 
 export default function StudentCoachingPage() {
@@ -63,6 +66,9 @@ export default function StudentCoachingPage() {
         createdAt: profile.created_at,
         avatarUrl: profile.avatar_url,
         initial: profile.username.charAt(0).toUpperCase(),
+        favoriteGame: profile.favorite_game,
+        valorantRank: profile.valorant_rank,
+        apexRank: profile.apex_rank,
       });
 
       const { data: messagesData } = await supabase
@@ -212,6 +218,26 @@ export default function StudentCoachingPage() {
             <Mail size={14} /> {student?.email} · Inscrit le {student && new Date(student.createdAt).toLocaleDateString('fr-FR')}
           </p>
         </div>
+
+        {/* Jeux & Rang */}
+        {student && (student.favoriteGame || student.valorantRank || student.apexRank) && (
+          <div className="card rounded-2xl p-4 mb-6 flex flex-wrap items-center gap-3">
+            <span className="text-xs uppercase tracking-wide text-gray-500 font-semibold">Jeux & rang</span>
+            {student.favoriteGame === 'valorant' && (
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/15 border border-red-500/30 text-red-300 text-sm font-medium">
+                🔫 Valorant · <span className="font-bold">{student.valorantRank || 'Non classé'}</span>
+              </span>
+            )}
+            {student.favoriteGame === 'apex' && (
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-300 text-sm font-medium">
+                ⚡ Apex Legends · <span className="font-bold">{student.apexRank || 'Non classé'}</span>
+              </span>
+            )}
+            {!student.favoriteGame && (
+              <span className="text-sm text-gray-500 italic">Aucun jeu favori sélectionné</span>
+            )}
+          </div>
+        )}
 
         <div className="card rounded-2xl overflow-hidden flex flex-col h-[70vh]">
           <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 space-y-4">

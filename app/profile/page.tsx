@@ -6,6 +6,7 @@ import { User, Mail, Settings, LogOut, Shield, Clock, Award, Camera, Trash2, Edi
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { useState, useRef } from 'react';
+import FavoriteGames from '@/components/FavoriteGames';
 
 export default function Profile() {
   const { user, logout, updateAvatar, updateUsername, isLoading: authLoading } = useAuth();
@@ -290,6 +291,13 @@ export default function Profile() {
             </button>
           </div>
         </div>
+
+        {/* Favorite Games */}
+        {!user.isAdmin && (
+          <div className="mb-12">
+            <FavoriteGames />
+          </div>
+        )}
 
         {/* Stats / Upcoming sections */}
         <div className="grid sm:grid-cols-3 gap-6 mb-12">

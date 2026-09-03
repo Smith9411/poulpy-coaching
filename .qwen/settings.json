@@ -6,7 +6,8 @@
       "Bash(rmdir *)",
       "Bash(npm run *)",
       "Bash(ping *)",
-      "Bash(curl *)"
+      "Bash(curl *)",
+      "Bash(git log *)"
     ]
   },
   "$version": 4

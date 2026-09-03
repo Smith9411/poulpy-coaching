@@ -179,6 +179,16 @@ function NotificationsBell({ href }: { href: string }) {
                 Accéder au chat →
               </Link>
             )}
+
+            {isAdmin && (
+              <Link
+                href="/admin/coaching"
+                onClick={() => setIsOpen(false)}
+                className="block px-4 py-3 text-center text-sm font-semibold text-purple-400 hover:bg-purple-500/10 transition-colors border-t border-white/10"
+              >
+                Voir toutes les conversations →
+              </Link>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
