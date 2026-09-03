@@ -37,7 +37,7 @@ type FormData = {
 };
 type Status = { type: 'success' | 'error'; text: string } | null;
 
-function getYouTubeEmbedUrl(url: string): string | null {
+function getYouTubeId(url: string): string | null {
   if (!url) return null;
   try {
     const u = new URL(url);
@@ -45,15 +45,23 @@ function getYouTubeEmbedUrl(url: string): string | null {
 
     if (u.hostname.includes('youtube.com')) {
       videoId = u.searchParams.get('v');
+      if (!videoId) {
+        // Gère aussi les formats /shorts/XXXX, /embed/XXXX
+        const match = u.pathname.match(/\/(shorts|embed)\/([\w-]+)/);
+        if (match) videoId = match[2];
+      }
     } else if (u.hostname === 'youtu.be') {
-      videoId = u.pathname.slice(1);
+      videoId = u.pathname.slice(1).split('/')[0];
     }
 
-    if (!videoId) return null;
-    return `https://www.youtube.com/embed/${videoId}`;
+    return videoId && /^[\w-]{6,}$/.test(videoId) ? videoId : null;
   } catch {
     return null;
   }
+}
+
+function getYouTubeThumbnail(videoId: string): string {
+  return `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
 }
 
 function getTwitchChannel(url: string): string | null {
@@ -156,7 +164,7 @@ export default function AdminSettings() {
     );
   }
 
-  const youtubeEmbed = getYouTubeEmbedUrl(formData.youtubeUrl);
+  const youtubeId = getYouTubeId(formData.youtubeUrl);
   const twitchChannel = getTwitchChannel(formData.twitchUrl);
 
   const urlErrors = {
@@ -441,16 +449,26 @@ export default function AdminSettings() {
                   <YoutubeIcon size={18} />
                   <span className="font-semibold text-sm">YouTube</span>
                 </div>
-                {youtubeEmbed ? (
-                  <div className="aspect-video w-full rounded-lg overflow-hidden bg-black">
-                    <iframe
-                      src={youtubeEmbed}
-                      title="Aperçu YouTube"
-                      className="w-full h-full"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
+                {youtubeId ? (
+                  <a
+                    href={`https://www.youtube.com/watch?v=${youtubeId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block aspect-video w-full rounded-lg overflow-hidden bg-black relative group"
+                  >
+                    <img
+                      src={getYouTubeThumbnail(youtubeId)}
+                      alt="Miniature YouTube"
+                      className="w-full h-full object-cover"
                     />
-                  </div>
+                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center shadow-lg">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
+                          <path d="M8 5v14l11-7z"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </a>
                 ) : (
                   <div className="aspect-video w-full rounded-lg bg-black/40 flex items-center justify-center text-gray-500 text-xs">
                     Aucune vidéo détectée (URL YouTube invalide)
@@ -466,14 +484,19 @@ export default function AdminSettings() {
                   <span className="font-semibold text-sm">Twitch</span>
                 </div>
                 {twitchChannel ? (
-                  <div className="aspect-video w-full rounded-lg overflow-hidden bg-black">
-                    <iframe
-                      src={`https://player.twitch.tv/?channel=${twitchChannel}&parent=localhost`}
-                      title="Aperçu Twitch"
-                      className="w-full h-full"
-                      allowFullScreen
-                    />
-                  </div>
+                  <a
+                    href={`https://www.twitch.tv/${twitchChannel}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block aspect-video w-full rounded-lg overflow-hidden bg-gradient-to-br from-purple-900 to-purple-700 relative group"
+                  >
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <TwitchIcon size={48} />
+                      <div className="mt-3 text-white font-bold text-lg">@{twitchChannel}</div>
+                      <div className="mt-2 text-xs text-purple-200">Ouvrir sur Twitch</div>
+                    </div>
+                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </a>
                 ) : (
                   <div className="aspect-video w-full rounded-lg bg-black/40 flex items-center justify-center text-gray-500 text-xs">
                     Aucune chaîne détectée (URL Twitch invalide)
