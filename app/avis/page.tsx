@@ -579,28 +579,23 @@ export default function Avis() {
                   </div>
 
                   <div className="grid sm:grid-cols-2 gap-4">
-                    {/* Game selection */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                    {/* Game selection — same style as FavoriteGames */}
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-300">
                         Jeu concerné
                       </label>
-                      <select
+                      <Select
                         value={game}
-                        onChange={(e) => {
-                          setGame(e.target.value);
+                        onChange={(v) => {
+                          setGame(v);
                           setRank('');
                           setRankFrom('');
                           setRankTo('');
                           setCustomRank('');
                         }}
-                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit focus:outline-none focus:border-purple-500"
-                      >
-                        {GAME_OPTIONS.map((g) => (
-                          <option key={g} value={g} className="bg-[#13161e] text-white">
-                            {g}
-                          </option>
-                        ))}
-                      </select>
+                        options={GAME_OPTIONS.map((g) => ({ value: g, label: g }))}
+                        accent="purple"
+                      />
                     </div>
 
                     {/* Rank Type Selector - Only for Valorant and Apex */}
@@ -655,67 +650,61 @@ export default function Avis() {
 
                   {/* Rank Input - Single field for rank mode (Valorant/Apex) */}
                   {game !== 'Autre' && rankType === 'rank' && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                    <div className="space-y-2">
+                      <label className="block text-sm font-medium text-gray-300">
                         Rang actuel
                       </label>
-                      <select
+                      <Select
                         value={rank}
-                        onChange={(e) => setRank(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit focus:outline-none focus:border-purple-500"
-                      >
-                        <option value="" className="bg-[#13161e] text-white">
-                          Sélectionne ton rang
-                        </option>
-                        {(game === 'Valorant' ? VALORANT_RANKS : APEX_RANKS).map((r) => (
-                          <option key={r} value={r} className="bg-[#13161e] text-white">
-                            {r}
-                          </option>
-                        ))}
-                      </select>
+                        onChange={setRank}
+                        options={[
+                          { value: '', label: '— Rang —' },
+                          ...(game === 'Valorant' ? VALORANT_RANKS : APEX_RANKS).map((r) => ({
+                            value: r,
+                            label: r,
+                          })),
+                        ]}
+                        accent={game === 'Valorant' ? 'red' : 'orange'}
+                      />
                     </div>
                   )}
 
                   {/* Progression Inputs - Two fields for progression mode (Valorant/Apex) */}
                   {game !== 'Autre' && rankType === 'progression' && (
                     <div className="grid sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-300">
                           Rang de départ
                         </label>
-                        <select
+                        <Select
                           value={rankFrom}
-                          onChange={(e) => setRankFrom(e.target.value)}
-                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit focus:outline-none focus:border-purple-500"
-                        >
-                          <option value="" className="bg-[#13161e] text-white">
-                            Départ
-                          </option>
-                          {(game === 'Valorant' ? VALORANT_RANKS : APEX_RANKS).map((r) => (
-                            <option key={r} value={r} className="bg-[#13161e] text-white">
-                              {r}
-                            </option>
-                          ))}
-                        </select>
+                          onChange={setRankFrom}
+                          options={[
+                            { value: '', label: '— Départ —' },
+                            ...(game === 'Valorant' ? VALORANT_RANKS : APEX_RANKS).map((r) => ({
+                              value: r,
+                              label: r,
+                            })),
+                          ]}
+                          accent={game === 'Valorant' ? 'red' : 'orange'}
+                        />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                        <label className="block text-sm font-medium text-gray-300">
                           Rang d'arrivée
                         </label>
-                        <select
+                        <Select
                           value={rankTo}
-                          onChange={(e) => setRankTo(e.target.value)}
-                          className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit focus:outline-none focus:border-purple-500"
-                        >
-                          <option value="" className="bg-[#13161e] text-white">
-                            Arrivée
-                          </option>
-                          {(game === 'Valorant' ? VALORANT_RANKS : APEX_RANKS).map((r) => (
-                            <option key={r} value={r} className="bg-[#13161e] text-white">
-                              {r}
-                            </option>
-                          ))}
-                        </select>
+                          onChange={setRankTo}
+                          options={[
+                            { value: '', label: '— Arrivée —' },
+                            ...(game === 'Valorant' ? VALORANT_RANKS : APEX_RANKS).map((r) => ({
+                              value: r,
+                              label: r,
+                            })),
+                          ]}
+                          accent={game === 'Valorant' ? 'red' : 'orange'}
+                        />
                       </div>
                     </div>
                   )}
@@ -748,9 +737,9 @@ export default function Avis() {
                     </div>
                   </div>
 
-                  {/* Comment Textarea */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                  {/* Comment Textarea — same style as bio edit */}
+                  <div className="space-y-2">
+                    <label className="block text-sm font-medium text-gray-300">
                       Ton retour d&apos;expérience
                     </label>
                     <textarea
@@ -759,23 +748,34 @@ export default function Avis() {
                       placeholder="Comment s'est passée ta session ? Quels aspects de ton jeu ont progressé ?"
                       value={text}
                       onChange={(e) => setText(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500"
+                      maxLength={2000}
+                      className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500 resize-none"
                     />
+                    <div className="flex items-center justify-between">
+                      <span
+                        className={`text-xs ${
+                          text.length >= 1800 ? 'text-orange-400' : 'text-gray-500'
+                        }`}
+                      >
+                        {text.length} / 2000
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Submit buttons */}
+                  {/* Submit buttons — same style as profile bio edit */}
                   <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/5">
                     <button
                       type="button"
                       onClick={() => setIsFormOpen(false)}
-                      className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-medium transition-colors"
+                      className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 font-medium transition-colors"
                     >
+                      <X size={16} />
                       Annuler
                     </button>
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40 transition-all disabled:opacity-50"
+                      className="inline-flex items-center gap-2 px-6 py-2.5 bg-green-500/20 hover:bg-green-500/30 text-green-400 font-semibold rounded-xl transition-all disabled:opacity-50"
                     >
                       {isSubmitting ? (
                         <>
@@ -783,7 +783,10 @@ export default function Avis() {
                           Publication...
                         </>
                       ) : (
-                        'Publier mon avis'
+                        <>
+                          <Check size={18} />
+                          Publier mon avis
+                        </>
                       )}
                     </button>
                   </div>
