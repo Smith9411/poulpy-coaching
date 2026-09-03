@@ -2,8 +2,17 @@
 
 import { motion } from 'framer-motion';
 import { Target, Heart, Shield, MessageCircle, Tv } from 'lucide-react';
+import { useState } from 'react';
+
+const YoutubeIcon = ({ size = 20, className = '' }: { size?: number; className?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.016 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+  </svg>
+);
 
 export default function About() {
+  const [activePlatform, setActivePlatform] = useState<'youtube' | 'twitch'>('youtube');
+  
   const values = [
     {
       icon: Target,
@@ -128,7 +137,7 @@ export default function About() {
                     Discord
                   </a>
                   <a
-                    href="https://www.twitch.tv/ccs_poulpy"
+                    href="https://www.twitch.tv/poulpy_coaching"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="glass px-4 py-2 rounded-lg hover:bg-white/10 transition-all flex items-center gap-2 text-sm"
@@ -142,11 +151,92 @@ export default function About() {
                     rel="noopener noreferrer"
                     className="glass px-4 py-2 rounded-lg hover:bg-white/10 transition-all flex items-center gap-2 text-sm"
                   >
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="text-red-500"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    <YoutubeIcon size={16} className="text-red-500" />
                     YouTube
                   </a>
                 </div>
               </div>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Media Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2 }}
+          className="mb-20"
+        >
+          <div className="glass-dark rounded-3xl p-6 sm:p-8 border border-purple-500/20">
+            {/* Platform Toggle */}
+            <div className="flex items-center justify-center gap-4 mb-6">
+              <button
+                onClick={() => setActivePlatform('youtube')}
+                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${
+                  activePlatform === 'youtube'
+                    ? 'bg-red-600 text-white shadow-lg shadow-red-500/30'
+                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                }`}
+              >
+                <YoutubeIcon size={20} />
+                YouTube
+              </button>
+              <button
+                onClick={() => setActivePlatform('twitch')}
+                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium transition-all ${
+                  activePlatform === 'twitch'
+                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30'
+                    : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                }`}
+              >
+                <Tv size={20} />
+                Twitch
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+              {activePlatform === 'youtube' ? (
+                <iframe
+                  src="https://www.youtube.com/embed/4gfWbGCA5q0"
+                  title="Poulpy YouTube"
+                  className="absolute top-0 left-0 w-full h-full rounded-xl"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <iframe
+                  src="https://player.twitch.tv/?channel=poulpy_coaching&parent=localhost&parent=poulpy-coaching.vercel.app&parent=www.poulpy-coaching.com"
+                  title="Poulpy Twitch"
+                  className="absolute top-0 left-0 w-full h-full rounded-xl"
+                  allowFullScreen
+                />
+              )}
+            </div>
+
+            {/* External Link */}
+            <div className="mt-4 text-center">
+              <a
+                href={activePlatform === 'youtube' 
+                  ? 'https://www.youtube.com/watch?v=4gfWbGCA5q0' 
+                  : 'https://www.twitch.tv/poulpy_coaching'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-sm text-gray-400 transition-colors"
+              >
+                {activePlatform === 'youtube' ? (
+                  <>
+                    <YoutubeIcon size={16} className="text-red-500" />
+                    Voir sur YouTube
+                  </>
+                ) : (
+                  <>
+                    <Tv size={16} className="text-purple-500" />
+                    Voir sur Twitch
+                  </>
+                )}
+              </a>
             </div>
           </div>
         </motion.div>
