@@ -86,10 +86,17 @@ export default function StudentCoachingPage() {
       if (markAsRead && user?.id) {
         const unread = formatted.filter((m) => !m.read_at && m.sender_id !== user.id);
         if (unread.length > 0) {
-          await supabase
-            .from('coaching_messages')
-            .update({ read_at: new Date().toISOString() })
-            .in('id', unread.map((m) => m.id));
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session?.access_token) {
+            await fetch('/api/coaching/mark-read', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${session.access_token}`,
+              },
+              body: JSON.stringify({ studentId }),
+            });
+          }
         }
       }
     } catch (err) {
@@ -115,15 +122,17 @@ export default function StudentCoachingPage() {
     return () => {
       if (!user?.id || !studentId) return;
       supabase.auth.getSession().then(({ data }) => {
-        const uid = data.session?.user.id;
-        if (!uid) return;
-        supabase
-          .from('coaching_messages')
-          .update({ read_at: new Date().toISOString() })
-          .eq('student_id', studentId)
-          .neq('sender_id', uid)
-          .is('read_at', null)
-          .then(() => {});
+        const token = data.session?.access_token;
+        if (!token) return;
+        fetch('/api/coaching/mark-read', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ studentId }),
+          keepalive: true,
+        }).catch(() => {});
       });
     };
   }, [studentId, user?.id]);
