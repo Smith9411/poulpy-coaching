@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Shield, ArrowLeft, User, Mail, Calendar, MessageSquare, Send, Loader2, AlertCircle } from 'lucide-react';
+import { Shield, ArrowLeft, User, Mail, Calendar, MessageSquare, Send, Loader2, AlertCircle, Trash2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -42,6 +42,8 @@ export default function StudentCoachingPage() {
   const [newMessage, setNewMessage] = useState('');
   const [messageType, setMessageType] = useState<'progression' | 'feedback' | 'tip'>('progression');
   const [error, setError] = useState('');
+  const [showConfirmClear, setShowConfirmClear] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const fetchStudentData = useCallback(async (markAsRead = false) => {
@@ -178,6 +180,32 @@ export default function StudentCoachingPage() {
     }
   };
 
+  const handleClearConversation = async () => {
+    if (!studentId) return;
+    setIsClearing(true);
+    setError('');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('Non authentifié');
+
+      const res = await fetch(`/api/admin/coaching/clear/${studentId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || 'Erreur suppression');
+
+      setShowConfirmClear(false);
+      setMessages([]);
+    } catch (err) {
+      console.error('Erreur clear conversation:', err);
+      setError(err instanceof Error ? err.message : 'Erreur lors de la suppression');
+    } finally {
+      setIsClearing(false);
+    }
+  };
+
   if (authLoading || isLoading) {
     return (
       <div className="min-h-screen page-bg flex items-center justify-center">
@@ -222,10 +250,47 @@ export default function StudentCoachingPage() {
             <ArrowLeft size={20} />
             Retour aux étudiants
           </Link>
-          <h1 className="text-3xl font-bold mb-2">Chat avec {student?.username}</h1>
-          <p className="text-gray-400 flex items-center gap-2">
-            <Mail size={14} /> {student?.email} · Inscrit le {student && new Date(student.createdAt).toLocaleDateString('fr-FR')}
-          </p>
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">Chat avec {student?.username}</h1>
+              <p className="text-gray-400 flex items-center gap-2">
+                <Mail size={14} /> {student?.email} · Inscrit le {student && new Date(student.createdAt).toLocaleDateString('fr-FR')}
+              </p>
+            </div>
+            {!showConfirmClear ? (
+              <button
+                type="button"
+                onClick={() => setShowConfirmClear(true)}
+                disabled={messages.length === 0}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                title="Supprimer définitivement tous les messages de cette conversation"
+              >
+                <Trash2 size={16} />
+                Vider la conversation
+              </button>
+            ) : (
+              <div className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-red-500/10 border border-red-500/30">
+                <span className="text-sm text-red-300">Confirmer la suppression ?</span>
+                <button
+                  type="button"
+                  onClick={handleClearConversation}
+                  disabled={isClearing}
+                  className="px-3 py-1 rounded-lg bg-red-500 hover:bg-red-600 text-white text-xs font-semibold transition-colors disabled:opacity-50 flex items-center gap-1"
+                >
+                  {isClearing ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
+                  Oui, tout supprimer
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmClear(false)}
+                  disabled={isClearing}
+                  className="px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-medium transition-colors disabled:opacity-50"
+                >
+                  Annuler
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Jeux & Rang */}
