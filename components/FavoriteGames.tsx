@@ -9,16 +9,11 @@ import Select from './Select';
 type Game = 'valorant' | 'apex';
 
 const VALORANT_RANKS = [
-  'Iron 1', 'Iron 2', 'Iron 3',
-  'Bronze 1', 'Bronze 2', 'Bronze 3',
-  'Silver 1', 'Silver 2', 'Silver 3',
-  'Gold 1', 'Gold 2', 'Gold 3',
-  'Platinum 1', 'Platinum 2', 'Platinum 3',
-  'Diamond 1', 'Diamond 2', 'Diamond 3',
-  'Ascendant 1', 'Ascendant 2', 'Ascendant 3',
-  'Immortal 1', 'Immortal 2', 'Immortal 3',
-  'Radiant',
+  'Iron', 'Bronze', 'Silver', 'Gold', 'Platinum',
+  'Diamond', 'Ascendant', 'Immortal', 'Radiant',
 ];
+
+const VALORANT_TIERS = ['1', '2', '3'];
 
 const APEX_RANKS = [
   'Rookie', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond',
@@ -31,6 +26,7 @@ export default function FavoriteGames() {
   const { user } = useAuth();
   const [favorite, setFavorite] = useState<Game | ''>('');
   const [valorantRank, setValorantRank] = useState('');
+  const [valorantTier, setValorantTier] = useState('1');
   const [apexRank, setApexRank] = useState('Rookie');
   const [apexTier, setApexTier] = useState('IV');
   const [isLoading, setIsLoading] = useState(true);
@@ -48,12 +44,18 @@ export default function FavoriteGames() {
         .single();
       if (data) {
         setFavorite((data.favorite_game as Game) || '');
-        setValorantRank(data.valorant_rank || '');
+        if (data.valorant_rank) {
+          const m = data.valorant_rank.match(/^(Iron|Bronze|Silver|Gold|Platinum|Diamond|Ascendant|Immortal|Radiant)(?:\s+(\d))?$/);
+          if (m) {
+            setValorantRank(m[1]);
+            setValorantTier(m[2] || '1');
+          }
+        }
         if (data.apex_rank) {
-          const match = data.apex_rank.match(/^(Rookie|Bronze|Silver|Gold|Platinum|Diamond|Master|Predator)(?:\s+(IV|III|II|I))?$/);
-          if (match) {
-            setApexRank(match[1]);
-            setApexTier(match[2] || 'IV');
+          const m = data.apex_rank.match(/^(Rookie|Bronze|Silver|Gold|Platinum|Diamond|Master|Predator)(?:\s+(IV|III|II|I))?$/);
+          if (m) {
+            setApexRank(m[1]);
+            setApexTier(m[2] || 'IV');
           }
         }
       }
@@ -67,11 +69,17 @@ export default function FavoriteGames() {
     setIsSaving(true);
     setSaved(false);
     try {
+      const valorantFull = valorantRank === 'Radiant'
+        ? 'Radiant'
+        : valorantRank
+          ? `${valorantRank} ${valorantTier}`
+          : null;
+
       const { error } = await supabase
         .from('profiles')
         .update({
           favorite_game: favorite || null,
-          valorant_rank: valorantRank || null,
+          valorant_rank: favorite === 'valorant' ? valorantFull : null,
           apex_rank: favorite === 'apex' ? `${apexRank} ${apexTier}` : null,
         })
         .eq('id', user.id);
@@ -93,12 +101,13 @@ export default function FavoriteGames() {
     );
   }
 
-  const valorantOptions = [
-    { value: '', label: '— Sélectionner un rang —' },
+  const valorantRankOptions = [
+    { value: '', label: '— Rang —' },
     ...VALORANT_RANKS.map((r) => ({ value: r, label: r })),
   ];
+  const valorantTierOptions = VALORANT_TIERS.map((t) => ({ value: t, label: `Tier ${t}` }));
   const apexRankOptions = APEX_RANKS.map((r) => ({ value: r, label: r }));
-  const apexTierOptions = APEX_TIERS.map((t) => ({ value: t, label: `Division ${t}` }));
+  const apexTierOptions = APEX_TIERS.map((t) => ({ value: t, label: `Tier ${t}` }));
 
   return (
     <div className="card rounded-2xl p-8">
@@ -136,13 +145,23 @@ export default function FavoriteGames() {
       </div>
 
       {favorite === 'valorant' && (
-        <div className="grid grid-cols-2 gap-3 mb-6">
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="space-y-2 col-span-1">
+            <label className="block text-sm font-medium text-gray-300">Tier</label>
+            <Select
+              value={valorantTier}
+              onChange={setValorantTier}
+              options={valorantTierOptions}
+              accent="red"
+              disabled={valorantRank === 'Radiant'}
+            />
+          </div>
           <div className="space-y-2 col-span-2">
-            <label className="block text-sm font-medium text-gray-300">Rang Valorant</label>
+            <label className="block text-sm font-medium text-gray-300">Rang</label>
             <Select
               value={valorantRank}
               onChange={setValorantRank}
-              options={valorantOptions}
+              options={valorantRankOptions}
               accent="red"
             />
           </div>
@@ -150,9 +169,9 @@ export default function FavoriteGames() {
       )}
 
       {favorite === 'apex' && (
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <div className="space-y-2">
-            <label className="block text-sm font-medium text-gray-300">Division</label>
+        <div className="grid grid-cols-3 gap-3 mb-6">
+          <div className="space-y-2 col-span-1">
+            <label className="block text-sm font-medium text-gray-300">Tier</label>
             <Select
               value={apexTier}
               onChange={setApexTier}
@@ -160,7 +179,7 @@ export default function FavoriteGames() {
               accent="orange"
             />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 col-span-2">
             <label className="block text-sm font-medium text-gray-300">Rang</label>
             <Select
               value={apexRank}
