@@ -101,7 +101,7 @@ export default function StudentCoachingPage() {
   }, [studentId, user?.id]);
 
   useEffect(() => {
-    if (user?.isAdmin && studentId) fetchStudentData(false);
+    if (user?.isAdmin && studentId) fetchStudentData(true);
   }, [user, studentId, fetchStudentData]);
 
   useEffect(() => {
