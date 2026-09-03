@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Shield, ArrowLeft, User, Search, MessageSquare, RefreshCw, Loader2, Mail, Calendar } from 'lucide-react';
+import { Shield, ArrowLeft, User, Search, MessageSquare, RefreshCw, Loader2, Mail, Calendar, Bell } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { useState, useEffect, useCallback } from 'react';
@@ -14,6 +14,7 @@ interface StudentRow {
   createdAt: string;
   avatarUrl?: string | null;
   initial: string;
+  unreadCount: number;
 }
 
 export default function AdminCoaching() {
@@ -25,12 +26,28 @@ export default function AdminCoaching() {
   const fetchStudents = useCallback(async () => {
     setIsLoading(true);
     try {
-      const { data: profiles, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const [{ data: profiles, error }, { data: { session } }] = await Promise.all([
+        supabase.from('profiles').select('*').order('created_at', { ascending: false }),
+        supabase.auth.getSession(),
+      ]);
 
       if (error) throw error;
+
+      let unreadCounts: Record<string, number> = {};
+      if (session?.access_token) {
+        try {
+          const res = await fetch('/api/admin/coaching/unread-count', {
+            headers: { Authorization: `Bearer ${session.access_token}` },
+            cache: 'no-store',
+          });
+          if (res.ok) {
+            const data = await res.json();
+            unreadCounts = data.counts || {};
+          }
+        } catch {
+          // Pas bloquant : on continue sans badge
+        }
+      }
 
       const studentsData = profiles
         .filter((p: any) => !p.is_admin)
@@ -42,6 +59,7 @@ export default function AdminCoaching() {
           createdAt: p.created_at,
           avatarUrl: p.avatar_url,
           initial: p.username.charAt(0).toUpperCase(),
+          unreadCount: unreadCounts[p.id] || 0,
         }));
 
       setStudents(studentsData);
@@ -58,10 +76,15 @@ export default function AdminCoaching() {
     }
   }, [user, fetchStudents]);
 
-  const filteredStudents = students.filter(student =>
-    student.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    student.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredStudents = students
+    .filter(student =>
+      student.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      student.email.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => {
+      if (b.unreadCount !== a.unreadCount) return b.unreadCount - a.unreadCount;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
 
   if (authLoading) {
     return (
@@ -139,52 +162,78 @@ export default function AdminCoaching() {
           </div>
         ) : (
           <div className="grid sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-            {filteredStudents.map((student) => (
-              <Link
-                key={student.id}
-                href={`/admin/coaching/${student.id}`}
-                className="card rounded-xl p-6 hover:bg-white/5 transition-all group cursor-pointer border border-white/5 hover:border-purple-500/30"
-              >
-                <div className="flex items-start gap-4">
-                  {/* Avatar */}
-                  {student.avatarUrl ? (
-                    <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-purple-500/30 flex-shrink-0">
-                      <img
-                        src={student.avatarUrl}
-                        alt={student.username}
-                        className="w-full h-full object-cover"
-                      />
+            {filteredStudents.map((student) => {
+              const hasUnread = student.unreadCount > 0;
+              return (
+                <Link
+                  key={student.id}
+                  href={`/admin/coaching/${student.id}`}
+                  className={`card rounded-xl p-6 transition-all group cursor-pointer border ${
+                    hasUnread
+                      ? 'border-cyan-500/40 bg-cyan-500/5 hover:border-cyan-500/60 shadow-[0_0_0_1px_rgba(34,211,238,0.15),0_8px_24px_-8px_rgba(34,211,238,0.35)]'
+                      : 'border-white/5 hover:border-purple-500/30 hover:bg-white/5'
+                  }`}
+                >
+                  <div className="flex items-start gap-4">
+                    {/* Avatar */}
+                    <div className="relative flex-shrink-0">
+                      {student.avatarUrl ? (
+                        <div className={`w-12 h-12 rounded-full overflow-hidden border-2 flex-shrink-0 ${hasUnread ? 'border-cyan-400' : 'border-purple-500/30'}`}>
+                          <img
+                            src={student.avatarUrl}
+                            alt={student.username}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className={`w-12 h-12 rounded-full bg-gradient-to-br flex items-center justify-center text-white font-bold flex-shrink-0 ${hasUnread ? 'from-cyan-500 to-blue-500' : 'from-purple-500 to-cyan-500'}`}>
+                          {student.initial}
+                        </div>
+                      )}
+                      {hasUnread && (
+                        <span className="absolute -top-1 -right-1 inline-flex items-center justify-center w-5 h-5 rounded-full bg-cyan-500 text-white text-[10px] font-bold ring-2 ring-page animate-pulse">
+                          {student.unreadCount > 9 ? '9+' : student.unreadCount}
+                        </span>
+                      )}
                     </div>
-                  ) : (
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-cyan-500 flex items-center justify-center text-white font-bold flex-shrink-0">
-                      {student.initial}
-                    </div>
-                  )}
 
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="font-bold text-lg mb-1 truncate">{student.username}</div>
-                    <div className="text-sm text-gray-400 flex items-center gap-2 mb-2">
-                      <Mail size={14} />
-                      <span className="truncate">{student.email}</span>
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`font-bold text-lg truncate ${hasUnread ? 'text-white' : ''}`}>
+                          {student.username}
+                        </span>
+                        {hasUnread && (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-[10px] font-semibold uppercase tracking-wide">
+                            <Bell size={10} />
+                            Nouveau
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-sm text-gray-400 flex items-center gap-2 mb-2">
+                        <Mail size={14} />
+                        <span className="truncate">{student.email}</span>
+                      </div>
+                      <div className="text-xs text-gray-500 flex items-center gap-2">
+                        <Calendar size={12} />
+                        <span>
+                          Inscrit le {new Date(student.createdAt).toLocaleDateString('fr-FR')}
+                        </span>
+                      </div>
                     </div>
-                    <div className="text-xs text-gray-500 flex items-center gap-2">
-                      <Calendar size={12} />
-                      <span>
-                        Inscrit le {new Date(student.createdAt).toLocaleDateString('fr-FR')}
-                      </span>
+
+                    {/* Message Icon */}
+                    <div className="flex-shrink-0">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
+                        hasUnread ? 'bg-cyan-500/20 group-hover:bg-cyan-500/30' : 'bg-purple-500/20 group-hover:bg-purple-500/30'
+                      }`}>
+                        <MessageSquare size={18} className={hasUnread ? 'text-cyan-300' : 'text-purple-400'} />
+                      </div>
                     </div>
                   </div>
-
-                  {/* Message Icon */}
-                  <div className="flex-shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
-                      <MessageSquare size={18} className="text-purple-400" />
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         )}
 
