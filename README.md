@@ -5,10 +5,21 @@
 
 ---
 
-## ⚠️ À lire avant toute modification
+## 🔴 OBLIGATOIRE — Lis ce fichier à chaque session de modification
 
-> **Ce fichier est la source de vérité sur l'état du projet.**
-> Lis-le entièrement avant de coder quoi que ce soit. À la fin de chaque session de modifications, ajoute une entrée dans la section **Historique des modifications** en bas de ce fichier pour que le prochain intervenant sache ce qui a été fait.
+> **Ce fichier est la source de vérité sur l'état du projet.** Tout le monde (toi, moi, ou une autre IA) DOIT le lire entièrement avant de coder.
+>
+> **À la fin de chaque session de modifications**, ajoute une entrée dans la section **"Historique des modifications"** en bas de ce fichier. Format :
+> ```
+> - YYYY-MM-DD (brève description) :
+>   - [changement 1]
+>   - [changement 2]
+>   - commit: `abc1234` [description]
+> ```
+>
+> **Sans cette mise à jour, le prochain intervenant sera aveugle sur ce que tu as fait.** C'est non-négociable.
+>
+> Voir aussi `AGENTS.md` pour le contrat de travail complet.
 
 ---
 
