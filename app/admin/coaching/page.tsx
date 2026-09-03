@@ -143,6 +143,12 @@ export default function AdminCoaching() {
           </div>
         </div>
 
+        {error && (
+          <div className="mb-6 p-4 rounded-xl bg-red-500/20 border border-red-500/30 text-red-400 text-sm">
+            {error}
+          </div>
+        )}
+
         {/* Search */}
         <div className="mb-6">
           <div className="relative">

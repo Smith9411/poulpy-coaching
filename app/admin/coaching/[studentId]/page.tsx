@@ -49,11 +49,20 @@ export default function StudentCoachingPage() {
   const fetchStudentData = useCallback(async (markAsRead = false) => {
     setError('');
     try {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', studentId)
-        .single();
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('Non authentifié');
+
+      const res = await fetch('/api/admin/users', {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: 'no-store',
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || 'Erreur chargement');
+      }
+      const data = await res.json();
+      const profile = (data.users || []).find((u: { id: string }) => u.id === studentId);
 
       if (!profile) {
         setError('Étudiant non trouvé');
@@ -64,13 +73,13 @@ export default function StudentCoachingPage() {
         id: profile.id,
         username: profile.username,
         email: profile.email || '',
-        isAdmin: profile.is_admin,
-        createdAt: profile.created_at,
-        avatarUrl: profile.avatar_url,
-        initial: profile.username.charAt(0).toUpperCase(),
-        favoriteGame: profile.favorite_game,
-        valorantRank: profile.valorant_rank,
-        apexRank: profile.apex_rank,
+        isAdmin: profile.isAdmin,
+        createdAt: profile.createdAt,
+        avatarUrl: profile.avatarUrl,
+        initial: profile.initial,
+        favoriteGame: profile.favoriteGame,
+        valorantRank: profile.valorantRank,
+        apexRank: profile.apexRank,
       });
 
       const { data: messagesData } = await supabase

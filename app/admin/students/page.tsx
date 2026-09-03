@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabase';
 import { ArrowLeft, Shield, Loader2, Search, MessageSquare, ChevronRight, Quote } from 'lucide-react';
 
 interface AdminUser {
@@ -27,21 +28,41 @@ export default function AdminStudentsPage() {
   const [search, setSearch] = useState('');
   const [gameFilter, setGameFilter] = useState<'all' | 'valorant' | 'apex'>('all');
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const res = await fetch('/api/admin/users');
-        if (!res.ok) throw new Error('Erreur chargement');
-        const data = await res.json();
-        setUsers((data.users || []).filter((u: AdminUser) => !u.isAdmin));
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Erreur');
-      } finally {
-        setIsLoading(false);
+  const fetchUsers = useCallback(async (signal?: AbortSignal) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('Non authentifié');
+
+      const res = await fetch('/api/admin/users', {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: 'no-store',
+        signal,
+      });
+      if (signal?.aborted) return;
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || 'Erreur chargement');
       }
-    };
-    if (user?.isAdmin) fetchUsers();
-  }, [user?.isAdmin]);
+      const data = await res.json();
+      if (signal?.aborted) return;
+      setUsers((data.users || []).filter((u: AdminUser) => !u.isAdmin));
+      setError('');
+    } catch (err) {
+      if ((err as { name?: string })?.name === 'AbortError') return;
+      setError(err instanceof Error ? err.message : 'Erreur');
+    } finally {
+      if (!signal?.aborted) setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!user?.isAdmin) return;
+    const controller = new AbortController();
+    setIsLoading(true);
+    fetchUsers(controller.signal);
+    return () => controller.abort();
+  }, [user?.isAdmin, fetchUsers]);
 
   if (authLoading) {
     return (
@@ -86,6 +107,12 @@ export default function AdminStudentsPage() {
           <h1 className="text-3xl font-bold mb-2">Rangs des élèves</h1>
           <p className="text-gray-400">Vue d'ensemble des élèves et de leurs rangs</p>
         </div>
+
+        {error && (
+          <div className="mb-6 p-4 rounded-xl bg-red-500/20 border border-red-500/30 text-red-400 text-sm">
+            {error}
+          </div>
+        )}
 
         {/* Stats */}
         <div className="grid sm:grid-cols-3 gap-4 mb-6">
