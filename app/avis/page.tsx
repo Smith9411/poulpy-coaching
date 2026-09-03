@@ -227,6 +227,8 @@ export default function Avis() {
   };
 
   const handleAdminResponse = async (reviewId: string) => {
+    console.log('handleAdminResponse appelé pour:', reviewId);
+    
     if (!responseText.trim()) {
       showStatus('error', 'Veuillez écrire une réponse.');
       return;
@@ -239,10 +241,14 @@ export default function Avis() {
 
     setIsSubmittingResponse(true);
     try {
+      console.log('Récupération session...');
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
+      console.log('Token:', token ? 'Présent' : 'Absent', 'User:', session?.user?.id);
+      
       if (!token) throw new Error('Non authentifié');
 
+      console.log('Envoi requête API...');
       const res = await fetch('/api/reviews/respond', {
         method: 'POST',
         headers: { 
@@ -255,7 +261,10 @@ export default function Avis() {
         }),
       });
 
+      console.log('Réponse API reçue, status:', res.status);
       const data = await res.json();
+      console.log('Données API:', data);
+      
       if (!res.ok || data.error) throw new Error(data.error || 'Erreur');
 
       setReviews((prev) => prev.map((r) => 
@@ -269,6 +278,7 @@ export default function Avis() {
       setRespondingToId(null);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erreur lors de la publication';
+      console.error('Erreur handleAdminResponse:', err);
       showStatus('error', msg);
     } finally {
       setIsSubmittingResponse(false);
