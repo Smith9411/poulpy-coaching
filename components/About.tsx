@@ -37,6 +37,11 @@ export default function About() {
     };
 
     fetchSettings();
+
+    // Recharger quand l'admin met à jour les settings
+    const onSettingsUpdated = () => fetchSettings();
+    window.addEventListener('settings-updated', onSettingsUpdated);
+    return () => window.removeEventListener('settings-updated', onSettingsUpdated);
   }, []);
   
   const values = [

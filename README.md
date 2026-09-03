@@ -220,6 +220,15 @@ Fonctionnement côté app : après le retour Google, `/auth/callback` vérifie l
 > `YYYY-MM-DD : [brève description des changements]`
 > Le prochain intervenant lira ces lignes pour comprendre l'évolution.
 
+- 2026-09-04 (fix persistance paramètres admin) :
+  - **Persistance réelle** : les changements dans `/admin/settings` sont maintenant vraiment sauvegardés en base Supabase (table `settings`). Suppression du message trompeur "mémoire locale uniquement"
+  - **API `/api/settings` durcie** : validation des clés autorisées, validation des URLs (http/https uniquement), gestion d'erreurs améliorée, refresh de session si token expiré, message d'erreur explicite si la table n'existe pas
+  - **SQL `create-settings-table.sql` amélioré** : script idempotent, RLS policies propres (SELECT public, INSERT/UPDATE/DELETE admin only), policy `WITH CHECK` ajoutée pour bloquer les inserts non-admin
+  - **UI paramètres refaite** : aperçu **live** YouTube + Twitch (iframe) qui s'update quand on tape l'URL, validation visuelle des URLs invalides (bordure rouge + message), détection auto de l'ID vidéo YouTube (watch?v=, youtu.be/), détection auto du channel Twitch
+  - **Alerte table manquante** : si la table `settings` n'existe pas, bandeau orange avec instructions SQL étape par étape
+  - **Refresh automatique des consommateurs** : `About.tsx` écoute un événement `settings-updated` pour recharger immédiatement après sauvegarde admin
+  - **Bouton sauvegarde** : désactivé pendant la sauvegarde, affiche un spinner, désactivé si URLs invalides
+  - Testé en local : build OK (TS strict)
 - 2026-09-04 (fix erreur serveur réponse admin + mode déroulant) :
   - **Erreur serveur réponse admin corrigée** : suppression du `.select().single()` final dans l'API `/api/reviews/respond` qui pouvait faire échouer l'update si la lecture post-écriture retournait 0 lignes — on renvoie maintenant directement les valeurs écrites
   - **Détection colonnes manquantes** : ajout de la détection "schema cache" dans le message d'erreur si les colonnes `admin_response`/`admin_response_at` n'existent pas
