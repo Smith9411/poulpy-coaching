@@ -73,6 +73,8 @@ export default function AdminCoaching() {
   useEffect(() => {
     if (user?.isAdmin) {
       fetchStudents();
+      const interval = setInterval(fetchStudents, 15000);
+      return () => clearInterval(interval);
     }
   }, [user, fetchStudents]);
 

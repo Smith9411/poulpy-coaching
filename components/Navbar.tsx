@@ -47,7 +47,7 @@ function useUnreadNotifications(userId: string | undefined, isAdmin: boolean) {
           }
         }
 
-        const res = await fetch('/api/notifications/unread', {
+        const res = await fetch('/api/notifications/all', {
           headers: { Authorization: `Bearer ${session.access_token}` },
         });
         if (!res.ok) throw new Error('Erreur notifs');
