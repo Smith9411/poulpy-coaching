@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Star, ArrowRight, MessageSquarePlus, Trash2, Check, X, Loader2, Shield, User as UserIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 
 interface Review {
@@ -56,6 +56,13 @@ export default function Avis() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
+    };
+  }, []);
 
   // Form state
   const [game, setGame] = useState('Valorant');
@@ -70,7 +77,8 @@ export default function Avis() {
 
   const showStatus = (type: 'success' | 'error', text: string) => {
     setStatusMsg({ type, text });
-    setTimeout(() => setStatusMsg(null), 3500);
+    if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
+    statusTimerRef.current = setTimeout(() => setStatusMsg(null), 3500);
   };
 
   const fetchReviews = useCallback(async () => {

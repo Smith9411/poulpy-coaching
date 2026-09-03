@@ -3,11 +3,18 @@
 import { Shield, ArrowLeft, Save, RotateCcw, Globe, Mail, Shield as ShieldIcon, Palette } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function AdminSettings() {
   const { user, isLoading: authLoading } = useAuth();
   const [saved, setSaved] = useState(false);
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+    };
+  }, []);
 
   if (authLoading) {
     return (
@@ -81,7 +88,8 @@ export default function AdminSettings() {
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     setSaved(true);
-    setTimeout(() => setSaved(false), 3000);
+    if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+    savedTimerRef.current = setTimeout(() => setSaved(false), 3000);
   };
 
   return (

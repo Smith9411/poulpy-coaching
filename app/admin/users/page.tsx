@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Shield, ArrowLeft, User, Search, ShieldOff, ShieldCheck, AlertTriangle, Trash2, RefreshCw, Edit2, Check, X, Loader2, ImageOff, Mail } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 interface UserRow {
   id: string;
@@ -31,10 +31,18 @@ export default function AdminUsers() {
   const [editingUsername, setEditingUsername] = useState('');
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
+  const successTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (successTimerRef.current) clearTimeout(successTimerRef.current);
+    };
+  }, []);
 
   const showSuccess = (msg: string) => {
     setSuccessMsg(msg);
-    setTimeout(() => setSuccessMsg(''), 3500);
+    if (successTimerRef.current) clearTimeout(successTimerRef.current);
+    successTimerRef.current = setTimeout(() => setSuccessMsg(''), 3500);
   };
 
   const fetchUsers = useCallback(async () => {
