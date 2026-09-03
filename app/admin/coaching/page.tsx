@@ -27,46 +27,42 @@ export default function AdminCoaching() {
   const fetchStudents = useCallback(async (signal?: AbortSignal) => {
     setIsLoading(true);
     try {
-      const [{ data: profiles, error }, { data: { session } }] = await Promise.all([
-        supabase.from('profiles').select('*').order('created_at', { ascending: false }),
-        supabase.auth.getSession(),
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('Non authentifié');
+
+      const [usersRes, unreadRes] = await Promise.all([
+        fetch('/api/admin/users', { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal }),
+        fetch('/api/admin/coaching/unread-count', { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store', signal }),
       ]);
 
       if (signal?.aborted) return;
-      if (error) throw error;
+
+      if (!usersRes.ok) {
+        const errData = await usersRes.json().catch(() => ({}));
+        throw new Error(errData.error || 'Erreur chargement utilisateurs');
+      }
+      const usersData = await usersRes.json();
+      const profiles = (usersData.users || []).filter((u: { isAdmin: boolean }) => !u.isAdmin);
 
       let unreadCounts: Record<string, number> = {};
-      if (session?.access_token) {
-        try {
-          const res = await fetch('/api/admin/coaching/unread-count', {
-            headers: { Authorization: `Bearer ${session.access_token}` },
-            cache: 'no-store',
-            signal,
-          });
-          if (res.ok) {
-            const data = await res.json();
-            unreadCounts = data.counts || {};
-          }
-        } catch (err) {
-          if ((err as { name?: string })?.name === 'AbortError') throw err;
-          // Pas bloquant : on continue sans badge
-        }
+      if (unreadRes.ok) {
+        const data = await unreadRes.json();
+        unreadCounts = data.counts || {};
       }
 
       if (signal?.aborted) return;
 
-      const studentsData = profiles
-        .filter((p: { is_admin: boolean }) => !p.is_admin)
-        .map((p: { id: string; username: string; email: string | null; is_admin: boolean; created_at: string; avatar_url: string | null }) => ({
-          id: p.id,
-          username: p.username,
-          email: p.email || '',
-          isAdmin: p.is_admin,
-          createdAt: p.created_at,
-          avatarUrl: p.avatar_url,
-          initial: p.username.charAt(0).toUpperCase(),
-          unreadCount: unreadCounts[p.id] || 0,
-        }));
+      const studentsData = profiles.map((p: { id: string; username: string; email: string; createdAt: string; avatarUrl: string | null; initial: string }) => ({
+        id: p.id,
+        username: p.username,
+        email: p.email,
+        isAdmin: false,
+        createdAt: p.createdAt,
+        avatarUrl: p.avatarUrl,
+        initial: p.initial,
+        unreadCount: unreadCounts[p.id] || 0,
+      }));
 
       setStudents(studentsData);
       setError('');
@@ -138,7 +134,7 @@ export default function AdminCoaching() {
               <p className="text-gray-400">Gérez la progression de vos étudiants</p>
             </div>
             <button
-              onClick={fetchStudents}
+              onClick={() => fetchStudents()}
               className="inline-flex items-center gap-2 px-4 py-2 glass rounded-lg hover:bg-white/10 transition-colors"
             >
               <RefreshCw size={18} className={isLoading ? 'animate-spin' : ''} />
