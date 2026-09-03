@@ -68,12 +68,16 @@ export default function Profile() {
 
     setIsUploading(true);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('Non authentifié');
+
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('userId', user.id);
 
       const res = await fetch('/api/avatar/upload', {
         method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
 

@@ -12,6 +12,18 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export async function POST(req: NextRequest) {
   try {
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader) {
+      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Token invalide' }, { status: 401 });
+    }
+
     const body = await req.json();
     const { studentId, adminId, message, messageType } = body;
 
@@ -22,7 +34,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verify admin is actually admin
+    if (adminId !== user.id) {
+      return NextResponse.json(
+        { error: 'adminId doit correspondre à l\'utilisateur authentifié' },
+        { status: 403 }
+      );
+    }
+
     const { data: adminProfile, error: adminError } = await supabase
       .from('profiles')
       .select('is_admin')
@@ -36,12 +54,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Insert message
     const { data, error } = await supabase
       .from('coaching_messages')
       .insert([{
         student_id: studentId,
         admin_id: adminId,
+        sender_id: adminId,
         message: message.trim(),
         message_type: messageType || 'progression',
       }])

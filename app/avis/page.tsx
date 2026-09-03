@@ -174,8 +174,13 @@ export default function Avis() {
 
   const handleDeleteReview = async (id: string) => {
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('Non authentifié');
+
       const res = await fetch(`/api/reviews?id=${id}`, {
         method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
       if (!res.ok || data.error) throw new Error(data.error || 'Erreur');

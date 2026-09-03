@@ -41,7 +41,11 @@ export default function AdminUsers() {
     setIsLoading(true);
     setLoadError('');
     try {
-      const res = await fetch('/api/admin/users');
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      const headers: HeadersInit = token ? { Authorization: `Bearer ${token}` } : {};
+
+      const res = await fetch('/api/admin/users', { headers });
       const data = await res.json();
 
       if (!res.ok || data.error) {
@@ -160,9 +164,16 @@ export default function AdminUsers() {
   const handleRemoveAvatar = async (u: UserRow) => {
     setBusyId(u.id);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('Non authentifié');
+
       const res = await fetch('/api/admin/users/remove-avatar', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ userId: u.id }),
       });
       const data = await res.json();
@@ -187,8 +198,13 @@ export default function AdminUsers() {
   const deleteUser = async (u: UserRow) => {
     setBusyId(u.id);
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('Non authentifié');
+
       const res = await fetch(`/api/admin/users?userId=${u.id}`, {
         method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
       if (!res.ok || data.error) throw new Error(data.error || 'Erreur');
