@@ -46,6 +46,15 @@ export default function StudentCoachingPage() {
   const [isClearing, setIsClearing] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    if (!showConfirmClear) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !isClearing) setShowConfirmClear(false);
+    };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [showConfirmClear, isClearing]);
+
   const fetchStudentData = useCallback(async (markAsRead = false) => {
     setError('');
     try {
@@ -84,7 +93,7 @@ export default function StudentCoachingPage() {
 
       const { data: messagesData } = await supabase
         .from('coaching_messages')
-        .select('*')
+        .select('id, message, message_type, created_at, read_at, sender_id, student_id, admin_id')
         .eq('student_id', studentId)
         .order('created_at', { ascending: true });
 
@@ -283,7 +292,12 @@ export default function StudentCoachingPage() {
                 Vider la conversation
               </button>
             ) : (
-              <div className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-red-500/10 border border-red-500/30">
+              <div
+                role="dialog"
+                aria-modal="true"
+                aria-label="Confirmation de suppression de la conversation"
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-red-500/10 border border-red-500/30"
+              >
                 <span className="text-sm text-red-300">Confirmer la suppression ?</span>
                 <button
                   type="button"

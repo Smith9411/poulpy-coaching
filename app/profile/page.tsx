@@ -8,6 +8,24 @@ import { supabase } from '@/lib/supabase';
 import { useState, useRef, useEffect } from 'react';
 import FavoriteGames from '@/components/FavoriteGames';
 
+const MAGIC_BYTES: Record<string, number[]> = {
+  'image/png': [0x89, 0x50, 0x4e, 0x47],
+  'image/jpeg': [0xff, 0xd8, 0xff],
+  'image/gif': [0x47, 0x49, 0x46, 0x38],
+  'image/webp': [0x52, 0x49, 0x46, 0x46],
+};
+
+async function verifyImageMagicBytes(file: File): Promise<boolean> {
+  const header = await file.slice(0, 8).arrayBuffer();
+  const bytes = new Uint8Array(header);
+  for (const [mime, signature] of Object.entries(MAGIC_BYTES)) {
+    if (signature.every((b, i) => bytes[i] === b)) {
+      return file.type === mime;
+    }
+  }
+  return false;
+}
+
 export default function Profile() {
   const { user, logout, updateAvatar, updateUsername, updateBio, isLoading: authLoading } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
@@ -71,6 +89,12 @@ export default function Profile() {
 
     if (file.size > 2 * 1024 * 1024) {
       showStatus('error', "L'image ne doit pas dépasser 2 Mo.");
+      return;
+    }
+
+    const isValidImage = await verifyImageMagicBytes(file);
+    if (!isValidImage) {
+      showStatus('error', "Le fichier n'est pas une image valide. Le contenu ne correspond pas à l'extension.");
       return;
     }
 

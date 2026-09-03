@@ -12,9 +12,29 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (!user?.isAdmin) return;
-    supabase.from('profiles').select('id', { count: 'exact', head: true }).then(({ count }) => {
-      setUserCount(count ?? 0);
-    });
+    const controller = new AbortController();
+    (async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const token = session?.access_token;
+        if (!token) return;
+
+        const res = await fetch('/api/admin/users', {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: 'no-store',
+          signal: controller.signal,
+        });
+        if (controller.signal.aborted) return;
+        if (!res.ok) return;
+        const data = await res.json();
+        const nonAdminCount = (data.users || []).filter((u: { isAdmin: boolean }) => !u.isAdmin).length;
+        setUserCount(nonAdminCount);
+      } catch (err) {
+        if ((err as { name?: string })?.name === 'AbortError') return;
+        console.error('Erreur chargement count users:', err);
+      }
+    })();
+    return () => controller.abort();
   }, [user?.isAdmin]);
 
   if (authLoading) {
