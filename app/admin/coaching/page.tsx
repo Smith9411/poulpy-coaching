@@ -22,8 +22,9 @@ export default function AdminCoaching() {
   const [students, setStudents] = useState<StudentRow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [error, setError] = useState('');
 
-  const fetchStudents = useCallback(async () => {
+  const fetchStudents = useCallback(async (signal?: AbortSignal) => {
     setIsLoading(true);
     try {
       const [{ data: profiles, error }, { data: { session } }] = await Promise.all([
@@ -31,6 +32,7 @@ export default function AdminCoaching() {
         supabase.auth.getSession(),
       ]);
 
+      if (signal?.aborted) return;
       if (error) throw error;
 
       let unreadCounts: Record<string, number> = {};
@@ -39,19 +41,23 @@ export default function AdminCoaching() {
           const res = await fetch('/api/admin/coaching/unread-count', {
             headers: { Authorization: `Bearer ${session.access_token}` },
             cache: 'no-store',
+            signal,
           });
           if (res.ok) {
             const data = await res.json();
             unreadCounts = data.counts || {};
           }
-        } catch {
+        } catch (err) {
+          if ((err as { name?: string })?.name === 'AbortError') throw err;
           // Pas bloquant : on continue sans badge
         }
       }
 
+      if (signal?.aborted) return;
+
       const studentsData = profiles
-        .filter((p: any) => !p.is_admin)
-        .map((p: any) => ({
+        .filter((p: { is_admin: boolean }) => !p.is_admin)
+        .map((p: { id: string; username: string; email: string | null; is_admin: boolean; created_at: string; avatar_url: string | null }) => ({
           id: p.id,
           username: p.username,
           email: p.email || '',
@@ -63,19 +69,25 @@ export default function AdminCoaching() {
         }));
 
       setStudents(studentsData);
-    } catch (error) {
-      console.error('Erreur chargement étudiants:', error);
+      setError('');
+    } catch (err) {
+      if ((err as { name?: string })?.name === 'AbortError') return;
+      console.error('Erreur chargement étudiants:', err);
+      setError(err instanceof Error ? err.message : 'Erreur de chargement');
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    if (user?.isAdmin) {
-      fetchStudents();
-      const interval = setInterval(fetchStudents, 15000);
-      return () => clearInterval(interval);
-    }
+    if (!user?.isAdmin) return;
+    const controller = new AbortController();
+    fetchStudents(controller.signal);
+    const interval = setInterval(() => fetchStudents(), 15000);
+    return () => {
+      controller.abort();
+      clearInterval(interval);
+    };
   }, [user, fetchStudents]);
 
   const filteredStudents = students

@@ -33,6 +33,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'studentId manquant' }, { status: 400 });
     }
 
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (typeof studentId !== 'string' || !uuidRegex.test(studentId)) {
+      return NextResponse.json({ error: 'studentId invalide' }, { status: 400 });
+    }
+
     const { error } = await supabase
       .from('coaching_messages')
       .update({ read_at: new Date().toISOString() })

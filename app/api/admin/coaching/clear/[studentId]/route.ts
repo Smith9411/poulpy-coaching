@@ -19,6 +19,11 @@ export async function DELETE(
   try {
     const { studentId } = await params;
 
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(studentId)) {
+      return NextResponse.json({ error: 'studentId invalide' }, { status: 400 });
+    }
+
     const authHeader = req.headers.get('authorization');
     if (!authHeader) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });

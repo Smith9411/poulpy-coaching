@@ -36,6 +36,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (typeof studentId !== 'string' || !uuidRegex.test(studentId)) {
+      return NextResponse.json({ error: 'studentId invalide' }, { status: 400 });
+    }
+
+    const trimmedMessage = String(message).trim();
+    if (trimmedMessage.length === 0 || trimmedMessage.length > 2000) {
+      return NextResponse.json({ error: 'Le message doit faire entre 1 et 2000 caractères' }, { status: 400 });
+    }
+
+    const allowedTypes = new Set(['progression', 'feedback', 'tip', 'student']);
+    if (messageType && !allowedTypes.has(messageType)) {
+      return NextResponse.json({ error: 'messageType invalide' }, { status: 400 });
+    }
+
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('is_admin')

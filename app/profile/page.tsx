@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { User, Mail, Settings, LogOut, Shield, Clock, Award, Camera, Trash2, Edit2, Check, X, Loader2, MessageSquare, Quote } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import FavoriteGames from '@/components/FavoriteGames';
 
 export default function Profile() {
@@ -19,11 +19,19 @@ export default function Profile() {
   const [bioDraft, setBioDraft] = useState('');
   const [isSavingBio, setIsSavingBio] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const showStatus = (type: 'success' | 'error', text: string) => {
     setStatusMsg({ type, text });
-    setTimeout(() => setStatusMsg(null), 3500);
+    if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
+    statusTimerRef.current = setTimeout(() => setStatusMsg(null), 3500);
   };
+
+  useEffect(() => {
+    return () => {
+      if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
+    };
+  }, []);
 
   if (authLoading) {
     return (
@@ -111,10 +119,18 @@ export default function Profile() {
     }
   };
 
-  const handleSaveUsername = async () => {
+const handleSaveUsername = async () => {
     const trimmed = newName.trim();
     if (!trimmed || trimmed === user.username) {
       setIsEditingName(false);
+      return;
+    }
+    if (trimmed.length < 2 || trimmed.length > 30) {
+      showStatus('error', 'Le pseudo doit contenir entre 2 et 30 caractères.');
+      return;
+    }
+    if (!/^[a-zA-Z0-9_\-À-ÿ ]+$/.test(trimmed)) {
+      showStatus('error', 'Le pseudo contient des caractères non autorisés.');
       return;
     }
     setIsSavingName(true);
