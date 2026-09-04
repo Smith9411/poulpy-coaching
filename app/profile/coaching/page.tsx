@@ -470,12 +470,20 @@ export default function StudentCoachingPage() {
               <ArrowLeft size={20} />
               Retour au profil
             </Link>
-            <Link
-              href="/profile/vod"
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20 text-xs font-semibold transition-colors"
-            >
-              🎬 Voir mes clips VOD analysés
-            </Link>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Link
+                href="/profile/sheet"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 text-xs font-semibold transition-colors"
+              >
+                📋 Ma fiche de suivi
+              </Link>
+              <Link
+                href="/profile/vod"
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20 text-xs font-semibold transition-colors"
+              >
+                🎬 Voir mes clips VOD
+              </Link>
+            </div>
           </div>
           <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
             <MessageSquare className="text-purple-400" />

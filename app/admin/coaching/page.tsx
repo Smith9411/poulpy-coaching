@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import {
   Shield, ArrowLeft, User, Search, MessageSquare, RefreshCw,
-  Loader2, Mail, Calendar, Bell, Film, Sparkles, Users
+  Loader2, Mail, Calendar, Bell, Film, Sparkles, Users, FileText
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -179,22 +179,32 @@ export default function AdminCoaching() {
 
           {/* Info */}
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1 flex-wrap">
-              <span className={`font-bold text-lg truncate ${hasUnread ? 'text-white' : ''}`}>
-                {student.username}
-              </span>
-              {student.inCoaching && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-semibold">
-                  <Sparkles size={10} />
-                  Coaching actuel
+            <div className="flex items-center justify-between gap-2 mb-1 flex-wrap">
+              <div className="flex items-center gap-2 flex-wrap min-w-0">
+                <span className={`font-bold text-lg truncate ${hasUnread ? 'text-white' : ''}`}>
+                  {student.username}
                 </span>
-              )}
-              {hasUnread && (
-                <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-[10px] font-semibold uppercase tracking-wide">
-                  <Bell size={10} />
-                  Nouveau
-                </span>
-              )}
+                {student.inCoaching && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-semibold">
+                    <Sparkles size={10} />
+                    Coaching actuel
+                  </span>
+                )}
+                {hasUnread && (
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-[10px] font-semibold uppercase tracking-wide">
+                    <Bell size={10} />
+                    Nouveau
+                  </span>
+                )}
+              </div>
+              <Link
+                href={`/admin/coaching/${student.id}/sheet`}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 border border-indigo-500/30 text-xs font-medium transition-colors ml-auto shadow-sm hover:scale-[1.02]"
+                title="Consulter et éditer la fiche perso de l'élève"
+              >
+                <FileText size={13} />
+                <span>Fiche perso</span>
+              </Link>
             </div>
             <div className="text-sm text-gray-400 flex items-center gap-2 mb-1">
               <Mail size={14} />
@@ -210,29 +220,36 @@ export default function AdminCoaching() {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2">
+        <div className="grid grid-cols-3 gap-2">
           <Link
             href={`/admin/coaching/${student.id}`}
-            className={`flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
               hasUnread
                 ? 'bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/30'
                 : 'bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/20'
             }`}
           >
-            <MessageSquare size={15} />
-            Chat
+            <MessageSquare size={14} />
+            <span>Chat</span>
             {hasUnread && (
-              <span className="ml-auto inline-flex items-center justify-center w-4 h-4 rounded-full bg-cyan-500 text-white text-[9px] font-bold">
+              <span className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-cyan-500 text-white text-[9px] font-bold">
                 {student.unreadCount > 9 ? '9+' : student.unreadCount}
               </span>
             )}
           </Link>
           <Link
             href={`/admin/coaching/${student.id}/clips`}
-            className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20"
+            className="inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20"
           >
-            <Film size={15} />
-            Clips VOD
+            <Film size={14} />
+            <span>Clips VOD</span>
+          </Link>
+          <Link
+            href={`/admin/coaching/${student.id}/sheet`}
+            className="inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 border border-indigo-500/30"
+          >
+            <FileText size={14} />
+            <span>Fiche perso</span>
           </Link>
         </div>
       </div>

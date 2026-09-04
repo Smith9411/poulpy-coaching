@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { User, Mail, Settings, LogOut, Shield, Clock, Award, Camera, Trash2, Edit2, Check, X, Loader2, MessageSquare, Quote, Film, Calendar, Gamepad2, AlertCircle } from 'lucide-react';
+import { User, Mail, Settings, LogOut, Shield, Clock, Award, Camera, Trash2, Edit2, Check, X, Loader2, MessageSquare, Quote, Film, Calendar, Gamepad2, AlertCircle, FileText } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { useState, useRef, useEffect } from 'react';
@@ -700,16 +700,19 @@ const handleSaveUsername = async () => {
             </Link>
           </div>
 
-          <div className="card rounded-2xl p-6 text-center hover:bg-white/5 transition-all group">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-cyan-600 to-blue-500 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-              <Award size={24} className="text-white" />
+          <Link
+            href="/profile/sheet"
+            className="card rounded-2xl p-6 text-center hover:bg-white/5 transition-all group cursor-pointer"
+          >
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-500 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-indigo-500/20">
+              <FileText size={24} className="text-white" />
             </div>
-            <h3 className="font-bold text-lg mb-2">Progression</h3>
-            <p className="text-gray-400 text-sm mb-4">Suivi de tes rangs</p>
-            <span className="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300 text-sm font-medium transition-colors">
-              Bientôt disponible
+            <h3 className="font-bold text-lg mb-1">Fiche Perso</h3>
+            <p className="text-gray-400 text-sm mb-4">Objectifs & plan coach</p>
+            <span className="inline-flex items-center gap-1 text-indigo-400 group-hover:text-indigo-300 text-sm font-medium transition-colors">
+              Consulter ma fiche →
             </span>
-          </div>
+          </Link>
         </div>
 
         {/* Info section */}
