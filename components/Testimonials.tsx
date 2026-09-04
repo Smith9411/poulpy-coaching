@@ -55,10 +55,10 @@ export default function Testimonials() {
     setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
   }, []);
 
-  // Auto-scroll carousel
+  // Auto-scroll carousel (accéléré à 2.5s pour un défilement dynamique)
   useEffect(() => {
     if (isHovered) return;
-    const interval = setInterval(nextTestimonial, 5000);
+    const interval = setInterval(nextTestimonial, 2500);
     return () => clearInterval(interval);
   }, [isHovered, nextTestimonial]);
 
@@ -85,10 +85,10 @@ export default function Testimonials() {
           <AnimatePresence mode="wait">
             <motion.div
               key={currentIndex}
-              initial={{ opacity: 0, x: 100 }}
+              initial={{ opacity: 0, x: 80 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -100 }}
-              transition={{ duration: 0.4 }}
+              exit={{ opacity: 0, x: -80 }}
+              transition={{ duration: 0.28, ease: 'easeOut' }}
               className="glass-dark rounded-2xl p-8 sm:p-12"
             >
               {/* Stars */}
