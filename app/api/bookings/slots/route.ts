@@ -66,16 +66,32 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ slots: [], warning: 'Table non initialisée' });
       }
 
-      // Récupérer aussi les réservations associées pour afficher le nom de l'élève
+      // Récupérer uniquement les réservations actives (confirmées ou reportées) pour afficher le nom de l'élève
       const { data: bookings } = await supabase
         .from('coaching_bookings')
         .select('id, slot_id, booking_date, booking_time, student_name, student_discord, plan_name, status')
         .gte('booking_date', defaultStart)
         .lte('booking_date', defaultEnd)
-        .neq('status', 'cancelled');
+        .in('status', ['confirmed', 'rescheduled']);
+
+      // Synchronisation : si un créneau était marqué is_booked dans coaching_slots mais qu'il n'a plus
+      // de réservation active (séance terminée ou annulée), on le libère automatiquement
+      const activeSlotKeys = new Set(
+        (bookings || []).map((b: { booking_date: string; booking_time: string }) => `${b.booking_date}_${b.booking_time}`)
+      );
+
+      const sanitizedSlots = (slots || []).map((s: { id: string; date: string; start_time: string; is_booked: boolean }) => {
+        const hasActiveBooking = activeSlotKeys.has(`${s.date}_${s.start_time}`);
+        if (s.is_booked && !hasActiveBooking) {
+          // Correction asynchrone en base
+          Promise.resolve(supabase.from('coaching_slots').update({ is_booked: false }).eq('id', s.id)).catch(() => {});
+          return { ...s, is_booked: false };
+        }
+        return s;
+      });
 
       return NextResponse.json({
-        slots: slots || [],
+        slots: sanitizedSlots,
         bookings: bookings || [],
       });
     }

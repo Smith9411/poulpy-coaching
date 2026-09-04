@@ -389,8 +389,9 @@ export default function AdminBookingsPage() {
       const data = await res.json();
       if (!res.ok || data.error) throw new Error(data.error || 'Erreur validation');
 
-      showToast('success', 'Séance marquée comme terminée !');
+      showToast('success', 'Séance marquée comme terminée ! Créneau libéré.');
       fetchBookings();
+      fetchSlots();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erreur';
       showToast('error', msg);
@@ -498,7 +499,7 @@ export default function AdminBookingsPage() {
                 <span className="text-xs text-gray-400">• Sans paiement</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-black text-white mt-1">
-                Planning & Réservations de Live
+                Planning & Réservations
               </h1>
             </div>
           </div>
@@ -811,29 +812,40 @@ export default function AdminBookingsPage() {
 
               {/* Status Filter buttons */}
               <div className="flex items-center gap-1.5 flex-wrap">
-                {(['all', 'confirmed', 'rescheduled', 'completed', 'cancelled'] as const).map((st) => (
+                {([
+                  { id: 'all', label: 'Toutes', count: bookingsList.length },
+                  { id: 'confirmed', label: 'Confirmées', count: bookingsList.filter((b) => b.status === 'confirmed').length },
+                  { id: 'rescheduled', label: 'Reportées', count: bookingsList.filter((b) => b.status === 'rescheduled').length },
+                  { id: 'completed', label: 'Terminées', count: bookingsList.filter((b) => b.status === 'completed').length },
+                  { id: 'cancelled', label: 'Annulées', count: bookingsList.filter((b) => b.status === 'cancelled').length },
+                ] as const).map((tab) => (
                   <button
-                    key={st}
+                    key={tab.id}
                     type="button"
-                    onClick={() => setStatusFilter(st)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      statusFilter === st
+                    onClick={() => setStatusFilter(tab.id)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                      statusFilter === tab.id
                         ? 'bg-gradient-to-r from-purple-600 to-cyan-500 text-white shadow-md'
-                        : 'glass text-gray-400 hover:text-white'
+                        : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10'
                     }`}
                   >
-                    {st === 'all' && 'Toutes'}
-                    {st === 'confirmed' && 'Confirmées'}
-                    {st === 'rescheduled' && 'Reportées'}
-                    {st === 'completed' && 'Terminées'}
-                    {st === 'cancelled' && 'Annulées'}
+                    <span>{tab.label}</span>
+                    <span
+                      className={`px-1.5 py-0.5 rounded-full text-[10px] leading-none ${
+                        statusFilter === tab.id
+                          ? 'bg-white/25 text-white font-black'
+                          : 'bg-white/5 text-gray-400'
+                      }`}
+                    >
+                      {tab.count}
+                    </span>
                   </button>
                 ))}
 
                 <button
                   type="button"
-                  onClick={fetchBookings}
-                  className="p-2 rounded-xl glass text-gray-300 hover:text-white"
+                  onClick={() => { fetchBookings(); fetchSlots(); }}
+                  className="p-2 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
                   title="Actualiser"
                 >
                   <RefreshCw size={16} className={bookingsLoading ? 'animate-spin' : ''} />
@@ -865,7 +877,7 @@ export default function AdminBookingsPage() {
                   return (
                     <div
                       key={b.id}
-                      className={`card rounded-2xl p-5 border flex flex-col justify-between space-y-4 transition-all ${
+                      className={`card rounded-2xl p-5 border flex flex-col justify-between space-y-4 transition-colors duration-200 ${
                         b.status === 'confirmed'
                           ? 'border-cyan-500/30 hover:border-cyan-400'
                           : b.status === 'rescheduled'
@@ -919,7 +931,7 @@ export default function AdminBookingsPage() {
                       </div>
 
                       {/* Student Info */}
-                      <div className="glass p-3.5 rounded-xl border border-white/5 space-y-2 text-xs">
+                      <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/5 space-y-2 text-xs">
                         <div className="flex items-center justify-between">
                           <span className="text-gray-400">Élève :</span>
                           <span className="font-bold text-white flex items-center gap-1">
@@ -975,7 +987,7 @@ export default function AdminBookingsPage() {
                                 setRescheduleDate(b.booking_date);
                                 setRescheduleTime(b.booking_time);
                               }}
-                              className="flex-1 py-1.5 rounded-lg glass text-xs font-semibold text-purple-300 hover:bg-purple-500/20 hover:text-white transition-colors flex items-center justify-center gap-1"
+                              className="flex-1 py-1.5 rounded-lg bg-purple-500/15 border border-purple-500/30 text-xs font-semibold text-purple-300 hover:bg-purple-500/30 hover:text-white transition-colors flex items-center justify-center gap-1 cursor-pointer"
                             >
                               <Edit2 size={13} />
                               <span>Reporter</span>
@@ -985,8 +997,8 @@ export default function AdminBookingsPage() {
                               type="button"
                               disabled={isActionLoading}
                               onClick={() => handleCompleteBooking(b.id)}
-                              className="p-1.5 rounded-lg glass text-xs font-semibold text-green-400 hover:bg-green-500/20 transition-colors"
-                              title="Marquer comme terminée"
+                              className="p-1.5 rounded-lg bg-green-500/15 border border-green-500/30 text-xs font-semibold text-green-400 hover:bg-green-500/30 transition-colors cursor-pointer"
+                              title="Marquer comme terminée (libère le créneau du planning)"
                             >
                               <CheckCircle2 size={15} />
                             </button>
@@ -998,7 +1010,7 @@ export default function AdminBookingsPage() {
                                 setCancelModalBooking(b);
                                 setCancelReasonInput('Annulée par le coach depuis le panneau admin.');
                               }}
-                              className="p-1.5 rounded-lg glass text-xs font-semibold text-red-400 hover:bg-red-500/20 transition-colors"
+                              className="p-1.5 rounded-lg bg-red-500/15 border border-red-500/30 text-xs font-semibold text-red-400 hover:bg-red-500/30 transition-colors cursor-pointer"
                               title="Annuler la séance (libère le créneau et retire du profil élève)"
                             >
                               <Trash2 size={15} />
@@ -1007,8 +1019,8 @@ export default function AdminBookingsPage() {
                         )}
 
                         {(b.status === 'cancelled' || b.status === 'completed') && (
-                          <span className="text-xs text-gray-500 italic w-full text-center">
-                            Séance {b.status === 'completed' ? 'effectuée' : 'annulée'}
+                          <span className="text-xs text-gray-400 font-medium italic w-full text-center py-1">
+                            Séance {b.status === 'completed' ? '✓ Effectuée & Terminée' : '✕ Annulée'}
                           </span>
                         )}
                       </div>

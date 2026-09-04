@@ -254,6 +254,20 @@ export async function PATCH(req: NextRequest) {
         return NextResponse.json({ error: updateErr.message }, { status: 500 });
       }
 
+      // Libérer le créneau associé s'il existe une fois la séance terminée
+      if (currentBooking.slot_id) {
+        await supabase
+          .from('coaching_slots')
+          .update({ is_booked: false, updated_at: new Date().toISOString() })
+          .eq('id', currentBooking.slot_id);
+      } else if (currentBooking.booking_date && currentBooking.booking_time) {
+        await supabase
+          .from('coaching_slots')
+          .update({ is_booked: false, updated_at: new Date().toISOString() })
+          .eq('date', currentBooking.booking_date)
+          .eq('start_time', currentBooking.booking_time);
+      }
+
       return NextResponse.json({ success: true, booking: updated });
     }
 
