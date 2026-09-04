@@ -101,15 +101,28 @@ html.light {
   --color-cyan-400: #3a4b8f;
 }
 
-/* Transition douce appliquée uniquement pendant le basculement de thème
-   (classe posée puis retirée par ThemeToggle) ; n'affecte pas les
-   animations framer-motion (opacity/transform non listées). */
-html.theme-transition,
-html.theme-transition *,
-html.theme-transition *::before,
-html.theme-transition *::after {
-  transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease,
-    fill 0.4s ease, stroke 0.4s ease, box-shadow 0.4s ease !important;
+/* Transition de thème sur PC (reste identique et riche) */
+@media (min-width: 1024px) {
+  html.theme-transition,
+  html.theme-transition *,
+  html.theme-transition *::before,
+  html.theme-transition *::after {
+    transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease,
+      fill 0.4s ease, stroke 0.4s ease, box-shadow 0.4s ease !important;
+  }
+}
+
+/* Optimisation mobile exclusive (< 1024px) : transition ultra-rapide sur conteneurs clés sans surcharger le CPU/GPU */
+@media (max-width: 1023px) {
+  html.theme-transition,
+  html.theme-transition body,
+  html.theme-transition nav,
+  html.theme-transition .mobile-drawer,
+  html.theme-transition .glass,
+  html.theme-transition .glass-dark,
+  html.theme-transition .card {
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease !important;
+  }
 }
 
 html.light body {
@@ -171,7 +184,17 @@ html.light .bg-black\/20 { background-color: rgba(38, 43, 56, 0.06); }
 html.light .bg-black\/30 { background-color: rgba(38, 43, 56, 0.09); }
 html.light .bg-black\/40 { background-color: rgba(38, 43, 56, 0.09); }
 /* Fond du menu mobile plein écran */
-html.light .bg-black\/80 { background-color: rgba(241, 237, 229, 0.92); }
+html.light .bg-black\/80 { background-color: rgba(241, 237, 229, 0.98); }
+
+html.light .mobile-drawer {
+  background-color: #f1ede5 !important;
+  color: #262b38 !important;
+}
+
+html.light .mobile-drawer-header {
+  background-color: #f1ede5 !important;
+  border-bottom-color: rgba(38, 43, 56, 0.1) !important;
+}
 
 /* Texte blanc imposé sur les boutons/fonds en dégradé, dans les deux thèmes */
 html.light [class*="bg-gradient-to"]:not([class*="text-black"]) {

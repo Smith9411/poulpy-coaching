@@ -675,132 +675,166 @@ export default function Navbar() {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, x: '100%' }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: '100%' }}
-            transition={{ type: 'spring', damping: 25 }}
-            className="fixed inset-0 z-40 lg:hidden"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ duration: 0.22, ease: 'easeOut' }}
+            className="fixed inset-0 z-50 lg:hidden flex flex-col bg-[#13161e] mobile-drawer"
           >
-            <div className="absolute inset-0 bg-black/80 backdrop-blur-xl">
-              <div className="flex flex-col items-center justify-center h-full gap-6 px-8">
-                {navLinks.map((link, index) => (
-                  <motion.div
-                    key={link.href}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <Link
-                      href={link.href}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className={`text-2xl font-semibold hover:text-white transition-colors ${
-                        activeSection === link.id ? 'text-gradient' : 'text-gray-300'
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
-                  </motion.div>
-                ))}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: navLinks.length * 0.05 }}
-                  className="flex flex-col gap-4 mt-8 w-full max-w-xs"
+            {/* Mobile Header with Logo, ThemeToggle and Close button */}
+            <div className="flex items-center justify-between px-6 h-16 border-b border-white/10 shrink-0 mobile-drawer-header">
+              <Link
+                href="/"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-2.5"
+              >
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-xl">
+                  🐙
+                </div>
+                <span className="text-xl font-bold tracking-tight text-white">
+                  POULPY<span className="text-purple-400">.</span>
+                </span>
+              </Link>
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+                <button
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-2 rounded-xl glass hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
+                  aria-label="Fermer le menu"
                 >
-                  {user ? (
-                    <>
-                      <div className="flex items-center gap-4 px-6 py-3 glass rounded-lg border border-white/10">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white font-bold text-lg overflow-hidden">
-                          {user.avatarUrl ? (
-                            <img src={user.avatarUrl} alt={user.username} className="w-full h-full object-cover" />
-                          ) : (
-                            user.initial
-                          )}
-                        </div>
-                        <div className="text-left">
-                          <p className="font-semibold text-white">{user.username}</p>
-                          <p className="text-xs text-gray-400">{user.email}</p>
-                          {user.isAdmin && (
-                            <span className="inline-block mt-1 px-2 py-0.5 text-xs font-bold bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full text-black">
-                              ADMIN
-                            </span>
-                          )}
-                        </div>
+                  <X size={22} />
+                </button>
+              </div>
+            </div>
+
+            {/* Scrollable Drawer Content */}
+            <div className="flex-1 overflow-y-auto px-6 py-6 pb-28 overscroll-contain space-y-6">
+              {/* User Section */}
+              {user ? (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3.5 p-3.5 glass rounded-2xl border border-white/10">
+                    <div className="w-11 h-11 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white font-bold text-base overflow-hidden shrink-0">
+                      {user.avatarUrl ? (
+                        <img src={user.avatarUrl} alt={user.username} className="w-full h-full object-cover" />
+                      ) : (
+                        user.initial
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1 text-left">
+                      <div className="flex items-center gap-2">
+                        <p className="font-bold text-white truncate text-sm">{user.username}</p>
+                        {user.isAdmin && (
+                          <span className="px-2 py-0.5 text-[10px] font-bold bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full text-black">
+                            ADMIN
+                          </span>
+                        )}
                       </div>
-                      {user.needsUsername && (
-                        <Link
-                          href="/auth/complete"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="flex items-center justify-center gap-2 px-6 py-3 glass rounded-lg border border-purple-500/30 text-lg font-medium text-purple-400 hover:bg-purple-500/10 transition-all"
-                        >
-                          <UserPlus size={20} />
-                          Choisis ton pseudo →
-                        </Link>
-                      )}
-                      <Link
-                        href="/profile"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-lg text-lg font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all"
-                      >
-                        <User size={20} />
-                        Mon profil
-                      </Link>
-                      {user.isAdmin && (
-                        <>
-                          <Link
-                            href="/admin"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="flex items-center justify-center gap-2 px-6 py-3 glass rounded-lg border border-purple-500/30 text-lg font-medium text-purple-400 hover:bg-purple-500/10 transition-all"
-                          >
-                            <Shield size={20} />
-                            Panneau Admin
-                          </Link>
-                          <Link
-                            href="/admin/stats"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="flex items-center justify-center gap-2 px-6 py-3 glass rounded-lg border border-cyan-500/30 text-lg font-medium text-cyan-400 hover:bg-cyan-500/10 transition-all"
-                          >
-                            <BarChart2 size={20} />
-                            Statistiques
-                          </Link>
-                          <Link
-                            href="/admin/settings"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="flex items-center justify-center gap-2 px-6 py-3 glass rounded-lg border border-yellow-500/30 text-lg font-medium text-yellow-400 hover:bg-yellow-500/10 transition-all"
-                          >
-                            <Settings size={20} />
-                            Paramètres
-                          </Link>
-                        </>
-                      )}
-                      <button
-                        onClick={() => { logout(); setIsMobileMenuOpen(false); }}
-                        className="flex items-center justify-center gap-2 px-6 py-3 glass rounded-lg border border-white/10 text-lg font-medium text-red-400 hover:bg-red-500/10 transition-all"
-                      >
-                        <LogOut size={20} />
-                        Déconnexion
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <Link
-                        href="/auth"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="flex items-center justify-center gap-2 px-6 py-3 glass rounded-lg border border-white/10 text-lg font-medium text-gray-300 hover:bg-white/5 transition-all"
-                      >
-                        <User size={20} />
-                        Connexion / S'inscrire
-                      </Link>
-                      <Link
-                        href="/#booking"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="px-6 py-3 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-lg text-lg font-semibold text-center hover:shadow-lg hover:shadow-purple-500/50 transition-all"
-                      >
-                        Réserver une session →
-                      </Link>
-                    </>
+                      <p className="text-xs text-gray-400 truncate">{user.email}</p>
+                    </div>
+                  </div>
+
+                  {user.needsUsername && (
+                    <Link
+                      href="/auth/complete"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center justify-center gap-2 py-2.5 px-4 glass rounded-xl border border-purple-500/30 text-xs font-medium text-purple-400"
+                    >
+                      <UserPlus size={16} />
+                      <span>Choisis ton pseudo →</span>
+                    </Link>
                   )}
-                </motion.div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <Link
+                      href="/profile"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center justify-center gap-2 py-2.5 px-3 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl text-xs font-bold text-white shadow-md"
+                    >
+                      <User size={15} />
+                      <span>Mon profil</span>
+                    </Link>
+                    <button
+                      onClick={() => { logout(); setIsMobileMenuOpen(false); }}
+                      className="flex items-center justify-center gap-2 py-2.5 px-3 glass rounded-xl border border-white/10 text-xs font-semibold text-red-400 hover:bg-red-500/10"
+                    >
+                      <LogOut size={15} />
+                      <span>Déconnexion</span>
+                    </button>
+                  </div>
+
+                  {user.isAdmin && (
+                    <div className="space-y-1.5 pt-3 border-t border-white/10">
+                      <span className="text-[11px] font-bold tracking-wider uppercase text-gray-400 px-1 block">
+                        Administration
+                      </span>
+                      <Link
+                        href="/admin"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-2.5 py-2.5 px-3.5 glass rounded-xl text-xs font-medium text-purple-300"
+                      >
+                        <Shield size={16} />
+                        <span>Panneau Admin</span>
+                      </Link>
+                      <Link
+                        href="/admin/stats"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-2.5 py-2.5 px-3.5 glass rounded-xl text-xs font-medium text-cyan-300"
+                      >
+                        <BarChart2 size={16} />
+                        <span>Statistiques</span>
+                      </Link>
+                      <Link
+                        href="/admin/settings"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-2.5 py-2.5 px-3.5 glass rounded-xl text-xs font-medium text-yellow-300"
+                      >
+                        <Settings size={16} />
+                        <span>Paramètres</span>
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-2.5">
+                  <Link
+                    href="/#booking"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-full py-3.5 px-4 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl text-sm font-bold text-center text-white shadow-lg flex items-center justify-center gap-2"
+                  >
+                    <span>Réserver une session</span>
+                    <span>→</span>
+                  </Link>
+                  <Link
+                    href="/auth"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-full py-2.5 px-4 glass rounded-xl text-sm font-semibold text-center text-gray-300 hover:text-white border border-white/10 flex items-center justify-center gap-2"
+                  >
+                    <User size={16} />
+                    <span>Connexion / S'inscrire</span>
+                  </Link>
+                </div>
+              )}
+
+              {/* Navigation Links */}
+              <div className="pt-3 border-t border-white/10 space-y-1">
+                <span className="text-[11px] font-bold tracking-wider uppercase text-gray-400 px-1 block mb-2">
+                  Navigation
+                </span>
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={`flex items-center justify-between py-3 px-3.5 rounded-xl text-base font-semibold transition-colors ${
+                      activeSection === link.id
+                        ? 'bg-gradient-to-r from-purple-600/30 to-cyan-500/20 text-white border border-purple-500/40'
+                        : 'text-gray-300 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <span>{link.label}</span>
+                    <span className="text-xs text-gray-500">→</span>
+                  </Link>
+                ))}
               </div>
             </div>
           </motion.div>
