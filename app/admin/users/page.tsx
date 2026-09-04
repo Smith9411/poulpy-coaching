@@ -98,29 +98,6 @@ export default function AdminUsers() {
     }
   }, [user?.isAdmin, fetchUsers]);
 
-  if (authLoading) {
-    return (
-      <main className="min-h-screen page-bg py-24 flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
-      </main>
-    );
-  }
-
-  if (!user || !user.isAdmin) {
-    return (
-      <main className="min-h-screen page-bg py-24 flex items-center justify-center">
-        <div className="text-center card rounded-2xl p-12 max-w-md mx-auto px-4">
-          <Shield size={64} className="mx-auto mb-6 text-gray-500" />
-          <h1 className="text-3xl font-bold mb-4">Accès refusé</h1>
-          <p className="text-gray-400 mb-8">Tu n&apos;as pas les permissions d&apos;administrateur.</p>
-          <Link href="/admin" className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all">
-            Retour à l&apos;admin
-          </Link>
-        </div>
-      </main>
-    );
-  }
-
   const toggleAdmin = async (u: UserRow) => {
     setBusyId(u.id);
     setLoadError('');
@@ -217,7 +194,7 @@ export default function AdminUsers() {
       setUsers((prev) =>
         prev.map((p) => (p.id === u.id ? { ...p, avatarUrl: null } : p))
       );
-      if (u.username === user.username || u.id === user.id) {
+      if (u.username === user?.username || u.id === user?.id) {
         await refreshUser();
       }
       showSuccess(`Photo de profil de ${u.username} retirée avec succès !`);
@@ -292,6 +269,29 @@ export default function AdminUsers() {
 
   const SortIcon = ({ field }: { field: string }) =>
     sortBy === field ? <span className="text-purple-400">{sortOrder === 'asc' ? '↑' : '↓'}</span> : <span className="text-gray-600">↕</span>;
+
+  if (authLoading) {
+    return (
+      <main className="min-h-screen page-bg py-24 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      </main>
+    );
+  }
+
+  if (!user || !user.isAdmin) {
+    return (
+      <main className="min-h-screen page-bg py-24 flex items-center justify-center">
+        <div className="text-center card rounded-2xl p-12 max-w-md mx-auto px-4">
+          <Shield size={64} className="mx-auto mb-6 text-gray-500" />
+          <h1 className="text-3xl font-bold mb-4">Accès refusé</h1>
+          <p className="text-gray-400 mb-8">Tu n&apos;as pas les permissions d&apos;administrateur.</p>
+          <Link href="/admin" className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all">
+            Retour à l&apos;admin
+          </Link>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen page-bg py-24">
@@ -507,7 +507,7 @@ export default function AdminUsers() {
                           )}
 
                           {/* Toggle admin — désactivé pour soi-même */}
-                          {u.id !== user.id && (
+                          {u.id !== user?.id && (
                             <button
                               onClick={() => toggleAdmin(u)}
                               disabled={busyId === u.id}
@@ -522,7 +522,7 @@ export default function AdminUsers() {
                           )}
 
                           {/* Supprimer — désactivé pour soi-même */}
-                          {u.id !== user.id && (
+                          {u.id !== user?.id && (
                             confirmDelete === u.id ? (
                               <div className="flex items-center gap-1 ml-1">
                                 <button
