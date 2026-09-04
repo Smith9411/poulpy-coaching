@@ -90,7 +90,7 @@ export default function Hero() {
           >
             <div className="glass-dark rounded-2xl p-8 border-2 border-purple-500/20 relative overflow-hidden">
               {/* Gradient overlay */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-600/30 to-cyan-500/30 blur-3xl pointer-events-none" />
+              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-purple-600/30 to-cyan-500/30 blur-2xl pointer-events-none" />
 
               <div className="relative z-10">
                 {/* Header */}
