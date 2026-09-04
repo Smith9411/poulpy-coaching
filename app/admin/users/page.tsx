@@ -1,10 +1,10 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { Shield, ArrowLeft, User, Search, ShieldOff, ShieldCheck, AlertTriangle, Trash2, RefreshCw, Edit2, Check, X, Loader2, ImageOff, Mail } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 
 interface UserRow {
   id: string;
@@ -237,19 +237,22 @@ export default function AdminUsers() {
     }
   };
 
-  const filteredUsers = users
-    .filter(
-      (u) =>
-        u.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        u.email.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    .sort((a, b) => {
-      const aVal = a[sortBy];
-      const bVal = b[sortBy];
-      if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
-      if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
-      return 0;
-    });
+  const filteredUsers = useMemo(() => {
+    const q = searchQuery.toLowerCase();
+    return users
+      .filter(
+        (u) =>
+          u.username.toLowerCase().includes(q) ||
+          u.email.toLowerCase().includes(q)
+      )
+      .sort((a, b) => {
+        const aVal = a[sortBy];
+        const bVal = b[sortBy];
+        if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
+        return 0;
+      });
+  }, [users, searchQuery, sortBy, sortOrder]);
 
   const formatDate = (dateStr: string) => {
     try {
@@ -477,7 +480,7 @@ export default function AdminUsers() {
                           )}
 
                           {/* Toggle admin — désactivé pour soi-même */}
-                          {u.username !== user.username && (
+                          {u.id !== user.id && (
                             <button
                               onClick={() => toggleAdmin(u)}
                               disabled={busyId === u.id}
@@ -492,7 +495,7 @@ export default function AdminUsers() {
                           )}
 
                           {/* Supprimer — désactivé pour soi-même */}
-                          {u.username !== user.username && (
+                          {u.id !== user.id && (
                             confirmDelete === u.id ? (
                               <div className="flex items-center gap-1 ml-1">
                                 <button

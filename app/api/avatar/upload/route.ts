@@ -15,6 +15,19 @@ const supabaseAdmin = createClient(supabaseUrl, serviceRoleKey, {
 const ALLOWED_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp', 'image/gif']);
 const MAX_SIZE = 2 * 1024 * 1024;
 
+const MAGIC_BYTES: Record<string, number[]> = {
+  'image/png': [0x89, 0x50, 0x4e, 0x47],
+  'image/jpeg': [0xff, 0xd8, 0xff],
+  'image/gif': [0x47, 0x49, 0x46, 0x38],
+  'image/webp': [0x52, 0x49, 0x46, 0x46],
+};
+
+function verifyMagicBytes(buffer: Buffer, claimedType: string): boolean {
+  const sig = MAGIC_BYTES[claimedType];
+  if (!sig) return false;
+  return sig.every((byte, i) => buffer[i] === byte);
+}
+
 export async function POST(req: NextRequest) {
   try {
     const authHeader = req.headers.get('authorization');
@@ -57,6 +70,13 @@ export async function POST(req: NextRequest) {
 
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
+
+    if (!verifyMagicBytes(buffer, file.type)) {
+      return NextResponse.json(
+        { error: 'Le contenu du fichier ne correspond pas au type déclaré. Upload refusé.' },
+        { status: 400 }
+      );
+    }
     const safeExt = (file.name.split('.').pop() || 'png').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 5) || 'png';
     const fileName = `${user.id}-${Date.now()}.${safeExt}`;
 
