@@ -5,7 +5,6 @@ import Footer from "@/components/Footer";
 import { AuthProvider } from "@/context/AuthContext";
 import PwaRegister from "@/components/PwaRegister";
 import SplashScreen from "@/components/SplashScreen";
-import PageTransition from "@/components/PageTransition";
 
 export const metadata: Metadata = {
   title: "Poulpy — Gaming Coach | Valorant, Apex & Aim",
@@ -47,9 +46,7 @@ export default function RootLayout({
           <SplashScreen />
           <PwaRegister />
           <Navbar />
-          <PageTransition>
-            {children}
-          </PageTransition>
+          {children}
           <Footer />
         </AuthProvider>
       </body>
