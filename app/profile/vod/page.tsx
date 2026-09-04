@@ -277,6 +277,15 @@ export default function ProfileVodPage() {
       });
       const data = await res.json();
       setClips(data.clips || []);
+
+      // Marquer les annotations sur ses clips comme lues
+      fetch('/api/vod/annotations/mark-read', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${tok}`,
+        },
+      }).catch(() => {});
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur de chargement');
     } finally {

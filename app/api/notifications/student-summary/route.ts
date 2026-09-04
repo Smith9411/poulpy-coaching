@@ -44,13 +44,11 @@ export async function GET(req: NextRequest) {
     const unreadMsgCount = (unreadMsgs || []).length;
     const lastMsg = unreadMsgs?.[0] || null;
 
-    // ── 2. Nouvelles annotations sur les clips de l'élève (7 jours) ─────────
+    // ── 2. Nouvelles annotations non lues sur les clips de l'élève ─────────
     let newAnnotationsCount = 0;
     let lastAnnotation: { clipTitle: string; content: string; createdAt: string } | null = null;
 
     try {
-      const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-
       // Récupère les clips de l'élève
       const { data: clips } = await supabase
         .from('vod_clips')
@@ -61,12 +59,12 @@ export async function GET(req: NextRequest) {
         const clipIds = clips.map((c: { id: string }) => c.id);
         const clipTitleMap = new Map(clips.map((c: { id: string; title: string }) => [c.id, c.title]));
 
-        // Récupère les annotations récentes sur ces clips
+        // Récupère les annotations non lues sur ces clips
         const { data: annotations } = await supabase
           .from('vod_annotations')
-          .select('id, clip_id, content, created_at')
+          .select('id, clip_id, content, created_at, read_at')
           .in('clip_id', clipIds)
-          .gte('created_at', since)
+          .is('read_at', null)
           .order('created_at', { ascending: false });
 
         newAnnotationsCount = (annotations || []).length;

@@ -483,6 +483,16 @@ export default function StudentClipsPage() {
       }
       const clipsData = await clipsRes.json();
       setClips(clipsData.clips || []);
+
+      // Marquer les clips de cet élève comme vus par le coach
+      fetch('/api/vod/clips/mark-read', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${tok}`,
+        },
+        body: JSON.stringify({ studentId }),
+      }).catch(() => {});
     } catch (err) {
       console.error('Erreur:', err);
       setError(err instanceof Error ? err.message : 'Erreur de chargement');

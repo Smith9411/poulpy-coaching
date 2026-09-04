@@ -78,8 +78,7 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // ── 2. Clips VOD sans annotations (en attente d'analyse) ────────────────
-    // On récupère les clips qui n'ont aucune annotation
+    // ── 2. Clips VOD non lus par le coach ──────────────────────────────────
     let newClips: Array<{
       clipId: string;
       studentId: string;
@@ -88,32 +87,19 @@ export async function GET(req: NextRequest) {
     }> = [];
 
     try {
-      // Récupère les clips soumis dans les 30 derniers jours
-      const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
       const { data: clips } = await supabase
         .from('vod_clips')
-        .select('id, student_id, title, submitted_at')
-        .gte('submitted_at', since)
+        .select('id, student_id, title, submitted_at, read_at')
+        .is('read_at', null)
         .order('submitted_at', { ascending: false });
 
       if (clips && clips.length > 0) {
-        // Récupère les clip_ids qui ont au moins une annotation
-        const clipIds = clips.map((c: { id: string }) => c.id);
-        const { data: annotated } = await supabase
-          .from('vod_annotations')
-          .select('clip_id')
-          .in('clip_id', clipIds);
-
-        const annotatedIds = new Set((annotated || []).map((a: { clip_id: string }) => a.clip_id));
-
-        newClips = clips
-          .filter((c: { id: string }) => !annotatedIds.has(c.id))
-          .map((c: { id: string; student_id: string; title: string; submitted_at: string }) => ({
-            clipId: c.id,
-            studentId: c.student_id,
-            title: c.title,
-            submittedAt: c.submitted_at,
-          }));
+        newClips = clips.map((c: { id: string; student_id: string; title: string; submitted_at: string }) => ({
+          clipId: c.id,
+          studentId: c.student_id,
+          title: c.title,
+          submittedAt: c.submitted_at,
+        }));
       }
     } catch {
       // vod_clips n'existe pas encore, ignorer silencieusement

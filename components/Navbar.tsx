@@ -206,7 +206,21 @@ function AdminNotificationsBell() {
                     <Link
                       key={`clip-${item.clipId}`}
                       href={`/admin/coaching/${item.studentId}/clips`}
-                      onClick={() => setIsOpen(false)}
+                      onClick={() => {
+                        setIsOpen(false);
+                        supabase.auth.getSession().then(({ data }) => {
+                          if (data.session?.access_token) {
+                            fetch('/api/vod/clips/mark-read', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${data.session.access_token}`,
+                              },
+                              body: JSON.stringify({ studentId: item.studentId }),
+                            }).catch(() => {});
+                          }
+                        });
+                      }}
                       className="block px-4 py-3 border-b border-white/5 hover:bg-white/5 transition-colors bg-orange-500/5"
                     >
                       <div className="flex items-start gap-3">
@@ -335,7 +349,20 @@ function StudentNotificationsBell({ href }: { href: string }) {
                   {(summary?.newAnnotationsCount ?? 0) > 0 && summary?.lastAnnotation && (
                     <Link
                       href="/profile/vod"
-                      onClick={() => setIsOpen(false)}
+                      onClick={() => {
+                        setIsOpen(false);
+                        supabase.auth.getSession().then(({ data }) => {
+                          if (data.session?.access_token) {
+                            fetch('/api/vod/annotations/mark-read', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${data.session.access_token}`,
+                              },
+                            }).catch(() => {});
+                          }
+                        });
+                      }}
                       className="block px-4 py-3 border-b border-white/5 hover:bg-white/5 transition-colors bg-orange-500/5"
                     >
                       <div className="flex items-start gap-3">
