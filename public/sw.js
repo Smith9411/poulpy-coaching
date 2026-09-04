@@ -1,11 +1,12 @@
 // Poulpy Coaching PWA Service Worker
-const CACHE_NAME = 'poulpy-cache-v1';
+const CACHE_NAME = 'poulpy-cache-v2';
 const PRECACHE_URLS = [
   '/',
   '/manifest.json',
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png',
-  '/poulpy-profile.png'
+  '/icons/apple-touch-icon.png',
+  '/icons/icon-maskable-512x512.png'
 ];
 
 // Installation: pre-cache static assets
