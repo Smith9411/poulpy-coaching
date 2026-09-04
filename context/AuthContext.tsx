@@ -60,9 +60,9 @@ async function buildUser(session: Session): Promise<User> {
   try {
     const { data } = await supabase
       .from('profiles')
-      .select('username, is_admin, bio, discord, twitch, youtube, tiktok')
+      .select('username, is_admin, bio')
       .eq('id', session.user.id)
-      .single();
+      .maybeSingle();
     if (data) {
       if (data.username) {
         username = data.username;
@@ -70,30 +70,27 @@ async function buildUser(session: Session): Promise<User> {
       }
       isAdmin = data.is_admin === true;
       if (typeof data.bio === 'string') bio = data.bio;
-      if (data.discord) discord = data.discord;
-      if (data.twitch) twitch = data.twitch;
-      if (data.youtube) youtube = data.youtube;
-      if (data.tiktok) tiktok = data.tiktok;
     }
   } catch {
-    // Si colonnes non encore migrées dans profiles, on retombe sur profiles standard
-    try {
-      const { data } = await supabase
-        .from('profiles')
-        .select('username, is_admin, bio')
-        .eq('id', session.user.id)
-        .single();
-      if (data) {
-        if (data.username) {
-          username = data.username;
-          profileUsername = data.username;
-        }
-        isAdmin = data.is_admin === true;
-        if (typeof data.bio === 'string') bio = data.bio;
-      }
-    } catch {
-      // profiles momentanément indisponible : on retombe sur les métadonnées
+    // profiles momentanément indisponible : on retombe sur les métadonnées
+  }
+
+  // Récupération optionnelle des colonnes réseaux si elles existent dans profiles,
+  // sans jamais bloquer ou altérer isAdmin ni le profil principal.
+  try {
+    const { data: socialData, error: socialErr } = await supabase
+      .from('profiles')
+      .select('discord, twitch, youtube, tiktok')
+      .eq('id', session.user.id)
+      .maybeSingle();
+    if (!socialErr && socialData) {
+      if (socialData.discord) discord = socialData.discord;
+      if (socialData.twitch) twitch = socialData.twitch;
+      if (socialData.youtube) youtube = socialData.youtube;
+      if (socialData.tiktok) tiktok = socialData.tiktok;
     }
+  } catch {
+    // Colonnes non encore migrées dans profiles, métadonnées auth utilisées
   }
 
   const metaUsername = typeof meta.username === 'string' ? meta.username.trim() : '';

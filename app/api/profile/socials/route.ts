@@ -45,13 +45,13 @@ export async function GET(req: NextRequest) {
     let youtube: string | null = null;
     let tiktok: string | null = null;
 
-    const { data: profile } = await supabaseAdmin
+    const { data: profile, error: profError } = await supabaseAdmin
       .from('profiles')
       .select('discord, twitch, youtube, tiktok')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
 
-    if (profile) {
+    if (!profError && profile) {
       discord = profile.discord || null;
       twitch = profile.twitch || null;
       youtube = profile.youtube || null;
