@@ -46,9 +46,10 @@ export default function Games() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.45, ease: 'easeOut' }}
           className="text-center mb-16"
         >
           <div className="inline-flex items-center gap-2 glass px-4 py-2 rounded-full mb-4 border border-purple-500/30">
@@ -68,11 +69,11 @@ export default function Games() {
           {games.map((game, index) => (
             <motion.div
               key={game.title}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.15 }}
-              className="glass-dark rounded-2xl p-8 sm:p-10 border border-white/10 hover:border-purple-500/40 hover:bg-white/[0.04] transition-all duration-300 group relative flex flex-col justify-between"
+              viewport={{ once: true, amount: 0.15 }}
+              transition={{ duration: 0.45, delay: index * 0.12, ease: 'easeOut' }}
+              className="glass-dark rounded-2xl p-8 sm:p-10 border border-white/10 hover:border-purple-500/40 hover:bg-white/[0.04] transition-colors duration-300 group relative flex flex-col justify-between"
             >
               <div>
                 {/* Header */}
