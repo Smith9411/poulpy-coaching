@@ -38,9 +38,8 @@ export default function Hero() {
             {/* Subtitle */}
             <p className="text-xl text-gray-300 mb-4">
               Coaching individuel haut de gamme sur{' '}
-              <span className="text-purple-400 font-semibold">Valorant</span> (Immortal 2 #5000),{' '}
-              <span className="text-orange-400 font-semibold">Apex Legends</span> (3x pick #450 S24) et{' '}
-              <span className="text-cyan-400 font-semibold">Aim Training</span> (KovaaK's)
+              <span className="text-purple-400 font-semibold">Valorant</span> (Immortal 2 #5000) et{' '}
+              <span className="text-orange-400 font-semibold">Apex Legends</span> (3x pick #450 S24)
             </p>
             <p className="text-lg text-gray-400 mb-8">
               par <span className="text-white font-semibold">Poulpy</span>.

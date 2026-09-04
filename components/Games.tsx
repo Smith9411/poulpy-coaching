@@ -1,59 +1,42 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Target, Flame, Crosshair, CheckCircle2 } from 'lucide-react';
+import { Target, Flame, CheckCircle2, Sparkles } from 'lucide-react';
 
 export default function Games() {
   const games = [
     {
       title: 'VALORANT',
       subtitle: 'FPS Tactique 5v5',
-      description: 'Analyse en profondeur de ton placement de viseur, ta gestion des compétences, la lecture du jeu adverse et la communication clutch.',
+      description: 'Perfectionnement complet : placement de viseur, micro-flicks, gestion des compétences, lecture du jeu adverse et communication clutch.',
       badge: 'COMPÉTITIF',
-      badgeColor: 'text-red-400 border-red-400/30',
+      badgeColor: 'text-red-400 border-red-400/30 bg-red-500/10',
       icon: Target,
-      iconColor: 'from-red-600 to-red-400',
+      iconColor: 'from-red-600 to-rose-400',
       features: [
-        'Aim & Crosshair placement',
-        'Movement & Peeking techniques',
-        'Game Sense & Decision making',
-        'Positionnement & Map control',
-        'Gestion de l\'économie & Clutch',
-        'Analyse approfondie de VOD',
+        'Aim, Micro-flicks & Crosshair placement',
+        'Movement & Peeking techniques (deadzoning, jiggle)',
+        'Game Sense & Prise de décision sous pression',
+        'Positionnement tactique & Map control',
+        'Gestion de l\'économie & Scénarios clutch',
+        'Routine d\'aim & Analyse approfondie de VOD',
       ],
     },
     {
       title: 'APEX LEGENDS',
       subtitle: 'Battle Royale Rapide',
-      description: 'Perfectionne tes duels rapprochés, ta mobilité avancée (tap-strafe, wall-bounce), la prise de décision sous pression et la rotation de squad.',
+      description: 'Domine tes duels et tes rotations : fluidité mécanique, tracking haute vitesse, mobilité avancée et prise de décision sous forte pression.',
       badge: 'HAUTE INTENSITÉ',
-      badgeColor: 'text-orange-400 border-orange-400/30',
+      badgeColor: 'text-orange-400 border-orange-400/30 bg-orange-500/10',
       icon: Flame,
-      iconColor: 'from-orange-600 to-orange-400',
+      iconColor: 'from-orange-600 to-amber-400',
       features: [
-        'Aim & Smooth Tracking',
-        'Movement avancé (Tap-strafe, Wall-bounce)',
-        'Positionnement & High Ground control',
-        'Fight Selection & 3rd Party management',
-        'Communication & IGL Decision',
-        'Rotation & Zone optimale',
-      ],
-    },
-    {
-      title: 'AIM TRAINING',
-      subtitle: 'Perfectionnement mécanique',
-      description: 'Développe une mémoire musculaire infaillible et une constance maximale grâce à des routines ciblées sur KovaaK\'s ou Aim Lab.',
-      badge: 'UNIVERSEL',
-      badgeColor: 'text-cyan-400 border-cyan-400/30',
-      icon: Crosshair,
-      iconColor: 'from-cyan-600 to-cyan-400',
-      features: [
-        'Flicking & Micro-corrections',
-        'Precise & Reactive Tracking',
-        'Target Switching à grande vitesse',
-        'Temps de réaction & Readiness',
-        'Analyse de posture & Sensibilité DPI',
-        'Routine d\'échauffement sur-mesure',
+        'Aim, Smooth & Reactive Tracking (KovaaK\'s / Aim Lab)',
+        'Movement avancé (Tap-strafe, Wall-bounce, Superglide)',
+        'Positionnement & Contrôle du High Ground',
+        'Fight Selection & Gestion des 3rd parties',
+        'Communication & Leadership IGL en squad',
+        'Routines d\'échauffement & Analyse de VOD',
       ],
     },
   ];
@@ -68,19 +51,20 @@ export default function Games() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <div className="inline-block glass px-4 py-2 rounded-full mb-4">
-            <span className="text-sm text-purple-400 font-medium">SPÉCIALITÉS</span>
+          <div className="inline-flex items-center gap-2 glass px-4 py-2 rounded-full mb-4 border border-purple-500/30">
+            <Sparkles size={16} className="text-purple-400" />
+            <span className="text-sm text-purple-300 font-medium tracking-wide">SPÉCIALITÉS DU COACHING</span>
           </div>
           <h2 className="text-4xl sm:text-5xl font-bold mb-6">
             Choisis ton terrain <span className="text-gradient">de jeu.</span>
           </h2>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Un coaching personnalisé et parfaitement adapté à la compétition.
+            Un accompagnement sur-mesure sur Valorant et Apex Legends, avec perfectionnement mécanique et aim training directement intégrés dans chaque séance.
           </p>
         </motion.div>
 
         {/* Games Grid */}
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {games.map((game, index) => (
             <motion.div
               key={game.title}
@@ -88,41 +72,42 @@ export default function Games() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.15 }}
-              className="glass-dark rounded-2xl p-8 hover:bg-white/5 transition-colors group"
+              className="glass-dark rounded-2xl p-8 sm:p-10 border border-white/10 hover:border-purple-500/40 hover:bg-white/[0.04] transition-all duration-300 group relative flex flex-col justify-between"
             >
-              {/* Header */}
-              <div className="flex items-start justify-between mb-6">
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${game.iconColor} flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                  <game.icon size={28} />
+              <div>
+                {/* Header */}
+                <div className="flex items-start justify-between mb-6">
+                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${game.iconColor} flex items-center justify-center group-hover:scale-110 shadow-lg shadow-black/40 transition-transform`}>
+                    <game.icon size={28} className="text-white" />
+                  </div>
+                  <span className={`text-xs px-3 py-1 rounded-lg border font-semibold ${game.badgeColor}`}>
+                    {game.badge}
+                  </span>
                 </div>
-                <span className={`text-xs glass px-3 py-1 rounded-lg border ${game.badgeColor}`}>
-                  {game.badge}
-                </span>
-              </div>
 
-              {/* Title */}
-              <h3 className="text-3xl font-bold mb-2">{game.title}</h3>
-              <p className="text-sm text-gray-400 mb-4 font-mono">{game.subtitle}</p>
+                {/* Title */}
+                <h3 className="text-3xl font-bold mb-2 tracking-tight">{game.title}</h3>
+                <p className="text-sm text-gray-400 mb-4 font-mono">{game.subtitle}</p>
 
-              {/* Description */}
-              <p className="text-gray-300 mb-6 leading-relaxed">{game.description}</p>
+                {/* Description */}
+                <p className="text-gray-300 mb-8 leading-relaxed">{game.description}</p>
 
-              {/* Features */}
-              <div className="mb-6">
-                <p className="text-xs font-semibold text-gray-400 mb-3 uppercase tracking-wider">
-                  Programme du coaching :
-                </p>
-                <div className="space-y-2">
-                  {game.features.map((feature) => (
-                    <div key={feature} className="flex items-start gap-2">
-                      <CheckCircle2 size={16} className={`mt-0.5 flex-shrink-0 ${game.badgeColor.split(' ')[0]}`} />
-                      <span className="text-sm text-gray-300">{feature}</span>
-                    </div>
-                  ))}
+                {/* Features */}
+                <div className="mb-6">
+                  <p className="text-xs font-semibold text-gray-400 mb-4 uppercase tracking-wider">
+                    Programme du coaching :
+                  </p>
+                  <div className="space-y-3">
+                    {game.features.map((feature) => (
+                      <div key={feature} className="flex items-start gap-2.5">
+                        <CheckCircle2 size={16} className={`mt-0.5 flex-shrink-0 ${game.badgeColor.split(' ')[0]}`} />
+                        <span className="text-sm text-gray-300 leading-snug">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
-
-                          </motion.div>
+            </motion.div>
           ))}
         </div>
       </div>
