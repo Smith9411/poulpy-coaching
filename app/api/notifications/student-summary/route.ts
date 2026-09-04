@@ -77,15 +77,59 @@ export async function GET(req: NextRequest) {
         }
       }
     } catch {
-      // vod_clips / vod_annotations n'existent pas encore, ignorer
+      // Ignorer si les tables VOD n'existent pas
     }
 
-    const totalCount = unreadMsgCount + newAnnotationsCount;
+    // ── 3. Alertes sur séances de coaching (déplacée ou annulée) ───────────
+    let bookingAlerts: Array<{
+      id: string;
+      status: 'rescheduled' | 'cancelled';
+      planName: string;
+      bookingDate: string;
+      bookingTime: string;
+      adminNotes: string | null;
+      updatedAt: string;
+    }> = [];
+
+    try {
+      const userEmail = authData.user.email?.toLowerCase();
+      let bQuery = supabase
+        .from('coaching_bookings')
+        .select('id, status, plan_name, booking_date, booking_time, admin_notes, updated_at')
+        .in('status', ['rescheduled', 'cancelled'])
+        .eq('read_by_student', false);
+
+      if (userEmail) {
+        bQuery = bQuery.or(`user_id.eq.${userId},student_email.eq.${userEmail}`);
+      } else {
+        bQuery = bQuery.eq('user_id', userId);
+      }
+
+      const { data: bData } = await bQuery.order('updated_at', { ascending: false });
+
+      if (bData && bData.length > 0) {
+        bookingAlerts = bData.map((b: { id: string; status: 'rescheduled' | 'cancelled'; plan_name: string; booking_date: string; booking_time: string; admin_notes: string | null; updated_at: string }) => ({
+          id: b.id,
+          status: b.status,
+          planName: b.plan_name,
+          bookingDate: b.booking_date,
+          bookingTime: b.booking_time,
+          adminNotes: b.admin_notes,
+          updatedAt: b.updated_at,
+        }));
+      }
+    } catch {
+      // Ignorer si coaching_bookings n'existe pas encore
+    }
+
+    const totalCount = unreadMsgCount + newAnnotationsCount + bookingAlerts.length;
 
     return NextResponse.json({
       totalCount,
       unreadMsgCount,
       newAnnotationsCount,
+      bookingAlertsCount: bookingAlerts.length,
+      bookingAlerts,
       lastMsg: lastMsg ? {
         message: lastMsg.message,
         createdAt: lastMsg.created_at,
@@ -96,5 +140,33 @@ export async function GET(req: NextRequest) {
     const msg = err instanceof Error ? err.message : 'Erreur serveur';
     console.error('Erreur student-summary:', err);
     return NextResponse.json({ error: msg }, { status: 500 });
+  }
+}
+
+/**
+ * POST /api/notifications/student-summary
+ * Marque une alerte de réservation comme lue par l'élève.
+ */
+export async function POST(req: NextRequest) {
+  try {
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+    }
+    const token = authHeader.replace('Bearer ', '').trim();
+    const { data: authData } = await supabase.auth.getUser(token);
+    if (!authData?.user) return NextResponse.json({ error: 'Invalide' }, { status: 401 });
+
+    const body = await req.json();
+    const { bookingId } = body;
+    if (bookingId) {
+      await supabase
+        .from('coaching_bookings')
+        .update({ read_by_student: true })
+        .eq('id', bookingId);
+    }
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    return NextResponse.json({ error: 'Erreur' }, { status: 500 });
   }
 }

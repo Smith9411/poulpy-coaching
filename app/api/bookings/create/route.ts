@@ -140,6 +140,31 @@ export async function POST(req: NextRequest) {
         .eq('id', targetSlotId);
     }
 
+    // 5. Attribuer le rôle 'in_coaching = true' au profil pour qu'il apparaisse immédiatement dans Gérer le coaching
+    try {
+      if (userId) {
+        await supabase
+          .from('profiles')
+          .update({ in_coaching: true })
+          .eq('id', userId);
+      } else {
+        const { data: matchedProfile } = await supabase
+          .from('profiles')
+          .select('id')
+          .or(`username.eq.${studentName.trim()},email.eq.${studentEmail.trim().toLowerCase()}`)
+          .maybeSingle();
+
+        if (matchedProfile?.id) {
+          await supabase
+            .from('profiles')
+            .update({ in_coaching: true })
+            .eq('id', matchedProfile.id);
+        }
+      }
+    } catch (e) {
+      console.error('Erreur mise à jour in_coaching profil:', e);
+    }
+
     return NextResponse.json({
       success: true,
       booking: newBooking,

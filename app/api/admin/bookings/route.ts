@@ -111,8 +111,22 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json();
     const { bookingId, action, newDate, newTime, newSlotId, adminNotes } = body;
 
-    if (!bookingId || !action) {
-      return NextResponse.json({ error: 'ID de réservation et action requis' }, { status: 400 });
+    if (!action) {
+      return NextResponse.json({ error: 'Action requise' }, { status: 400 });
+    }
+
+    // Action globale : marquer toutes les réservations comme lues par l'admin
+    if (action === 'mark_all_read') {
+      await supabase
+        .from('coaching_bookings')
+        .update({ read_by_admin: true, updated_at: new Date().toISOString() })
+        .eq('read_by_admin', false);
+
+      return NextResponse.json({ success: true });
+    }
+
+    if (!bookingId) {
+      return NextResponse.json({ error: 'ID de réservation requis' }, { status: 400 });
     }
 
     // Récupérer la réservation actuelle
@@ -128,11 +142,12 @@ export async function PATCH(req: NextRequest) {
 
     // ── 1. ACTION : ANNULER ────────────────────────────────────────────────
     if (action === 'cancel') {
-      // 1. Mettre le statut à 'cancelled'
+      // 1. Mettre le statut à 'cancelled' et alerter l'élève (read_by_student = false)
       const { data: updated, error: updateErr } = await supabase
         .from('coaching_bookings')
         .update({
           status: 'cancelled',
+          read_by_student: false,
           admin_notes: adminNotes || currentBooking.admin_notes,
           updated_at: new Date().toISOString(),
         })
@@ -208,6 +223,7 @@ export async function PATCH(req: NextRequest) {
           booking_time: newTime,
           slot_id: targetSlotId || null,
           status: 'rescheduled',
+          read_by_student: false,
           admin_notes: adminNotes || currentBooking.admin_notes,
           updated_at: new Date().toISOString(),
         })

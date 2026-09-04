@@ -39,6 +39,15 @@ export default function Profile() {
   const [bioDraft, setBioDraft] = useState('');
   const [isSavingBio, setIsSavingBio] = useState(false);
   const [studentBookings, setStudentBookings] = useState<CoachingBooking[]>([]);
+  const [studentAlerts, setStudentAlerts] = useState<Array<{
+    id: string;
+    status: 'rescheduled' | 'cancelled';
+    plan_name: string;
+    booking_date: string;
+    booking_time: string;
+    admin_notes: string | null;
+    updated_at: string;
+  }>>([]);
   const [bookingsLoading, setBookingsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -47,6 +56,23 @@ export default function Profile() {
     setStatusMsg({ type, text });
     if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
     statusTimerRef.current = setTimeout(() => setStatusMsg(null), 3500);
+  };
+
+  const dismissAlert = async (bookingId: string) => {
+    setStudentAlerts(prev => prev.filter(a => a.id !== bookingId));
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        await fetch('/api/notifications/student-summary', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ bookingId }),
+        });
+      }
+    } catch {}
   };
 
   useEffect(() => {
@@ -74,6 +100,7 @@ export default function Profile() {
         const data = await res.json();
         if (!cancelled) {
           setStudentBookings(data.bookings || []);
+          setStudentAlerts(data.alerts || []);
         }
       } catch (err) {
         console.error('Erreur chargement bookings profil:', err);
@@ -261,6 +288,57 @@ const handleSaveUsername = async () => {
             <span>{statusMsg.text}</span>
           </div>
         )}
+
+        {/* Alertes de coaching (séance déplacée ou annulée) */}
+        {studentAlerts.map((alert) => (
+          <div
+            key={alert.id}
+            className={`mb-6 p-5 rounded-2xl border backdrop-blur-md shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in slide-in-from-top-3 ${
+              alert.status === 'cancelled'
+                ? 'bg-red-500/15 border-red-500/30 text-red-200'
+                : 'bg-purple-500/15 border-purple-500/30 text-purple-200'
+            }`}
+          >
+            <div className="flex items-start gap-3">
+              <div
+                className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold shrink-0 ${
+                  alert.status === 'cancelled'
+                    ? 'bg-red-500/20 text-red-400 border border-red-500/40'
+                    : 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
+                }`}
+              >
+                {alert.status === 'cancelled' ? '⚠️' : '📅'}
+              </div>
+              <div className="space-y-1">
+                <p className="font-bold text-white text-sm">
+                  {alert.status === 'cancelled'
+                    ? `Séance de coaching annulée (${alert.plan_name})`
+                    : `Séance de coaching reportée (${alert.plan_name})`}
+                </p>
+                <p className="text-xs text-gray-300">
+                  {alert.status === 'cancelled' ? (
+                    <>La séance initialement prévue le <strong className="text-white">{new Date(alert.booking_date).toLocaleDateString('fr-FR')} à {alert.booking_time}</strong> a été annulée par le coach.</>
+                  ) : (
+                    <>Nouvelle date retenue : <strong className="text-white">{new Date(alert.booking_date).toLocaleDateString('fr-FR')} à {alert.booking_time}</strong>.</>
+                  )}
+                </p>
+                {alert.admin_notes && (
+                  <p className="text-xs italic text-gray-400">
+                    Message du coach : &laquo; {alert.admin_notes} &raquo;
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => dismissAlert(alert.id)}
+              className="px-4 py-2 rounded-xl glass hover:bg-white/10 text-white text-xs font-semibold shrink-0 transition-colors cursor-pointer"
+            >
+              J&apos;ai compris
+            </button>
+          </div>
+        ))}
 
         {/* Profile Card */}
         <div className="card rounded-2xl p-8 mb-12">
@@ -570,7 +648,7 @@ const handleSaveUsername = async () => {
                       rel="noopener noreferrer"
                       className="px-3 py-1.5 rounded-lg glass hover:bg-white/10 text-cyan-300 font-medium text-[11px] transition-colors"
                     >
-                      Rejoindre le vocal
+                      Discord
                     </a>
                   </div>
                 </div>

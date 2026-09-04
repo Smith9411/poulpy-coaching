@@ -49,10 +49,22 @@ interface AdminSummary {
   unreadBookings?: AdminUnreadBooking[];
 }
 
+export interface StudentBookingAlert {
+  id: string;
+  status: 'rescheduled' | 'cancelled';
+  planName: string;
+  bookingDate: string;
+  bookingTime: string;
+  adminNotes: string | null;
+  updatedAt: string;
+}
+
 interface StudentSummary {
   totalCount: number;
   unreadMsgCount: number;
   newAnnotationsCount: number;
+  bookingAlertsCount?: number;
+  bookingAlerts?: StudentBookingAlert[];
   lastMsg: { message: string; createdAt: string } | null;
   lastAnnotation: { clipTitle: string; content: string; createdAt: string } | null;
 }
@@ -260,7 +272,21 @@ function AdminNotificationsBell() {
                     <Link
                       key={`booking-${item.bookingId}`}
                       href="/admin/bookings"
-                      onClick={() => setIsOpen(false)}
+                      onClick={() => {
+                        setIsOpen(false);
+                        supabase.auth.getSession().then(({ data }) => {
+                          if (data.session?.access_token) {
+                            fetch('/api/admin/bookings', {
+                              method: 'PATCH',
+                              headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${data.session.access_token}`,
+                              },
+                              body: JSON.stringify({ action: 'mark_read', bookingId: item.bookingId }),
+                            }).catch(() => {});
+                          }
+                        });
+                      }}
                       className="block px-4 py-3 border-b border-white/5 hover:bg-white/5 transition-colors bg-purple-500/10"
                     >
                       <div className="flex items-start gap-3">
@@ -427,6 +453,59 @@ function StudentNotificationsBell({ href }: { href: string }) {
                       </div>
                     </Link>
                   )}
+
+                  {/* Alertes réservations déplacées ou annulées */}
+                  {(summary?.bookingAlerts || []).map(alert => (
+                    <Link
+                      key={`alert-${alert.id}`}
+                      href="/profile"
+                      onClick={() => {
+                        setIsOpen(false);
+                        supabase.auth.getSession().then(({ data }) => {
+                          if (data.session?.access_token) {
+                            fetch('/api/notifications/student-summary', {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${data.session.access_token}`,
+                              },
+                              body: JSON.stringify({ bookingId: alert.id }),
+                            }).catch(() => {});
+                          }
+                        });
+                      }}
+                      className={`block px-4 py-3 border-b border-white/5 hover:bg-white/5 transition-colors ${
+                        alert.status === 'cancelled' ? 'bg-red-500/10' : 'bg-amber-500/10'
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
+                          alert.status === 'cancelled' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                        }`}>
+                          {alert.status === 'cancelled' ? '✕' : '📅'}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-sm font-semibold text-white">
+                              {alert.status === 'cancelled' ? 'Séance annulée' : 'Séance déplacée'}
+                            </p>
+                            <span className="text-[10px] text-gray-400 shrink-0">
+                              {new Date(alert.updatedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
+                            </span>
+                          </div>
+                          <p className="text-xs text-gray-300 mt-0.5 line-clamp-1">
+                            {alert.planName} • {new Date(alert.bookingDate).toLocaleDateString('fr-FR')} à {alert.bookingTime}
+                          </p>
+                          {alert.adminNotes && (
+                            <p className="text-[11px] text-amber-300/90 mt-1 italic line-clamp-1">
+                              &laquo; {alert.adminNotes} &raquo;
+                            </p>
+                          )}
+                        </div>
+                        <span className={`w-2 h-2 rounded-full shrink-0 mt-2 ${alert.status === 'cancelled' ? 'bg-red-400' : 'bg-amber-400'}`} />
+                      </div>
+                    </Link>
+                  ))}
                 </>
               )}
             </div>

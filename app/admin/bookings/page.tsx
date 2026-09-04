@@ -71,6 +71,10 @@ export default function AdminBookingsPage() {
   const [rescheduleDate, setRescheduleDate] = useState('');
   const [rescheduleTime, setRescheduleTime] = useState('');
 
+  // Modal d'annulation de séance stylisé
+  const [cancelModalBooking, setCancelModalBooking] = useState<CoachingBooking | null>(null);
+  const [cancelReasonInput, setCancelReasonInput] = useState('');
+
   // Toast message
   const [toast, setToast] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -165,6 +169,16 @@ export default function AdminBookingsPage() {
       if (!res.ok) return;
       const data = await res.json();
       setBookingsList(data.bookings || []);
+
+      // Marquer automatiquement les réservations comme lues par l'admin
+      fetch('/api/admin/bookings', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ action: 'mark_all_read' }),
+      }).catch(() => {});
     } catch (err) {
       console.error('Erreur chargement bookings list:', err);
     } finally {
@@ -316,11 +330,10 @@ export default function AdminBookingsPage() {
     }
   };
 
-  // Action Admin : Annuler une réservation
-  const handleCancelBooking = async (booking: CoachingBooking) => {
-    if (!confirm(`Es-tu sûr de vouloir annuler la réservation de ${booking.student_name} (${booking.booking_date} à ${booking.booking_time}) ?\nCette séance disparaîtra de son profil et le créneau sera libéré.`)) {
-      return;
-    }
+  // Action Admin : Confirmer l'annulation d'une réservation (depuis le modal stylisé)
+  const handleConfirmCancelBooking = async () => {
+    if (!cancelModalBooking) return;
+    const booking = cancelModalBooking;
     setActionLoadingId(booking.id);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -335,7 +348,7 @@ export default function AdminBookingsPage() {
         body: JSON.stringify({
           bookingId: booking.id,
           action: 'cancel',
-          adminNotes: 'Annulée par le coach depuis le panneau admin.',
+          adminNotes: cancelReasonInput.trim() || 'Annulée par le coach depuis le panneau admin.',
         }),
       });
 
@@ -343,6 +356,7 @@ export default function AdminBookingsPage() {
       if (!res.ok || data.error) throw new Error(data.error || 'Erreur annulation');
 
       showToast('success', `Réservation de ${booking.student_name} annulée et créneau libéré.`);
+      setCancelModalBooking(null);
       fetchBookings();
       fetchSlots();
     } catch (err: unknown) {
@@ -980,7 +994,10 @@ export default function AdminBookingsPage() {
                             <button
                               type="button"
                               disabled={isActionLoading}
-                              onClick={() => handleCancelBooking(b)}
+                              onClick={() => {
+                                setCancelModalBooking(b);
+                                setCancelReasonInput('Annulée par le coach depuis le panneau admin.');
+                              }}
                               className="p-1.5 rounded-lg glass text-xs font-semibold text-red-400 hover:bg-red-500/20 transition-colors"
                               title="Annuler la séance (libère le créneau et retire du profil élève)"
                             >
@@ -1073,6 +1090,98 @@ export default function AdminBookingsPage() {
                   className="px-5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-bold text-xs shadow-md"
                 >
                   Confirmer le report
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ══════════════════════════════════════════════════════════════════════════ */}
+        {/* MODAL D'ANNULATION DE SÉANCE                                             */}
+        {/* ══════════════════════════════════════════════════════════════════════════ */}
+        {cancelModalBooking && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
+            <div className="glass-dark border border-red-500/40 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl shadow-red-500/10 animate-in zoom-in-95">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-red-500/20 border border-red-500/40 flex items-center justify-center text-red-400">
+                    <Trash2 size={18} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-white text-base">Annuler la réservation</h3>
+                    <p className="text-[11px] text-gray-400">Cette action libérera le créneau</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setCancelModalBooking(null)}
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-400">Élève :</span>
+                  <span className="font-semibold text-white">{cancelModalBooking.student_name}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-400">Formule :</span>
+                  <span className="font-medium text-purple-300">{cancelModalBooking.plan_name}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-gray-400">Date et heure :</span>
+                  <span className="font-medium text-white">
+                    {cancelModalBooking.booking_date} à {cancelModalBooking.booking_time}
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+                  Motif ou message pour l'élève (optionnel)
+                </label>
+                <input
+                  type="text"
+                  value={cancelReasonInput}
+                  onChange={(e) => setCancelReasonInput(e.target.value)}
+                  placeholder="Ex: Imprévu, reprogrammation nécessaire..."
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-red-500 placeholder-gray-500"
+                />
+              </div>
+
+              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-300 flex items-start gap-2">
+                <span className="shrink-0 text-sm">⚠️</span>
+                <span>L'élève recevra une alerte sur son profil et le créneau sera de nouveau disponible à la réservation.</span>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  disabled={actionLoadingId === cancelModalBooking.id}
+                  onClick={() => setCancelModalBooking(null)}
+                  className="px-4 py-2.5 rounded-xl glass text-xs font-semibold text-gray-400 hover:text-white transition-colors"
+                >
+                  Garder la séance
+                </button>
+                <button
+                  type="button"
+                  disabled={actionLoadingId === cancelModalBooking.id}
+                  onClick={handleConfirmCancelBooking}
+                  className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-lg shadow-red-500/20 transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  {actionLoadingId === cancelModalBooking.id ? (
+                    <>
+                      <Loader2 size={14} className="animate-spin" />
+                      <span>Annulation...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 size={14} />
+                      <span>Confirmer l'annulation</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>

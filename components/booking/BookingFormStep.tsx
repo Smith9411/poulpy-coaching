@@ -7,6 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { BookingFormData, Plan } from './types';
 import { SelectedSlotDetails } from './BookingSlotsStep';
+import Select, { SelectOption } from '@/components/Select';
 
 interface BookingFormStepProps {
   plan: Plan;
@@ -16,15 +17,9 @@ interface BookingFormStepProps {
   onBack: () => void;
 }
 
-const POPULAR_GAMES = [
-  'Valorant',
-  'Counter-Strike 2',
-  'Fortnite',
-  'Overwatch 2',
-  'Apex Legends',
-  'League of Legends',
-  'Rocket League',
-  'Autre jeu',
+const GAME_OPTIONS: SelectOption[] = [
+  { value: 'Valorant', label: '🔫 Valorant' },
+  { value: 'Apex Legends', label: '⚡ Apex Legends' },
 ];
 
 export default function BookingFormStep({
@@ -220,23 +215,18 @@ export default function BookingFormStep({
 
         {/* Game selection */}
         <div>
-          <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-            Jeu principal pour le coaching <span className="text-purple-400">*</span>
+          <label className="block text-xs font-semibold text-gray-300 mb-1.5 flex items-center gap-1.5">
+            <Gamepad2 size={15} className="text-purple-400" />
+            <span>Jeu pour la session</span>
+            <span className="text-purple-400">*</span>
           </label>
-          <div className="relative">
-            <Gamepad2 size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-purple-400 pointer-events-none" />
-            <select
-              value={formData.game}
-              onChange={(e) => setFormData({ ...formData, game: e.target.value })}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500 transition-colors appearance-none cursor-pointer"
-            >
-              {POPULAR_GAMES.map((game) => (
-                <option key={game} value={game} className="bg-gray-900 text-white">
-                  {game}
-                </option>
-              ))}
-            </select>
-          </div>
+          <Select
+            value={formData.game}
+            onChange={(val) => setFormData({ ...formData, game: val })}
+            options={GAME_OPTIONS}
+            accent="purple"
+            placeholder="Choisis ton jeu..."
+          />
         </div>
 
         {/* Notes / Goals */}

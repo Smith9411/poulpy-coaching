@@ -123,7 +123,7 @@ export default function BookingConfirmation({
         {/* Actions */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <a
-            href="https://discord.gg/poulpy-coaching"
+            href="https://discord.gg/rJMg3ZZRkp"
             target="_blank"
             rel="noopener noreferrer"
             className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 font-bold text-sm text-white shadow-lg hover:shadow-purple-500/30 flex items-center justify-center gap-2 transition-all"
