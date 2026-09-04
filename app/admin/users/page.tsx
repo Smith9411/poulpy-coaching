@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Shield, ArrowLeft, User, Search, ShieldOff, ShieldCheck, AlertTriangle, Trash2, RefreshCw, Edit2, Check, X, Loader2, ImageOff, Mail } from 'lucide-react';
+import { Shield, ArrowLeft, User, Search, ShieldOff, ShieldCheck, AlertTriangle, Trash2, RefreshCw, Edit2, Check, X, Loader2, ImageOff, Mail, Sparkles } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
@@ -11,6 +11,7 @@ interface UserRow {
   username: string;
   email: string;
   isAdmin: boolean;
+  inCoaching: boolean;
   createdAt: string;
   avatarUrl?: string | null;
   initial: string;
@@ -65,7 +66,7 @@ export default function AdminUsers() {
       // Fallback direct sur Supabase profiles si l'API est momentanément indisponible
       const { data, error } = await supabase
         .from('profiles')
-        .select('id, username, is_admin, created_at')
+        .select('*')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -80,6 +81,7 @@ export default function AdminUsers() {
               username: name,
               email: '—',
               isAdmin: p.is_admin === true,
+              inCoaching: p.in_coaching === true,
               createdAt: p.created_at || '',
               avatarUrl: null,
               initial: name.charAt(0).toUpperCase(),
@@ -97,6 +99,35 @@ export default function AdminUsers() {
       fetchUsers();
     }
   }, [user?.isAdmin, fetchUsers]);
+
+  const toggleCoaching = async (u: UserRow) => {
+    setBusyId(u.id);
+    setLoadError('');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('Non authentifié');
+
+      const res = await fetch('/api/admin/users', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ userId: u.id, inCoaching: !u.inCoaching }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || 'Erreur lors du changement de statut coaching');
+
+      setUsers((prev) => prev.map((p) => (p.id === u.id ? { ...p, inCoaching: !p.inCoaching } : p)));
+      showSuccess(`${u.username} est maintenant ${!u.inCoaching ? 'en coaching actif' : 'en coaching inactif'}`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erreur';
+      setLoadError(msg);
+    } finally {
+      setBusyId(null);
+    }
+  };
 
   const toggleAdmin = async (u: UserRow) => {
     setBusyId(u.id);
@@ -345,6 +376,10 @@ export default function AdminUsers() {
             </div>
             <div className="flex items-center gap-4 text-sm flex-wrap">
               <span className="text-gray-400">{users.length} utilisateur{users.length > 1 ? 's' : ''}</span>
+              <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-medium flex items-center gap-1">
+                <Sparkles size={13} />
+                {users.filter((u) => u.inCoaching).length} en coaching
+              </span>
               <span className="px-2.5 py-1 rounded-full bg-yellow-500/20 text-yellow-400 font-medium">
                 {users.filter((u) => u.isAdmin).length} admin{users.filter((u) => u.isAdmin).length > 1 ? 's' : ''}
               </span>
@@ -385,6 +420,7 @@ export default function AdminUsers() {
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-white transition-colors hidden md:table-cell" onClick={() => handleSort('createdAt')}>
                       <div className="flex items-center gap-2">Inscrit le <SortIcon field="createdAt" /></div>
                     </th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Coaching</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Rôle</th>
                     <th className="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
                   </tr>
@@ -458,6 +494,29 @@ export default function AdminUsers() {
                       {/* Date */}
                       <td className="px-6 py-4 hidden md:table-cell">
                         <p className="text-gray-400 text-sm">{formatDate(u.createdAt)}</p>
+                      </td>
+
+                      {/* Statut Coaching */}
+                      <td className="px-6 py-4">
+                        <button
+                          onClick={() => toggleCoaching(u)}
+                          disabled={busyId === u.id}
+                          title={u.inCoaching ? 'Retirer du coaching actuel' : 'Marquer en coaching actuel'}
+                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                            u.inCoaching
+                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30 shadow-[0_0_12px_rgba(16,185,129,0.2)]'
+                              : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 hover:text-white'
+                          } disabled:opacity-50`}
+                        >
+                          {busyId === u.id ? (
+                            <Loader2 size={12} className="animate-spin" />
+                          ) : u.inCoaching ? (
+                            <Sparkles size={12} className="text-emerald-400" />
+                          ) : (
+                            <span className="w-2 h-2 rounded-full bg-gray-500" />
+                          )}
+                          {u.inCoaching ? 'En coaching' : 'Inactif'}
+                        </button>
                       </td>
 
                       {/* Badge rôle */}

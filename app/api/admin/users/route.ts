@@ -63,11 +63,11 @@ export async function GET(req: NextRequest) {
     const profilesQuery = userIdFilter
       ? supabaseAdmin
           .from('profiles')
-          .select('id, username, is_admin, created_at, favorite_game, valorant_rank, apex_rank, bio')
+          .select('*')
           .eq('id', userIdFilter)
       : supabaseAdmin
           .from('profiles')
-          .select('id, username, is_admin, created_at, favorite_game, valorant_rank, apex_rank, bio');
+          .select('*');
 
     const [authRes, profRes] = await Promise.all([
       authUserPromise,
@@ -85,6 +85,7 @@ export async function GET(req: NextRequest) {
       id: string;
       username?: string | null;
       is_admin?: boolean | null;
+      in_coaching?: boolean | null;
       created_at?: string | null;
       favorite_game?: string | null;
       valorant_rank?: string | null;
@@ -116,6 +117,7 @@ export async function GET(req: NextRequest) {
         username,
         email: u?.email || '—',
         isAdmin: p?.is_admin === true,
+        inCoaching: p?.in_coaching === true,
         createdAt: u?.created_at || p?.created_at || new Date().toISOString(),
         avatarUrl,
         initial: username.charAt(0).toUpperCase(),
@@ -140,13 +142,13 @@ export async function PATCH(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { userId, username, isAdmin } = body;
+    const { userId, username, isAdmin, inCoaching } = body;
 
     if (!userId) {
       return NextResponse.json({ error: 'userId manquant' }, { status: 400 });
     }
 
-    const updates: { username?: string; is_admin?: boolean } = {};
+    const updates: { username?: string; is_admin?: boolean; in_coaching?: boolean } = {};
 
     if (username !== undefined) {
       const trimmed = String(username).trim();
@@ -161,6 +163,10 @@ export async function PATCH(req: NextRequest) {
         return NextResponse.json({ error: 'Tu ne peux pas retirer tes propres droits administrateur' }, { status: 400 });
       }
       updates.is_admin = Boolean(isAdmin);
+    }
+
+    if (inCoaching !== undefined) {
+      updates.in_coaching = Boolean(inCoaching);
     }
 
     if (Object.keys(updates).length === 0) {
