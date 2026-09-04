@@ -1,0 +1,54 @@
+{
+  "name": "Poulpy Coaching - Esport & Gaming",
+  "short_name": "Poulpy",
+  "description": "Coaching Esport individuel et sur mesure avec Poulpy : reviews VOD, suivi personnalisé, chat en direct et fiches d'entraînement.",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#0B0E14",
+  "theme_color": "#9333ea",
+  "orientation": "portrait-primary",
+  "lang": "fr-FR",
+  "categories": ["games", "education", "sports"],
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Espace Coaching",
+      "short_name": "Coaching",
+      "url": "/coaching",
+      "description": "Accède à ton chat de coaching et tes fiches VOD",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Réserver une session",
+      "short_name": "Réserver",
+      "url": "/#booking",
+      "description": "Réserve ton prochain créneau de coaching",
+      "icons": [{ "src": "/icons/icon-192x192.png", "sizes": "192x192" }]
+    }
+  ]
+}

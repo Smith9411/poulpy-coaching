@@ -1,811 +1,152 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Menu, X, User, LogOut, ChevronDown, Settings, Shield, BarChart2, Bell, UserPlus } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/lib/supabase';
 import ThemeToggle from './ThemeToggle';
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface AdminUnreadMsg {
-  type: 'message';
-  studentId: string;
-  studentName: string;
-  count: number;
-  lastMessage: string;
-  lastAt: string;
-}
-
-interface AdminPendingClip {
-  type: 'clip';
-  clipId: string;
-  studentId: string;
-  studentName: string;
-  title: string;
-  submittedAt: string;
-}
-
-interface AdminSummary {
-  totalCount: number;
-  totalUnread: number;
-  totalClips: number;
-  unreadMessages: AdminUnreadMsg[];
-  pendingClips: AdminPendingClip[];
-}
-
-interface StudentSummary {
-  totalCount: number;
-  unreadMsgCount: number;
-  newAnnotationsCount: number;
-  lastMsg: { message: string; createdAt: string } | null;
-  lastAnnotation: { clipTitle: string; content: string; createdAt: string } | null;
-}
-
-// ─── Hook admin ───────────────────────────────────────────────────────────────
-function useAdminNotifications(userId: string | undefined) {
-  const [summary, setSummary] = useState<AdminSummary | null>(null);
-
-  useEffect(() => {
-    if (!userId) { setSummary(null); return; }
-    let cancelled = false;
-
-    const fetch_ = async () => {
-      try {
-        let { data: { session } } = await supabase.auth.getSession();
-        if (!session?.access_token) return;
-        if (session.expires_at && new Date(session.expires_at * 1000) <= new Date()) {
-          const { data: r } = await supabase.auth.refreshSession();
-          session = r.session ?? session;
-          if (!session?.access_token) return;
-        }
-        const res = await fetch('/api/notifications/admin-summary', {
-          headers: { Authorization: `Bearer ${session.access_token}` },
-        });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (!cancelled) setSummary(data);
-      } catch { /* silently fail */ }
-    };
-
-    fetch_();
-    const interval = setInterval(fetch_, 10000);
-    return () => { cancelled = true; clearInterval(interval); };
-  }, [userId]);
-
-  return summary;
-}
-
-// ─── Hook élève ───────────────────────────────────────────────────────────────
-function useStudentNotifications(userId: string | undefined) {
-  const [summary, setSummary] = useState<StudentSummary | null>(null);
-
-  useEffect(() => {
-    if (!userId) { setSummary(null); return; }
-    let cancelled = false;
-
-    const fetch_ = async () => {
-      try {
-        let { data: { session } } = await supabase.auth.getSession();
-        if (!session?.access_token) return;
-        if (session.expires_at && new Date(session.expires_at * 1000) <= new Date()) {
-          const { data: r } = await supabase.auth.refreshSession();
-          session = r.session ?? session;
-          if (!session?.access_token) return;
-        }
-        const res = await fetch('/api/notifications/student-summary', {
-          headers: { Authorization: `Bearer ${session.access_token}` },
-        });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (!cancelled) setSummary(data);
-      } catch { /* silently fail */ }
-    };
-
-    fetch_();
-    const interval = setInterval(fetch_, 10000);
-    return () => { cancelled = true; clearInterval(interval); };
-  }, [userId]);
-
-  return summary;
-}
-
-// ─── Cloche Admin ─────────────────────────────────────────────────────────────
-function AdminNotificationsBell() {
-  const { user } = useAuth();
-  const summary = useAdminNotifications(user?.id);
-  const [isOpen, setIsOpen] = useState(false);
-  const wrapperRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleClickOutside = (e: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) setIsOpen(false);
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen]);
-
-  const totalCount = summary?.totalCount ?? 0;
-  const unreadMessages = summary?.unreadMessages ?? [];
-  const pendingClips = summary?.pendingClips ?? [];
-
-  return (
-    <div ref={wrapperRef} className="relative">
-      <button
-        onClick={() => setIsOpen(v => !v)}
-        className="relative p-2 rounded-lg hover:bg-white/5 transition-colors"
-        aria-label={`Notifications${totalCount > 0 ? ` (${totalCount})` : ''}`}
-        aria-expanded={isOpen}
-      >
-        <Bell size={20} className="text-gray-300" />
-        {totalCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center animate-pulse">
-            {totalCount > 99 ? '99+' : totalCount}
-          </span>
-        )}
-      </button>
-
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            className="absolute right-0 top-full mt-2 w-80 bg-gray-900/90 backdrop-blur-md border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50"
-          >
-            <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
-              <p className="font-semibold text-white">Notifications</p>
-              {totalCount > 0 && (
-                <span className="text-xs text-gray-400">{totalCount} en attente</span>
-              )}
-            </div>
-
-            <div className="max-h-80 overflow-y-auto">
-              {totalCount === 0 ? (
-                <div className="px-4 py-8 text-center text-gray-500 text-sm">
-                  <Bell size={28} className="mx-auto mb-2 opacity-40" />
-                  Tout est à jour
-                </div>
-              ) : (
-                <>
-                  {/* Messages non lus par élève */}
-                  {unreadMessages.map(item => (
-                    <Link
-                      key={`msg-${item.studentId}`}
-                      href={`/admin/coaching/${item.studentId}`}
-                      onClick={() => setIsOpen(false)}
-                      className="block px-4 py-3 border-b border-white/5 hover:bg-white/5 transition-colors bg-cyan-500/5"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
-                          {item.studentName.charAt(0).toUpperCase()}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-2">
-                            <p className="text-sm font-semibold text-white truncate">{item.studentName}</p>
-                            <span className="text-[10px] text-gray-500 shrink-0">
-                              {new Date(item.lastAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
-                            </span>
-                          </div>
-                          <p className="text-xs text-white mt-0.5 line-clamp-1">{item.lastMessage}</p>
-                          <p className="text-[10px] text-cyan-400 mt-0.5">
-                            💬 {item.count} message{item.count > 1 ? 's' : ''} non lu{item.count > 1 ? 's' : ''}
-                          </p>
-                        </div>
-                        <span className="w-2 h-2 rounded-full bg-cyan-500 shrink-0 mt-2" />
-                      </div>
-                    </Link>
-                  ))}
-
-                  {/* Clips sans annotation */}
-                  {pendingClips.map(item => (
-                    <Link
-                      key={`clip-${item.clipId}`}
-                      href={`/admin/coaching/${item.studentId}/clips`}
-                      onClick={() => {
-                        setIsOpen(false);
-                        supabase.auth.getSession().then(({ data }) => {
-                          if (data.session?.access_token) {
-                            fetch('/api/vod/clips/mark-read', {
-                              method: 'POST',
-                              headers: {
-                                'Content-Type': 'application/json',
-                                Authorization: `Bearer ${data.session.access_token}`,
-                              },
-                              body: JSON.stringify({ studentId: item.studentId }),
-                            }).catch(() => {});
-                          }
-                        });
-                      }}
-                      className="block px-4 py-3 border-b border-white/5 hover:bg-white/5 transition-colors bg-orange-500/5"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-yellow-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
-                          🎬
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-2">
-                            <p className="text-sm font-semibold text-white truncate">{item.studentName}</p>
-                            <span className="text-[10px] text-gray-500 shrink-0">
-                              {new Date(item.submittedAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
-                            </span>
-                          </div>
-                          <p className="text-xs text-orange-300 mt-0.5 line-clamp-1">📎 {item.title}</p>
-                          <p className="text-[10px] text-orange-400 mt-0.5">Clip en attente d&apos;analyse</p>
-                        </div>
-                        <span className="w-2 h-2 rounded-full bg-orange-500 shrink-0 mt-2" />
-                      </div>
-                    </Link>
-                  ))}
-                </>
-              )}
-            </div>
-
-            <Link
-              href="/admin/coaching"
-              onClick={() => setIsOpen(false)}
-              className="block px-4 py-3 text-center text-sm font-semibold text-purple-400 hover:bg-purple-500/10 transition-colors border-t border-white/10"
-            >
-              Voir toutes les conversations →
-            </Link>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-// ─── Cloche Élève ─────────────────────────────────────────────────────────────
-function StudentNotificationsBell({ href }: { href: string }) {
-  const { user } = useAuth();
-  const summary = useStudentNotifications(user?.id);
-  const [isOpen, setIsOpen] = useState(false);
-  const wrapperRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleClickOutside = (e: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) setIsOpen(false);
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isOpen]);
-
-  const totalCount = summary?.totalCount ?? 0;
-
-  return (
-    <div ref={wrapperRef} className="relative">
-      <button
-        onClick={() => setIsOpen(v => !v)}
-        className="relative p-2 rounded-lg hover:bg-white/5 transition-colors"
-        aria-label={`Notifications${totalCount > 0 ? ` (${totalCount})` : ''}`}
-        aria-expanded={isOpen}
-      >
-        <Bell size={20} className="text-gray-300" />
-        {totalCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] font-bold flex items-center justify-center animate-pulse">
-            {totalCount > 99 ? '99+' : totalCount}
-          </span>
-        )}
-      </button>
-
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-            className="absolute right-0 top-full mt-2 w-80 bg-gray-900/90 backdrop-blur-md border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50"
-          >
-            <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
-              <p className="font-semibold text-white">Notifications</p>
-              {totalCount > 0 && (
-                <span className="text-xs text-gray-400">{totalCount} non lu{totalCount > 1 ? 's' : ''}</span>
-              )}
-            </div>
-
-            <div className="max-h-80 overflow-y-auto">
-              {totalCount === 0 ? (
-                <div className="px-4 py-8 text-center text-gray-500 text-sm">
-                  <Bell size={28} className="mx-auto mb-2 opacity-40" />
-                  Aucun message pour le moment
-                </div>
-              ) : (
-                <>
-                  {/* Messages coach non lus */}
-                  {(summary?.unreadMsgCount ?? 0) > 0 && summary?.lastMsg && (
-                    <Link
-                      href="/profile/coaching"
-                      onClick={() => setIsOpen(false)}
-                      className="block px-4 py-3 border-b border-white/5 hover:bg-white/5 transition-colors bg-purple-500/5"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
-                          🐙
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-2">
-                            <p className="text-sm font-semibold text-white">Ton coach</p>
-                            <span className="text-[10px] text-gray-500 shrink-0">
-                              {new Date(summary.lastMsg.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
-                            </span>
-                          </div>
-                          <p className="text-xs text-white mt-0.5 line-clamp-2">{summary.lastMsg.message}</p>
-                          <p className="text-[10px] text-purple-400 mt-0.5">
-                            💬 {summary.unreadMsgCount} message{summary.unreadMsgCount > 1 ? 's' : ''} non lu{summary.unreadMsgCount > 1 ? 's' : ''}
-                          </p>
-                        </div>
-                        <span className="w-2 h-2 rounded-full bg-purple-500 shrink-0 mt-2" />
-                      </div>
-                    </Link>
-                  )}
-
-                  {/* Nouvelles annotations VOD */}
-                  {(summary?.newAnnotationsCount ?? 0) > 0 && summary?.lastAnnotation && (
-                    <Link
-                      href="/profile/vod"
-                      onClick={() => {
-                        setIsOpen(false);
-                        supabase.auth.getSession().then(({ data }) => {
-                          if (data.session?.access_token) {
-                            fetch('/api/vod/annotations/mark-read', {
-                              method: 'POST',
-                              headers: {
-                                'Content-Type': 'application/json',
-                                Authorization: `Bearer ${data.session.access_token}`,
-                              },
-                            }).catch(() => {});
-                          }
-                        });
-                      }}
-                      className="block px-4 py-3 border-b border-white/5 hover:bg-white/5 transition-colors bg-orange-500/5"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-orange-500 to-yellow-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
-                          🎬
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-2">
-                            <p className="text-sm font-semibold text-white truncate">Ton coach a analysé un clip</p>
-                            <span className="text-[10px] text-gray-500 shrink-0">
-                              {new Date(summary.lastAnnotation.createdAt).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
-                            </span>
-                          </div>
-                          <p className="text-xs text-orange-300 mt-0.5 line-clamp-1">📎 {summary.lastAnnotation.clipTitle}</p>
-                          <p className="text-[10px] text-orange-400 mt-0.5">
-                            {summary.newAnnotationsCount} annotation{summary.newAnnotationsCount > 1 ? 's' : ''} cette semaine
-                          </p>
-                        </div>
-                        <span className="w-2 h-2 rounded-full bg-orange-500 shrink-0 mt-2" />
-                      </div>
-                    </Link>
-                  )}
-                </>
-              )}
-            </div>
-
-            <Link
-              href={href}
-              onClick={() => setIsOpen(false)}
-              className="block px-4 py-3 text-center text-sm font-semibold text-purple-400 hover:bg-purple-500/10 transition-colors border-t border-white/10"
-            >
-              Accéder au chat →
-            </Link>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
+import AdminNotificationsBell from './navbar/AdminNotificationsBell';
+import StudentNotificationsBell from './navbar/StudentNotificationsBell';
+import NavbarUserMenu from './navbar/NavbarUserMenu';
+import NavbarMobileMenu from './navbar/NavbarMobileMenu';
 
 export default function Navbar() {
-  const { user, logout, isLoading } = useAuth();
+  const { user } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState<string>('coaching');
+  const [activeSection, setActiveSection] = useState('accueil');
 
+  const navLinks = [
+    { href: '/', label: 'Accueil', id: 'accueil' },
+    { href: '/#apropos', label: 'À propos', id: 'apropos' },
+    { href: '/#methode', label: 'Méthode', id: 'methode' },
+    { href: '/#tarifs', label: 'Tarifs', id: 'tarifs' },
+    { href: '/#booking', label: 'Réserver', id: 'booking' },
+    { href: '/#faq', label: 'FAQ', id: 'faq' },
+    { href: '/avis', label: 'Avis', id: 'avis' },
+    { href: '/contact', label: 'Contact', id: 'contact' },
+  ];
+
+  // Gestion du scroll
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
+
+      const sections = ['accueil', 'apropos', 'methode', 'tarifs', 'booking', 'faq'];
+      const scrollPosition = window.scrollY + 100;
+
+      for (const section of sections) {
+        const el = document.getElementById(section);
+        if (el) {
+          const top = el.offsetTop;
+          const height = el.offsetHeight;
+          if (scrollPosition >= top && scrollPosition < top + height) {
+            setActiveSection(section);
+            break;
+          }
+        }
+      }
     };
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // IntersectionObserver for active section highlight
-  useEffect(() => {
-    const sections = ['coaching', 'jeux', 'methode', 'progression', 'booking', 'tarifs', 'avis', 'apropos', 'faq'];
-    const observers: IntersectionObserver[] = [];
-
-    sections.forEach((sectionId) => {
-      const element = document.getElementById(sectionId);
-      if (element) {
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                setActiveSection(sectionId);
-              }
-            });
-          },
-          { rootMargin: '-20% 0px -60% 0px', threshold: 0 }
-        );
-        observer.observe(element);
-        observers.push(observer);
-      }
-    });
-
-    return () => {
-      observers.forEach((obs) => obs.disconnect());
-    };
-  }, []);
-
-  // Close profile menu on outside click
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (isProfileMenuOpen && !(e.target as HTMLElement).closest('.profile-menu')) {
-        setIsProfileMenuOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [isProfileMenuOpen]);
-
-  const navLinks = [
-    { href: '/#coaching', label: 'Coaching', id: 'coaching' },
-    { href: '/#jeux', label: 'Jeux', id: 'jeux' },
-    { href: '/#methode', label: 'Méthode', id: 'methode' },
-    { href: '/#progression', label: 'Progression', id: 'progression' },
-    { href: '/#tarifs', label: 'Tarifs', id: 'tarifs' },
-    { href: '/#booking', label: 'Réserver', id: 'booking' },
-    { href: '/#avis', label: 'Avis', id: 'avis' },
-    { href: '/#apropos', label: 'À propos', id: 'apropos' },
-    { href: '/#faq', label: 'FAQ', id: 'faq' },
-  ];
-
-  if (isLoading) {
-    return (
-      <motion.nav
-        className="fixed top-0 left-0 right-0 z-50 bg-transparent"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-20">
-            <Link href="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-2xl">
-                🐙
-              </div>
-              <span className="text-xl font-bold tracking-tight">POULPY<span className="text-purple-400">.</span></span>
-            </Link>
-            <div className="hidden lg:flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-white/10 animate-pulse" />
-              <div className="w-32 h-10 rounded-lg bg-white/10 animate-pulse" />
-            </div>
-          </div>
-        </div>
-      </motion.nav>
-    );
-  }
-
   return (
-    <>
-      <motion.nav
-        className={`fixed top-0 left-0 right-0 z-50 duration-300 ${
-          isScrolled ? 'nav-scrolled' : 'bg-transparent'
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16 lg:h-20">
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 group shrink-0">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                🐙
-              </div>
-              <span className="text-xl font-bold tracking-tight">
-                POULPY<span className="text-purple-400">.</span>
-              </span>
-            </Link>
-
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-1 mx-8">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
-                    activeSection === link.id
-                      ? 'text-white bg-white/10 shadow-lg shadow-purple-500/20'
-                      : 'text-gray-300 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
+    <nav
+      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+        isScrolled
+          ? 'bg-gray-950/85 backdrop-blur-md border-b border-white/10 shadow-lg'
+          : 'bg-transparent'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 lg:h-20">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-3 group shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-2xl group-hover:scale-105 transition-transform shadow-md shadow-purple-500/20">
+              🐙
             </div>
+            <span className="text-xl font-bold tracking-tight text-white">
+              POULPY<span className="text-purple-400">.</span>
+            </span>
+          </Link>
 
-            {/* Right side - Theme toggle + Auth or User Menu */}
-            <div className="hidden lg:flex items-center gap-4">
-              <ThemeToggle />
-              {user && (
-                user.isAdmin
-                  ? <AdminNotificationsBell />
-                  : <StudentNotificationsBell href="/profile/coaching" />
-              )}
-              {user ? (
-                <div className="relative profile-menu">
-                  {/* Profile Button */}
-                  <button
-                    onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg hover:bg-white/5 transition-all group"
-                    aria-label="Menu utilisateur"
-                    aria-expanded={isProfileMenuOpen}
-                  >
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white font-bold text-sm group-hover:scale-110 transition-transform overflow-hidden">
-                      {user.avatarUrl ? (
-                        <img src={user.avatarUrl} alt={user.username} className="w-full h-full object-cover" />
-                      ) : (
-                        user.initial
-                      )}
-                    </div>
-                    <ChevronDown size={16} className={`text-gray-400 transition-transform ${isProfileMenuOpen ? 'rotate-180' : ''}`} />
-                  </button>
-
-                  {/* Profile Dropdown */}
-                  <AnimatePresence>
-                    {isProfileMenuOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{ type: 'spring', damping: 20, stiffness: 300 }}
-                        className="absolute right-0 top-full mt-2 w-56 bg-gray-900/90 backdrop-blur-md rounded-xl border border-white/10 shadow-2xl overflow-hidden py-2 z-50"
-                      >
-                        <div className="px-4 py-3 border-b border-white/5">
-                          <p className="font-semibold text-white">{user.username}</p>
-                          <p className="text-xs text-gray-400 truncate">{user.email}</p>
-                          {user.isAdmin && (
-                            <span className="inline-block mt-1 px-2 py-0.5 text-xs font-bold bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full text-black">
-                              ADMIN
-                            </span>
-                          )}
-                        </div>
-                        {user.needsUsername && (
-                          <Link
-                            href="/auth/complete"
-                            className="flex items-center gap-3 px-4 py-3 text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 transition-colors border-b border-white/5"
-                            onClick={() => setIsProfileMenuOpen(false)}
-                          >
-                            <UserPlus size={18} />
-                            Choisis ton pseudo →
-                          </Link>
-                        )}
-                        <Link
-                          href="/profile"
-                          className="flex items-center gap-3 px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 transition-colors"
-                          onClick={() => setIsProfileMenuOpen(false)}
-                        >
-                          <User size={18} />
-                          Mon profil
-                        </Link>
-                        {user.isAdmin && (
-                          <>
-                            <hr className="my-2 border-white/10" />
-                            <Link
-                              href="/admin"
-                              className="flex items-center gap-3 px-4 py-3 text-purple-400 hover:text-purple-300 hover:bg-purple-500/10 transition-colors"
-                              onClick={() => setIsProfileMenuOpen(false)}
-                            >
-                              <Shield size={18} />
-                              Panneau Admin
-                            </Link>
-                            <Link
-                              href="/admin/stats"
-                              className="flex items-center gap-3 px-4 py-3 text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition-colors"
-                              onClick={() => setIsProfileMenuOpen(false)}
-                            >
-                              <BarChart2 size={18} />
-                              Statistiques
-                            </Link>
-                            <Link
-                              href="/admin/settings"
-                              className="flex items-center gap-3 px-4 py-3 text-yellow-400 hover:text-yellow-300 hover:bg-yellow-500/10 transition-colors"
-                              onClick={() => setIsProfileMenuOpen(false)}
-                            >
-                              <Settings size={18} />
-                              Paramètres
-                            </Link>
-                          </>
-                        )}
-                        <button
-                          onClick={() => { logout(); setIsProfileMenuOpen(false); }}
-                          className="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-colors text-left"
-                        >
-                          <LogOut size={18} />
-                          Déconnexion
-                        </button>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              ) : (
-                <>
-                  <Link
-                    href="/auth"
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors"
-                  >
-                    <User size={18} />
-                    Connexion
-                  </Link>
-                  <Link
-                    href="/#booking"
-                    className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-lg text-sm font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all hover:scale-105 whitespace-nowrap"
-                  >
-                    Réserver une session →
-                  </Link>
-                </>
-              )}
-            </div>
-
-            {/* Mobile: theme toggle + menu button */}
-            <div className="flex items-center gap-2 lg:hidden">
-              <ThemeToggle />
-              {user && (
-                user.isAdmin
-                  ? <AdminNotificationsBell />
-                  : <StudentNotificationsBell href="/profile/coaching" />
-              )}
-              <button
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="p-2 rounded-lg hover:bg-white/5 transition-colors"
+          {/* Desktop Navigation Links */}
+          <div className="hidden lg:flex items-center gap-1 mx-6">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`px-3.5 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+                  activeSection === link.id
+                    ? 'text-white bg-white/10 shadow-sm shadow-purple-500/10'
+                    : 'text-gray-300 hover:text-white hover:bg-white/5'
+                }`}
               >
-                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-              </button>
-            </div>
+                {link.label}
+              </Link>
+            ))}
+          </div>
+
+          {/* Desktop Right Side */}
+          <div className="hidden lg:flex items-center gap-3">
+            <ThemeToggle />
+
+            {/* Notification Bell (Role-Based) */}
+            {user && (
+              user.isAdmin ? (
+                <AdminNotificationsBell />
+              ) : (
+                <StudentNotificationsBell href="/profile/coaching" />
+              )
+            )}
+
+            {/* User Menu or Auth Button */}
+            {user ? (
+              <NavbarUserMenu />
+            ) : (
+              <Link
+                href="/auth"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl text-sm font-semibold text-white hover:shadow-lg hover:shadow-purple-500/30 transition-all hover:scale-[1.02]"
+              >
+                Connexion
+                <ArrowRight size={15} />
+              </Link>
+            )}
+          </div>
+
+          {/* Mobile Right Side */}
+          <div className="flex items-center gap-2 lg:hidden">
+            <ThemeToggle />
+
+            {user && (
+              user.isAdmin ? (
+                <AdminNotificationsBell />
+              ) : (
+                <StudentNotificationsBell href="/profile/coaching" />
+              )
+            )}
+
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 rounded-xl hover:bg-white/5 text-gray-300 hover:text-white transition-colors border border-white/5"
+              aria-label="Menu principal"
+              aria-expanded={isMobileMenuOpen}
+            >
+              {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+            </button>
           </div>
         </div>
-      </motion.nav>
+      </div>
 
-      {/* Mobile Menu */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, x: '100%' }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: '100%' }}
-            transition={{ type: 'spring', damping: 25 }}
-            className="fixed inset-0 z-40 lg:hidden"
-          >
-            <div className="absolute inset-0 bg-black/80 backdrop-blur-xl">
-              <div className="flex flex-col items-center justify-center h-full gap-6 px-8">
-                {navLinks.map((link, index) => (
-                  <motion.div
-                    key={link.href}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                  >
-                    <Link
-                      href={link.href}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className={`text-2xl font-semibold hover:text-white transition-colors ${
-                        activeSection === link.id ? 'text-gradient' : 'text-gray-300'
-                      }`}
-                    >
-                      {link.label}
-                    </Link>
-                  </motion.div>
-                ))}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: navLinks.length * 0.05 }}
-                  className="flex flex-col gap-4 mt-8 w-full max-w-xs"
-                >
-                  {user ? (
-                    <>
-                      <div className="flex items-center gap-4 px-6 py-3 glass rounded-lg border border-white/10">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white font-bold text-lg overflow-hidden">
-                          {user.avatarUrl ? (
-                            <img src={user.avatarUrl} alt={user.username} className="w-full h-full object-cover" />
-                          ) : (
-                            user.initial
-                          )}
-                        </div>
-                        <div className="text-left">
-                          <p className="font-semibold text-white">{user.username}</p>
-                          <p className="text-xs text-gray-400">{user.email}</p>
-                          {user.isAdmin && (
-                            <span className="inline-block mt-1 px-2 py-0.5 text-xs font-bold bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full text-black">
-                              ADMIN
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      {user.needsUsername && (
-                        <Link
-                          href="/auth/complete"
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="flex items-center justify-center gap-2 px-6 py-3 glass rounded-lg border border-purple-500/30 text-lg font-medium text-purple-400 hover:bg-purple-500/10 transition-all"
-                        >
-                          <UserPlus size={20} />
-                          Choisis ton pseudo →
-                        </Link>
-                      )}
-                      <Link
-                        href="/profile"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-lg text-lg font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all"
-                      >
-                        <User size={20} />
-                        Mon profil
-                      </Link>
-                      {user.isAdmin && (
-                        <>
-                          <Link
-                            href="/admin"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="flex items-center justify-center gap-2 px-6 py-3 glass rounded-lg border border-purple-500/30 text-lg font-medium text-purple-400 hover:bg-purple-500/10 transition-all"
-                          >
-                            <Shield size={20} />
-                            Panneau Admin
-                          </Link>
-                          <Link
-                            href="/admin/stats"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="flex items-center justify-center gap-2 px-6 py-3 glass rounded-lg border border-cyan-500/30 text-lg font-medium text-cyan-400 hover:bg-cyan-500/10 transition-all"
-                          >
-                            <BarChart2 size={20} />
-                            Statistiques
-                          </Link>
-                          <Link
-                            href="/admin/settings"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="flex items-center justify-center gap-2 px-6 py-3 glass rounded-lg border border-yellow-500/30 text-lg font-medium text-yellow-400 hover:bg-yellow-500/10 transition-all"
-                          >
-                            <Settings size={20} />
-                            Paramètres
-                          </Link>
-                        </>
-                      )}
-                      <button
-                        onClick={() => { logout(); setIsMobileMenuOpen(false); }}
-                        className="flex items-center justify-center gap-2 px-6 py-3 glass rounded-lg border border-white/10 text-lg font-medium text-red-400 hover:bg-red-500/10 transition-all"
-                      >
-                        <LogOut size={20} />
-                        Déconnexion
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <Link
-                        href="/auth"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="flex items-center justify-center gap-2 px-6 py-3 glass rounded-lg border border-white/10 text-lg font-medium text-gray-300 hover:bg-white/5 transition-all"
-                      >
-                        <User size={20} />
-                        Connexion / S'inscrire
-                      </Link>
-                      <Link
-                        href="/#booking"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="px-6 py-3 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-lg text-lg font-semibold text-center hover:shadow-lg hover:shadow-purple-500/50 transition-all"
-                      >
-                        Réserver une session →
-                      </Link>
-                    </>
-                  )}
-                </motion.div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+      {/* Mobile Drawer */}
+      <NavbarMobileMenu
+        isOpen={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        navLinks={navLinks}
+        activeSection={activeSection}
+      />
+    </nav>
   );
 }
