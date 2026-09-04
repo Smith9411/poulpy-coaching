@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Link from 'next/link';
 import { Shield, ArrowLeft, User, Search, ShieldOff, ShieldCheck, AlertTriangle, Trash2, RefreshCw, Edit2, Check, X, Loader2, ImageOff, Mail } from 'lucide-react';
@@ -123,17 +123,31 @@ export default function AdminUsers() {
 
   const toggleAdmin = async (u: UserRow) => {
     setBusyId(u.id);
-    const { error } = await supabase
-      .from('profiles')
-      .update({ is_admin: !u.isAdmin })
-      .eq('id', u.id);
-    if (error) {
-      setLoadError(error.message);
-    } else {
+    setLoadError('');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('Non authentifié');
+
+      const res = await fetch('/api/admin/users', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ userId: u.id, isAdmin: !u.isAdmin }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || 'Erreur lors du changement de rôle');
+
       setUsers((prev) => prev.map((p) => (p.id === u.id ? { ...p, isAdmin: !p.isAdmin } : p)));
       showSuccess(`${u.username} est maintenant ${!u.isAdmin ? 'administrateur' : 'membre'}`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erreur';
+      setLoadError(msg);
+    } finally {
+      setBusyId(null);
     }
-    setBusyId(null);
   };
 
   const handleStartEdit = (u: UserRow) => {
@@ -148,14 +162,23 @@ export default function AdminUsers() {
       return;
     }
     setIsSavingEdit(true);
-    const { error } = await supabase
-      .from('profiles')
-      .update({ username: trimmed })
-      .eq('id', u.id);
+    setLoadError('');
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('Non authentifié');
 
-    if (error) {
-      setLoadError(error.message);
-    } else {
+      const res = await fetch('/api/admin/users', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ userId: u.id, username: trimmed }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || 'Erreur lors de la modification du pseudo');
+
       setUsers((prev) =>
         prev.map((p) =>
           p.id === u.id
@@ -165,8 +188,12 @@ export default function AdminUsers() {
       );
       showSuccess(`Pseudo de ${u.username} modifié en "${trimmed}" !`);
       setEditingUserId(null);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erreur';
+      setLoadError(msg);
+    } finally {
+      setIsSavingEdit(false);
     }
-    setIsSavingEdit(false);
   };
 
   const handleRemoveAvatar = async (u: UserRow) => {

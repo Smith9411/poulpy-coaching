@@ -160,7 +160,6 @@ export default function Testimonials() {
               Voir tous les avis
               <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
             </Link>
-            <p className="text-xs text-gray-500 mt-2">Page dédiée bientôt disponible</p>
           </motion.div>
         </div>
       </div>
