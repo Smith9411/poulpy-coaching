@@ -584,7 +584,7 @@ USING (student_id = auth.uid());`;
         </div>
 
         {/* Barre d'outils / Contrôles éditeur */}
-        <div className="glass-dark rounded-xl p-3 mb-4 border border-white/10 flex items-center justify-between gap-2 flex-wrap print:hidden">
+        <div className="relative z-30 glass-dark rounded-xl p-3 mb-4 border border-white/10 flex items-center justify-between gap-2 flex-wrap print:hidden">
           {/* Outils de mise en page */}
           <div className="flex items-center gap-1 flex-wrap">
             <button
@@ -673,59 +673,65 @@ USING (student_id = auth.uid());`;
               </button>
 
               {showTableMenu && (
-                <div className="absolute left-0 mt-2 w-64 rounded-xl glass-dark border border-white/15 shadow-2xl p-2 z-40 animate-fade-in space-y-1">
-                  <button
-                    onClick={() => {
-                      insertText(
-                        `\n| Objectif Spécifique | Cible Mesurable | Échéance | Statut |\n| :--- | :--- | :--- | :--- |\n| Stabiliser le Crosshair | 65% Headshot en Deathmatch | Semaine 2 | En cours 🔄 |\n| Tracking fluide Pasu | Score KovaaK's > 80 | Semaine 3 | À faire ⏳ |\n`
-                      );
-                      setShowTableMenu(false);
-                    }}
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 text-xs text-gray-200 transition-colors"
-                  >
-                    📊 <strong>Tableau d'Objectifs</strong>
-                    <span className="block text-[10px] text-gray-400">Objectif, Cible, Échéance, Statut</span>
-                  </button>
+                <>
+                  <div
+                    className="fixed inset-0 z-40 cursor-default"
+                    onClick={() => setShowTableMenu(false)}
+                  />
+                  <div className="absolute left-0 mt-2 w-72 rounded-xl bg-[#13111C] border border-purple-500/40 shadow-[0_12px_40px_rgba(0,0,0,0.85)] p-2 z-50 animate-fade-in space-y-1">
+                    <button
+                      onClick={() => {
+                        insertText(
+                          `\n| Objectif Spécifique | Cible Mesurable | Échéance | Statut |\n| :--- | :--- | :--- | :--- |\n| Stabiliser le Crosshair | 65% Headshot en Deathmatch | Semaine 2 | En cours 🔄 |\n| Tracking fluide Pasu | Score KovaaK's > 80 | Semaine 3 | À faire ⏳ |\n`
+                        );
+                        setShowTableMenu(false);
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/10 text-xs text-gray-200 transition-colors"
+                    >
+                      📊 <strong className="text-white">Tableau d'Objectifs</strong>
+                      <span className="block text-[10px] text-gray-400 mt-0.5">Objectif, Cible, Échéance, Statut</span>
+                    </button>
 
-                  <button
-                    onClick={() => {
-                      insertText(
-                        `\n| Exercice / Scénario | Support | Durée | Score Actuel | Objectif |\n| :--- | :--- | :--- | :--- | :--- |\n| 1wall6targets TE | KovaaK's | 10 min | 140 | 165+ |\n| Pasu Voltaic Easy | KovaaK's | 10 min | 75 | 90+ |\n| Range Hard Bots | Valorant | 5 min | 20/30 | 25+/30 |\n`
-                      );
-                      setShowTableMenu(false);
-                    }}
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 text-xs text-gray-200 transition-colors"
-                  >
-                    🎯 <strong>Tableau Routine d'Aim</strong>
-                    <span className="block text-[10px] text-gray-400">Scénario, Logiciel, Durée, Score</span>
-                  </button>
+                    <button
+                      onClick={() => {
+                        insertText(
+                          `\n| Exercice / Scénario | Support | Durée | Score Actuel | Objectif |\n| :--- | :--- | :--- | :--- | :--- |\n| 1wall6targets TE | KovaaK's | 10 min | 140 | 165+ |\n| Pasu Voltaic Easy | KovaaK's | 10 min | 75 | 90+ |\n| Range Hard Bots | Valorant | 5 min | 20/30 | 25+/30 |\n`
+                        );
+                        setShowTableMenu(false);
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/10 text-xs text-gray-200 transition-colors"
+                    >
+                      🎯 <strong className="text-white">Tableau Routine d'Aim</strong>
+                      <span className="block text-[10px] text-gray-400 mt-0.5">Scénario, Logiciel, Durée, Score</span>
+                    </button>
 
-                  <button
-                    onClick={() => {
-                      insertText(
-                        `\n| Séance | Date | Sujet / Thème | Points Forts | Axes de Travail |\n| :--- | :--- | :--- | :--- | :--- |\n| Session #1 | ${new Date().toLocaleDateString('fr-FR')} | Diagnostic & Posture | Bonne réactivité | Micro-flicks trop amples |\n`
-                      );
-                      setShowTableMenu(false);
-                    }}
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 text-xs text-gray-200 transition-colors"
-                  >
-                    📅 <strong>Tableau Suivi Séances</strong>
-                    <span className="block text-[10px] text-gray-400">Historique et feedback séance</span>
-                  </button>
+                    <button
+                      onClick={() => {
+                        insertText(
+                          `\n| Séance | Date | Sujet / Thème | Points Forts | Axes de Travail |\n| :--- | :--- | :--- | :--- | :--- |\n| Session #1 | ${new Date().toLocaleDateString('fr-FR')} | Diagnostic & Posture | Bonne réactivité | Micro-flicks trop amples |\n`
+                        );
+                        setShowTableMenu(false);
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/10 text-xs text-gray-200 transition-colors"
+                    >
+                      📅 <strong className="text-white">Tableau Suivi Séances</strong>
+                      <span className="block text-[10px] text-gray-400 mt-0.5">Historique et feedback séance</span>
+                    </button>
 
-                  <button
-                    onClick={() => {
-                      insertText(
-                        `\n| Colonne 1 | Colonne 2 | Colonne 3 |\n| :--- | :--- | :--- |\n| Donnée 1 | Donnée 2 | Donnée 3 |\n| Donnée 4 | Donnée 5 | Donnée 6 |\n`
-                      );
-                      setShowTableMenu(false);
-                    }}
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 text-xs text-gray-200 transition-colors"
-                  >
-                    ➕ <strong>Tableau Simple (3x3)</strong>
-                    <span className="block text-[10px] text-gray-400">Tableau vide personnalisable</span>
-                  </button>
-                </div>
+                    <button
+                      onClick={() => {
+                        insertText(
+                          `\n| Colonne 1 | Colonne 2 | Colonne 3 |\n| :--- | :--- | :--- |\n| Donnée 1 | Donnée 2 | Donnée 3 |\n| Donnée 4 | Donnée 5 | Donnée 6 |\n`
+                        );
+                        setShowTableMenu(false);
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/10 text-xs text-gray-200 transition-colors"
+                    >
+                      ➕ <strong className="text-white">Tableau Simple (3x3)</strong>
+                      <span className="block text-[10px] text-gray-400 mt-0.5">Tableau vide personnalisable</span>
+                    </button>
+                  </div>
+                </>
               )}
             </div>
 
@@ -757,38 +763,44 @@ USING (student_id = auth.uid());`;
               </button>
 
               {showTemplatesMenu && (
-                <div className="absolute left-0 mt-2 w-64 rounded-xl glass-dark border border-white/15 shadow-2xl p-2 z-40 animate-fade-in space-y-1">
-                  <button
-                    onClick={() => {
-                      applyTemplate('complet');
-                      setShowTemplatesMenu(false);
-                    }}
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 text-xs text-gray-200 transition-colors"
-                  >
-                    ✨ <strong>Fiche Complète de Suivi</strong>
-                    <span className="block text-[10px] text-gray-400">Diagnostic, Objectifs, Aim & Séances</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      applyTemplate('aim');
-                      setShowTemplatesMenu(false);
-                    }}
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 text-xs text-gray-200 transition-colors"
-                  >
-                    🎯 <strong>Programme Aim & Mécaniques</strong>
-                    <span className="block text-[10px] text-gray-400">Routines KovaaK's, scores et règles d'or</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      applyTemplate('vod');
-                      setShowTemplatesMenu(false);
-                    }}
-                    className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 text-xs text-gray-200 transition-colors"
-                  >
-                    🎬 <strong>Synthèse VOD & Tactique</strong>
-                    <span className="block text-[10px] text-gray-400">Analyse de matchs et plans d'action</span>
-                  </button>
-                </div>
+                <>
+                  <div
+                    className="fixed inset-0 z-40 cursor-default"
+                    onClick={() => setShowTemplatesMenu(false)}
+                  />
+                  <div className="absolute left-0 mt-2 w-72 rounded-xl bg-[#13111C] border border-indigo-500/40 shadow-[0_12px_40px_rgba(0,0,0,0.85)] p-2 z-50 animate-fade-in space-y-1">
+                    <button
+                      onClick={() => {
+                        applyTemplate('complet');
+                        setShowTemplatesMenu(false);
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/10 text-xs text-gray-200 transition-colors"
+                    >
+                      ✨ <strong className="text-white">Fiche Complète de Suivi</strong>
+                      <span className="block text-[10px] text-gray-400 mt-0.5">Diagnostic, Objectifs, Aim & Séances</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        applyTemplate('aim');
+                        setShowTemplatesMenu(false);
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/10 text-xs text-gray-200 transition-colors"
+                    >
+                      🎯 <strong className="text-white">Programme Aim & Mécaniques</strong>
+                      <span className="block text-[10px] text-gray-400 mt-0.5">Routines KovaaK's, scores et règles d'or</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        applyTemplate('vod');
+                        setShowTemplatesMenu(false);
+                      }}
+                      className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/10 text-xs text-gray-200 transition-colors"
+                    >
+                      🎬 <strong className="text-white">Synthèse VOD & Tactique</strong>
+                      <span className="block text-[10px] text-gray-400 mt-0.5">Analyse de matchs et plans d'action</span>
+                    </button>
+                  </div>
+                </>
               )}
             </div>
           </div>

@@ -220,36 +220,29 @@ export default function AdminCoaching() {
         </div>
 
         {/* Action Buttons */}
-        <div className="grid grid-cols-3 gap-2">
+        <div className="flex gap-2">
           <Link
             href={`/admin/coaching/${student.id}`}
-            className={`inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+            className={`flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
               hasUnread
                 ? 'bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/30'
                 : 'bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/20'
             }`}
           >
-            <MessageSquare size={14} />
-            <span>Chat</span>
+            <MessageSquare size={15} />
+            Chat
             {hasUnread && (
-              <span className="ml-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-cyan-500 text-white text-[9px] font-bold">
+              <span className="ml-auto inline-flex items-center justify-center w-4 h-4 rounded-full bg-cyan-500 text-white text-[9px] font-bold">
                 {student.unreadCount > 9 ? '9+' : student.unreadCount}
               </span>
             )}
           </Link>
           <Link
             href={`/admin/coaching/${student.id}/clips`}
-            className="inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20"
+            className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20"
           >
-            <Film size={14} />
-            <span>Clips VOD</span>
-          </Link>
-          <Link
-            href={`/admin/coaching/${student.id}/sheet`}
-            className="inline-flex items-center justify-center gap-1.5 px-2.5 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-300 border border-indigo-500/30"
-          >
-            <FileText size={14} />
-            <span>Fiche perso</span>
+            <Film size={15} />
+            Clips VOD
           </Link>
         </div>
       </div>
