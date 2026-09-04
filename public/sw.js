@@ -1,5 +1,5 @@
 // Poulpy Coaching PWA Service Worker
-const CACHE_NAME = 'poulpy-cache-v3';
+const CACHE_NAME = 'poulpy-cache-v4';
 const PRECACHE_URLS = [
   '/',
   '/manifest.json',
