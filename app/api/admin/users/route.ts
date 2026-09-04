@@ -91,6 +91,10 @@ export async function GET(req: NextRequest) {
       valorant_rank?: string | null;
       apex_rank?: string | null;
       bio?: string | null;
+      discord?: string | null;
+      twitch?: string | null;
+      youtube?: string | null;
+      tiktok?: string | null;
     }
 
     const profilesList = (profRes?.data || []) as ProfileRow[];
@@ -107,10 +111,14 @@ export async function GET(req: NextRequest) {
     const users = Array.from(allUserIds).map((id) => {
       const u = authMap.get(id);
       const p = profilesMap.get(id);
-      const meta = u?.user_metadata || {};
+      const meta = (u?.user_metadata || {}) as Record<string, string | undefined>;
       const username = p?.username || meta.username || u?.email?.split('@')[0] || 'Joueur';
       const avatarUrl = meta.avatar_url || null;
       const bio = (p?.bio && typeof p.bio === 'string') ? p.bio : null;
+      const discord = p?.discord || meta.discord || null;
+      const twitch = p?.twitch || meta.twitch || null;
+      const youtube = p?.youtube || meta.youtube || null;
+      const tiktok = p?.tiktok || meta.tiktok || null;
 
       return {
         id,
@@ -125,6 +133,10 @@ export async function GET(req: NextRequest) {
         valorantRank: p?.valorant_rank || null,
         apexRank: p?.apex_rank || null,
         bio,
+        discord,
+        twitch,
+        youtube,
+        tiktok,
       };
     });
 

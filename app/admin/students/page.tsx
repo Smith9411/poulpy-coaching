@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { ArrowLeft, Shield, Loader2, Search, MessageSquare, ChevronRight, Quote } from 'lucide-react';
+import SocialLinks from '@/components/SocialLinks';
 
 interface AdminUser {
   id: string;
@@ -18,6 +19,10 @@ interface AdminUser {
   valorantRank?: string | null;
   apexRank?: string | null;
   bio?: string | null;
+  discord?: string | null;
+  twitch?: string | null;
+  youtube?: string | null;
+  tiktok?: string | null;
 }
 
 export default function AdminStudentsPage() {
@@ -183,6 +188,7 @@ export default function AdminStudentsPage() {
                   <tr className="border-b border-white/10 text-left text-gray-400 text-xs uppercase tracking-wide">
                     <th className="px-4 py-3 font-semibold">Élève</th>
                     <th className="px-4 py-3 font-semibold">Email</th>
+                    <th className="px-4 py-3 font-semibold">Réseaux</th>
                     <th className="px-4 py-3 font-semibold">🔫 Valorant</th>
                     <th className="px-4 py-3 font-semibold">⚡ Apex</th>
                     <th className="px-4 py-3 font-semibold">Bio</th>
@@ -211,6 +217,17 @@ export default function AdminStudentsPage() {
                         </div>
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-400">{u.email}</td>
+                      <td className="px-4 py-3">
+                        <SocialLinks
+                          socials={{
+                            discord: u.discord,
+                            twitch: u.twitch,
+                            youtube: u.youtube,
+                            tiktok: u.tiktok,
+                          }}
+                          compact
+                        />
+                      </td>
                       <td className="px-4 py-3">
                         {u.valorantRank ? (
                           <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-red-500/15 border border-red-500/30 text-red-300 text-xs font-medium">

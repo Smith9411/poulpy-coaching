@@ -7,6 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { useState, useRef, useEffect } from 'react';
 import FavoriteGames from '@/components/FavoriteGames';
+import SocialLinks from '@/components/SocialLinks';
 
 const MAGIC_BYTES: Record<string, number[]> = {
   'image/png': [0x89, 0x50, 0x4e, 0x47],
@@ -435,6 +436,11 @@ const handleSaveUsername = async () => {
               Aucune bio pour l&apos;instant. Ajoute quelques lignes pour que ton coach puisse mieux te connaître.
             </p>
           )}
+        </div>
+
+        {/* Social Links */}
+        <div className="mb-12">
+          <SocialLinks editable />
         </div>
 
         {/* Favorite Games */}

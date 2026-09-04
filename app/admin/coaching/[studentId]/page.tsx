@@ -10,6 +10,7 @@ import { supabase } from '@/lib/supabase';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import AudioMessagePlayer from '@/components/AudioMessagePlayer';
+import SocialLinks from '@/components/SocialLinks';
 
 interface Message {
   id: string;
@@ -34,6 +35,10 @@ interface StudentProfile {
   favoriteGame?: 'valorant' | 'apex' | null;
   valorantRank?: string | null;
   apexRank?: string | null;
+  discord?: string | null;
+  twitch?: string | null;
+  youtube?: string | null;
+  tiktok?: string | null;
 }
 
 export default function StudentCoachingPage() {
@@ -113,6 +118,10 @@ export default function StudentCoachingPage() {
         favoriteGame: profile.favoriteGame,
         valorantRank: profile.valorantRank,
         apexRank: profile.apexRank,
+        discord: profile.discord,
+        twitch: profile.twitch,
+        youtube: profile.youtube,
+        tiktok: profile.tiktok,
       });
 
       const { data: messagesData } = await supabase
@@ -570,20 +579,40 @@ export default function StudentCoachingPage() {
           </div>
         </div>
 
-        {/* Jeux & Rang */}
-        {student && (student.valorantRank || student.apexRank) && (
-          <div className="card rounded-2xl p-4 mb-6 flex flex-wrap items-center gap-3">
-            <span className="text-xs uppercase tracking-wide text-gray-500 font-semibold">Jeux & rang</span>
-            {student.valorantRank && (
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/15 border border-red-500/30 text-red-300 text-sm font-medium">
-                🔫 Valorant · <span className="font-bold">{student.valorantRank}</span>
-              </span>
-            )}
-            {student.apexRank && (
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-300 text-sm font-medium">
-                ⚡ Apex Legends · <span className="font-bold">{student.apexRank}</span>
-              </span>
-            )}
+        {/* Jeux, Rang & Réseaux */}
+        {student && (
+          <div className="card rounded-2xl p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-3">
+              {(student.valorantRank || student.apexRank) && (
+                <>
+                  <span className="text-xs uppercase tracking-wide text-gray-500 font-semibold">Jeux & rang</span>
+                  {student.valorantRank && (
+                    <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/15 border border-red-500/30 text-red-300 text-sm font-medium">
+                      🔫 Valorant · <span className="font-bold">{student.valorantRank}</span>
+                    </span>
+                  )}
+                  {student.apexRank && (
+                    <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-300 text-sm font-medium">
+                      ⚡ Apex Legends · <span className="font-bold">{student.apexRank}</span>
+                    </span>
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* Réseaux sociaux de l'élève */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs uppercase tracking-wide text-gray-500 font-semibold hidden sm:inline">Réseaux :</span>
+              <SocialLinks
+                socials={{
+                  discord: student.discord,
+                  twitch: student.twitch,
+                  youtube: student.youtube,
+                  tiktok: student.tiktok,
+                }}
+                compact
+              />
+            </div>
           </div>
         )}
 

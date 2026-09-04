@@ -12,6 +12,10 @@ export interface User {
   isAdmin: boolean;
   avatarUrl?: string | null;
   bio?: string | null;
+  discord?: string | null;
+  twitch?: string | null;
+  youtube?: string | null;
+  tiktok?: string | null;
   // true quand l'utilisateur est connecté (ex: via Google) mais n'a pas
   // encore choisi de pseudo → doit passer par /auth/complete
   needsUsername: boolean;
@@ -27,6 +31,12 @@ interface AuthContextType {
   updateAvatar: (avatarUrl: string | null) => Promise<void>;
   updateUsername: (newUsername: string) => Promise<void>;
   updateBio: (newBio: string) => Promise<void>;
+  updateSocials: (socials: {
+    discord?: string | null;
+    twitch?: string | null;
+    youtube?: string | null;
+    tiktok?: string | null;
+  }) => Promise<void>;
   refreshUser: () => Promise<void>;
 }
 
@@ -42,10 +52,15 @@ async function buildUser(session: Session): Promise<User> {
 
   let bio: string | null = null;
   let profileUsername: string | null = null;
+  let discord: string | null = meta.discord || null;
+  let twitch: string | null = meta.twitch || null;
+  let youtube: string | null = meta.youtube || null;
+  let tiktok: string | null = meta.tiktok || null;
+
   try {
     const { data } = await supabase
       .from('profiles')
-      .select('username, is_admin, bio')
+      .select('username, is_admin, bio, discord, twitch, youtube, tiktok')
       .eq('id', session.user.id)
       .single();
     if (data) {
@@ -55,9 +70,30 @@ async function buildUser(session: Session): Promise<User> {
       }
       isAdmin = data.is_admin === true;
       if (typeof data.bio === 'string') bio = data.bio;
+      if (data.discord) discord = data.discord;
+      if (data.twitch) twitch = data.twitch;
+      if (data.youtube) youtube = data.youtube;
+      if (data.tiktok) tiktok = data.tiktok;
     }
   } catch {
-    // profiles momentanément indisponible : on retombe sur les métadonnées
+    // Si colonnes non encore migrées dans profiles, on retombe sur profiles standard
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('username, is_admin, bio')
+        .eq('id', session.user.id)
+        .single();
+      if (data) {
+        if (data.username) {
+          username = data.username;
+          profileUsername = data.username;
+        }
+        isAdmin = data.is_admin === true;
+        if (typeof data.bio === 'string') bio = data.bio;
+      }
+    } catch {
+      // profiles momentanément indisponible : on retombe sur les métadonnées
+    }
   }
 
   const metaUsername = typeof meta.username === 'string' ? meta.username.trim() : '';
@@ -73,6 +109,10 @@ async function buildUser(session: Session): Promise<User> {
     isAdmin,
     avatarUrl,
     bio,
+    discord,
+    twitch,
+    youtube,
+    tiktok,
     needsUsername,
   };
 }
@@ -193,8 +233,60 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser((prev) => (prev ? { ...prev, bio: trimmed || null } : null));
   };
 
+  const updateSocials = async (socials: {
+    discord?: string | null;
+    twitch?: string | null;
+    youtube?: string | null;
+    tiktok?: string | null;
+  }) => {
+    if (!user) return;
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    if (!token) throw new Error('Non authentifié');
+
+    const res = await fetch('/api/profile/socials', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(socials),
+    });
+
+    const result = await res.json();
+    if (!res.ok || result.error) {
+      throw new Error(result.error || 'Erreur sauvegarde réseaux');
+    }
+
+    setUser((prev) =>
+      prev
+        ? {
+            ...prev,
+            discord: result.socials.discord,
+            twitch: result.socials.twitch,
+            youtube: result.socials.youtube,
+            tiktok: result.socials.tiktok,
+          }
+        : null
+    );
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, signInWithGoogle, logout, updateAvatar, updateUsername, updateBio, refreshUser }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        isLoading,
+        login,
+        register,
+        signInWithGoogle,
+        logout,
+        updateAvatar,
+        updateUsername,
+        updateBio,
+        updateSocials,
+        refreshUser,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
