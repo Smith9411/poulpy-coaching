@@ -12,7 +12,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
-import SheetMarkdownPreview from '@/components/admin/SheetMarkdownPreview';
+import SheetMarkdownPreview, { TableData } from '@/components/admin/SheetMarkdownPreview';
+import VisualTableModal from '@/components/admin/VisualTableModal';
 
 interface StudentProfile {
   id: string;
@@ -42,9 +43,13 @@ export default function StudentSheetPage() {
   const [tableReady, setTableReady] = useState(true);
   const [token, setToken] = useState('');
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null);
-  const [showTableMenu, setShowTableMenu] = useState(false);
   const [showTemplatesMenu, setShowTemplatesMenu] = useState(false);
   const [copiedSql, setCopiedSql] = useState(false);
+
+  // Modal d'édition visuelle de tableau
+  const [isTableModalOpen, setIsTableModalOpen] = useState(false);
+  const [editingTableIndex, setEditingTableIndex] = useState<number | null>(null);
+  const [tableModalData, setTableModalData] = useState<TableData | null>(null);
 
   // Deferred content pour ne jamais bloquer la saisie
   const deferredContent = useDeferredValue(content);
@@ -204,6 +209,110 @@ export default function StudentSheetPage() {
       textarea.focus();
       textarea.setSelectionRange(start + before.length, start + before.length + selected.length);
     }, 10);
+  };
+
+  // Helper pour cibler et modifier le N-ième tableau Markdown dans le document
+  const updateNthTable = (
+    fullContent: string,
+    targetIndex: number,
+    transform: (tableLines: string[]) => string[]
+  ): string => {
+    const lines = fullContent.split('\n');
+    let currentTableIndex = 0;
+    const resultLines: string[] = [];
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const trimmed = line.trim();
+
+      if (trimmed.startsWith('|') && trimmed.endsWith('|') && trimmed.includes('|')) {
+        const tableLines: string[] = [];
+        let j = i;
+        while (j < lines.length && lines[j].trim().startsWith('|') && lines[j].trim().endsWith('|')) {
+          tableLines.push(lines[j]);
+          j++;
+        }
+
+        if (tableLines.length >= 2) {
+          if (currentTableIndex === targetIndex) {
+            const newTableLines = transform(tableLines);
+            resultLines.push(...newTableLines);
+          } else {
+            resultLines.push(...tableLines);
+          }
+          currentTableIndex++;
+          i = j - 1;
+          continue;
+        }
+      }
+
+      resultLines.push(line);
+    }
+
+    return resultLines.join('\n');
+  };
+
+  // Ajouter une colonne vers la droite sur un tableau spécifique
+  const handleAddColumnToTable = (tableIndex: number) => {
+    setContent(prev =>
+      updateNthTable(prev, tableIndex, tableLines => {
+        const headers = tableLines[0]
+          .split('|')
+          .slice(1, -1)
+          .map(c => c.trim());
+        const newColNum = headers.length + 1;
+        const isDivider =
+          tableLines.length > 1 && /^(\|\s*:?-+:?\s*)+\|$/.test(tableLines[1].trim());
+
+        return tableLines.map((line, idx) => {
+          const tLine = line.trim();
+          if (idx === 0) {
+            return tLine.replace(/\|$/, ` Colonne ${newColNum} |`);
+          }
+          if (idx === 1 && isDivider) {
+            return tLine.replace(/\|$/, ' :--- |');
+          }
+          return tLine.replace(/\|$/, ' - |');
+        });
+      })
+    );
+  };
+
+  // Ajouter une ligne en bas sur un tableau spécifique
+  const handleAddRowToTable = (tableIndex: number) => {
+    setContent(prev =>
+      updateNthTable(prev, tableIndex, tableLines => {
+        const headers = tableLines[0]
+          .split('|')
+          .slice(1, -1)
+          .map(c => c.trim());
+        const colCount = Math.max(headers.length, 1);
+        const emptyRow = '| ' + Array(colCount).fill('-').join(' | ') + ' |';
+        return [...tableLines, emptyRow];
+      })
+    );
+  };
+
+  // Ouvrir l'éditeur visuel pour modifier un tableau existant
+  const handleOpenEditTable = (tableIndex: number, data: TableData) => {
+    setEditingTableIndex(tableIndex);
+    setTableModalData(data);
+    setIsTableModalOpen(true);
+  };
+
+  // Sauvegarder depuis le modal visuel (insertion nouveau tableau ou mise à jour)
+  const handleSaveVisualTable = (markdownTable: string) => {
+    if (editingTableIndex !== null) {
+      const cleanTableLines = markdownTable.trim().split('\n');
+      setContent(prev =>
+        updateNthTable(prev, editingTableIndex, () => cleanTableLines)
+      );
+      setEditingTableIndex(null);
+      setTableModalData(null);
+    } else {
+      insertText('\n' + markdownTable.trim() + '\n');
+    }
+    setIsTableModalOpen(false);
   };
 
   // Upload d'image / capture d'écran
@@ -656,84 +765,20 @@ USING (student_id = auth.uid());`;
             </button>
             <div className="h-5 w-px bg-white/10 mx-1" />
 
-            {/* Menu Déroulant Tableaux */}
-            <div className="relative">
-              <button
-                onClick={() => {
-                  setShowTableMenu(!showTableMenu);
-                  setShowTemplatesMenu(false);
-                }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                  showTableMenu ? 'bg-purple-600 text-white' : 'bg-white/5 hover:bg-white/10 text-gray-300'
-                }`}
-                title="Insérer un tableau"
-              >
-                <Table size={15} />
-                <span>Tableaux</span>
-              </button>
-
-              {showTableMenu && (
-                <>
-                  <div
-                    className="fixed inset-0 z-40 cursor-default"
-                    onClick={() => setShowTableMenu(false)}
-                  />
-                  <div className="absolute left-0 mt-2 w-72 rounded-xl bg-[#13111C] border border-purple-500/40 shadow-[0_12px_40px_rgba(0,0,0,0.85)] p-2 z-50 animate-fade-in space-y-1">
-                    <button
-                      onClick={() => {
-                        insertText(
-                          `\n| Objectif Spécifique | Cible Mesurable | Échéance | Statut |\n| :--- | :--- | :--- | :--- |\n| Stabiliser le Crosshair | 65% Headshot en Deathmatch | Semaine 2 | En cours 🔄 |\n| Tracking fluide Pasu | Score KovaaK's > 80 | Semaine 3 | À faire ⏳ |\n`
-                        );
-                        setShowTableMenu(false);
-                      }}
-                      className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/10 text-xs text-gray-200 transition-colors"
-                    >
-                      📊 <strong className="text-white">Tableau d'Objectifs</strong>
-                      <span className="block text-[10px] text-gray-400 mt-0.5">Objectif, Cible, Échéance, Statut</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        insertText(
-                          `\n| Exercice / Scénario | Support | Durée | Score Actuel | Objectif |\n| :--- | :--- | :--- | :--- | :--- |\n| 1wall6targets TE | KovaaK's | 10 min | 140 | 165+ |\n| Pasu Voltaic Easy | KovaaK's | 10 min | 75 | 90+ |\n| Range Hard Bots | Valorant | 5 min | 20/30 | 25+/30 |\n`
-                        );
-                        setShowTableMenu(false);
-                      }}
-                      className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/10 text-xs text-gray-200 transition-colors"
-                    >
-                      🎯 <strong className="text-white">Tableau Routine d'Aim</strong>
-                      <span className="block text-[10px] text-gray-400 mt-0.5">Scénario, Logiciel, Durée, Score</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        insertText(
-                          `\n| Séance | Date | Sujet / Thème | Points Forts | Axes de Travail |\n| :--- | :--- | :--- | :--- | :--- |\n| Session #1 | ${new Date().toLocaleDateString('fr-FR')} | Diagnostic & Posture | Bonne réactivité | Micro-flicks trop amples |\n`
-                        );
-                        setShowTableMenu(false);
-                      }}
-                      className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/10 text-xs text-gray-200 transition-colors"
-                    >
-                      📅 <strong className="text-white">Tableau Suivi Séances</strong>
-                      <span className="block text-[10px] text-gray-400 mt-0.5">Historique et feedback séance</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        insertText(
-                          `\n| Colonne 1 | Colonne 2 | Colonne 3 |\n| :--- | :--- | :--- |\n| Donnée 1 | Donnée 2 | Donnée 3 |\n| Donnée 4 | Donnée 5 | Donnée 6 |\n`
-                        );
-                        setShowTableMenu(false);
-                      }}
-                      className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/10 text-xs text-gray-200 transition-colors"
-                    >
-                      ➕ <strong className="text-white">Tableau Simple (3x3)</strong>
-                      <span className="block text-[10px] text-gray-400 mt-0.5">Tableau vide personnalisable</span>
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
+            {/* Bouton Créer un Tableau Visuel */}
+            <button
+              onClick={() => {
+                setEditingTableIndex(null);
+                setTableModalData(null);
+                setIsTableModalOpen(true);
+                setShowTemplatesMenu(false);
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600/20 to-cyan-500/20 hover:from-purple-600/35 hover:to-cyan-500/35 text-purple-200 border border-purple-500/30 text-xs font-semibold transition-all hover:scale-105"
+              title="Insérer un tableau avec l'éditeur visuel (sans code markdown)"
+            >
+              <Table size={15} className="text-cyan-400" />
+              <span>Tableaux</span>
+            </button>
 
             {/* Bouton Upload Capture d'écran */}
             <button
@@ -751,7 +796,6 @@ USING (student_id = auth.uid());`;
               <button
                 onClick={() => {
                   setShowTemplatesMenu(!showTemplatesMenu);
-                  setShowTableMenu(false);
                 }}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
                   showTemplatesMenu ? 'bg-indigo-600 text-white' : 'bg-white/5 hover:bg-white/10 text-gray-300'
@@ -874,12 +918,31 @@ USING (student_id = auth.uid());`;
                 <span className="text-[11px] text-gray-500">Rendu final & interactif</span>
               </div>
               <div className="flex-1 p-6 sm:p-8 overflow-y-auto print:overflow-visible print:p-0">
-                <SheetMarkdownPreview content={deferredContent} />
+                <SheetMarkdownPreview
+                  content={deferredContent}
+                  editable={true}
+                  onAddColumnToTable={handleAddColumnToTable}
+                  onAddRowToTable={handleAddRowToTable}
+                  onEditTable={handleOpenEditTable}
+                />
               </div>
             </div>
           )}
         </div>
       </div>
+
+      {/* Modal d'édition visuelle de tableau */}
+      <VisualTableModal
+        isOpen={isTableModalOpen}
+        onClose={() => {
+          setIsTableModalOpen(false);
+          setEditingTableIndex(null);
+          setTableModalData(null);
+        }}
+        onSaveTable={handleSaveVisualTable}
+        initialData={tableModalData}
+        mode={editingTableIndex !== null ? 'edit' : 'insert'}
+      />
     </main>
   );
 }

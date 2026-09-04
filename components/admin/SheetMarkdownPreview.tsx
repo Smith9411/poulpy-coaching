@@ -1,14 +1,30 @@
 'use client';
 
 import React, { useState } from 'react';
-import { CheckSquare, Square, ExternalLink, Maximize2, X } from 'lucide-react';
+import { CheckSquare, Square, ExternalLink, Maximize2, X, Plus, Edit3, Table } from 'lucide-react';
+
+export interface TableData {
+  headers: string[];
+  rows: string[][];
+}
 
 interface SheetMarkdownPreviewProps {
   content: string;
   className?: string;
+  editable?: boolean;
+  onAddColumnToTable?: (tableIndex: number) => void;
+  onAddRowToTable?: (tableIndex: number) => void;
+  onEditTable?: (tableIndex: number, data: TableData) => void;
 }
 
-export default function SheetMarkdownPreview({ content, className = '' }: SheetMarkdownPreviewProps) {
+export default function SheetMarkdownPreview({
+  content,
+  className = '',
+  editable = false,
+  onAddColumnToTable,
+  onAddRowToTable,
+  onEditTable,
+}: SheetMarkdownPreviewProps) {
   const [zoomImage, setZoomImage] = useState<string | null>(null);
 
   if (!content || !content.trim()) {
@@ -142,6 +158,7 @@ export default function SheetMarkdownPreview({ content, className = '' }: SheetM
 
   const lines = content.split('\n');
   const blocks: React.ReactNode[] = [];
+  let tableCounter = 0;
 
   // Boucle principale FOR 100% sécurisée
   for (let i = 0; i < lines.length; i++) {
@@ -250,6 +267,7 @@ export default function SheetMarkdownPreview({ content, className = '' }: SheetM
       i = nextIdx - 1;
 
       if (tableLines.length >= 2) {
+        const thisTableIndex = tableCounter++;
         const headerCells = tableLines[0]
           .split('|')
           .slice(1, -1)
@@ -257,37 +275,83 @@ export default function SheetMarkdownPreview({ content, className = '' }: SheetM
 
         const isDivider = /^(\|\s*:?-+:?\s*)+\|$/.test(tableLines[1]);
         const dataRows = isDivider ? tableLines.slice(2) : tableLines.slice(1);
+        const parsedRows = dataRows.map(rowStr =>
+          rowStr
+            .split('|')
+            .slice(1, -1)
+            .map(c => c.trim())
+        );
 
         blocks.push(
-          <div key={`table-${i}`} className="my-6 overflow-x-auto rounded-xl border border-white/10 bg-black/20 shadow-md">
-            <table className="w-full text-left text-sm border-collapse">
-              <thead>
-                <tr className="bg-white/5 border-b border-white/15 text-purple-300 font-semibold uppercase tracking-wider text-xs">
-                  {headerCells.map((cell, cIdx) => (
-                    <th key={cIdx} className="px-4 py-3 whitespace-nowrap">
-                      {renderInline(cell)}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-white/5">
-                {dataRows.map((rowStr, rIdx) => {
-                  const cells = rowStr
-                    .split('|')
-                    .slice(1, -1)
-                    .map(c => c.trim());
-                  return (
-                    <tr key={rIdx} className="hover:bg-white/[0.03] transition-colors">
-                      {cells.map((cell, cIdx) => (
-                        <td key={cIdx} className="px-4 py-3 text-gray-300">
-                          {renderInline(cell)}
-                        </td>
-                      ))}
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+          <div key={`table-${i}`} className="my-6 rounded-xl border border-white/10 bg-black/25 shadow-lg overflow-hidden group">
+            {/* Barre d'action rapide sur le tableau si éditable */}
+            {editable && (
+              <div className="px-4 py-2 bg-white/[0.03] border-b border-white/10 flex items-center justify-between gap-2 flex-wrap print:hidden">
+                <span className="text-[11px] font-semibold text-purple-300/80 flex items-center gap-1.5 uppercase tracking-wide">
+                  <Table size={13} /> Tableau #{thisTableIndex + 1}
+                </span>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => onAddColumnToTable?.(thisTableIndex)}
+                    className="px-2.5 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 text-xs font-semibold flex items-center gap-1 transition-all hover:scale-105"
+                    title="Ajouter une colonne vers la droite"
+                  >
+                    <Plus size={13} />
+                    <span>+ Colonne à droite</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onAddRowToTable?.(thisTableIndex)}
+                    className="px-2.5 py-1 rounded-lg bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 text-xs font-semibold flex items-center gap-1 transition-all hover:scale-105"
+                    title="Ajouter une ligne en bas"
+                  >
+                    <Plus size={13} />
+                    <span>+ Ligne en bas</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onEditTable?.(thisTableIndex, { headers: headerCells, rows: parsedRows })}
+                    className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 text-xs font-semibold flex items-center gap-1 transition-all"
+                    title="Ouvrir l'éditeur visuel pour modifier les cellules"
+                  >
+                    <Edit3 size={13} />
+                    <span>Modifier tout</span>
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm border-collapse">
+                <thead>
+                  <tr className="bg-white/5 border-b border-white/15 text-purple-300 font-semibold uppercase tracking-wider text-xs">
+                    {headerCells.map((cell, cIdx) => (
+                      <th key={cIdx} className="px-4 py-3 whitespace-nowrap">
+                        {renderInline(cell)}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {dataRows.map((rowStr, rIdx) => {
+                    const cells = rowStr
+                      .split('|')
+                      .slice(1, -1)
+                      .map(c => c.trim());
+                    return (
+                      <tr key={rIdx} className="hover:bg-white/[0.03] transition-colors">
+                        {cells.map((cell, cIdx) => (
+                          <td key={cIdx} className="px-4 py-3 text-gray-300">
+                            {renderInline(cell)}
+                          </td>
+                        ))}
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         );
         continue;
