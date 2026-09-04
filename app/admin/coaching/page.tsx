@@ -1,7 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { Shield, ArrowLeft, User, Search, MessageSquare, RefreshCw, Loader2, Mail, Calendar, Bell } from 'lucide-react';
+import {
+  Shield, ArrowLeft, User, Search, MessageSquare, RefreshCw,
+  Loader2, Mail, Calendar, Bell, Film,
+} from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { useState, useEffect, useCallback, useMemo } from 'react';
@@ -184,16 +187,15 @@ export default function AdminCoaching() {
             {filteredStudents.map((student) => {
               const hasUnread = student.unreadCount > 0;
               return (
-                <Link
+                <div
                   key={student.id}
-                  href={`/admin/coaching/${student.id}`}
-                  className={`card rounded-xl p-6 transition-all group cursor-pointer border ${
+                  className={`card rounded-xl p-5 border transition-all ${
                     hasUnread
-                      ? 'border-cyan-500/40 bg-cyan-500/5 hover:border-cyan-500/60 shadow-[0_0_0_1px_rgba(34,211,238,0.15),0_8px_24px_-8px_rgba(34,211,238,0.35)]'
-                      : 'border-white/5 hover:border-purple-500/30 hover:bg-white/5'
+                      ? 'border-cyan-500/40 bg-cyan-500/5 shadow-[0_0_0_1px_rgba(34,211,238,0.15),0_8px_24px_-8px_rgba(34,211,238,0.35)]'
+                      : 'border-white/5 hover:border-purple-500/20'
                   }`}
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="flex items-start gap-4 mb-4">
                     {/* Avatar */}
                     <div className="relative flex-shrink-0">
                       {student.avatarUrl ? (
@@ -229,7 +231,7 @@ export default function AdminCoaching() {
                           </span>
                         )}
                       </div>
-                      <div className="text-sm text-gray-400 flex items-center gap-2 mb-2">
+                      <div className="text-sm text-gray-400 flex items-center gap-2 mb-1">
                         <Mail size={14} />
                         <span className="truncate">{student.email}</span>
                       </div>
@@ -240,17 +242,35 @@ export default function AdminCoaching() {
                         </span>
                       </div>
                     </div>
-
-                    {/* Message Icon */}
-                    <div className="flex-shrink-0">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
-                        hasUnread ? 'bg-cyan-500/20 group-hover:bg-cyan-500/30' : 'bg-purple-500/20 group-hover:bg-purple-500/30'
-                      }`}>
-                        <MessageSquare size={18} className={hasUnread ? 'text-cyan-300' : 'text-purple-400'} />
-                      </div>
-                    </div>
                   </div>
-                </Link>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-2">
+                    <Link
+                      href={`/admin/coaching/${student.id}`}
+                      className={`flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                        hasUnread
+                          ? 'bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/30'
+                          : 'bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/20'
+                      }`}
+                    >
+                      <MessageSquare size={15} />
+                      Chat
+                      {hasUnread && (
+                        <span className="ml-auto inline-flex items-center justify-center w-4 h-4 rounded-full bg-cyan-500 text-white text-[9px] font-bold">
+                          {student.unreadCount > 9 ? '9+' : student.unreadCount}
+                        </span>
+                      )}
+                    </Link>
+                    <Link
+                      href={`/admin/coaching/${student.id}/clips`}
+                      className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20"
+                    >
+                      <Film size={15} />
+                      Clips VOD
+                    </Link>
+                  </div>
+                </div>
               );
             })}
           </div>

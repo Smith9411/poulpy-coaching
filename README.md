@@ -159,10 +159,12 @@ npm run start        # Serveur production
 - `/auth/complete` — Choix du pseudo (Google uniquement, garde de session)
 - `/profile` — Profil élève
 - `/profile/coaching` — Chat élève
+- `/profile/vod` — Clips VOD élève (soumission + annotations coach)
 - `/avis` — Reviews
 - `/admin` — Dashboard admin (admin only)
-- `/admin/coaching` — Liste élèves avec badges non-lus
+- `/admin/coaching` — Liste élèves avec badges non-lus (boutons Chat + Clips VOD)
 - `/admin/coaching/[studentId]` — Conv avec un élève (admin only)
+- `/admin/coaching/[studentId]/clips` — Clips VOD d'un élève + annotations admin
 - `/admin/users` — Gestion users (admin only)
 - `/admin/students` — Tableau élèves (admin only)
 - `/admin/stats` — Stats (admin only)
@@ -220,6 +222,16 @@ Fonctionnement côté app : après le retour Google, `/auth/callback` vérifie l
 > `YYYY-MM-DD : [brève description des changements]`
 > Le prochain intervenant lira ces lignes pour comprendre l'évolution.
 
+- 2026-09-04 (feature Fiches VOD & Analyse de replay) :
+  - **Nouvelle table SQL** : `vod_clips` (clips soumis par les élèves) + `vod_annotations` (annotations horodatées du coach) avec RLS policies complètes
+  - **`lib/vod-utils.ts`** : parser d'URLs vidéo (YouTube watch/shorts/youtu.be, Twitch clips/VOD, Medal.tv) → embedUrl + thumbnailUrl + providerLabel
+  - **`/api/vod/clips`** : GET (liste clips d'un élève, admin ou self), POST (élève soumet, validation URL + magic parse), DELETE (admin supprime en cascade)
+  - **`/api/vod/annotations`** : GET / POST / DELETE — écriture réservée à l'admin, timestamp optionnel (mm:ss ou secondes brutes), catégories : point_fort / erreur / axe_travail / general
+  - **`/admin/coaching`** : cartes élèves redessinées avec 2 boutons séparés : **Chat** (cyan, badge non-lus) + **Clips VOD** (orange)
+  - **`/admin/coaching/[studentId]/clips`** : page admin dédiée — liste des clips avec embed inline (iframe), formulaire d'annotation (catégorie + timestamp + texte 1000 car.), suppression clip/annotation avec confirmation
+  - **`/profile/vod`** : page élève — formulaire de soumission avec validation URL live (feedback vert/rouge), liste de ses clips, annotations du coach affichées avec badge coloré par catégorie
+  - **`/profile`** : grille 4 cartes (ajout carte "Clips VOD" → `/profile/vod`)
+  - Testé en local : build OK (TS strict), 35/35 pages, exit 0
 - 2026-09-04 (audit complet + correctifs) :
   - **Sécurité** : magic bytes (PNG/JPEG/GIF/WEBP) vérifiés **côté serveur** dans `/api/avatar/upload` — bloque l'upload de fichiers malveillants renommés en .png
   - **Sécurité** : `/admin/users` utilise maintenant `u.id !== user.id` au lieu de `u.username !== user.username` pour empêcher un user de se promouvoir admin / se supprimer (un attaquant peut créer un compte avec le même pseudo)

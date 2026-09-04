@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { User, Mail, Settings, LogOut, Shield, Clock, Award, Camera, Trash2, Edit2, Check, X, Loader2, MessageSquare, Quote } from 'lucide-react';
+import { User, Mail, Settings, LogOut, Shield, Clock, Award, Camera, Trash2, Edit2, Check, X, Loader2, MessageSquare, Quote, Film } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { useState, useRef, useEffect } from 'react';
@@ -445,7 +445,7 @@ const handleSaveUsername = async () => {
         )}
 
         {/* Stats / Upcoming sections */}
-        <div className="grid sm:grid-cols-3 gap-6 mb-12">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           <Link
             href="/profile/coaching"
             className="card rounded-2xl p-6 text-center hover:bg-white/5 transition-all group cursor-pointer"
@@ -456,6 +456,18 @@ const handleSaveUsername = async () => {
             <h3 className="font-bold mb-1">Messages Coaching</h3>
             <p className="text-sm text-gray-400">Retours de ton coach</p>
           </Link>
+
+          <Link
+            href="/profile/vod"
+            className="card rounded-2xl p-6 text-center hover:bg-white/5 transition-all group cursor-pointer"
+          >
+            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500 to-yellow-500 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+              <Film size={24} className="text-white" />
+            </div>
+            <h3 className="font-bold mb-1">Clips VOD</h3>
+            <p className="text-sm text-gray-400">Analyses de tes replays</p>
+          </Link>
+
           <div className="card rounded-2xl p-6 text-center hover:bg-white/5 transition-all group">
             <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
               <Clock size={24} className="text-white" />
@@ -478,17 +490,6 @@ const handleSaveUsername = async () => {
             <h3 className="font-bold text-lg mb-2">Progression</h3>
             <p className="text-gray-400 text-sm mb-4">Suivi de tes rangs</p>
             <span className="inline-flex items-center gap-1 text-cyan-400 hover:text-cyan-300 text-sm font-medium transition-colors">
-              Bientôt disponible
-            </span>
-          </div>
-
-          <div className="card rounded-2xl p-6 text-center hover:bg-white/5 transition-all group">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-pink-600 to-purple-500 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-              <Settings size={24} className="text-white" />
-            </div>
-            <h3 className="font-bold text-lg mb-2">Paramètres</h3>
-            <p className="text-gray-400 text-sm mb-4">Gérer ton compte</p>
-            <span className="inline-flex items-center gap-1 text-pink-400 hover:text-pink-300 text-sm font-medium transition-colors">
               Bientôt disponible
             </span>
           </div>
