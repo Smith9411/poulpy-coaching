@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { Shield, ArrowLeft, User, Search, ShieldOff, ShieldCheck, AlertTriangle, Trash2, RefreshCw, Edit2, Check, X, Loader2, ImageOff, Mail, Sparkles } from 'lucide-react';
+import { Shield, ArrowLeft, User, Search, ShieldOff, ShieldCheck, AlertTriangle, Trash2, RefreshCw, Edit2, Check, X, Loader2, ImageOff, Mail, Sparkles, Share2, ChevronDown, ExternalLink } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef, Fragment } from 'react';
+import { DiscordIcon, TwitchIcon, YoutubeIcon, TiktokIcon, formatSocialUrl, formatSocialDisplay } from '@/components/SocialLinks';
 
 interface UserRow {
   id: string;
@@ -15,6 +16,10 @@ interface UserRow {
   createdAt: string;
   avatarUrl?: string | null;
   initial: string;
+  discord?: string | null;
+  twitch?: string | null;
+  youtube?: string | null;
+  tiktok?: string | null;
 }
 
 export default function AdminUsers() {
@@ -31,6 +36,8 @@ export default function AdminUsers() {
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [editingUsername, setEditingUsername] = useState('');
   const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const [expandedSocials, setExpandedSocials] = useState<Set<string>>(new Set());
+  const [removingSocialKey, setRemovingSocialKey] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState('');
   const successTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -85,6 +92,10 @@ export default function AdminUsers() {
               createdAt: p.created_at || '',
               avatarUrl: null,
               initial: name.charAt(0).toUpperCase(),
+              discord: p.discord || null,
+              twitch: p.twitch || null,
+              youtube: p.youtube || null,
+              tiktok: p.tiktok || null,
             };
           })
         );
@@ -263,6 +274,68 @@ export default function AdminUsers() {
     }
   };
 
+  const toggleSocials = (userId: string) => {
+    setExpandedSocials((prev) => {
+      const next = new Set(prev);
+      if (next.has(userId)) {
+        next.delete(userId);
+      } else {
+        next.add(userId);
+      }
+      return next;
+    });
+  };
+
+  const handleRemoveSocial = async (u: UserRow, platform: 'discord' | 'twitch' | 'youtube' | 'tiktok') => {
+    const actionKey = `${u.id}-${platform}`;
+    setRemovingSocialKey(actionKey);
+    setLoadError('');
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('Non authentifié');
+
+      const res = await fetch('/api/admin/users', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          userId: u.id,
+          [platform]: null,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Erreur lors de la suppression du réseau');
+      }
+
+      setUsers((prev) =>
+        prev.map((item) =>
+          item.id === u.id
+            ? { ...item, [platform]: null }
+            : item
+        )
+      );
+
+      const labels: Record<string, string> = {
+        discord: 'Discord',
+        twitch: 'Twitch',
+        youtube: 'YouTube',
+        tiktok: 'TikTok',
+      };
+      showSuccess(`Réseau ${labels[platform] || platform} retiré pour ${u.username} !`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erreur';
+      setLoadError(msg);
+    } finally {
+      setRemovingSocialKey(null);
+    }
+  };
+
   const handleSort = (field: 'username' | 'email' | 'createdAt') => {
     if (sortBy === field) {
       setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
@@ -421,197 +494,387 @@ export default function AdminUsers() {
                       <div className="flex items-center gap-2">Inscrit le <SortIcon field="createdAt" /></div>
                     </th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Coaching</th>
+                    <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Réseaux</th>
                     <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Rôle</th>
                     <th className="px-6 py-4 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {filteredUsers.map((u) => (
-                    <tr
-                      key={u.id}
-                      className="hover:bg-white/5 transition-colors"
-                    >
-                      {/* Avatar + pseudo (avec édition inline) */}
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 overflow-hidden">
-                            {u.avatarUrl ? (
-                              <img src={u.avatarUrl} alt={u.username} className="w-full h-full object-cover" />
-                            ) : (
-                              u.initial
-                            )}
-                          </div>
-                          <div>
-                            {editingUserId === u.id ? (
-                              <div className="flex items-center gap-1.5">
-                                <input
-                                  type="text"
-                                  value={editingUsername}
-                                  onChange={(e) => setEditingUsername(e.target.value)}
-                                  className="px-2.5 py-1 text-sm rounded-lg bg-white/10 border border-white/20 text-inherit focus:outline-none focus:border-purple-500"
-                                  autoFocus
-                                />
-                                <button
-                                  onClick={() => handleSaveUsername(u)}
-                                  disabled={isSavingEdit}
-                                  className="p-1 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30"
-                                  title="Enregistrer"
-                                >
-                                  {isSavingEdit ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-                                </button>
-                                <button
-                                  onClick={() => setEditingUserId(null)}
-                                  className="p-1 rounded-lg bg-white/5 text-gray-400 hover:bg-white/10"
-                                  title="Annuler"
-                                >
-                                  <X size={14} />
-                                </button>
+                  {filteredUsers.map((u) => {
+                    const socialCount = [u.discord, u.twitch, u.youtube, u.tiktok].filter(Boolean).length;
+                    const isExpanded = expandedSocials.has(u.id);
+
+                    return (
+                      <Fragment key={u.id}>
+                        <tr className="hover:bg-white/5 transition-colors">
+                          {/* Avatar + pseudo (avec édition inline) */}
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 overflow-hidden">
+                                {u.avatarUrl ? (
+                                  <img src={u.avatarUrl} alt={u.username} className="w-full h-full object-cover" />
+                                ) : (
+                                  u.initial
+                                )}
                               </div>
-                            ) : (
-                              <div className="flex items-center gap-2">
-                                <p className="font-medium">{u.username}</p>
-                                <button
-                                  onClick={() => handleStartEdit(u)}
-                                  className="p-1 rounded hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
-                                  title="Modifier le pseudo"
-                                >
-                                  <Edit2 size={13} />
-                                </button>
+                              <div>
+                                {editingUserId === u.id ? (
+                                  <div className="flex items-center gap-1.5">
+                                    <input
+                                      type="text"
+                                      value={editingUsername}
+                                      onChange={(e) => setEditingUsername(e.target.value)}
+                                      className="px-2.5 py-1 text-sm rounded-lg bg-white/10 border border-white/20 text-inherit focus:outline-none focus:border-purple-500"
+                                      autoFocus
+                                    />
+                                    <button
+                                      onClick={() => handleSaveUsername(u)}
+                                      disabled={isSavingEdit}
+                                      className="p-1 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30"
+                                      title="Enregistrer"
+                                    >
+                                      {isSavingEdit ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
+                                    </button>
+                                    <button
+                                      onClick={() => setEditingUserId(null)}
+                                      className="p-1 rounded-lg bg-white/5 text-gray-400 hover:bg-white/10"
+                                      title="Annuler"
+                                    >
+                                      <X size={14} />
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-2">
+                                    <p className="font-medium">{u.username}</p>
+                                    <button
+                                      onClick={() => handleStartEdit(u)}
+                                      className="p-1 rounded hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                                      title="Modifier le pseudo"
+                                    >
+                                      <Edit2 size={13} />
+                                    </button>
+                                  </div>
+                                )}
+                                {u.isAdmin && (
+                                  <span className="text-xs text-yellow-400 font-medium">Administrateur</span>
+                                )}
                               </div>
-                            )}
-                            {u.isAdmin && (
-                              <span className="text-xs text-yellow-400 font-medium">Administrateur</span>
-                            )}
-                          </div>
-                        </div>
-                      </td>
+                            </div>
+                          </td>
 
-                      {/* Email */}
-                      <td className="px-6 py-4">
-                        <p className="text-gray-300 text-sm">{u.email}</p>
-                      </td>
+                          {/* Email */}
+                          <td className="px-6 py-4">
+                            <p className="text-gray-300 text-sm">{u.email}</p>
+                          </td>
 
-                      {/* Date */}
-                      <td className="px-6 py-4 hidden md:table-cell">
-                        <p className="text-gray-400 text-sm">{formatDate(u.createdAt)}</p>
-                      </td>
+                          {/* Date */}
+                          <td className="px-6 py-4 hidden md:table-cell">
+                            <p className="text-gray-400 text-sm">{formatDate(u.createdAt)}</p>
+                          </td>
 
-                      {/* Statut Coaching */}
-                      <td className="px-6 py-4">
-                        <button
-                          onClick={() => toggleCoaching(u)}
-                          disabled={busyId === u.id}
-                          title={u.inCoaching ? 'Retirer du coaching actuel' : 'Marquer en coaching actuel'}
-                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all ${
-                            u.inCoaching
-                              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30 shadow-[0_0_12px_rgba(16,185,129,0.2)]'
-                              : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 hover:text-white'
-                          } disabled:opacity-50`}
-                        >
-                          {busyId === u.id ? (
-                            <Loader2 size={12} className="animate-spin" />
-                          ) : u.inCoaching ? (
-                            <Sparkles size={12} className="text-emerald-400" />
-                          ) : (
-                            <span className="w-2 h-2 rounded-full bg-gray-500" />
-                          )}
-                          {u.inCoaching ? 'En coaching' : 'Inactif'}
-                        </button>
-                      </td>
-
-                      {/* Badge rôle */}
-                      <td className="px-6 py-4">
-                        {u.isAdmin ? (
-                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-yellow-500 to-orange-500 text-black">
-                            <Shield size={10} />Admin
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-gray-300">
-                            <User size={10} />Membre
-                          </span>
-                        )}
-                      </td>
-
-                      {/* Actions */}
-                      <td className="px-6 py-4">
-                        <div className="flex items-center justify-end gap-1">
-
-                          {/* Retirer la photo de profil si présente */}
-                          {u.avatarUrl && (
-                            confirmRemoveAvatar === u.id ? (
-                              <div className="flex items-center gap-1 mr-1">
-                                <button
-                                  onClick={() => handleRemoveAvatar(u)}
-                                  disabled={busyId === u.id}
-                                  className="px-2 py-1 text-xs rounded-lg bg-orange-500/20 text-orange-400 hover:bg-orange-500/40 transition-colors disabled:opacity-40"
-                                >
-                                  Retirer photo
-                                </button>
-                                <button
-                                  onClick={() => setConfirmRemoveAvatar(null)}
-                                  className="px-2 py-1 text-xs rounded-lg bg-white/5 text-gray-400 hover:bg-white/10 transition-colors"
-                                >
-                                  ✕
-                                </button>
-                              </div>
-                            ) : (
-                              <button
-                                onClick={() => setConfirmRemoveAvatar(u.id)}
-                                title="Retirer la photo de profil de cet utilisateur"
-                                className="p-2 rounded-lg hover:bg-orange-500/10 transition-colors text-gray-400 hover:text-orange-400"
-                              >
-                                <ImageOff size={16} />
-                              </button>
-                            )
-                          )}
-
-                          {/* Toggle admin — désactivé pour soi-même */}
-                          {u.id !== user?.id && (
+                          {/* Statut Coaching */}
+                          <td className="px-6 py-4">
                             <button
-                              onClick={() => toggleAdmin(u)}
+                              onClick={() => toggleCoaching(u)}
                               disabled={busyId === u.id}
-                              title={u.isAdmin ? 'Retirer le rôle admin' : 'Promouvoir admin'}
-                              className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400 hover:text-white disabled:opacity-40"
+                              title={u.inCoaching ? 'Retirer du coaching actuel' : 'Marquer en coaching actuel'}
+                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                                u.inCoaching
+                                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30 shadow-[0_0_12px_rgba(16,185,129,0.2)]'
+                                  : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 hover:text-white'
+                              } disabled:opacity-50`}
                             >
-                              {busyId === u.id
-                                ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                                : u.isAdmin ? <ShieldOff size={16} /> : <ShieldCheck size={16} />
-                              }
+                              {busyId === u.id ? (
+                                <Loader2 size={12} className="animate-spin" />
+                              ) : u.inCoaching ? (
+                                <Sparkles size={12} className="text-emerald-400" />
+                              ) : (
+                                <span className="w-2 h-2 rounded-full bg-gray-500" />
+                              )}
+                              {u.inCoaching ? 'En coaching' : 'Inactif'}
                             </button>
-                          )}
+                          </td>
 
-                          {/* Supprimer — désactivé pour soi-même */}
-                          {u.id !== user?.id && (
-                            confirmDelete === u.id ? (
-                              <div className="flex items-center gap-1 ml-1">
+                          {/* Bouton Réseaux */}
+                          <td className="px-6 py-4">
+                            <button
+                              type="button"
+                              onClick={() => toggleSocials(u.id)}
+                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                                socialCount > 0
+                                  ? isExpanded
+                                    ? 'bg-purple-600 text-white shadow-[0_0_12px_rgba(147,51,234,0.35)]'
+                                    : 'bg-purple-500/15 text-purple-300 border border-purple-500/30 hover:bg-purple-500/25 hover:border-purple-500/50'
+                                  : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 hover:text-white'
+                              }`}
+                              title={
+                                socialCount > 0
+                                  ? `${socialCount} réseau${socialCount > 1 ? 'x' : ''} enregistré${socialCount > 1 ? 's' : ''} - Cliquer pour voir ou retirer`
+                                  : 'Aucun réseau - Cliquer pour voir'
+                              }
+                            >
+                              <Share2 size={12} className={socialCount > 0 ? 'text-purple-400' : 'text-gray-500'} />
+                              <span>Réseaux</span>
+                              {socialCount > 0 ? (
+                                <span
+                                  className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+                                    isExpanded ? 'bg-white/20 text-white' : 'bg-purple-500/30 text-purple-200'
+                                  }`}
+                                >
+                                  {socialCount}
+                                </span>
+                              ) : (
+                                <span className="text-[10px] text-gray-500">0</span>
+                              )}
+                              <ChevronDown
+                                size={12}
+                                className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+                              />
+                            </button>
+                          </td>
+
+                          {/* Badge rôle */}
+                          <td className="px-6 py-4">
+                            {u.isAdmin ? (
+                              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-yellow-500 to-orange-500 text-black">
+                                <Shield size={10} />Admin
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-gray-300">
+                                <User size={10} />Membre
+                              </span>
+                            )}
+                          </td>
+
+                          {/* Actions */}
+                          <td className="px-6 py-4">
+                            <div className="flex items-center justify-end gap-1">
+                              {/* Retirer la photo de profil si présente */}
+                              {u.avatarUrl && (
+                                confirmRemoveAvatar === u.id ? (
+                                  <div className="flex items-center gap-1 mr-1">
+                                    <button
+                                      onClick={() => handleRemoveAvatar(u)}
+                                      disabled={busyId === u.id}
+                                      className="px-2 py-1 text-xs rounded-lg bg-orange-500/20 text-orange-400 hover:bg-orange-500/40 transition-colors disabled:opacity-40"
+                                    >
+                                      Retirer photo
+                                    </button>
+                                    <button
+                                      onClick={() => setConfirmRemoveAvatar(null)}
+                                      className="px-2 py-1 text-xs rounded-lg bg-white/5 text-gray-400 hover:bg-white/10 transition-colors"
+                                    >
+                                      ✕
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => setConfirmRemoveAvatar(u.id)}
+                                    title="Retirer la photo de profil de cet utilisateur"
+                                    className="p-2 rounded-lg hover:bg-orange-500/10 transition-colors text-gray-400 hover:text-orange-400"
+                                  >
+                                    <ImageOff size={16} />
+                                  </button>
+                                )
+                              )}
+
+                              {/* Toggle admin — désactivé pour soi-même */}
+                              {u.id !== user?.id && (
                                 <button
-                                  onClick={() => deleteUser(u)}
+                                  onClick={() => toggleAdmin(u)}
                                   disabled={busyId === u.id}
-                                  className="px-2 py-1 text-xs rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/40 transition-colors disabled:opacity-40"
+                                  title={u.isAdmin ? 'Retirer le rôle admin' : 'Promouvoir admin'}
+                                  className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400 hover:text-white disabled:opacity-40"
                                 >
-                                  Confirmer
+                                  {busyId === u.id
+                                    ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                    : u.isAdmin ? <ShieldOff size={16} /> : <ShieldCheck size={16} />
+                                  }
                                 </button>
+                              )}
+
+                              {/* Supprimer — désactivé pour soi-même */}
+                              {u.id !== user?.id && (
+                                confirmDelete === u.id ? (
+                                  <div className="flex items-center gap-1 ml-1">
+                                    <button
+                                      onClick={() => deleteUser(u)}
+                                      disabled={busyId === u.id}
+                                      className="px-2 py-1 text-xs rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/40 transition-colors disabled:opacity-40"
+                                    >
+                                      Confirmer
+                                    </button>
+                                    <button
+                                      onClick={() => setConfirmDelete(null)}
+                                      className="px-2 py-1 text-xs rounded-lg bg-white/5 text-gray-400 hover:bg-white/10 transition-colors"
+                                    >
+                                      Annuler
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => setConfirmDelete(u.id)}
+                                    title="Supprimer le compte"
+                                    className="p-2 rounded-lg hover:bg-red-500/10 transition-colors text-gray-500 hover:text-red-400"
+                                  >
+                                    <Trash2 size={16} />
+                                  </button>
+                                )
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+
+                        {/* Rangée déroulante des réseaux sociaux en dessous */}
+                        {isExpanded && (
+                          <tr className="bg-purple-950/20 border-b border-purple-500/20">
+                            <td colSpan={7} className="px-6 py-3.5">
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-black/40 border border-purple-500/20 rounded-xl p-3.5">
+                                <div className="flex flex-wrap items-center gap-2.5">
+                                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide mr-1 flex items-center gap-1.5">
+                                    <Share2 size={12} className="text-purple-400" />
+                                    Réseaux de {u.username} :
+                                  </span>
+
+                                  {socialCount === 0 ? (
+                                    <span className="text-xs text-gray-500 italic">
+                                      Aucun réseau social enregistré pour cet utilisateur.
+                                    </span>
+                                  ) : (
+                                    <>
+                                      {/* Discord */}
+                                      {u.discord && (
+                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#5865F2]/15 border border-[#5865F2]/30 text-xs">
+                                          <span className="text-[#5865F2] flex items-center">
+                                            <DiscordIcon className="w-3.5 h-3.5" />
+                                          </span>
+                                          <span className="text-gray-200 font-mono font-medium">{u.discord}</span>
+                                          <button
+                                            type="button"
+                                            onClick={() => handleRemoveSocial(u, 'discord')}
+                                            disabled={removingSocialKey === `${u.id}-discord`}
+                                            title="Retirer ce compte Discord"
+                                            className="ml-1 p-1 rounded hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors disabled:opacity-40"
+                                          >
+                                            {removingSocialKey === `${u.id}-discord` ? (
+                                              <Loader2 size={12} className="animate-spin text-red-400" />
+                                            ) : (
+                                              <Trash2 size={12} />
+                                            )}
+                                          </button>
+                                        </div>
+                                      )}
+
+                                      {/* Twitch */}
+                                      {u.twitch && (
+                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#9146FF]/15 border border-[#9146FF]/30 text-xs">
+                                          <a
+                                            href={formatSocialUrl('twitch', u.twitch)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1.5 text-purple-300 hover:text-white transition-colors"
+                                          >
+                                            <span className="text-[#9146FF] flex items-center">
+                                              <TwitchIcon className="w-3.5 h-3.5" />
+                                            </span>
+                                            <span className="font-medium">{formatSocialDisplay('twitch', u.twitch)}</span>
+                                            <ExternalLink size={10} className="text-gray-400" />
+                                          </a>
+                                          <button
+                                            type="button"
+                                            onClick={() => handleRemoveSocial(u, 'twitch')}
+                                            disabled={removingSocialKey === `${u.id}-twitch`}
+                                            title="Retirer ce compte Twitch"
+                                            className="ml-1 p-1 rounded hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors disabled:opacity-40"
+                                          >
+                                            {removingSocialKey === `${u.id}-twitch` ? (
+                                              <Loader2 size={12} className="animate-spin text-red-400" />
+                                            ) : (
+                                              <Trash2 size={12} />
+                                            )}
+                                          </button>
+                                        </div>
+                                      )}
+
+                                      {/* YouTube */}
+                                      {u.youtube && (
+                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#FF0000]/15 border border-[#FF0000]/30 text-xs">
+                                          <a
+                                            href={formatSocialUrl('youtube', u.youtube)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1.5 text-red-300 hover:text-white transition-colors"
+                                          >
+                                            <span className="text-[#FF0000] flex items-center">
+                                              <YoutubeIcon className="w-3.5 h-3.5" />
+                                            </span>
+                                            <span className="font-medium">{formatSocialDisplay('youtube', u.youtube)}</span>
+                                            <ExternalLink size={10} className="text-gray-400" />
+                                          </a>
+                                          <button
+                                            type="button"
+                                            onClick={() => handleRemoveSocial(u, 'youtube')}
+                                            disabled={removingSocialKey === `${u.id}-youtube`}
+                                            title="Retirer ce compte YouTube"
+                                            className="ml-1 p-1 rounded hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors disabled:opacity-40"
+                                          >
+                                            {removingSocialKey === `${u.id}-youtube` ? (
+                                              <Loader2 size={12} className="animate-spin text-red-400" />
+                                            ) : (
+                                              <Trash2 size={12} />
+                                            )}
+                                          </button>
+                                        </div>
+                                      )}
+
+                                      {/* TikTok */}
+                                      {u.tiktok && (
+                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#00f2fe]/15 border border-[#00f2fe]/30 text-xs">
+                                          <a
+                                            href={formatSocialUrl('tiktok', u.tiktok)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1.5 text-cyan-300 hover:text-white transition-colors"
+                                          >
+                                            <span className="text-cyan-400 flex items-center">
+                                              <TiktokIcon className="w-3.5 h-3.5" />
+                                            </span>
+                                            <span className="font-medium">{formatSocialDisplay('tiktok', u.tiktok)}</span>
+                                            <ExternalLink size={10} className="text-gray-400" />
+                                          </a>
+                                          <button
+                                            type="button"
+                                            onClick={() => handleRemoveSocial(u, 'tiktok')}
+                                            disabled={removingSocialKey === `${u.id}-tiktok`}
+                                            title="Retirer ce compte TikTok"
+                                            className="ml-1 p-1 rounded hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors disabled:opacity-40"
+                                          >
+                                            {removingSocialKey === `${u.id}-tiktok` ? (
+                                              <Loader2 size={12} className="animate-spin text-red-400" />
+                                            ) : (
+                                              <Trash2 size={12} />
+                                            )}
+                                          </button>
+                                        </div>
+                                      )}
+                                    </>
+                                  )}
+                                </div>
+
                                 <button
-                                  onClick={() => setConfirmDelete(null)}
-                                  className="px-2 py-1 text-xs rounded-lg bg-white/5 text-gray-400 hover:bg-white/10 transition-colors"
+                                  type="button"
+                                  onClick={() => toggleSocials(u.id)}
+                                  className="self-end sm:self-center text-xs text-gray-400 hover:text-gray-200 px-2 py-1 rounded bg-white/5 hover:bg-white/10 transition-colors"
                                 >
-                                  Annuler
+                                  Fermer
                                 </button>
                               </div>
-                            ) : (
-                              <button
-                                onClick={() => setConfirmDelete(u.id)}
-                                title="Supprimer le compte"
-                                className="p-2 rounded-lg hover:bg-red-500/10 transition-colors text-gray-500 hover:text-red-400"
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                            )
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                            </td>
+                          </tr>
+                        )}
+                      </Fragment>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -620,7 +883,7 @@ export default function AdminUsers() {
 
         {/* Légende */}
         <p className="text-xs text-gray-500 text-center mt-4">
-          Les données sont synchronisées en direct avec Supabase · Cliquer sur le crayon pour modifier un pseudo ou sur l&apos;icône photo pour retirer un avatar
+          Les données sont synchronisées en direct avec Supabase · Cliquer sur le bouton Réseaux pour voir et retirer les liens sociaux
         </p>
 
       </div>

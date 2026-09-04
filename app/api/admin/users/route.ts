@@ -154,7 +154,7 @@ export async function PATCH(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { userId, username, isAdmin, inCoaching } = body;
+    const { userId, username, isAdmin, inCoaching, discord, twitch, youtube, tiktok } = body;
 
     if (!userId) {
       return NextResponse.json({ error: 'userId manquant' }, { status: 400 });
@@ -181,22 +181,58 @@ export async function PATCH(req: NextRequest) {
       updates.in_coaching = Boolean(inCoaching);
     }
 
-    if (Object.keys(updates).length === 0) {
+    const hasSocialUpdates =
+      discord !== undefined || twitch !== undefined || youtube !== undefined || tiktok !== undefined;
+
+    if (Object.keys(updates).length === 0 && !hasSocialUpdates) {
       return NextResponse.json({ error: 'Aucune modification fournie' }, { status: 400 });
     }
 
-    // 1. Mettre à jour profiles avec service role
-    const { error: profError } = await supabaseAdmin
-      .from('profiles')
-      .update(updates)
-      .eq('id', userId);
+    // 1. Mettre à jour profiles avec service role pour les colonnes standard
+    if (Object.keys(updates).length > 0) {
+      const { error: profError } = await supabaseAdmin
+        .from('profiles')
+        .update(updates)
+        .eq('id', userId);
 
-    if (profError) {
-      console.error('Erreur update profiles:', profError);
-      return NextResponse.json({ error: profError.message }, { status: 500 });
+      if (profError) {
+        console.error('Erreur update profiles:', profError);
+        return NextResponse.json({ error: profError.message }, { status: 500 });
+      }
     }
 
-    // 2. Si le username est modifié, mettre à jour également user_metadata dans auth
+    // 2. Si des réseaux sont mis à jour ou retirés, mettre à jour user_metadata et tenter profiles
+    if (hasSocialUpdates) {
+      const { data: targetUser } = await supabaseAdmin.auth.admin.getUserById(userId);
+      const existingMeta = (targetUser?.user?.user_metadata || {}) as Record<string, unknown>;
+      const newMeta = { ...existingMeta };
+
+      if (discord !== undefined) newMeta.discord = discord ? String(discord).trim() : null;
+      if (twitch !== undefined) newMeta.twitch = twitch ? String(twitch).trim() : null;
+      if (youtube !== undefined) newMeta.youtube = youtube ? String(youtube).trim() : null;
+      if (tiktok !== undefined) newMeta.tiktok = tiktok ? String(tiktok).trim() : null;
+
+      await supabaseAdmin.auth.admin.updateUserById(userId, {
+        user_metadata: newMeta,
+      }).catch((err) => {
+        console.warn('Update user_metadata socials warning:', err);
+      });
+
+      // Mettre à jour profiles de façon sécurisée (sans bloquer si les colonnes physiques n'existent pas)
+      try {
+        const profSocialUpdates: Record<string, string | null> = {};
+        if (discord !== undefined) profSocialUpdates.discord = discord ? String(discord).trim() : null;
+        if (twitch !== undefined) profSocialUpdates.twitch = twitch ? String(twitch).trim() : null;
+        if (youtube !== undefined) profSocialUpdates.youtube = youtube ? String(youtube).trim() : null;
+        if (tiktok !== undefined) profSocialUpdates.tiktok = tiktok ? String(tiktok).trim() : null;
+
+        await supabaseAdmin.from('profiles').update(profSocialUpdates).eq('id', userId);
+      } catch {
+        // Optionnel : table profiles non migrée
+      }
+    }
+
+    // 3. Si le username est modifié, mettre à jour également user_metadata dans auth
     if (updates.username) {
       const { data: targetUser } = await supabaseAdmin.auth.admin.getUserById(userId);
       const existingMeta = targetUser?.user?.user_metadata || {};
