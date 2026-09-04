@@ -2,12 +2,13 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { User, Mail, Settings, LogOut, Shield, Clock, Award, Camera, Trash2, Edit2, Check, X, Loader2, MessageSquare, Quote, Film } from 'lucide-react';
+import { User, Mail, Settings, LogOut, Shield, Clock, Award, Camera, Trash2, Edit2, Check, X, Loader2, MessageSquare, Quote, Film, Calendar, Gamepad2, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { useState, useRef, useEffect } from 'react';
 import FavoriteGames from '@/components/FavoriteGames';
 import SocialLinks from '@/components/SocialLinks';
+import { CoachingBooking } from '@/components/booking/types';
 
 const MAGIC_BYTES: Record<string, number[]> = {
   'image/png': [0x89, 0x50, 0x4e, 0x47],
@@ -37,6 +38,8 @@ export default function Profile() {
   const [isEditingBio, setIsEditingBio] = useState(false);
   const [bioDraft, setBioDraft] = useState('');
   const [isSavingBio, setIsSavingBio] = useState(false);
+  const [studentBookings, setStudentBookings] = useState<CoachingBooking[]>([]);
+  const [bookingsLoading, setBookingsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -51,6 +54,39 @@ export default function Profile() {
       if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
     };
   }, []);
+
+  // Charger les réservations de l'élève
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+
+    const loadBookings = async () => {
+      setBookingsLoading(true);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) return;
+
+        const res = await fetch('/api/bookings/student', {
+          headers: { Authorization: `Bearer ${session.access_token}` },
+          cache: 'no-store',
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!cancelled) {
+          setStudentBookings(data.bookings || []);
+        }
+      } catch (err) {
+        console.error('Erreur chargement bookings profil:', err);
+      } finally {
+        if (!cancelled) setBookingsLoading(false);
+      }
+    };
+
+    loadBookings();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
 
   if (authLoading) {
     return (
@@ -450,6 +486,99 @@ const handleSaveUsername = async () => {
           </div>
         )}
 
+        {/* Active Coaching Bookings */}
+        <div className="mb-12">
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5">
+              <Calendar size={22} className="text-cyan-400" />
+              <span>Mes Séances de Coaching Réservées</span>
+            </h2>
+            <Link
+              href="/#booking"
+              className="text-xs sm:text-sm font-semibold text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1"
+            >
+              + Réserver une autre session
+            </Link>
+          </div>
+
+          {bookingsLoading ? (
+            <div className="card rounded-2xl p-8 text-center">
+              <Loader2 size={24} className="animate-spin text-purple-500 mx-auto mb-2" />
+              <p className="text-xs text-gray-400">Chargement de tes réservations...</p>
+            </div>
+          ) : studentBookings.length === 0 ? (
+            <div className="card rounded-2xl p-8 text-center border border-white/5">
+              <Clock size={36} className="mx-auto mb-3 text-gray-500" />
+              <p className="text-sm font-semibold text-white mb-1">Aucune session de coaching planifiée</p>
+              <p className="text-xs text-gray-400 mb-4 max-w-md mx-auto">
+                Choisis ton pack et sélectionne une date disponible pour démarrer ton entraînement personnalisé avec Poulpy.
+              </p>
+              <Link
+                href="/#booking"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-bold text-xs shadow-md hover:shadow-cyan-500/20 transition-all"
+              >
+                <span>Choisir un créneau disponible</span>
+                <Award size={14} />
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {studentBookings.map((b) => (
+                <div
+                  key={b.id}
+                  className="card rounded-2xl p-5 border border-purple-500/30 hover:border-purple-400/60 transition-all flex flex-col justify-between space-y-3"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300">
+                        {b.plan_name}
+                      </span>
+                      <span
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          b.status === 'rescheduled'
+                            ? 'bg-purple-500/20 text-purple-300'
+                            : 'bg-green-500/20 text-green-300'
+                        }`}
+                      >
+                        {b.status === 'rescheduled' ? 'Reportée' : 'Confirmée'}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-white font-extrabold text-base sm:text-lg">
+                      <Calendar size={18} className="text-cyan-400" />
+                      <span>
+                        {new Date(b.booking_date).toLocaleDateString('fr-FR', {
+                          weekday: 'short',
+                          day: 'numeric',
+                          month: 'short',
+                        })}{' '}
+                        à {b.booking_time}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      {b.plan_duration} • Jeu : <span className="text-amber-300 font-semibold">{b.game}</span>
+                    </p>
+                  </div>
+
+                  <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-2 text-xs">
+                    <span className="text-gray-400 text-[11px]">
+                      Discord : <strong className="text-white">{b.student_discord}</strong>
+                    </span>
+                    <a
+                      href="https://discord.gg/rJMg3ZZRkp"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1.5 rounded-lg glass hover:bg-white/10 text-cyan-300 font-medium text-[11px] transition-colors"
+                    >
+                      Rejoindre le vocal
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Stats / Upcoming sections */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           <Link
@@ -479,7 +608,11 @@ const handleSaveUsername = async () => {
               <Clock size={24} className="text-white" />
             </div>
             <h3 className="font-bold text-lg mb-2">Sessions à venir</h3>
-            <p className="text-gray-400 text-sm mb-4">Aucune session planifiée</p>
+            <p className="text-gray-400 text-sm mb-4">
+              {studentBookings.length > 0
+                ? `${studentBookings.length} session${studentBookings.length > 1 ? 's' : ''} planifiée${studentBookings.length > 1 ? 's' : ''}`
+                : 'Aucune session planifiée'}
+            </p>
             <Link
               href="/#booking"
               className="inline-flex items-center gap-1 text-purple-400 hover:text-purple-300 text-sm font-medium transition-colors"

@@ -1,6 +1,6 @@
 'use client';
 
-import { Shield, Users, DollarSign, BarChart2, Settings, LogOut, Mail, Award, MessageSquare, Zap } from 'lucide-react';
+import { Shield, Users, DollarSign, BarChart2, Settings, LogOut, Mail, Award, MessageSquare, Zap, Calendar } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 export default function AdminDashboard() {
   const { user, logout, isLoading: authLoading } = useAuth();
   const [userCount, setUserCount] = useState<number | null>(null);
+  const [bookingCount, setBookingCount] = useState<number | null>(null);
 
   useEffect(() => {
     if (!user?.isAdmin) return;
@@ -19,19 +20,31 @@ export default function AdminDashboard() {
         const token = session?.access_token;
         if (!token) return;
 
+        // Count users
         const res = await fetch('/api/admin/users', {
           headers: { Authorization: `Bearer ${token}` },
           cache: 'no-store',
           signal: controller.signal,
         });
-        if (controller.signal.aborted) return;
-        if (!res.ok) return;
-        const data = await res.json();
-        const nonAdminCount = (data.users || []).filter((u: { isAdmin: boolean }) => !u.isAdmin).length;
-        setUserCount(nonAdminCount);
+        if (!controller.signal.aborted && res.ok) {
+          const data = await res.json();
+          const nonAdminCount = (data.users || []).filter((u: { isAdmin: boolean }) => !u.isAdmin).length;
+          setUserCount(nonAdminCount);
+        }
+
+        // Count bookings
+        const bookingsRes = await fetch('/api/admin/bookings', {
+          headers: { Authorization: `Bearer ${token}` },
+          cache: 'no-store',
+          signal: controller.signal,
+        });
+        if (!controller.signal.aborted && bookingsRes.ok) {
+          const bData = await bookingsRes.json();
+          setBookingCount(bData.stats?.confirmedCount ?? 0);
+        }
       } catch (err) {
         if ((err as { name?: string })?.name === 'AbortError') return;
-        console.error('Erreur chargement count users:', err);
+        console.error('Erreur chargement admin stats:', err);
       }
     })();
     return () => controller.abort();
@@ -65,13 +78,14 @@ export default function AdminDashboard() {
 
   const stats = [
     { label: 'Utilisateurs', value: userCount === null ? '…' : String(userCount), icon: Users, gradient: 'from-purple-600 to-purple-400' },
-    { label: 'Sessions réservées', value: '0', icon: Award, gradient: 'from-cyan-600 to-cyan-400' },
+    { label: 'Sessions réservées', value: bookingCount === null ? '…' : String(bookingCount), icon: Calendar, gradient: 'from-cyan-600 to-cyan-400' },
     { label: 'Revenus', value: '0 €', icon: DollarSign, gradient: 'from-green-600 to-green-400' },
     { label: 'Taux conversion', value: '0 %', icon: BarChart2, gradient: 'from-yellow-600 to-yellow-400' },
   ];
 
   const quickActions = [
-    { label: 'Rangs', href: '/admin/students', icon: Zap, cls: 'border-orange-500/30 hover:bg-orange-500/10 text-orange-400' },
+    { label: 'Planning & Réservations', href: '/admin/bookings', icon: Calendar, cls: 'border-cyan-500/40 hover:bg-cyan-500/10 text-cyan-400' },
+    { label: 'Rangs élèves', href: '/admin/students', icon: Zap, cls: 'border-orange-500/30 hover:bg-orange-500/10 text-orange-400' },
     { label: 'Gérer utilisateurs', href: '/admin/users', icon: Users, cls: 'border-purple-500/30 hover:bg-purple-500/10 text-purple-400' },
     { label: 'Gérer coaching', href: '/admin/coaching', icon: MessageSquare, cls: 'border-green-500/30 hover:bg-green-500/10 text-green-400' },
     { label: 'Voir statistiques', href: '/admin/stats', icon: BarChart2, cls: 'border-cyan-500/30 hover:bg-cyan-500/10 text-cyan-400' },

@@ -105,7 +105,41 @@ export async function GET(req: NextRequest) {
       // vod_clips n'existe pas encore, ignorer silencieusement
     }
 
-    // ── 3. Récupérer les usernames des élèves concernés ─────────────────────
+    // ── 3. Réservations non lues par le coach ──────────────────────────────
+    let unreadBookings: Array<{
+      bookingId: string;
+      studentName: string;
+      planName: string;
+      bookingDate: string;
+      bookingTime: string;
+      game: string;
+      createdAt: string;
+    }> = [];
+
+    try {
+      const { data: bookings } = await supabase
+        .from('coaching_bookings')
+        .select('id, student_name, plan_name, booking_date, booking_time, game, created_at')
+        .eq('read_by_admin', false)
+        .neq('status', 'cancelled')
+        .order('created_at', { ascending: false });
+
+      if (bookings && bookings.length > 0) {
+        unreadBookings = bookings.map((b: { id: string; student_name: string; plan_name: string; booking_date: string; booking_time: string; game: string; created_at: string }) => ({
+          bookingId: b.id,
+          studentName: b.student_name,
+          planName: b.plan_name,
+          bookingDate: b.booking_date,
+          bookingTime: b.booking_time,
+          game: b.game,
+          createdAt: b.created_at,
+        }));
+      }
+    } catch {
+      // coaching_bookings n'existe pas encore
+    }
+
+    // ── 4. Récupérer les usernames des élèves concernés ─────────────────────
     const allStudentIds = new Set<string>([
       ...Array.from(msgByStudent.keys()),
       ...newClips.map(c => c.studentId),
@@ -122,7 +156,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // ── 4. Construire la réponse ─────────────────────────────────────────────
+    // ── 5. Construire la réponse ─────────────────────────────────────────────
     const unreadMessages = Array.from(msgByStudent.values()).map(entry => ({
       type: 'message' as const,
       studentId: entry.studentId,
@@ -143,14 +177,17 @@ export async function GET(req: NextRequest) {
 
     const totalUnread = unreadMessages.reduce((sum, m) => sum + m.count, 0);
     const totalClips = pendingClips.length;
-    const totalCount = totalUnread + totalClips;
+    const totalBookings = unreadBookings.length;
+    const totalCount = totalUnread + totalClips + totalBookings;
 
     return NextResponse.json({
       totalCount,
       totalUnread,
       totalClips,
+      totalBookings,
       unreadMessages,
       pendingClips,
+      unreadBookings,
     });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Erreur serveur';

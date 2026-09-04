@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, User, LogOut, ChevronDown, Settings, Shield, BarChart2, Bell, UserPlus } from 'lucide-react';
+import { Menu, X, User, LogOut, ChevronDown, Settings, Shield, BarChart2, Bell, UserPlus, Calendar } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -29,12 +29,24 @@ interface AdminPendingClip {
   submittedAt: string;
 }
 
+interface AdminUnreadBooking {
+  bookingId: string;
+  studentName: string;
+  planName: string;
+  bookingDate: string;
+  bookingTime: string;
+  game: string;
+  createdAt: string;
+}
+
 interface AdminSummary {
   totalCount: number;
   totalUnread: number;
   totalClips: number;
+  totalBookings?: number;
   unreadMessages: AdminUnreadMsg[];
   pendingClips: AdminPendingClip[];
+  unreadBookings?: AdminUnreadBooking[];
 }
 
 interface StudentSummary {
@@ -239,6 +251,35 @@ function AdminNotificationsBell() {
                           <p className="text-[10px] text-orange-400 mt-0.5">Clip en attente d&apos;analyse</p>
                         </div>
                         <span className="w-2 h-2 rounded-full bg-orange-500 shrink-0 mt-2" />
+                      </div>
+                    </Link>
+                  ))}
+
+                  {/* Nouvelles réservations en attente */}
+                  {(summary?.unreadBookings || []).map(item => (
+                    <Link
+                      key={`booking-${item.bookingId}`}
+                      href="/admin/bookings"
+                      onClick={() => setIsOpen(false)}
+                      className="block px-4 py-3 border-b border-white/5 hover:bg-white/5 transition-colors bg-purple-500/10"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                          📅
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-sm font-semibold text-white truncate">{item.studentName}</p>
+                            <span className="text-[10px] text-gray-400 shrink-0">
+                              {new Date(item.bookingDate).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' })}
+                            </span>
+                          </div>
+                          <p className="text-xs text-purple-300 mt-0.5 line-clamp-1">
+                            {item.planName} • {item.bookingTime} ({item.game})
+                          </p>
+                          <p className="text-[10px] text-cyan-400 mt-0.5 font-medium">Nouvelle réservation</p>
+                        </div>
+                        <span className="w-2 h-2 rounded-full bg-purple-400 shrink-0 mt-2" />
                       </div>
                     </Link>
                   ))}
@@ -633,6 +674,14 @@ export default function Navbar() {
                               Panneau Admin
                             </Link>
                             <Link
+                              href="/admin/bookings"
+                              className="flex items-center gap-3 px-4 py-3 text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition-colors"
+                              onClick={() => setIsProfileMenuOpen(false)}
+                            >
+                              <Calendar size={18} />
+                              Planning & Réservations
+                            </Link>
+                            <Link
                               href="/admin/stats"
                               className="flex items-center gap-3 px-4 py-3 text-cyan-400 hover:text-cyan-300 hover:bg-cyan-500/10 transition-colors"
                               onClick={() => setIsProfileMenuOpen(false)}
@@ -802,6 +851,14 @@ export default function Navbar() {
                       >
                         <Shield size={16} />
                         <span>Panneau Admin</span>
+                      </Link>
+                      <Link
+                        href="/admin/bookings"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-2.5 py-2.5 px-3.5 glass rounded-xl text-xs font-medium text-cyan-300"
+                      >
+                        <Calendar size={16} />
+                        <span>Planning & Réservations</span>
                       </Link>
                       <Link
                         href="/admin/stats"

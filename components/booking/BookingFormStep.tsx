@@ -1,14 +1,17 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ChevronLeft, Gamepad2, Mail, MessageSquare, Send, Sparkles, User as UserIcon } from 'lucide-react';
+import { ChevronLeft, Gamepad2, Mail, MessageSquare, Send, Sparkles, User as UserIcon, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/lib/supabase';
 import { BookingFormData, Plan } from './types';
+import { SelectedSlotDetails } from './BookingSlotsStep';
 
 interface BookingFormStepProps {
   plan: Plan;
   slotLabel: string;
+  selectedSlotDetails?: SelectedSlotDetails | null;
   onSubmit: (formData: BookingFormData) => void;
   onBack: () => void;
 }
@@ -27,6 +30,7 @@ const POPULAR_GAMES = [
 export default function BookingFormStep({
   plan,
   slotLabel,
+  selectedSlotDetails,
   onSubmit,
   onBack,
 }: BookingFormStepProps) {
@@ -41,6 +45,7 @@ export default function BookingFormStep({
   });
 
   const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -52,7 +57,7 @@ export default function BookingFormStep({
     }
   }, [user]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim()) {
       setError('Merci de renseigner ton pseudo ou nom.');
@@ -66,8 +71,50 @@ export default function BookingFormStep({
       setError('Ton pseudo Discord est obligatoire pour que Poulpy te contacte.');
       return;
     }
+
+    setIsSubmitting(true);
     setError(null);
-    onSubmit(formData);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+      };
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
+      const res = await fetch('/api/bookings/create', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          slotId: selectedSlotDetails?.slotId,
+          bookingDate: selectedSlotDetails?.bookingDate,
+          bookingTime: selectedSlotDetails?.bookingTime,
+          planId: plan.id,
+          planName: plan.name,
+          planPrice: plan.price,
+          planDuration: plan.duration,
+          studentName: formData.name,
+          studentEmail: formData.email,
+          studentDiscord: formData.discord,
+          game: formData.game,
+          notes: formData.notes,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Erreur lors de la réservation.');
+      }
+
+      onSubmit(formData);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erreur inattendue.';
+      setError(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -210,10 +257,20 @@ export default function BookingFormStep({
         <div className="pt-2">
           <button
             type="submit"
-            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-purple-600 via-cyan-500 to-blue-500 text-white font-bold text-sm sm:text-base shadow-lg hover:shadow-cyan-500/30 transition-all flex items-center justify-center gap-2"
+            disabled={isSubmitting}
+            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-purple-600 via-cyan-500 to-blue-500 text-white font-bold text-sm sm:text-base shadow-lg hover:shadow-cyan-500/30 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
           >
-            <Send size={18} />
-            <span>Valider ma réservation instantanée</span>
+            {isSubmitting ? (
+              <>
+                <Loader2 size={18} className="animate-spin" />
+                <span>Enregistrement de ta séance...</span>
+              </>
+            ) : (
+              <>
+                <Send size={18} />
+                <span>Valider ma réservation instantanée</span>
+              </>
+            )}
           </button>
         </div>
       </form>

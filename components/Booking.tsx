@@ -6,7 +6,7 @@ import { useState } from 'react';
 import BookingConfirmation from './booking/BookingConfirmation';
 import BookingFormStep from './booking/BookingFormStep';
 import BookingPlansStep from './booking/BookingPlansStep';
-import BookingSlotsStep from './booking/BookingSlotsStep';
+import BookingSlotsStep, { SelectedSlotDetails } from './booking/BookingSlotsStep';
 import { BookingFormData, Plan } from './booking/types';
 
 const PLANS: Plan[] = [
@@ -72,6 +72,7 @@ export default function Booking() {
   const [step, setStep] = useState(1);
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const [selectedSlotDetails, setSelectedSlotDetails] = useState<SelectedSlotDetails | null>(null);
   const [slotLabel, setSlotLabel] = useState<string>('');
   const [formData, setFormData] = useState<BookingFormData | null>(null);
 
@@ -82,9 +83,10 @@ export default function Booking() {
     setStep(2);
   };
 
-  const handleSelectSlot = (slotId: string, label: string) => {
-    setSelectedSlot(slotId);
-    setSlotLabel(label);
+  const handleSelectSlot = (details: SelectedSlotDetails) => {
+    setSelectedSlot(details.slotId || `${details.bookingDate}-${details.bookingTime}`);
+    setSlotLabel(details.slotLabel);
+    setSelectedSlotDetails(details);
     setStep(3);
   };
 
@@ -96,6 +98,7 @@ export default function Booking() {
   const handleReset = () => {
     setSelectedPlanId(null);
     setSelectedSlot(null);
+    setSelectedSlotDetails(null);
     setSlotLabel('');
     setFormData(null);
     setStep(1);
@@ -185,6 +188,7 @@ export default function Booking() {
           <BookingFormStep
             plan={selectedPlan}
             slotLabel={slotLabel}
+            selectedSlotDetails={selectedSlotDetails}
             onSubmit={handleFormSubmit}
             onBack={() => setStep(2)}
           />
