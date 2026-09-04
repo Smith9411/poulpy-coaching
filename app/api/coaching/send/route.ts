@@ -27,23 +27,30 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { studentId, message, messageType } = body;
+    const { studentId, message, messageType, attachmentUrl, attachmentType } = body;
 
-    if (!studentId || !message?.trim()) {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!studentId || typeof studentId !== 'string' || !uuidRegex.test(studentId)) {
+      return NextResponse.json({ error: 'studentId invalide ou manquant' }, { status: 400 });
+    }
+
+    let finalMessage = String(message || '').trim();
+
+    if (!finalMessage && !attachmentUrl) {
       return NextResponse.json(
-        { error: 'Champs obligatoires manquants (studentId, message)' },
+        { error: 'Veuillez écrire un message ou joindre un média / une note vocale' },
         { status: 400 }
       );
     }
 
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (typeof studentId !== 'string' || !uuidRegex.test(studentId)) {
-      return NextResponse.json({ error: 'studentId invalide' }, { status: 400 });
+    if (!finalMessage && attachmentUrl) {
+      if (attachmentType === 'audio') finalMessage = '🎙️ Note vocale';
+      else if (attachmentType === 'video') finalMessage = '🎬 Extrait vidéo';
+      else finalMessage = '📷 Photo / Capture';
     }
 
-    const trimmedMessage = String(message).trim();
-    if (trimmedMessage.length === 0 || trimmedMessage.length > 2000) {
-      return NextResponse.json({ error: 'Le message doit faire entre 1 et 2000 caractères' }, { status: 400 });
+    if (finalMessage.length > 2000) {
+      return NextResponse.json({ error: 'Le message doit faire moins de 2000 caractères' }, { status: 400 });
     }
 
     const allowedTypes = new Set(['progression', 'feedback', 'tip', 'student']);
@@ -73,20 +80,27 @@ export async function POST(req: NextRequest) {
 
     if (isSelf && isAdmin) {
       return NextResponse.json(
-        { error: 'Un admin ne peut pas se message lui-même en tant qu\'élève' },
+        { error: 'Un admin ne peut pas se messager lui-même en tant qu\'élève' },
         { status: 400 }
       );
     }
 
+    const insertData: Record<string, unknown> = {
+      student_id: studentId,
+      sender_id: user.id,
+      admin_id: isAdmin ? user.id : null,
+      message: finalMessage,
+      message_type: isAdmin ? (messageType || 'progression') : 'student',
+    };
+
+    if (attachmentUrl) {
+      insertData.attachment_url = attachmentUrl;
+      insertData.attachment_type = attachmentType || 'image';
+    }
+
     const { data, error } = await supabase
       .from('coaching_messages')
-      .insert([{
-        student_id: studentId,
-        sender_id: user.id,
-        admin_id: isAdmin ? user.id : null,
-        message: message.trim(),
-        message_type: isAdmin ? (messageType || 'progression') : 'student',
-      }])
+      .insert([insertData])
       .select()
       .single();
 
