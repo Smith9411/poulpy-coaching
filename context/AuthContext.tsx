@@ -27,6 +27,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, username: string, password: string) => Promise<{ needsEmailConfirmation: boolean }>;
   signInWithGoogle: () => Promise<void>;
+  signInWithDiscord: () => Promise<void>;
   logout: () => Promise<void>;
   updateAvatar: (avatarUrl: string | null) => Promise<void>;
   updateUsername: (newUsername: string) => Promise<void>;
@@ -196,6 +197,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // En cas de succès, le navigateur quitte la page vers Google : rien à faire ici.
   };
 
+  const signInWithDiscord = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'discord',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+        scopes: 'identify email',
+      },
+    });
+    if (error) {
+      if (/provider/i.test(error.message) && /not enabled|unsupported/i.test(error.message)) {
+        throw new Error(
+          "La connexion Discord n'est pas encore activée. Active-la dans le dashboard Supabase → Authentication → Providers → Discord."
+        );
+      }
+      throw new Error(error.message);
+    }
+    // En cas de succès, le navigateur est redirigé vers Discord.
+  };
+
   const logout = async () => {
     await supabase.auth.signOut();
   };
@@ -276,6 +296,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         login,
         register,
         signInWithGoogle,
+        signInWithDiscord,
         logout,
         updateAvatar,
         updateUsername,

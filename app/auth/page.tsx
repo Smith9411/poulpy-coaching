@@ -18,8 +18,20 @@ function GoogleLogo() {
   );
 }
 
+// Logo Discord officiel (brand guidelines)
+function DiscordLogo() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 127.14 96.36" aria-hidden="true">
+      <path
+        fill="#fff"
+        d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.89,105.89,0,0,0,19.39,8.09C2.79,32.65-1.71,56.6.54,80.21h0A105.73,105.73,0,0,0,32.71,96.36,77.7,77.7,0,0,0,39.6,85.25a68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1A105.25,105.25,0,0,0,126.6,80.22h0C129.24,52.84,122.09,29.11,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53s5-12.74,11.43-12.74S54,46,53.89,53,48.84,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.25,60,73.25,53s5-12.74,11.44-12.74S96.23,46,96.12,53,91.08,65.69,84.69,65.69Z"
+      />
+    </svg>
+  );
+}
+
 export default function Auth() {
-  const { login, register, signInWithGoogle } = useAuth();
+  const { login, register, signInWithGoogle, signInWithDiscord } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -29,6 +41,7 @@ export default function Auth() {
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isDiscordLoading, setIsDiscordLoading] = useState(false);
 
   const handleGoogleSignIn = async () => {
     setError('');
@@ -40,6 +53,19 @@ export default function Auth() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue');
       setIsGoogleLoading(false);
+    }
+  };
+
+  const handleDiscordSignIn = async () => {
+    setError('');
+    setSuccess('');
+    setIsDiscordLoading(true);
+    try {
+      await signInWithDiscord();
+      // En cas de succès, le navigateur quitte la page vers Discord.
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+      setIsDiscordLoading(false);
     }
   };
 
@@ -133,31 +159,58 @@ export default function Auth() {
               </motion.div>
             )}
 
-            {/* Connexion Google */}
-            <motion.button
-              type="button"
-              onClick={handleGoogleSignIn}
-              disabled={isLoading || isGoogleLoading}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="w-full py-3.5 rounded-xl bg-white text-[#1f1f1f] font-semibold flex items-center justify-center gap-3 border border-white/10 hover:bg-gray-100 hover:shadow-lg hover:shadow-black/20 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-            >
-              {isGoogleLoading ? (
-                <>
-                  <svg className="animate-spin h-5 w-5 text-[#1f1f1f]" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Redirection vers Google...
-                </>
-              ) : (
-                <>
-                  <GoogleLogo />
-                  Continuer avec Google
-                </>
-              )}
-            </motion.button>
+            {/* Boutons OAuth : Google + Discord */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <motion.button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={isLoading || isGoogleLoading || isDiscordLoading}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="flex-1 py-3.5 rounded-xl bg-white text-[#1f1f1f] font-semibold flex items-center justify-center gap-2.5 border border-white/10 hover:bg-gray-100 hover:shadow-lg hover:shadow-black/20 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              >
+                {isGoogleLoading ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5 text-[#1f1f1f]" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    <span className="text-sm">Connexion...</span>
+                  </>
+                ) : (
+                  <>
+                    <GoogleLogo />
+                    <span className="text-sm">Google</span>
+                  </>
+                )}
+              </motion.button>
+
+              <motion.button
+                type="button"
+                onClick={handleDiscordSignIn}
+                disabled={isLoading || isGoogleLoading || isDiscordLoading}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.35 }}
+                className="flex-1 py-3.5 rounded-xl bg-[#5865F2] text-white font-semibold flex items-center justify-center gap-2.5 border border-[#5865F2]/60 hover:bg-[#4752c4] hover:shadow-lg hover:shadow-[#5865F2]/30 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              >
+                {isDiscordLoading ? (
+                  <>
+                    <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    <span className="text-sm">Connexion...</span>
+                  </>
+                ) : (
+                  <>
+                    <DiscordLogo />
+                    <span className="text-sm">Discord</span>
+                  </>
+                )}
+              </motion.button>
+            </div>
 
             {/* Séparateur */}
             <motion.div
