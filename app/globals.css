@@ -33,16 +33,15 @@
   }
 
   .glass {
-    @apply bg-white/5 backdrop-blur-md border border-white/10;
-    /* Accélération GPU légère sans saturation de la VRAM */
-    transform: translateZ(0);
-    -webkit-backdrop-filter: blur(12px);
+    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+    /* Couche graphique stable : évite le flash du backdrop-blur quand
+       framer-motion anime l'élément (ajout/retrait de will-change). */
+    will-change: transform, opacity;
   }
 
   .glass-dark {
-    @apply bg-black/40 backdrop-blur-md border border-white/5;
-    transform: translateZ(0);
-    -webkit-backdrop-filter: blur(12px);
+    @apply bg-black/40 backdrop-blur-xl border border-white/5;
+    will-change: transform, opacity;
   }
 
   /* Fond de page adaptatif (dark par défaut, clair en mode light) */
@@ -54,9 +53,7 @@
   .card {
     background-color: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.09);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    transform: translateZ(0);
+    backdrop-filter: blur(16px);
   }
 
   /* Couleur de bordure qui suit le fond de page (badge avatar) */
@@ -64,30 +61,17 @@
     border-color: #13161e;
   }
 
-  /* Navbar scrollée — fond flouté adaptatif et optimisé */
+  /* Navbar scrollée — fond flouté adaptatif */
   .nav-scrolled {
-    background-color: rgba(0, 0, 0, 0.60);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.07), 0 8px 24px rgba(0,0,0,0.35);
+    background-color: rgba(0, 0, 0, 0.50);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.07), 0 8px 32px rgba(0,0,0,0.4);
   }
 }
 
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
-}
-
-/* Respect des préférences d'animation réduites (économie d'énergie / accessibilité) */
-@media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
 }
 
 /* Custom scrollbar */
