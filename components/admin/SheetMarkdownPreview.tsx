@@ -22,11 +22,16 @@ export default function SheetMarkdownPreview({ content, className = '' }: SheetM
 
   // Helper pour parser le texte en ligne (gras, italique, code, liens, images)
   const renderInline = (text: string): React.ReactNode => {
+    if (!text) return null;
     const tokens: React.ReactNode[] = [];
     let remaining = text;
     let keyIdx = 0;
+    let safetyCounter = 0;
 
-    while (remaining.length > 0) {
+    while (remaining.length > 0 && safetyCounter < 1500) {
+      safetyCounter++;
+      const prevLen = remaining.length;
+
       // Image: ![alt](url)
       const imgMatch = remaining.match(/^!\[([^\]]*)\]\(([^)]+)\)/);
       if (imgMatch) {
@@ -124,6 +129,12 @@ export default function SheetMarkdownPreview({ content, className = '' }: SheetM
         tokens.push(remaining.slice(0, nextSpecial));
         remaining = remaining.slice(nextSpecial);
       }
+
+      // Garantie absolue contre toute boucle infinie
+      if (remaining.length >= prevLen) {
+        tokens.push(remaining[0]);
+        remaining = remaining.slice(1);
+      }
     }
 
     return tokens;
@@ -131,15 +142,14 @@ export default function SheetMarkdownPreview({ content, className = '' }: SheetM
 
   const lines = content.split('\n');
   const blocks: React.ReactNode[] = [];
-  let i = 0;
 
-  while (i < lines.length) {
+  // Boucle principale FOR 100% sécurisée
+  for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     const trimmed = line.trim();
 
     // 1. Ligne vide
     if (!trimmed) {
-      i++;
       continue;
     }
 
@@ -148,19 +158,18 @@ export default function SheetMarkdownPreview({ content, className = '' }: SheetM
       blocks.push(
         <hr key={`hr-${i}`} className="my-6 border-white/10" />
       );
-      i++;
       continue;
     }
 
-    // 3. Bloc de code
+    // 3. Bloc de code (```)
     if (trimmed.startsWith('```')) {
       const codeLines: string[] = [];
-      i++;
-      while (i < lines.length && !lines[i].trim().startsWith('```')) {
-        codeLines.push(lines[i]);
-        i++;
+      let nextIdx = i + 1;
+      while (nextIdx < lines.length && !lines[nextIdx].trim().startsWith('```')) {
+        codeLines.push(lines[nextIdx]);
+        nextIdx++;
       }
-      i++;
+      i = nextIdx; // saute après le bloc fermant
       blocks.push(
         <pre key={`codeblock-${i}`} className="p-4 rounded-xl bg-black/50 border border-white/10 overflow-x-auto text-sm text-cyan-300 font-mono my-4">
           <code>{codeLines.join('\n')}</code>
@@ -178,15 +187,15 @@ export default function SheetMarkdownPreview({ content, className = '' }: SheetM
         if (level === 1) {
           blocks.push(
             <h1 key={`h1-${i}`} className="text-2xl sm:text-3xl font-black text-white mt-6 mb-3 pb-2 border-b border-purple-500/30 flex items-center gap-2">
-              <span className="w-2 h-6 bg-gradient-to-b from-purple-500 to-cyan-500 rounded-full inline-block" />
-              {renderInline(titleText)}
+              <span className="w-2 h-6 bg-gradient-to-b from-purple-500 to-cyan-500 rounded-full inline-block flex-shrink-0" />
+              <span>{renderInline(titleText)}</span>
             </h1>
           );
         } else if (level === 2) {
           blocks.push(
             <h2 key={`h2-${i}`} className="text-xl sm:text-2xl font-bold text-white mt-5 mb-2 flex items-center gap-2">
-              <span className="w-1.5 h-4 bg-purple-400 rounded-full inline-block" />
-              {renderInline(titleText)}
+              <span className="w-1.5 h-4 bg-purple-400 rounded-full inline-block flex-shrink-0" />
+              <span>{renderInline(titleText)}</span>
             </h2>
           );
         } else if (level === 3) {
@@ -202,7 +211,6 @@ export default function SheetMarkdownPreview({ content, className = '' }: SheetM
             </h4>
           );
         }
-        i++;
         continue;
       }
     }
@@ -210,10 +218,12 @@ export default function SheetMarkdownPreview({ content, className = '' }: SheetM
     // 5. Citations / Callouts (> Texte)
     if (trimmed.startsWith('>')) {
       const quoteLines: string[] = [];
-      while (i < lines.length && lines[i].trim().startsWith('>')) {
-        quoteLines.push(lines[i].trim().replace(/^>\s?/, ''));
-        i++;
+      let nextIdx = i;
+      while (nextIdx < lines.length && lines[nextIdx].trim().startsWith('>')) {
+        quoteLines.push(lines[nextIdx].trim().replace(/^>\s?/, ''));
+        nextIdx++;
       }
+      i = nextIdx - 1;
       blocks.push(
         <blockquote
           key={`quote-${i}`}
@@ -232,10 +242,12 @@ export default function SheetMarkdownPreview({ content, className = '' }: SheetM
     // 6. Tableau Markdown (| Col 1 | Col 2 |)
     if (trimmed.startsWith('|') && trimmed.endsWith('|') && trimmed.includes('|')) {
       const tableLines: string[] = [];
-      while (i < lines.length && lines[i].trim().startsWith('|') && lines[i].trim().endsWith('|')) {
-        tableLines.push(lines[i].trim());
-        i++;
+      let nextIdx = i;
+      while (nextIdx < lines.length && lines[nextIdx].trim().startsWith('|') && lines[nextIdx].trim().endsWith('|')) {
+        tableLines.push(lines[nextIdx].trim());
+        nextIdx++;
       }
+      i = nextIdx - 1;
 
       if (tableLines.length >= 2) {
         const headerCells = tableLines[0]
@@ -282,18 +294,20 @@ export default function SheetMarkdownPreview({ content, className = '' }: SheetM
       }
     }
 
-    // 7. Checklists (- [ ] ou - [x])
-    if (/^[-*]\s+\[([ xX])\]\s+(.+)$/.test(trimmed)) {
+    // 7. Checklists (- [ ] ou - [x] ou * [ ])
+    if (/^[-*]\s*\[([ xX])\]/.test(trimmed)) {
       const checkItems: { checked: boolean; text: string }[] = [];
-      while (i < lines.length) {
-        const m = lines[i].trim().match(/^[-*]\s+\[([ xX])\]\s+(.+)$/);
+      let nextIdx = i;
+      while (nextIdx < lines.length) {
+        const m = lines[nextIdx].trim().match(/^[-*]\s*\[([ xX])\]\s*(.*)$/);
         if (!m) break;
         checkItems.push({
           checked: m[1].toLowerCase() === 'x',
           text: m[2],
         });
-        i++;
+        nextIdx++;
       }
+      i = nextIdx - 1;
 
       blocks.push(
         <div key={`checklist-${i}`} className="my-3 space-y-2">
@@ -314,15 +328,19 @@ export default function SheetMarkdownPreview({ content, className = '' }: SheetM
       continue;
     }
 
-    // 8. Listes à puces simples (- ou *)
-    if (/^[-*]\s+(.+)$/.test(trimmed)) {
+    // 8. Listes à puces simples (- ou *) NON checklists
+    if (/^[-*]\s+/.test(trimmed) && !/^[-*]\s*\[([ xX])\]/.test(trimmed)) {
       const listItems: string[] = [];
-      while (i < lines.length) {
-        const m = lines[i].trim().match(/^[-*]\s+(.+)$/);
-        if (!m || /^[-*]\s+\[([ xX])\]/.test(lines[i].trim())) break;
+      let nextIdx = i;
+      while (nextIdx < lines.length) {
+        const lTrim = lines[nextIdx].trim();
+        if (/^[-*]\s*\[([ xX])\]/.test(lTrim)) break;
+        const m = lTrim.match(/^[-*]\s+(.*)$/);
+        if (!m) break;
         listItems.push(m[1]);
-        i++;
+        nextIdx++;
       }
+      i = nextIdx - 1;
 
       blocks.push(
         <ul key={`ul-${i}`} className="my-3 pl-5 list-disc space-y-1.5 text-sm text-gray-300">
@@ -335,14 +353,16 @@ export default function SheetMarkdownPreview({ content, className = '' }: SheetM
     }
 
     // 9. Listes numérotées (1. 2.)
-    if (/^\d+\.\s+(.+)$/.test(trimmed)) {
+    if (/^\d+\.\s+/.test(trimmed)) {
       const numItems: string[] = [];
-      while (i < lines.length) {
-        const m = lines[i].trim().match(/^\d+\.\s+(.+)$/);
+      let nextIdx = i;
+      while (nextIdx < lines.length) {
+        const m = lines[nextIdx].trim().match(/^\d+\.\s+(.*)$/);
         if (!m) break;
         numItems.push(m[1]);
-        i++;
+        nextIdx++;
       }
+      i = nextIdx - 1;
 
       blocks.push(
         <ol key={`ol-${i}`} className="my-3 pl-5 list-decimal space-y-1.5 text-sm text-gray-300">
@@ -380,7 +400,6 @@ export default function SheetMarkdownPreview({ content, className = '' }: SheetM
           )}
         </div>
       );
-      i++;
       continue;
     }
 
@@ -390,7 +409,6 @@ export default function SheetMarkdownPreview({ content, className = '' }: SheetM
         {renderInline(line)}
       </p>
     );
-    i++;
   }
 
   return (

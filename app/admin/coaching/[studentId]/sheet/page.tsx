@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useDeferredValue } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import {
@@ -45,6 +45,9 @@ export default function StudentSheetPage() {
   const [showTableMenu, setShowTableMenu] = useState(false);
   const [showTemplatesMenu, setShowTemplatesMenu] = useState(false);
   const [copiedSql, setCopiedSql] = useState(false);
+
+  // Deferred content pour ne jamais bloquer la saisie
+  const deferredContent = useDeferredValue(content);
 
   // Mode d'affichage: 'edit' | 'preview' | 'split'
   const [viewMode, setViewMode] = useState<'edit' | 'preview' | 'split'>('split');
@@ -166,16 +169,19 @@ export default function StudentSheetPage() {
   };
 
   // Raccourci clavier Ctrl+S / Cmd+S
+  const handleSaveRef = useRef(handleSave);
+  handleSaveRef.current = handleSave;
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
-        handleSave();
+        handleSaveRef.current();
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  });
+  }, []);
 
   // Insérer du texte à la position du curseur
   const insertText = (before: string, after: string = '', defaultPlaceholder: string = '') => {
@@ -856,7 +862,7 @@ USING (student_id = auth.uid());`;
                 <span className="text-[11px] text-gray-500">Rendu final & interactif</span>
               </div>
               <div className="flex-1 p-6 sm:p-8 overflow-y-auto print:overflow-visible print:p-0">
-                <SheetMarkdownPreview content={content} />
+                <SheetMarkdownPreview content={deferredContent} />
               </div>
             </div>
           )}
