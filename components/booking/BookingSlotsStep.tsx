@@ -85,10 +85,7 @@ export default function BookingSlotsStep({
       {/* Plan summary badge */}
       <div className="glass-dark rounded-2xl p-4 sm:p-5 flex items-center justify-between flex-wrap gap-4 border border-white/10">
         <div className="flex items-center gap-3.5">
-          <div
-            className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-white shadow-md"
-            style={{ background: plan.color }}
-          >
+          <div className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-white text-xs text-center shadow-md bg-gradient-to-br from-purple-600 to-cyan-500">
             {plan.duration}
           </div>
           <div>

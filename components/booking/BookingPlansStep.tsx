@@ -60,10 +60,7 @@ export default function BookingPlansStep({
 
             {/* Price */}
             <div className="mb-4 flex items-baseline">
-              <span
-                className="text-4xl sm:text-5xl font-extrabold bg-gradient-to-r text-transparent bg-clip-text"
-                style={{ background: plan.color }}
-              >
+              <span className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
                 {plan.price}
               </span>
               <span className="text-gray-400 ml-2 text-sm">/ {plan.duration}</span>
@@ -79,10 +76,7 @@ export default function BookingPlansStep({
             <ul className="space-y-2.5 mb-6 flex-1 text-xs sm:text-sm">
               {plan.features.map((feature) => (
                 <li key={feature} className="flex items-start gap-2.5">
-                  <div
-                    className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
-                    style={{ background: plan.color }}
-                  >
+                  <div className="w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 bg-gradient-to-r from-purple-500 to-cyan-500">
                     <CheckCircle2 size={11} className="text-white" />
                   </div>
                   <span className="text-gray-300 leading-snug">{feature}</span>

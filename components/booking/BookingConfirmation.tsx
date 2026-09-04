@@ -48,10 +48,7 @@ export default function BookingConfirmation({
         {/* Recap Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6 text-left">
           <div className="glass p-3.5 rounded-xl flex items-center gap-3 border border-white/10">
-            <div
-              className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-              style={{ background: plan.color }}
-            >
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-purple-600 to-cyan-500">
               <User size={18} className="text-white" />
             </div>
             <div className="min-w-0">
