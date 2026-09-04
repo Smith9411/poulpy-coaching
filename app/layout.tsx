@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { AuthProvider } from "@/context/AuthContext";
 import PwaRegister from "@/components/PwaRegister";
+import SplashScreen from "@/components/SplashScreen";
 
 export const metadata: Metadata = {
   title: "Poulpy — Gaming Coach | Valorant, Apex & Aim",
@@ -42,6 +43,7 @@ export default function RootLayout({
           }}
         />
         <AuthProvider>
+          <SplashScreen />
           <PwaRegister />
           <Navbar />
           {children}

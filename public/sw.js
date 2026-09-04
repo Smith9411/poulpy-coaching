@@ -20,15 +20,22 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Activation: clean up outdated caches
+// Activation: clean up outdated caches and broadcast update to clients
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
+      const hasOldCache = cacheNames.some((name) => name !== CACHE_NAME);
       return Promise.all(
         cacheNames
           .filter((name) => name !== CACHE_NAME)
           .map((name) => caches.delete(name))
-      );
+      ).then(() => {
+        if (hasOldCache) {
+          self.clients.matchAll({ type: 'window' }).then((clients) => {
+            clients.forEach((client) => client.postMessage({ type: 'SW_UPDATED' }));
+          });
+        }
+      });
     }).then(() => self.clients.claim())
   );
 });
