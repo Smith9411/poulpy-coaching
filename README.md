@@ -220,6 +220,12 @@ Fonctionnement côté app : après le retour Google, `/auth/callback` vérifie l
 > `YYYY-MM-DD : [brève description des changements]`
 > Le prochain intervenant lira ces lignes pour comprendre l'évolution.
 
+- 2026-09-04 (audit complet + correctifs) :
+  - **Sécurité** : magic bytes (PNG/JPEG/GIF/WEBP) vérifiés **côté serveur** dans `/api/avatar/upload` — bloque l'upload de fichiers malveillants renommés en .png
+  - **Sécurité** : `/admin/users` utilise maintenant `u.id !== user.id` au lieu de `u.username !== user.username` pour empêcher un user de se promouvoir admin / se supprimer (un attaquant peut créer un compte avec le même pseudo)
+  - **Perf** : `/api/admin/users` accepte `?userId=xxx` pour ne charger qu'un seul user (au lieu de tous les lister). Utilisé par `/admin/coaching/[studentId]`
+  - **Perf** : `useMemo` sur les filtres/tri de `/admin/users` et `/admin/coaching` (recalcul évité à chaque render)
+  - **Bug** : `setTimeout` du scrollIntoView dans `handleStartEdit` (avis) utilise maintenant un `useRef` + cleanup au unmount (évite le scroll fantôme si on quitte la page vite)
 - 2026-09-04 (édition et suppression de son propre avis) :
   - **Édition d'avis par le propriétaire** : un user peut modifier son propre avis pendant 5 minutes après publication. Bouton "Modifier" avec icône Edit3 apparaît automatiquement sur ses cartes
   - **Compte à rebours visuel** : badge `Modifiable 4:32` qui s'actualise toutes les 30s
