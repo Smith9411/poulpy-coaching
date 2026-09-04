@@ -14,6 +14,12 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import SheetMarkdownPreview, { TableData } from '@/components/admin/SheetMarkdownPreview';
 import VisualTableModal from '@/components/admin/VisualTableModal';
+import VisualSheetEditor, {
+  SheetBlock,
+  markdownToBlocks,
+  blocksToMarkdown,
+  createBlockId,
+} from '@/components/admin/VisualSheetEditor';
 
 interface StudentProfile {
   id: string;
@@ -51,11 +57,14 @@ export default function StudentSheetPage() {
   const [editingTableIndex, setEditingTableIndex] = useState<number | null>(null);
   const [tableModalData, setTableModalData] = useState<TableData | null>(null);
 
+  // Blocs de la fiche en mode visuel (style Notion)
+  const [blocks, setBlocks] = useState<SheetBlock[]>([]);
+
+  // Mode d'affichage: 'visual' (défaut) | 'preview' | 'raw'
+  const [viewMode, setViewMode] = useState<'visual' | 'preview' | 'raw'>('visual');
+
   // Deferred content pour ne jamais bloquer la saisie
   const deferredContent = useDeferredValue(content);
-
-  // Mode d'affichage: 'edit' | 'preview' | 'split'
-  const [viewMode, setViewMode] = useState<'edit' | 'preview' | 'split'>('split');
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -113,9 +122,14 @@ export default function StudentSheetPage() {
         setContent(c);
         setOriginalTitle(t);
         setOriginalContent(c);
+        setBlocks(markdownToBlocks(c));
         if (sheetData.sheet.updated_at) {
           setLastSavedAt(new Date(sheetData.sheet.updated_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }));
         }
+      } else {
+        const defaultBlocks = markdownToBlocks('');
+        setBlocks(defaultBlocks);
+        setContent(blocksToMarkdown(defaultBlocks));
       }
     } catch (err: unknown) {
       console.error('Erreur chargement fiche perso:', err);
@@ -300,17 +314,30 @@ export default function StudentSheetPage() {
     setIsTableModalOpen(true);
   };
 
+  // Mise à jour des blocs visuels avec synchronisation automatique vers le contenu Markdown
+  const handleBlocksChange = (newBlocks: SheetBlock[]) => {
+    setBlocks(newBlocks);
+    setContent(blocksToMarkdown(newBlocks));
+  };
+
   // Sauvegarder depuis le modal visuel (insertion nouveau tableau ou mise à jour)
   const handleSaveVisualTable = (markdownTable: string) => {
     if (editingTableIndex !== null) {
       const cleanTableLines = markdownTable.trim().split('\n');
-      setContent(prev =>
-        updateNthTable(prev, editingTableIndex, () => cleanTableLines)
-      );
+      const updated = updateNthTable(content, editingTableIndex, () => cleanTableLines);
+      setContent(updated);
+      setBlocks(markdownToBlocks(updated));
       setEditingTableIndex(null);
       setTableModalData(null);
     } else {
-      insertText('\n' + markdownTable.trim() + '\n');
+      const newTableBlocks = markdownToBlocks(markdownTable).filter(b => b.type === 'table');
+      if (newTableBlocks.length > 0) {
+        const nextBlocks = [...blocks, ...newTableBlocks];
+        setBlocks(nextBlocks);
+        setContent(blocksToMarkdown(nextBlocks));
+      } else {
+        insertText('\n' + markdownTable.trim() + '\n');
+      }
     }
     setIsTableModalOpen(false);
   };
@@ -341,7 +368,20 @@ export default function StudentSheetPage() {
       const data = await res.json();
       if (!data.url) throw new Error('URL de l\'image non retournée');
 
-      // Insérer le tag markdown de l'image
+      // Ajouter le bloc image dans les blocs visuels
+      const newImgBlock: SheetBlock = {
+        id: createBlockId(),
+        type: 'image',
+        url: data.url,
+        alt: `Capture - ${new Date().toLocaleDateString('fr-FR')}`,
+      };
+      setBlocks(prev => {
+        const next = [...prev, newImgBlock];
+        setContent(blocksToMarkdown(next));
+        return next;
+      });
+
+      // Insérer aussi le tag markdown si dans le textarea
       const imgTag = `\n![Capture - ${new Date().toLocaleDateString('fr-FR')}](${data.url})\n`;
       insertText(imgTag);
     } catch (err: unknown) {
@@ -378,8 +418,9 @@ export default function StudentSheetPage() {
 
     const studentName = student?.username || 'Élève';
 
+    let templateMd = '';
     if (type === 'complet') {
-      setContent(`# Fiche de Suivi Coaching : ${studentName}
+      templateMd = `# Fiche de Suivi Coaching : ${studentName}
 
 > 🎯 **Objectif Principal :** Atteindre le palier supérieur avec une constance mécanique et un mental clutch infaillible.
 
@@ -427,9 +468,9 @@ export default function StudentSheetPage() {
 - [x] Ajustement de la sensibilité validé
 - [ ] Routine quotidienne effectuée 5 jours consécutifs
 - [ ] Transmission d'un clip de clutch à analyser
-`);
+`;
     } else if (type === 'aim') {
-      setContent(`# Programme Aim Training & Mécaniques : ${studentName}
+      templateMd = `# Programme Aim Training & Mécaniques : ${studentName}
 
 > ⚡ **Focus :** Réactivité, micro-corrections et tracking fluide.
 
@@ -448,9 +489,9 @@ export default function StudentSheetPage() {
 3. **Respiration :** Ne pas bloquer sa respiration pendant les duels à haute intensité.
 
 > ⚠️ **Attention :** Si fatigue musculaire, stop immédiat. Privilégier la qualité à la quantité.
-`);
+`;
     } else if (type === 'vod') {
-      setContent(`# Synthèse VOD Review & Tactique : ${studentName}
+      templateMd = `# Synthèse VOD Review & Tactique : ${studentName}
 
 ## Matchs Analysés
 
@@ -465,7 +506,12 @@ export default function StudentSheetPage() {
 - [ ] Poser les fumigènes de manière anticipée sur les exécutions rapides.
 - [ ] Ne jamais reprendre une ligne ouverte après avoir révélé sa position.
 - [ ] Déposer 2 clips de situations perdues dans l'onglet Clips VOD.
-`);
+`;
+    }
+
+    if (templateMd) {
+      setContent(templateMd);
+      setBlocks(markdownToBlocks(templateMd));
     }
   };
 
@@ -852,83 +898,110 @@ USING (student_id = auth.uid());`;
           {/* Sélecteur de mode d'affichage */}
           <div className="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-white/10">
             <button
-              onClick={() => setViewMode('edit')}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
-                viewMode === 'edit' ? 'bg-purple-600 text-white' : 'text-gray-400 hover:text-white'
+              onClick={() => {
+                if (viewMode === 'raw') {
+                  setBlocks(markdownToBlocks(content));
+                }
+                setViewMode('visual');
+              }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                viewMode === 'visual'
+                  ? 'bg-gradient-to-r from-purple-600 to-cyan-500 text-white shadow-md'
+                  : 'text-gray-400 hover:text-white'
               }`}
             >
-              <Edit3 size={14} />
-              <span className="hidden sm:inline">Éditeur</span>
+              <Sparkles size={14} />
+              <span>Éditeur Visuel</span>
             </button>
             <button
-              onClick={() => setViewMode('split')}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
-                viewMode === 'split' ? 'bg-purple-600 text-white' : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              <Columns size={14} />
-              <span className="hidden sm:inline">Côte à côte</span>
-            </button>
-            <button
-              onClick={() => setViewMode('preview')}
-              className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
-                viewMode === 'preview' ? 'bg-purple-600 text-white' : 'text-gray-400 hover:text-white'
+              onClick={() => {
+                if (viewMode === 'visual') {
+                  setContent(blocksToMarkdown(blocks));
+                }
+                setViewMode('preview');
+              }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                viewMode === 'preview' ? 'bg-purple-600 text-white shadow-md' : 'text-gray-400 hover:text-white'
               }`}
             >
               <Eye size={14} />
-              <span className="hidden sm:inline">Aperçu</span>
+              <span>Aperçu Élève</span>
+            </button>
+            <button
+              onClick={() => {
+                if (viewMode === 'visual') {
+                  setContent(blocksToMarkdown(blocks));
+                }
+                setViewMode('raw');
+              }}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                viewMode === 'raw' ? 'bg-purple-600 text-white shadow-md' : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <Edit3 size={14} />
+              <span>Markdown</span>
             </button>
           </div>
         </div>
 
-        {/* Zone Principale Éditeur / Aperçu */}
-        <div className={`grid gap-6 ${viewMode === 'split' ? 'lg:grid-cols-2' : 'grid-cols-1'}`}>
-          {/* Colonne Éditeur */}
-          {(viewMode === 'edit' || viewMode === 'split') && (
-            <div className="flex flex-col h-[750px] rounded-2xl glass-dark border border-white/10 overflow-hidden shadow-2xl relative print:hidden">
-              <div className="px-4 py-2.5 bg-white/5 border-b border-white/10 flex items-center justify-between text-xs text-gray-400">
-                <span className="font-mono">ÉDITEUR MARKDOWN</span>
-                <span className="text-[11px] text-gray-500">
-                  Astuce : Tu peux coller (Ctrl+V) une capture d'écran directement ici !
-                </span>
-              </div>
-              <textarea
-                ref={textareaRef}
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                onPaste={handlePaste}
-                placeholder="Rédige ici les objectifs, consignes, routines d'aim et insère tes tableaux ou captures d'écran..."
-                className="flex-1 w-full p-5 bg-transparent text-gray-200 placeholder-gray-600 font-mono text-sm leading-relaxed resize-none focus:outline-none overflow-y-auto"
-                spellCheck={false}
-              />
-              {isUploadingImage && (
-                <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center gap-3 text-cyan-300 font-medium text-sm">
-                  <Loader2 size={24} className="animate-spin" />
-                  Téléversement de la capture d'écran...
-                </div>
-              )}
-            </div>
-          )}
+        {/* Zone Principale de Travail */}
+        {viewMode === 'visual' && (
+          <div className="glass-dark rounded-2xl p-4 sm:p-8 border border-white/10 shadow-2xl">
+            <VisualSheetEditor
+              blocks={blocks}
+              onChange={handleBlocksChange}
+              onUploadImage={uploadImageFile}
+              isUploadingImage={isUploadingImage}
+            />
+          </div>
+        )}
 
-          {/* Colonne Aperçu */}
-          {(viewMode === 'preview' || viewMode === 'split') && (
-            <div className="flex flex-col h-[750px] rounded-2xl glass-dark border border-white/10 overflow-hidden shadow-2xl bg-black/40 print:h-auto print:bg-transparent print:border-none print:shadow-none">
-              <div className="px-4 py-2.5 bg-white/5 border-b border-white/10 flex items-center justify-between text-xs text-gray-400 print:hidden">
-                <span className="font-mono text-purple-300 font-semibold">APERÇU FICHE ÉLÈVE</span>
-                <span className="text-[11px] text-gray-500">Rendu final & interactif</span>
-              </div>
-              <div className="flex-1 p-6 sm:p-8 overflow-y-auto print:overflow-visible print:p-0">
-                <SheetMarkdownPreview
-                  content={deferredContent}
-                  editable={true}
-                  onAddColumnToTable={handleAddColumnToTable}
-                  onAddRowToTable={handleAddRowToTable}
-                  onEditTable={handleOpenEditTable}
-                />
-              </div>
+        {viewMode === 'preview' && (
+          <div className="glass-dark rounded-2xl border border-white/10 overflow-hidden shadow-2xl bg-black/40">
+            <div className="px-4 py-2.5 bg-white/5 border-b border-white/10 flex items-center justify-between text-xs text-gray-400">
+              <span className="font-mono text-purple-300 font-semibold">APERÇU FICHE ÉLÈVE</span>
+              <span className="text-[11px] text-gray-500">Rendu final exact tel que l'élève le voit</span>
             </div>
-          )}
-        </div>
+            <div className="p-6 sm:p-10 overflow-y-auto">
+              <SheetMarkdownPreview
+                content={deferredContent}
+                editable={true}
+                onAddColumnToTable={handleAddColumnToTable}
+                onAddRowToTable={handleAddRowToTable}
+                onEditTable={handleOpenEditTable}
+              />
+            </div>
+          </div>
+        )}
+
+        {viewMode === 'raw' && (
+          <div className="flex flex-col h-[750px] rounded-2xl glass-dark border border-white/10 overflow-hidden shadow-2xl relative">
+            <div className="px-4 py-2.5 bg-white/5 border-b border-white/10 flex items-center justify-between text-xs text-gray-400">
+              <span className="font-mono">ÉDITEUR MARKDOWN BRUT</span>
+              <span className="text-[11px] text-gray-500">
+                Tu peux coller (Ctrl+V) une capture d'écran directement ici
+              </span>
+            </div>
+            <textarea
+              ref={textareaRef}
+              value={content}
+              onChange={(e) => {
+                setContent(e.target.value);
+                setBlocks(markdownToBlocks(e.target.value));
+              }}
+              onPaste={handlePaste}
+              placeholder="Rédige ici les objectifs, consignes, routines d'aim et insère tes tableaux..."
+              className="flex-1 w-full p-5 bg-transparent text-gray-200 placeholder-gray-600 font-mono text-sm leading-relaxed resize-none focus:outline-none overflow-y-auto"
+              spellCheck={false}
+            />
+            {isUploadingImage && (
+              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center gap-3 text-cyan-300 font-medium text-sm">
+                <Loader2 size={24} className="animate-spin" />
+                Téléversement de la capture d'écran...
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Modal d'édition visuelle de tableau */}
