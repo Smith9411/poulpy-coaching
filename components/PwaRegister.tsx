@@ -110,8 +110,8 @@ export default function PwaRegister() {
           className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:max-w-md z-50 animate-in fade-in slide-in-from-bottom-5 duration-300"
         >
           <div className="glass-dark border border-purple-500/40 rounded-2xl p-4 shadow-2xl backdrop-blur-xl flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center flex-shrink-0 shadow-md">
-              <Smartphone size={22} className="text-white" />
+            <div className="w-11 h-11 rounded-xl overflow-hidden flex-shrink-0 shadow-md border border-white/10">
+              <img src="/icons/icon-192x192.png" alt="Poulpy Coaching" className="w-full h-full object-cover" />
             </div>
 
             <div className="flex-1 min-w-0">
