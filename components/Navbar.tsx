@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Menu, X, User, LogOut, ChevronDown, Settings, Shield, BarChart2, Bell, UserPlus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
@@ -406,10 +407,25 @@ function StudentNotificationsBell({ href }: { href: string }) {
 
 export default function Navbar() {
   const { user, logout, isLoading } = useAuth();
+  const pathname = usePathname();
+  const isHomePage = pathname === '/';
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState<string>('coaching');
+  const [activeSection, setActiveSection] = useState<string>('');
+
+  // Ferme le menu mobile à chaque changement de route
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+    setIsProfileMenuOpen(false);
+  }, [pathname]);
+
+  // Réinitialise la section active quand on quitte la homepage
+  useEffect(() => {
+    if (!isHomePage) {
+      setActiveSection('');
+    }
+  }, [isHomePage]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -503,7 +519,11 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 lg:h-20">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-3 group shrink-0">
+            <Link
+              href="/"
+              onClick={() => { if (isHomePage) window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+              className="flex items-center gap-3 group shrink-0"
+            >
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
                 🐙
               </div>
