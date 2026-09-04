@@ -436,32 +436,40 @@ export default function Navbar() {
   }, []);
 
   // IntersectionObserver for active section highlight
+  // Dépend de isHomePage : se ré-attache chaque fois qu'on revient sur la homepage
+  // car les éléments DOM des sections sont recréés à chaque navigation.
   useEffect(() => {
+    if (!isHomePage) return;
+
     const sections = ['coaching', 'jeux', 'methode', 'progression', 'booking', 'tarifs', 'avis', 'apropos', 'faq'];
     const observers: IntersectionObserver[] = [];
 
-    sections.forEach((sectionId) => {
-      const element = document.getElementById(sectionId);
-      if (element) {
-        const observer = new IntersectionObserver(
-          (entries) => {
-            entries.forEach((entry) => {
-              if (entry.isIntersecting) {
-                setActiveSection(sectionId);
-              }
-            });
-          },
-          { rootMargin: '-20% 0px -60% 0px', threshold: 0 }
-        );
-        observer.observe(element);
-        observers.push(observer);
-      }
-    });
+    // Petit délai pour laisser Next.js finir le rendu des sections
+    const timeout = setTimeout(() => {
+      sections.forEach((sectionId) => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          const observer = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  setActiveSection(sectionId);
+                }
+              });
+            },
+            { rootMargin: '-20% 0px -60% 0px', threshold: 0 }
+          );
+          observer.observe(element);
+          observers.push(observer);
+        }
+      });
+    }, 50);
 
     return () => {
+      clearTimeout(timeout);
       observers.forEach((obs) => obs.disconnect());
     };
-  }, []);
+  }, [isHomePage]);
 
   // Close profile menu on outside click
   useEffect(() => {
