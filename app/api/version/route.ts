@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server';
 
-// Version identifier: Vercel commit SHA or deploy timestamp generated when this build starts
+// Version identifier généré à chaque build :
+// - Sur Vercel : commit SHA (VERCEL_GIT_COMMIT_SHA)
+// - Sinon : timestamp injecté dans next.config.ts (NEXT_PUBLIC_BUILD_TIME)
+// → change à chaque déploiement → détection fiable des mises à jour côté client
 const BUILD_VERSION =
   process.env.VERCEL_GIT_COMMIT_SHA ||
   process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA ||
-  process.env.NEXT_BUILD_ID ||
-  '2026-09-04-v4';
+  process.env.NEXT_PUBLIC_BUILD_TIME ||
+  'local-dev';
 
 export const dynamic = 'force-dynamic';
 

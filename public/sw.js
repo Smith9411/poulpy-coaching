@@ -117,11 +117,19 @@ self.addEventListener('push', (event) => {
   );
 });
 
-// Notification click: focus or open client window
+// Notification click: focus or open client window + clear badge
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
   const targetUrl = event.notification.data?.url || '/coaching';
+
+  // Efface la pastille rouge de l'icône de l'app
+  if ('clearAppBadge' in self.registration) {
+    self.registration.clearAppBadge?.().catch(() => {});
+  }
+  if ('clearAppBadge' in navigator) {
+    navigator.clearAppBadge?.().catch(() => {});
+  }
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {

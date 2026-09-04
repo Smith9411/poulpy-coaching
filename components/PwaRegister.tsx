@@ -3,7 +3,7 @@
 import { Bell, Check, Download, Smartphone, Sparkles, X } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { notifyAdminSiteUpdate, requestNotificationPermission, sendNotification } from '@/lib/notifications';
+import { notifyAdminSiteUpdate, requestNotificationPermission, sendNotification, clearAppBadge } from '@/lib/notifications';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -94,8 +94,15 @@ export default function PwaRegister() {
         checkForSiteUpdate();
       }
 
-      // Re-vérifier lors du retour sur l'onglet
-      window.addEventListener('focus', checkForSiteUpdate);
+      // Re-vérifier lors du retour sur l'onglet + effacer la pastille rouge
+      const handleFocus = () => {
+        checkForSiteUpdate();
+        // L'utilisateur a ouvert l'app → on efface la pastille rouge
+        clearAppBadge();
+      };
+      window.addEventListener('focus', handleFocus);
+      // Effacer aussi immédiatement au montage si l'app est déjà en focus
+      clearAppBadge();
 
       // Vérification périodique toutes les 60 secondes pour les admins connectés
       const intervalId = setInterval(() => {
@@ -106,7 +113,7 @@ export default function PwaRegister() {
 
       return () => {
         navigator.serviceWorker.removeEventListener('message', handleSwMessage);
-        window.removeEventListener('focus', checkForSiteUpdate);
+        window.removeEventListener('focus', handleFocus);
         clearInterval(intervalId);
       };
     }

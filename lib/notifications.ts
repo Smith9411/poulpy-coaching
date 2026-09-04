@@ -29,8 +29,39 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
 }
 
 /**
+ * Affiche une pastille rouge (badge) sur l'icône de l'app mobile (PWA).
+ * Utilise l'API Badging supportée sur Chrome Android et Edge.
+ */
+export async function setAppBadge(count: number = 1): Promise<void> {
+  if (typeof navigator === 'undefined') return;
+  try {
+    if ('setAppBadge' in navigator) {
+      await (navigator as Navigator & { setAppBadge: (n?: number) => Promise<void> }).setAppBadge(count);
+    }
+  } catch {
+    // Silencieux — API non supportée sur cet appareil
+  }
+}
+
+/**
+ * Efface la pastille rouge de l'icône de l'app mobile.
+ * Appelé quand l'utilisateur ouvre l'app ou voit les notifications.
+ */
+export async function clearAppBadge(): Promise<void> {
+  if (typeof navigator === 'undefined') return;
+  try {
+    if ('clearAppBadge' in navigator) {
+      await (navigator as Navigator & { clearAppBadge: () => Promise<void> }).clearAppBadge();
+    }
+  } catch {
+    // Silencieux
+  }
+}
+
+/**
  * Envoie une notification via le Service Worker (ou fallback Notification native)
  * Supporte le paramètre 'tag' pour remplacer automatiquement les notifications existantes.
+ * Active automatiquement la pastille rouge sur l'icône de l'app.
  */
 export async function sendNotification(payload: NotificationPayload): Promise<boolean> {
   if (typeof window === 'undefined' || !('Notification' in window)) {
@@ -56,6 +87,8 @@ export async function sendNotification(payload: NotificationPayload): Promise<bo
         data: { url: payload.url || '/' },
       };
       await reg.showNotification(payload.title, options as NotificationOptions);
+      // Allume la pastille rouge sur l'icône de l'app
+      await setAppBadge(1);
       return true;
     }
   } catch (err) {
@@ -71,6 +104,7 @@ export async function sendNotification(payload: NotificationPayload): Promise<bo
       tag: payload.tag,
       data: { url: payload.url || '/' },
     });
+    await setAppBadge(1);
     return true;
   } catch (err) {
     console.warn('[Notification] Native Notification constructor failed:', err);
@@ -93,6 +127,7 @@ export async function notifyAdminSiteUpdate(updateDetails?: string): Promise<boo
     url: '/',
   });
 }
+
 
 // -------------------------------------------------------------
 // Préréglages pour les notifications futures
