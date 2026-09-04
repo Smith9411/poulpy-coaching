@@ -62,7 +62,8 @@ export default function StudentCoachingPage() {
       const token = session?.access_token;
       if (!token) throw new Error('Non authentifié');
 
-      const res = await fetch('/api/admin/users', {
+      // Charge uniquement ce user (et pas tous les users) pour scaler correctement
+      const res = await fetch(`/api/admin/users?userId=${encodeURIComponent(studentId)}`, {
         headers: { Authorization: `Bearer ${token}` },
         cache: 'no-store',
       });
@@ -71,6 +72,8 @@ export default function StudentCoachingPage() {
         throw new Error(errData.error || 'Erreur chargement');
       }
       const data = await res.json();
+      // Avec ?userId=X l'API renvoie un seul user, mais on garde le find
+      // pour la robustesse (au cas où l'ID ne correspond pas)
       const profile = (data.users || []).find((u: { id: string }) => u.id === studentId);
 
       if (!profile) {

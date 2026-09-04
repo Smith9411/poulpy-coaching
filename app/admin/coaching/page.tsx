@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Shield, ArrowLeft, User, Search, MessageSquare, RefreshCw, Loader2, Mail, Calendar, Bell } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
 interface StudentRow {
   id: string;
@@ -86,15 +86,18 @@ export default function AdminCoaching() {
     };
   }, [user, fetchStudents]);
 
-  const filteredStudents = students
-    .filter(student =>
-      student.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      student.email.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (b.unreadCount !== a.unreadCount) return b.unreadCount - a.unreadCount;
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
+  const filteredStudents = useMemo(() => {
+    const q = searchQuery.toLowerCase();
+    return students
+      .filter(student =>
+        student.username.toLowerCase().includes(q) ||
+        student.email.toLowerCase().includes(q)
+      )
+      .sort((a, b) => {
+        if (b.unreadCount !== a.unreadCount) return b.unreadCount - a.unreadCount;
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+  }, [students, searchQuery]);
 
   if (authLoading) {
     return (

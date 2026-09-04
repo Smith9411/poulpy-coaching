@@ -43,9 +43,36 @@ export async function GET(req: NextRequest) {
   if (auth.error) return auth.error;
 
   try {
+    const { searchParams } = new URL(req.url);
+    const userIdFilter = searchParams.get('userId');
+
+    // Si on demande UN user précis, on évite de lister tous les users
+    // (scaling : évite de charger 1000+ lignes pour un seul profil)
+    let authUserPromise: Promise<{ data: { users: unknown[] }; error: unknown }>;
+    if (userIdFilter) {
+      const singlePromise = supabaseAdmin.auth.admin.getUserById(userIdFilter);
+      authUserPromise = singlePromise
+        .then(({ data, error }) => ({
+          data: { users: data?.user ? [data.user] : [] },
+          error,
+        }))
+        .catch((err) => ({ data: { users: [] }, error: err }));
+    } else {
+      authUserPromise = supabaseAdmin.auth.admin.listUsers();
+    }
+
+    const profilesQuery = userIdFilter
+      ? supabaseAdmin
+          .from('profiles')
+          .select('id, username, is_admin, created_at, favorite_game, valorant_rank, apex_rank, bio')
+          .eq('id', userIdFilter)
+      : supabaseAdmin
+          .from('profiles')
+          .select('id, username, is_admin, created_at, favorite_game, valorant_rank, apex_rank, bio');
+
     const [{ data: authUsers, error: authErr }, { data: profiles, error: profErr }] = await Promise.all([
-      supabaseAdmin.auth.admin.listUsers(),
-      supabaseAdmin.from('profiles').select('id, username, is_admin, created_at, favorite_game, valorant_rank, apex_rank, bio'),
+      authUserPromise,
+      profilesQuery,
     ]);
 
     if (authErr) throw authErr;
@@ -53,7 +80,12 @@ export async function GET(req: NextRequest) {
 
     const profilesMap = new Map((profiles || []).map((p) => [p.id, p]));
 
-    const users = (authUsers.users || []).map((u) => {
+    const users = ((authUsers.users || []) as Array<{
+      id: string;
+      email?: string;
+      created_at?: string;
+      user_metadata?: { username?: string; avatar_url?: string };
+    }>).map((u) => {
       const p = profilesMap.get(u.id);
       const meta = u.user_metadata || {};
       const username = p?.username || meta.username || u.email?.split('@')[0] || 'Joueur';

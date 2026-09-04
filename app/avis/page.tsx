@@ -73,6 +73,7 @@ export default function Avis() {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const editScrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   
   // Sorting states
   const [sortBy, setSortBy] = useState<'date' | 'name' | 'rating'>('date');
@@ -130,6 +131,7 @@ export default function Avis() {
   useEffect(() => {
     return () => {
       if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
+      if (editScrollTimeoutRef.current) clearTimeout(editScrollTimeoutRef.current);
     };
   }, []);
 
@@ -334,9 +336,14 @@ export default function Avis() {
       setEditRankType('rank');
     }
 
-    setTimeout(() => {
+    // Annule un éventuel scroll précédent (si on clique vite sur ✏️ d'un autre avis)
+    if (editScrollTimeoutRef.current) {
+      clearTimeout(editScrollTimeoutRef.current);
+    }
+    editScrollTimeoutRef.current = setTimeout(() => {
       const el = document.getElementById(`review-${review.id}`);
       if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      editScrollTimeoutRef.current = null;
     }, 100);
   };
 
