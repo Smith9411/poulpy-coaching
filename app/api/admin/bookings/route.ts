@@ -142,18 +142,34 @@ export async function PATCH(req: NextRequest) {
 
     // ── 1. ACTION : ANNULER ────────────────────────────────────────────────
     if (action === 'cancel') {
-      // 1. Mettre le statut à 'cancelled' et alerter l'élève (read_by_student = false)
-      const { data: updated, error: updateErr } = await supabase
+      const updatePayload: Record<string, unknown> = {
+        status: 'cancelled',
+        admin_notes: adminNotes || currentBooking.admin_notes,
+        updated_at: new Date().toISOString(),
+      };
+
+      // 1. Tenter d'abord avec read_by_student pour alerter l'élève
+      let { data: updated, error: updateErr } = await supabase
         .from('coaching_bookings')
         .update({
-          status: 'cancelled',
+          ...updatePayload,
           read_by_student: false,
-          admin_notes: adminNotes || currentBooking.admin_notes,
-          updated_at: new Date().toISOString(),
         })
         .eq('id', bookingId)
         .select()
         .single();
+
+      // Fallback sans read_by_student si la colonne n'existe pas encore dans Supabase
+      if (updateErr && (updateErr.message.includes('read_by_student') || updateErr.code === 'PGRST204')) {
+        const retryRes = await supabase
+          .from('coaching_bookings')
+          .update(updatePayload)
+          .eq('id', bookingId)
+          .select()
+          .single();
+        updated = retryRes.data;
+        updateErr = retryRes.error;
+      }
 
       if (updateErr) {
         return NextResponse.json({ error: updateErr.message }, { status: 500 });
@@ -215,21 +231,36 @@ export async function PATCH(req: NextRequest) {
           .eq('id', targetSlotId);
       }
 
-      // 3. Mettre à jour la réservation
-      const { data: updated, error: updateErr } = await supabase
+      // 3. Mettre à jour la réservation (avec fallback si read_by_student manque)
+      const reschedulePayload: Record<string, unknown> = {
+        booking_date: newDate,
+        booking_time: newTime,
+        slot_id: targetSlotId || null,
+        status: 'rescheduled',
+        admin_notes: adminNotes || currentBooking.admin_notes,
+        updated_at: new Date().toISOString(),
+      };
+
+      let { data: updated, error: updateErr } = await supabase
         .from('coaching_bookings')
         .update({
-          booking_date: newDate,
-          booking_time: newTime,
-          slot_id: targetSlotId || null,
-          status: 'rescheduled',
+          ...reschedulePayload,
           read_by_student: false,
-          admin_notes: adminNotes || currentBooking.admin_notes,
-          updated_at: new Date().toISOString(),
         })
         .eq('id', bookingId)
         .select()
         .single();
+
+      if (updateErr && (updateErr.message.includes('read_by_student') || updateErr.code === 'PGRST204')) {
+        const retryRes = await supabase
+          .from('coaching_bookings')
+          .update(reschedulePayload)
+          .eq('id', bookingId)
+          .select()
+          .single();
+        updated = retryRes.data;
+        updateErr = retryRes.error;
+      }
 
       if (updateErr) {
         return NextResponse.json({ error: updateErr.message }, { status: 500 });

@@ -39,9 +39,13 @@ CREATE TABLE IF NOT EXISTS coaching_bookings (
   status TEXT NOT NULL DEFAULT 'confirmed' CHECK (status IN ('confirmed', 'completed', 'rescheduled', 'cancelled')),
   admin_notes TEXT,
   read_by_admin BOOLEAN NOT NULL DEFAULT false,
+  read_by_student BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Assurer la présence de read_by_student si la table existait déjà
+ALTER TABLE coaching_bookings ADD COLUMN IF NOT EXISTS read_by_student BOOLEAN DEFAULT true;
 
 -- Index pour les recherches par élève, par statut et par date
 CREATE INDEX IF NOT EXISTS idx_coaching_bookings_user 
