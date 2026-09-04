@@ -34,12 +34,16 @@ export async function GET(req: NextRequest) {
 
     if (error) throw error;
 
-    const unreadMessages = messages?.filter((m: { read_at: string | null }) => !m.read_at) || [];
-    if (unreadMessages.length > 0) {
+    // Marquer comme lus uniquement les messages reçus (sender_id ≠ user.id)
+    // Ne jamais toucher aux messages envoyés par l'élève lui-même
+    const unreadFromOthers = messages?.filter(
+      (m: { read_at: string | null; sender_id: string }) => !m.read_at && m.sender_id !== user.id
+    ) || [];
+    if (unreadFromOthers.length > 0) {
       await supabase
         .from('coaching_messages')
         .update({ read_at: new Date().toISOString() })
-        .in('id', unreadMessages.map((m: { id: string }) => m.id));
+        .in('id', unreadFromOthers.map((m: { id: string }) => m.id));
     }
 
     return NextResponse.json({ messages: messages || [] });
