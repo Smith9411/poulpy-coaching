@@ -2,29 +2,170 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
+import {
+  Menu,
+  X,
+  User,
+  Shield,
+  LogOut,
+  Calendar,
+  MessageSquare,
+  Film,
+  Zap,
+  ArrowRight,
+  ChevronDown,
+  Bell,
+  LayoutDashboard,
+  ExternalLink,
+  CheckCircle2
+} from "lucide-react";
 import DecryptedText from "./DecryptedText";
-import { Menu, X, ArrowUpRight, User, Bell, Check, Film, Calendar, Zap, Shield, LogOut, ChevronDown, LayoutDashboard } from "lucide-react";
-import AuthModal from "./AuthModal";
 import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/lib/supabase";
+import AuthModal from "./AuthModal";
 
-interface CyberNavbarProps {
-  onOpenBooking?: () => void;
+interface RealNotificationItem {
+  id: string;
+  type: "message" | "annotation" | "booking" | "clip";
+  title: string;
+  description: string;
+  timeAgo: string;
+  href: string;
 }
 
-export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
+export default function CyberNavbar({
+  onOpenBooking,
+}: {
+  onOpenBooking?: () => void;
+}) {
   const { user, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [notifsOpen, setNotifsOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [activeSection, setActiveSection] = useState<string>("");
+  
+  // Real notifications state
+  const [realNotifs, setRealNotifs] = useState<RealNotificationItem[]>([]);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [loadingNotifs, setLoadingNotifs] = useState<boolean>(false);
+
   const notifsRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
+
+  // Fetch real notifications from Supabase
+  const fetchRealNotifications = async () => {
+    if (!user) {
+      setRealNotifs([]);
+      setUnreadCount(0);
+      return;
+    }
+
+    try {
+      setLoadingNotifs(true);
+      let { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) return;
+
+      if (session.expires_at && new Date(session.expires_at * 1000) <= new Date()) {
+        const { data: r } = await supabase.auth.refreshSession();
+        session = r.session ?? session;
+        if (!session?.access_token) return;
+      }
+
+      const endpoint = user.isAdmin
+        ? "/api/notifications/admin-summary"
+        : "/api/notifications/student-summary";
+
+      const res = await fetch(endpoint, {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+
+      if (!res.ok) return;
+      const data = await res.json();
+
+      const items: RealNotificationItem[] = [];
+
+      if (user.isAdmin) {
+        // Admin notifications
+        if (data.unreadMessages && Array.isArray(data.unreadMessages)) {
+          data.unreadMessages.forEach((m: { studentId: string; studentName: string; count: number; lastMessage: string }) => {
+            items.push({
+              id: `msg-${m.studentId}`,
+              type: "message",
+              title: `MESSAGE DE ${m.studentName.toUpperCase()}`,
+              description: m.lastMessage || `${m.count} nouveau(x) message(s)`,
+              timeAgo: "RÉCENT",
+              href: `/admin/coaching/${m.studentId}`,
+            });
+          });
+        }
+        if (data.pendingClips && Array.isArray(data.pendingClips)) {
+          data.pendingClips.forEach((c: { id: string; studentName: string; title: string }) => {
+            items.push({
+              id: `clip-${c.id}`,
+              type: "clip",
+              title: "NOUVEAU CLIP VOD À REVOIR",
+              description: `${c.studentName} : ${c.title}`,
+              timeAgo: "EN ATTENTE",
+              href: "/admin/coaching",
+            });
+          });
+        }
+        setUnreadCount(data.totalCount || items.length);
+      } else {
+        // Student notifications
+        if (data.unreadMsgCount && data.unreadMsgCount > 0) {
+          items.push({
+            id: "student-msgs",
+            type: "message",
+            title: "NOUVEAU MESSAGE DU COACH",
+            description: data.lastMsg?.message || `Vous avez ${data.unreadMsgCount} nouveau(x) message(s) de Poulpy.`,
+            timeAgo: "RÉCENT",
+            href: "/profile/coaching",
+          });
+        }
+        if (data.newAnnotationsCount && data.newAnnotationsCount > 0) {
+          items.push({
+            id: "student-annot",
+            type: "annotation",
+            title: "ANNOTATION SUR VOTRE VOD",
+            description: data.lastAnnotation?.content || "Poulpy a annoté un de vos clips.",
+            timeAgo: "RÉCENT",
+            href: "/profile/vod",
+          });
+        }
+        if (data.bookingAlerts && Array.isArray(data.bookingAlerts)) {
+          data.bookingAlerts.forEach((b: { id: string; status: string; planName: string; bookingDate: string; bookingTime: string }) => {
+            items.push({
+              id: `booking-${b.id}`,
+              type: "booking",
+              title: b.status === "cancelled" ? "SÉANCE ANNULÉE" : "SÉANCE REPLANIFIÉE",
+              description: `${b.planName} du ${b.bookingDate} à ${b.bookingTime}`,
+              timeAgo: "IMPORTANT",
+              href: "/profile",
+            });
+          });
+        }
+        setUnreadCount(data.totalUnread || items.length);
+      }
+
+      setRealNotifs(items);
+    } catch {
+      // silently fail
+    } finally {
+      setLoadingNotifs(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchRealNotifications();
+    const interval = setInterval(fetchRealNotifications, 15000);
+    return () => clearInterval(interval);
+  }, [user]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -32,7 +173,6 @@ export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
     }
 
     const handleScroll = () => {
-      // 100% transparent on Hero
       if (window.scrollY < 200) {
         setScrolled(false);
         setActiveSection("");
@@ -47,7 +187,6 @@ export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
         setScrolled(window.scrollY > 400);
       }
 
-      // Check if user is near the very bottom of the document
       const isAtBottom =
         window.innerHeight + window.scrollY >=
         document.documentElement.scrollHeight - 80;
@@ -57,7 +196,6 @@ export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
         return;
       }
 
-      // Robust BoundingClientRect Scrollspy
       const sections = [
         { id: "coaching", linkId: "coaching" },
         { id: "games", linkId: "games" },
@@ -69,7 +207,7 @@ export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
         { id: "faq", linkId: "faq" },
       ];
 
-      const detectionLine = 140; // 140px below the top of viewport
+      const detectionLine = 140;
       let detected = "";
 
       for (const s of sections) {
@@ -125,11 +263,12 @@ export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
 
     const targetId = href.replace("#", "");
     const targetEl = document.getElementById(targetId);
+
     if (targetEl) {
+      setActiveSection(targetId === "apropos" || targetId === "media" ? "apropos" : targetId);
       const navOffset = 70;
       const targetTop = targetEl.getBoundingClientRect().top + window.scrollY - navOffset;
       const distance = Math.abs(targetTop - window.scrollY);
-      // Durée cinématique proportionnelle à la distance (0.9s → 1.8s)
       const duration = Math.min(1.8, Math.max(0.9, distance / 3200));
 
       gsap.to(window, {
@@ -138,14 +277,12 @@ export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
         ease: "power3.inOut",
         overwrite: "auto",
       });
-    } else {
-      window.location.href = `/${href}`;
     }
   };
 
   const navLinks = [
     { label: "POURQUOI POULPY", href: "#coaching", id: "coaching" },
-    { label: "JEUX", href: "#games", id: "games" },
+    { label: "JEUX & RANKS", href: "#games", id: "games" },
     { label: "MÉTHODE", href: "#methodology", id: "methodology" },
     { label: "RÉSERVER", href: "#booking", id: "booking" },
     { label: "AVIS", href: "#avis", id: "avis" },
@@ -177,7 +314,7 @@ export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
             </div>
           </a>
 
-          {/* Desktop Navigation Links — Direct, Clean & Smooth with Sliding Active Square */}
+          {/* Desktop Navigation Links */}
           <nav className="hidden lg:flex items-center gap-1 xl:gap-2 font-mono text-[11px] relative">
             {navLinks.map((link) => {
               const isActive = activeSection === link.id;
@@ -209,7 +346,7 @@ export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
 
           {/* Action Row: Notifications + Connexion + Réserver CTA */}
           <div className="hidden sm:flex items-center gap-3 pr-10 lg:pr-12">
-            {/* Notification Bell with Dropdown */}
+            {/* Notification Bell with Dropdown (REAL NOTIFICATIONS ONLY) */}
             <div className="relative" ref={notifsRef}>
               <button
                 onClick={() => setNotifsOpen(!notifsOpen)}
@@ -231,7 +368,7 @@ export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
                   <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
                     <span className="text-[10px] text-[#FF7582] font-bold tracking-wider flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 bg-[#FF7582] animate-pulse" />
-                      NOTIFICATIONS // {unreadCount} NOUVELLES
+                      NOTIFICATIONS // {unreadCount} {unreadCount > 1 ? "NOUVELLES" : "NOUVELLE"}
                     </span>
                     {unreadCount > 0 && (
                       <button
@@ -244,41 +381,54 @@ export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
                   </div>
 
                   <div className="space-y-2 max-h-72 overflow-y-auto">
-                    <div className="p-2.5 bg-black/60 border border-white/5 space-y-1 hover:border-[#8FAFD4]/40 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] text-[#8FAFD4] font-bold flex items-center gap-1">
-                          <Film className="w-3 h-3" /> ANALYSE VOD PRÊTE
-                        </span>
-                        <span className="text-[9px] text-white/40">IL Y A 2H</span>
+                    {!user ? (
+                      <div className="py-6 text-center text-white/40 space-y-2">
+                        <Bell className="w-6 h-6 text-white/20 mx-auto" />
+                        <div className="text-xs font-bold text-white/70">NON CONNECTÉ</div>
+                        <p className="text-[10px] text-white/40">Connectez-vous pour voir vos notifications.</p>
+                        <button
+                          onClick={() => {
+                            setNotifsOpen(false);
+                            setAuthOpen(true);
+                          }}
+                          className="btn-cyber-primary py-1.5 px-4 text-[10px] mt-1 inline-block"
+                        >
+                          SE CONNECTER
+                        </button>
                       </div>
-                      <p className="text-[11px] text-white/80 leading-snug">
-                        Poulpy a annoté votre dernière VOD sur Ascent (3 axes d'amélioration prioritaires).
-                      </p>
-                    </div>
-
-                    <div className="p-2.5 bg-black/60 border border-white/5 space-y-1 hover:border-[#A4DE87]/40 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] text-[#A4DE87] font-bold flex items-center gap-1">
-                          <Calendar className="w-3 h-3" /> SÉANCE CONFIRMÉE
-                        </span>
-                        <span className="text-[9px] text-white/40">HIER</span>
+                    ) : realNotifs.length === 0 ? (
+                      <div className="py-6 text-center text-white/40 space-y-1.5">
+                        <CheckCircle2 className="w-6 h-6 text-[#A4DE87]/40 mx-auto" />
+                        <div className="text-xs font-bold text-white/70">AUCUNE NOTIFICATION</div>
+                        <p className="text-[10px] text-white/30">Toutes vos notifications sont à jour.</p>
                       </div>
-                      <p className="text-[11px] text-white/80 leading-snug">
-                        Votre créneau de Coaching PRO du 15 Septembre à 18h00 est validé.
-                      </p>
-                    </div>
-
-                    <div className="p-2.5 bg-black/60 border border-white/5 space-y-1 hover:border-[#FF7582]/40 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px] text-[#FF7582] font-bold flex items-center gap-1">
-                          <Zap className="w-3 h-3" /> ROUTINE AIMLABS
-                        </span>
-                        <span className="text-[9px] text-white/40">IL Y A 2J</span>
-                      </div>
-                      <p className="text-[11px] text-white/80 leading-snug">
-                        Nouvelle routine micro-flicks 20 min ajoutée à votre dossier d'entraînement.
-                      </p>
-                    </div>
+                    ) : (
+                      realNotifs.map((item) => (
+                        <Link
+                          key={item.id}
+                          href={item.href}
+                          onClick={() => setNotifsOpen(false)}
+                          className="block p-2.5 bg-black/60 border border-white/5 space-y-1 hover:border-[#FF7582]/40 transition-colors"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] text-[#FF7582] font-bold flex items-center gap-1">
+                              {item.type === "message" ? (
+                                <MessageSquare className="w-3 h-3" />
+                              ) : item.type === "annotation" ? (
+                                <Film className="w-3 h-3" />
+                              ) : (
+                                <Calendar className="w-3 h-3" />
+                              )}
+                              {item.title}
+                            </span>
+                            <span className="text-[9px] text-white/40">{item.timeAgo}</span>
+                          </div>
+                          <p className="text-[11px] text-white/80 leading-snug">
+                            {item.description}
+                          </p>
+                        </Link>
+                      ))
+                    )}
                   </div>
                 </div>
               )}
@@ -323,7 +473,7 @@ export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
                       <span>MON PROFIL</span>
                     </Link>
                     <Link
-                      href="/coaching"
+                      href="/profile/coaching"
                       onClick={() => setUserMenuOpen(false)}
                       className="w-full p-2 hover:bg-white/5 text-white/80 hover:text-white flex items-center gap-2.5 transition-colors"
                     >
@@ -331,7 +481,7 @@ export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
                       <span>ESPACE ÉLÈVE</span>
                     </Link>
                     <Link
-                      href="/coaching/sheet"
+                      href="/profile/sheet"
                       onClick={() => setUserMenuOpen(false)}
                       className="w-full p-2 hover:bg-white/5 text-white/80 hover:text-white flex items-center gap-2.5 transition-colors"
                     >
@@ -349,11 +499,11 @@ export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
                       </Link>
                     )}
                     <button
-                      onClick={() => {
+                      onClick={async () => {
                         setUserMenuOpen(false);
-                        logout();
+                        await logout();
                       }}
-                      className="w-full p-2 hover:bg-red-500/10 text-red-400 hover:text-red-300 flex items-center gap-2.5 transition-colors text-left border-t border-white/10 mt-1 cursor-pointer"
+                      className="w-full p-2 hover:bg-red-500/10 text-red-400 hover:text-red-300 flex items-center gap-2.5 transition-colors border-t border-white/10 mt-1 cursor-pointer"
                     >
                       <LogOut className="w-3.5 h-3.5" />
                       <span>DÉCONNEXION</span>
@@ -364,122 +514,112 @@ export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
             ) : (
               <button
                 onClick={() => setAuthOpen(true)}
-                className="flex items-center gap-1.5 text-xs font-mono tracking-wider text-white/70 hover:text-white transition-colors py-2 px-2 cursor-pointer group"
-                title="Accès Espace Membre"
+                className="text-xs font-mono text-white/80 hover:text-white transition-colors py-2 px-3 border border-white/15 hover:border-white/40 cursor-pointer uppercase tracking-wider"
               >
-                <User className="w-3.5 h-3.5 text-[#8FAFD4] group-hover:scale-110 transition-transform" />
-                <span className="font-medium tracking-widest">CONNEXION</span>
+                CONNEXION
               </button>
             )}
 
-            {/* Prominent CTA Button */}
+            {/* Réserver Direct Action Button */}
             <button
               onClick={() => {
                 if (onOpenBooking) {
                   onOpenBooking();
                 } else {
-                  window.location.href = "/#booking";
+                  const el = document.getElementById("booking");
+                  if (el) el.scrollIntoView({ behavior: "smooth" });
                 }
               }}
-              className="btn-cyber-primary text-xs py-2 px-4 font-bold"
+              className="btn-cyber-primary py-2 px-4 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer"
             >
               <span>RÉSERVER</span>
-              <ArrowUpRight className="w-4 h-4" />
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          {/* Mobile Actions & Hamburger */}
-          <div className="flex lg:hidden items-center gap-1.5 pr-10">
-            <button
-              onClick={() => setNotifsOpen(!notifsOpen)}
-              className="p-2 text-white/80 hover:text-white relative"
-              title="Notifications"
-            >
-              <Bell className="w-4 h-4" />
-              {unreadCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-[#FF7582] rounded-full" />
-              )}
-            </button>
-            {user ? (
-              <Link
-                href="/coaching"
-                className="p-2 text-white/80 hover:text-white"
-                title="Espace Membre"
-              >
-                <div className="w-5 h-5 bg-[#FF7582]/20 border border-[#FF7582]/40 text-[#FF7582] text-[10px] font-bold flex items-center justify-center">
-                  {user.initial || user.username[0]?.toUpperCase() || "P"}
-                </div>
-              </Link>
-            ) : (
-              <button
-                onClick={() => setAuthOpen(true)}
-                className="p-2 text-white/80 hover:text-white"
-                title="Connexion"
-              >
-                <User className="w-4 h-4 text-[#8FAFD4]" />
-              </button>
-            )}
+          {/* Mobile Hamburger Button */}
+          <div className="flex sm:hidden items-center gap-2">
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="p-2 border border-white/20 text-white"
+              className="p-2 text-white/80 hover:text-white border border-white/20"
+              aria-label="Menu Mobile"
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Drawer */}
-        {mobileOpen && (
-          <div className="lg:hidden bg-[#060606] border-b border-white/15 px-6 py-6 font-mono text-sm space-y-3">
-            {navLinks.map((link) => {
-              const isActive = activeSection === link.id;
-              return (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={(e) => handleNavClick(e, link.href)}
-                  className={`block py-1.5 uppercase tracking-wider text-xs transition-colors flex items-center gap-2 ${
-                    isActive ? "text-[#FF7582] font-bold" : "text-white/80 hover:text-[#FF7582]"
-                  }`}
+        {/* Mobile Slide-Down Menu */}
+        <AnimatePresence>
+          {mobileOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              className="sm:hidden bg-[#06080A]/95 border-b border-white/10 backdrop-blur-lg px-6 py-6 space-y-4 font-mono text-xs overflow-hidden"
+            >
+              <div className="space-y-2">
+                {navLinks.map((link) => (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    onClick={(e) => handleNavClick(e, link.href)}
+                    className="block py-2 text-white/80 hover:text-[#FF7582] transition-colors uppercase tracking-wider font-semibold border-b border-white/5"
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+
+              <div className="pt-2 flex flex-col gap-3">
+                {user ? (
+                  <div className="space-y-2">
+                    <Link
+                      href="/profile"
+                      onClick={() => setMobileOpen(false)}
+                      className="btn-cyber-ghost w-full py-2.5 text-center block"
+                    >
+                      MON PROFIL ({user.username})
+                    </Link>
+                    {user.isAdmin && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setMobileOpen(false)}
+                        className="btn-cyber-primary w-full py-2.5 text-center block"
+                      >
+                        PANNEAU ADMIN
+                      </Link>
+                    )}
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setMobileOpen(false);
+                      setAuthOpen(true);
+                    }}
+                    className="btn-cyber-ghost w-full py-2.5 text-center cursor-pointer uppercase"
+                  >
+                    SE CONNECTER
+                  </button>
+                )}
+
+                <button
+                  onClick={() => {
+                    setMobileOpen(false);
+                    if (onOpenBooking) onOpenBooking();
+                  }}
+                  className="btn-cyber-primary w-full py-3 text-center uppercase cursor-pointer font-bold tracking-wider"
                 >
-                  {isActive && <span className="w-1.5 h-1.5 bg-[#FF7582]" />}
-                  <span>{link.label}</span>
-                </a>
-              );
-            })}
-
-            <div className="pt-4 border-t border-white/10 space-y-2">
-              <button
-                onClick={() => {
-                  setMobileOpen(false);
-                  setAuthOpen(true);
-                }}
-                className="w-full py-2.5 text-xs text-white/80 hover:text-white uppercase font-bold tracking-wider flex items-center justify-center gap-2"
-              >
-                <User className="w-3.5 h-3.5 text-[#8FAFD4]" />
-                <span>ESPACE MEMBRE // CONNEXION</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  setMobileOpen(false);
-                  if (onOpenBooking) {
-                    onOpenBooking();
-                  } else {
-                    window.location.href = "/#booking";
-                  }
-                }}
-                className="btn-cyber-primary w-full justify-center text-xs py-3"
-              >
-                <span>RÉSERVER UN CRÉNEAU</span>
-                <ArrowUpRight className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        )}
+                  RÉSERVER UN CRÉNEAU
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
-      {/* Interactive Auth Modal */}
+      {/* Auth Modal */}
       <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
     </>
   );
