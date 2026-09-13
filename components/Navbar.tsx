@@ -625,7 +625,7 @@ export default function Navbar() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-2xl">
                 🐙
               </div>
-              <span className="text-xl font-bold tracking-tight">POULPY<span className="text-purple-400">.</span></span>
+              <span className="text-xl font-bold tracking-tight text-white">POULPY<span className="text-[#FF7582]">.</span></span>
             </Link>
             <div className="hidden lg:flex items-center gap-4">
               <div className="w-10 h-10 rounded-full bg-white/10 animate-pulse" />
@@ -655,8 +655,8 @@ export default function Navbar() {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
                 🐙
               </div>
-              <span className="text-xl font-bold tracking-tight">
-                POULPY<span className="text-purple-400">.</span>
+              <span className="text-xl font-bold tracking-tight text-white">
+                POULPY<span className="text-[#FF7582]">.</span>
               </span>
             </Link>
 
@@ -848,7 +848,7 @@ export default function Navbar() {
                   🐙
                 </div>
                 <span className="text-xl font-bold tracking-tight text-white">
-                  POULPY<span className="text-purple-400">.</span>
+                  POULPY<span className="text-[#FF7582]">.</span>
                 </span>
               </Link>
               <div className="flex items-center gap-2">
