@@ -52,8 +52,8 @@ function useCardTilt() {
     const percentX = (x / rect.width) * 100;
     const percentY = (y / rect.height) * 100;
 
-    const rotX = ((y - rect.height / 2) / (rect.height / 2)) * -10;
-    const rotY = ((x - rect.width / 2) / (rect.width / 2)) * 10;
+    const rotX = ((y - rect.height / 2) / (rect.height / 2)) * -4.5;
+    const rotY = ((x - rect.width / 2) / (rect.width / 2)) * 4.5;
 
     setRotate({ x: rotX, y: rotY });
     setMousePos({ x: percentX, y: percentY });
@@ -374,7 +374,7 @@ export default function Booking() {
                       animate={{
                         rotateX: proTilt.rotate.x,
                         rotateY: proTilt.rotate.y,
-                        scale: proTilt.isHovered ? 1.012 : 1,
+                        scale: proTilt.isHovered ? 1.004 : 1,
                       }}
                       transition={{
                         type: "spring",
@@ -403,7 +403,7 @@ export default function Booking() {
                         />
                       )}
 
-                      <div className="space-y-6 relative z-10" style={{ transform: "translateZ(20px)" }}>
+                      <div className="space-y-6 relative z-10" style={{ transform: "translateZ(8px)" }}>
                         {/* Top Badges */}
                         <div className="flex items-center justify-between border-b border-white/10 pb-4">
                           <span className="bg-[#FF7582] text-black text-[10px] font-bold px-3 py-1 uppercase tracking-widest">
@@ -486,7 +486,7 @@ export default function Booking() {
                         animate={{
                           rotateX: sessionTilt.rotate.x,
                           rotateY: sessionTilt.rotate.y,
-                          scale: sessionTilt.isHovered ? 1.015 : 1,
+                          scale: sessionTilt.isHovered ? 1.004 : 1,
                         }}
                         transition={{
                           type: "spring",
@@ -511,7 +511,7 @@ export default function Booking() {
                           />
                         )}
 
-                        <div className="space-y-3 relative z-10" style={{ transform: "translateZ(15px)" }}>
+                        <div className="space-y-3 relative z-10" style={{ transform: "translateZ(6px)" }}>
                           <div className="flex items-center justify-between border-b border-white/10 pb-2">
                             <span className="bg-white/10 text-white/70 text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
                               DIAGNOSTIC FLASH
@@ -573,7 +573,7 @@ export default function Booking() {
                         animate={{
                           rotateX: perfTilt.rotate.x,
                           rotateY: perfTilt.rotate.y,
-                          scale: perfTilt.isHovered ? 1.015 : 1,
+                          scale: perfTilt.isHovered ? 1.004 : 1,
                         }}
                         transition={{
                           type: "spring",
@@ -598,7 +598,7 @@ export default function Booking() {
                           />
                         )}
 
-                        <div className="space-y-3 relative z-10" style={{ transform: "translateZ(15px)" }}>
+                        <div className="space-y-3 relative z-10" style={{ transform: "translateZ(6px)" }}>
                           <div className="flex items-center justify-between border-b border-white/10 pb-2">
                             <span className="bg-[#8FAFD4]/20 text-[#8FAFD4] text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
                               COMPÉTITION & TEAM

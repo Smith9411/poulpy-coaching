@@ -17,6 +17,7 @@ interface StepData {
   tag: string;
   accent: "acid" | "laser";
   color: string;
+  statusLabel: string;
 }
 
 const STEPS: StepData[] = [
@@ -35,6 +36,7 @@ const STEPS: StepData[] = [
     tag: "AUDIT GLOBAL",
     accent: "laser",
     color: "#8FAFD4",
+    statusLabel: "PHASE 01 : DIAGNOSTIC DU GAMEPLAY",
   },
   {
     num: "02",
@@ -51,6 +53,7 @@ const STEPS: StepData[] = [
     tag: "CIBLAGE CHIRURGICAL",
     accent: "acid",
     color: "#FF7582",
+    statusLabel: "PHASE 02 : ANALYSE DES BLOCAGES",
   },
   {
     num: "03",
@@ -67,6 +70,7 @@ const STEPS: StepData[] = [
     tag: "MÉCANIQUE PURE",
     accent: "laser",
     color: "#8FAFD4",
+    statusLabel: "PHASE 03 : CALIBRATION MÉCANIQUE",
   },
   {
     num: "04",
@@ -83,6 +87,7 @@ const STEPS: StepData[] = [
     tag: "RÉSULTAT GARANTI",
     accent: "acid",
     color: "#FF7582",
+    statusLabel: "PROTOCOLE VALIDÉ",
   },
 ];
 
@@ -90,6 +95,7 @@ const STEPS: StepData[] = [
 function ScrollStackCard({ step, index, total }: { step: StepData; index: number; total: number }) {
   const Icon = step.icon;
   const isAcid = step.accent === "acid";
+  const isLast = index === total - 1;
   const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
   const [isHovered, setIsHovered] = useState(false);
 
@@ -203,18 +209,23 @@ function ScrollStackCard({ step, index, total }: { step: StepData; index: number
           </div>
 
           {/* Card Footer */}
-          <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs text-white/50">
+          <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs">
             <div className="flex items-center gap-2">
-              <Crosshair className="w-3.5 h-3.5 text-[#A4DE87]" />
-              <span className="text-[11px] text-white/60">PROTOCOLE VALIDÉ & REPRODUCTIBLE</span>
+              <Crosshair className={`w-3.5 h-3.5 ${isLast ? "text-[#A4DE87]" : "text-white/40"}`} />
+              <span className={`text-[11px] font-mono tracking-wider font-bold ${
+                isLast ? "text-[#A4DE87]" : "text-white/40"
+              }`}>
+                {step.statusLabel}
+              </span>
             </div>
+
             <a
               href="#booking"
               className={`flex items-center gap-1.5 font-bold uppercase tracking-wider text-xs transition-colors ${
                 isAcid ? "text-[#FF7582] hover:text-white" : "text-[#8FAFD4] hover:text-white"
               }`}
             >
-              <span>RÉSERVER CETTE FORMULE</span>
+              <span>CHOISIR MON CRÉNEAU</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </a>
           </div>
@@ -236,11 +247,11 @@ export default function Methodology() {
           <div className="space-y-2">
             <div className="flex items-center gap-3">
               <span className="data-badge data-badge-acid">
-                <DecryptedText text="OPTION 6 : L'EMPILEMENT AU SCROLL (STICKY STACK)" />
+                <DecryptedText text="MÉTHODOLOGIE D'ENTRAÎNEMENT" />
               </span>
               <span className="text-xs text-white/40 font-mono flex items-center gap-1.5">
                 <Layers className="w-3.5 h-3.5 text-[#FF7582]" />
-                CARTES QUI S&apos;EMPILENT EN CASCADE
+                4 PHASES CHIRURGICALES
               </span>
             </div>
 
@@ -259,7 +270,7 @@ export default function Methodology() {
         </div>
 
         {/* SCROLL STACKING CARDS LIST */}
-        <div className="relative pt-4 pb-12 space-y-8">
+        <div className="relative pt-4 pb-6 space-y-8">
           {STEPS.map((step, index) => (
             <ScrollStackCard
               key={step.num}
@@ -268,23 +279,6 @@ export default function Methodology() {
               total={STEPS.length}
             />
           ))}
-        </div>
-
-        {/* Bottom Callout Banner */}
-        <div className="p-4 bg-[#090c10] border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/60 relative z-30">
-          <div className="flex items-center gap-3">
-            <CheckCircle2 className="w-4 h-4 text-[#A4DE87] shrink-0" />
-            <span>
-              <strong className="text-white">PRÉCISION SUB-PIXEL :</strong> Chaque phase cible une composante isolée de ton jeu pour maximiser ton winrate.
-            </span>
-          </div>
-          <a
-            href="#booking"
-            className="text-xs text-[#FF7582] hover:text-white font-bold uppercase tracking-wider flex items-center gap-1 shrink-0 transition-colors"
-          >
-            <span>RÉSERVER CE PROTOCOLE</span>
-            <ChevronRight className="w-3.5 h-3.5" />
-          </a>
         </div>
       </div>
     </section>
