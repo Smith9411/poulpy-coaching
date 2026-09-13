@@ -39,21 +39,44 @@ const MONTHS_FULL = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Jui
 
 const STANDARD_HOURS = ["10:00", "11:30", "14:00", "15:30", "17:00", "18:30", "20:00", "21:30"];
 
+// Custom hook for 3D card tilt & spotlight
+function useCardTilt() {
+  const [rotate, setRotate] = useState({ x: 0, y: 0 });
+  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const percentX = (x / rect.width) * 100;
+    const percentY = (y / rect.height) * 100;
+
+    const rotX = ((y - rect.height / 2) / (rect.height / 2)) * -10;
+    const rotY = ((x - rect.width / 2) / (rect.width / 2)) * 10;
+
+    setRotate({ x: rotX, y: rotY });
+    setMousePos({ x: percentX, y: percentY });
+  };
+
+  const handleMouseEnter = () => setIsHovered(true);
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setRotate({ x: 0, y: 0 });
+  };
+
+  return { rotate, mousePos, isHovered, handleMouseMove, handleMouseEnter, handleMouseLeave };
+}
+
 export default function Booking() {
   const { user } = useAuth();
   const [step, setStep] = useState<number>(1);
   const [selectedPlan, setSelectedPlan] = useState<string>("pro");
 
-  // Mouse hover states for interactive spotlight
-  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
-  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
-
-  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    setMousePos({ x, y });
-  };
+  // Tilt controls for each card
+  const proTilt = useCardTilt();
+  const sessionTilt = useCardTilt();
+  const perfTilt = useCardTilt();
 
   // Slots data
   const [dbSlots, setDbSlots] = useState<RawSlot[]>([]);
@@ -314,7 +337,7 @@ export default function Booking() {
         <div className="reticle-box p-6 sm:p-8 bg-[#090c10] border border-white/20 relative shadow-[0_0_50px_rgba(0,0,0,0.9)]">
           <AnimatePresence mode="wait" initial={false}>
             {/* ======================================================== */}
-            {/* STEP 1: EXACT PNG REPRODUCTION WITH SMOOTH HOVER EFFECT */}
+            {/* STEP 1: EXACT PNG LAYOUT + DYNAMIC 3D TILT MOTION */}
             {/* ======================================================== */}
             {step === 1 && (
               <motion.div
@@ -337,243 +360,291 @@ export default function Booking() {
                 {/* Main Grid: Left Pro (7 cols) + Right Stacked Satellite cards (5 cols) */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
                   {/* ========================================= */}
-                  {/* LEFT CARD: COACHING PRO (7 cols) */}
+                  {/* LEFT CARD: COACHING PRO (7 cols) + 3D TILT */}
                   {/* ========================================= */}
                   <div
+                    className="lg:col-span-7 cursor-pointer"
+                    style={{ perspective: "1000px" }}
                     onClick={() => setSelectedPlan("pro")}
-                    onMouseEnter={() => setHoveredCard("pro")}
-                    onMouseLeave={() => setHoveredCard(null)}
-                    onMouseMove={handleCardMouseMove}
-                    className={`lg:col-span-7 relative p-7 flex flex-col justify-between cursor-pointer transition-all duration-300 border overflow-hidden select-none ${
-                      selectedPlan === "pro"
-                        ? "bg-[#0c0f15] border-[#FF7582] shadow-[0_0_35px_rgba(255,117,130,0.25)] ring-1 ring-[#FF7582]"
-                        : hoveredCard === "pro"
-                        ? "bg-[#0c0f15] border-[#FF7582]/60 shadow-[0_0_25px_rgba(255,117,130,0.15)]"
-                        : "bg-[#090C12] border-white/15 hover:border-white/30"
-                    }`}
+                    onMouseMove={proTilt.handleMouseMove}
+                    onMouseEnter={proTilt.handleMouseEnter}
+                    onMouseLeave={proTilt.handleMouseLeave}
                   >
-                    {/* Corner Brackets */}
-                    <CornerBrackets color="coral" />
+                    <motion.div
+                      animate={{
+                        rotateX: proTilt.rotate.x,
+                        rotateY: proTilt.rotate.y,
+                        scale: proTilt.isHovered ? 1.012 : 1,
+                      }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 280,
+                        damping: 22,
+                      }}
+                      style={{ transformStyle: "preserve-3d" }}
+                      className={`relative h-full p-7 flex flex-col justify-between transition-colors duration-200 border overflow-hidden select-none ${
+                        selectedPlan === "pro"
+                          ? "bg-[#0c0f15] border-[#FF7582] shadow-[0_0_35px_rgba(255,117,130,0.25)] ring-1 ring-[#FF7582]"
+                          : proTilt.isHovered
+                          ? "bg-[#0c0f15] border-[#FF7582]/60 shadow-[0_0_25px_rgba(255,117,130,0.15)]"
+                          : "bg-[#090C12] border-white/15 hover:border-white/30"
+                      }`}
+                    >
+                      {/* Corner Brackets */}
+                      <CornerBrackets color="coral" />
 
-                    {/* Dynamic Spotlight Follower on Hover */}
-                    {hoveredCard === "pro" && (
-                      <div
-                        className="absolute inset-0 pointer-events-none transition-opacity duration-200"
-                        style={{
-                          background: `radial-gradient(circle 280px at ${mousePos.x}% ${mousePos.y}%, rgba(255, 117, 130, 0.14), transparent 80%)`,
-                        }}
-                      />
-                    )}
+                      {/* Dynamic Spotlight Follower */}
+                      {proTilt.isHovered && (
+                        <div
+                          className="absolute inset-0 pointer-events-none transition-opacity duration-200"
+                          style={{
+                            background: `radial-gradient(circle 280px at ${proTilt.mousePos.x}% ${proTilt.mousePos.y}%, rgba(255, 117, 130, 0.16), transparent 80%)`,
+                          }}
+                        />
+                      )}
 
-                    <div className="space-y-6 relative z-10">
-                      {/* Top Badges */}
-                      <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                        <span className="bg-[#FF7582] text-black text-[10px] font-bold px-3 py-1 uppercase tracking-widest">
-                          FORMULE DE RÉFÉRENCE
-                        </span>
-                        <span className="text-xs text-white/70 tracking-widest font-mono">
-                          DURÉE : 60 MINUTES
-                        </span>
-                      </div>
-
-                      {/* Title & Price */}
-                      <div>
-                        <span className="text-[10px] text-white/40 uppercase tracking-widest block font-mono">
-                          COACHING INDIVIDUEL COMPLET
-                        </span>
-                        <h3 className="text-3xl sm:text-4xl font-display text-white tracking-wider mt-1">
-                          COACHING PRO
-                        </h3>
-                        <div className="flex items-baseline gap-2 mt-2">
-                          <span className="text-4xl sm:text-5xl font-display text-[#FF7582]">
-                            49 €
+                      <div className="space-y-6 relative z-10" style={{ transform: "translateZ(20px)" }}>
+                        {/* Top Badges */}
+                        <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                          <span className="bg-[#FF7582] text-black text-[10px] font-bold px-3 py-1 uppercase tracking-widest">
+                            FORMULE DE RÉFÉRENCE
                           </span>
-                          <span className="text-xs text-white/40 font-mono">/ SÉANCE INTENSIVE</span>
+                          <span className="text-xs text-white/70 tracking-widest font-mono">
+                            DURÉE : 60 MINUTES
+                          </span>
+                        </div>
+
+                        {/* Title & Price */}
+                        <div>
+                          <span className="text-[10px] text-white/40 uppercase tracking-widest block font-mono">
+                            COACHING INDIVIDUEL COMPLET
+                          </span>
+                          <h3 className="text-3xl sm:text-4xl font-display text-white tracking-wider mt-1">
+                            COACHING PRO
+                          </h3>
+                          <div className="flex items-baseline gap-2 mt-2">
+                            <span className="text-4xl sm:text-5xl font-display text-[#FF7582]">
+                              49 €
+                            </span>
+                            <span className="text-xs text-white/40 font-mono">/ SÉANCE INTENSIVE</span>
+                          </div>
+                        </div>
+
+                        {/* Description */}
+                        <p className="text-xs text-white/70 leading-relaxed max-w-xl">
+                          L&apos;expérience centrale de l&apos;Atelier Poulpy : diagnostic en direct, recalibrage biomécanique du viseur et correction chirurgicale de vos prises d&apos;information.
+                        </p>
+
+                        {/* Features Matrix (2 columns of dark boxes) */}
+                        <div className="space-y-2.5 pt-2">
+                          <span className="text-[10px] text-white/40 uppercase tracking-widest block font-mono">
+                            CONTENU DU PROTOCOLE :
+                          </span>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                            {[
+                              "Analyse complète de gameplay",
+                              "Coaching personnalisé en vocal",
+                              "Travail d'aim & placement du viseur",
+                              "Feuille de route Notion 4 semaines",
+                              "Suivi Discord VIP 7j/7",
+                            ].map((feat, i) => (
+                              <div key={i} className="p-2.5 bg-black/70 border border-white/5 flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 bg-[#FF7582] shrink-0" />
+                                <span className="text-white/80 text-[11px] leading-tight">{feat}</span>
+                              </div>
+                            ))}
+                          </div>
                         </div>
                       </div>
 
-                      {/* Description */}
-                      <p className="text-xs text-white/70 leading-relaxed max-w-xl">
-                        L&apos;expérience centrale de l&apos;Atelier Poulpy : diagnostic en direct, recalibrage biomécanique du viseur et correction chirurgicale de vos prises d&apos;information.
-                      </p>
-
-                      {/* Features Matrix (2 columns of dark boxes) */}
-                      <div className="space-y-2.5 pt-2">
-                        <span className="text-[10px] text-white/40 uppercase tracking-widest block font-mono">
-                          CONTENU DU PROTOCOLE :
+                      {/* Footer note */}
+                      <div className="pt-5 mt-6 border-t border-white/10 text-[10px] text-white/40 font-mono flex items-center justify-between relative z-10">
+                        <span>Idéal pour débloquer un palier de ranked tenace</span>
+                        <span className={`font-bold uppercase tracking-wider text-[11px] ${
+                          selectedPlan === "pro" ? "text-[#FF7582]" : "text-white/30"
+                        }`}>
+                          {selectedPlan === "pro" ? "CHOISI" : "CLIQUE POUR CHOISIR"}
                         </span>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                          {[
-                            "Analyse complète de gameplay",
-                            "Coaching personnalisé en vocal",
-                            "Travail d'aim & placement du viseur",
-                            "Feuille de route Notion 4 semaines",
-                            "Suivi Discord VIP 7j/7",
-                          ].map((feat, i) => (
-                            <div key={i} className="p-2.5 bg-black/70 border border-white/5 flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 bg-[#FF7582] shrink-0" />
-                              <span className="text-white/80 text-[11px] leading-tight">{feat}</span>
-                            </div>
-                          ))}
-                        </div>
                       </div>
-                    </div>
-
-                    {/* Footer note */}
-                    <div className="pt-5 mt-6 border-t border-white/10 text-[10px] text-white/40 font-mono flex items-center justify-between relative z-10">
-                      <span>Idéal pour débloquer un palier de ranked tenace</span>
-                      <span className={`font-bold uppercase tracking-wider text-[11px] ${
-                        selectedPlan === "pro" ? "text-[#FF7582]" : "text-white/30"
-                      }`}>
-                        {selectedPlan === "pro" ? "CHOISI" : "CLIQUE POUR CHOISIR"}
-                      </span>
-                    </div>
+                    </motion.div>
                   </div>
 
                   {/* ========================================= */}
-                  {/* RIGHT COLUMN: 2 SATELLITE CARDS (5 cols) */}
+                  {/* RIGHT COLUMN: 2 SATELLITE CARDS + 3D TILT */}
                   {/* ========================================= */}
                   <div className="lg:col-span-5 flex flex-col gap-4">
                     {/* Top Right: SESSION DIAGNOSTIC */}
                     <div
+                      className="flex-1 cursor-pointer"
+                      style={{ perspective: "1000px" }}
                       onClick={() => setSelectedPlan("session")}
-                      onMouseEnter={() => setHoveredCard("session")}
-                      onMouseLeave={() => setHoveredCard(null)}
-                      onMouseMove={handleCardMouseMove}
-                      className={`flex-1 relative p-5 flex flex-col justify-between cursor-pointer transition-all duration-300 border overflow-hidden select-none ${
-                        selectedPlan === "session"
-                          ? "bg-[#0c0f15] border-white shadow-[0_0_25px_rgba(255,255,255,0.2)] ring-1 ring-white"
-                          : hoveredCard === "session"
-                          ? "bg-[#0c0f15] border-white/50 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
-                          : "bg-[#090C12] border-white/15 hover:border-white/30"
-                      }`}
+                      onMouseMove={sessionTilt.handleMouseMove}
+                      onMouseEnter={sessionTilt.handleMouseEnter}
+                      onMouseLeave={sessionTilt.handleMouseLeave}
                     >
-                      {hoveredCard === "session" && (
-                        <div
-                          className="absolute inset-0 pointer-events-none transition-opacity duration-200"
-                          style={{
-                            background: `radial-gradient(circle 200px at ${mousePos.x}% ${mousePos.y}%, rgba(255, 255, 255, 0.08), transparent 80%)`,
-                          }}
-                        />
-                      )}
+                      <motion.div
+                        animate={{
+                          rotateX: sessionTilt.rotate.x,
+                          rotateY: sessionTilt.rotate.y,
+                          scale: sessionTilt.isHovered ? 1.015 : 1,
+                        }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 280,
+                          damping: 22,
+                        }}
+                        style={{ transformStyle: "preserve-3d" }}
+                        className={`relative h-full p-5 flex flex-col justify-between transition-colors duration-200 border overflow-hidden select-none ${
+                          selectedPlan === "session"
+                            ? "bg-[#0c0f15] border-white shadow-[0_0_25px_rgba(255,255,255,0.2)] ring-1 ring-white"
+                            : sessionTilt.isHovered
+                            ? "bg-[#0c0f15] border-white/50 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+                            : "bg-[#090C12] border-white/15 hover:border-white/30"
+                        }`}
+                      >
+                        {sessionTilt.isHovered && (
+                          <div
+                            className="absolute inset-0 pointer-events-none transition-opacity duration-200"
+                            style={{
+                              background: `radial-gradient(circle 200px at ${sessionTilt.mousePos.x}% ${sessionTilt.mousePos.y}%, rgba(255, 255, 255, 0.1), transparent 80%)`,
+                            }}
+                          />
+                        )}
 
-                      <div className="space-y-3 relative z-10">
-                        <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                          <span className="bg-white/10 text-white/70 text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
-                            DIAGNOSTIC FLASH
+                        <div className="space-y-3 relative z-10" style={{ transform: "translateZ(15px)" }}>
+                          <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                            <span className="bg-white/10 text-white/70 text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
+                              DIAGNOSTIC FLASH
+                            </span>
+                            <span className="text-[11px] text-white/50 tracking-wider font-mono">
+                              30 MINUTES
+                            </span>
+                          </div>
+
+                          <div>
+                            <h4 className="text-xl font-display text-white tracking-wider">
+                              SESSION DIAGNOSTIC
+                            </h4>
+                            <div className="text-2xl font-display text-white mt-0.5">
+                              29 €
+                            </div>
+                          </div>
+
+                          <p className="text-[11px] text-white/60 leading-snug">
+                            Audit ciblé pour isoler rapidement les défauts majeurs de viseur ou de crosshair placement.
+                          </p>
+
+                          <div className="space-y-1 pt-1 text-[11px] text-white/70">
+                            <div className="flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 bg-white/40 shrink-0" />
+                              <span>Analyse rapide de gameplay</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 bg-white/40 shrink-0" />
+                              <span>Conseils personnalisés immédiats</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 bg-white/40 shrink-0" />
+                              <span>Compte-rendu écrit</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="pt-2 text-right relative z-10">
+                          <span className={`text-[10px] font-bold uppercase tracking-wider ${
+                            selectedPlan === "session" ? "text-white" : "text-white/30"
+                          }`}>
+                            {selectedPlan === "session" ? "SÉLECTIONNÉ" : "SÉLECTIONNER"}
                           </span>
-                          <span className="text-[11px] text-white/50 tracking-wider font-mono">
-                            30 MINUTES
-                          </span>
                         </div>
-
-                        <div>
-                          <h4 className="text-xl font-display text-white tracking-wider">
-                            SESSION DIAGNOSTIC
-                          </h4>
-                          <div className="text-2xl font-display text-white mt-0.5">
-                            29 €
-                          </div>
-                        </div>
-
-                        <p className="text-[11px] text-white/60 leading-snug">
-                          Audit ciblé pour isoler rapidement les défauts majeurs de viseur ou de crosshair placement.
-                        </p>
-
-                        <div className="space-y-1 pt-1 text-[11px] text-white/70">
-                          <div className="flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 bg-white/40 shrink-0" />
-                            <span>Analyse rapide de gameplay</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 bg-white/40 shrink-0" />
-                            <span>Conseils personnalisés immédiats</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 bg-white/40 shrink-0" />
-                            <span>Compte-rendu écrit</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="pt-2 text-right relative z-10">
-                        <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                          selectedPlan === "session" ? "text-white" : "text-white/30"
-                        }`}>
-                          {selectedPlan === "session" ? "SÉLECTIONNÉ" : "SÉLECTIONNER"}
-                        </span>
-                      </div>
+                      </motion.div>
                     </div>
 
                     {/* Bottom Right: PERFORMANCE */}
                     <div
+                      className="flex-1 cursor-pointer"
+                      style={{ perspective: "1000px" }}
                       onClick={() => setSelectedPlan("performance")}
-                      onMouseEnter={() => setHoveredCard("performance")}
-                      onMouseLeave={() => setHoveredCard(null)}
-                      onMouseMove={handleCardMouseMove}
-                      className={`flex-1 relative p-5 flex flex-col justify-between cursor-pointer transition-all duration-300 border overflow-hidden select-none ${
-                        selectedPlan === "performance"
-                          ? "bg-[#0c0f15] border-[#8FAFD4] shadow-[0_0_25px_rgba(143,175,212,0.25)] ring-1 ring-[#8FAFD4]"
-                          : hoveredCard === "performance"
-                          ? "bg-[#0c0f15] border-[#8FAFD4]/60 shadow-[0_0_20px_rgba(143,175,212,0.15)]"
-                          : "bg-[#090C12] border-white/15 hover:border-white/30"
-                      }`}
+                      onMouseMove={perfTilt.handleMouseMove}
+                      onMouseEnter={perfTilt.handleMouseEnter}
+                      onMouseLeave={perfTilt.handleMouseLeave}
                     >
-                      {hoveredCard === "performance" && (
-                        <div
-                          className="absolute inset-0 pointer-events-none transition-opacity duration-200"
-                          style={{
-                            background: `radial-gradient(circle 200px at ${mousePos.x}% ${mousePos.y}%, rgba(143, 175, 212, 0.12), transparent 80%)`,
-                          }}
-                        />
-                      )}
+                      <motion.div
+                        animate={{
+                          rotateX: perfTilt.rotate.x,
+                          rotateY: perfTilt.rotate.y,
+                          scale: perfTilt.isHovered ? 1.015 : 1,
+                        }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 280,
+                          damping: 22,
+                        }}
+                        style={{ transformStyle: "preserve-3d" }}
+                        className={`relative h-full p-5 flex flex-col justify-between transition-colors duration-200 border overflow-hidden select-none ${
+                          selectedPlan === "performance"
+                            ? "bg-[#0c0f15] border-[#8FAFD4] shadow-[0_0_25px_rgba(143,175,212,0.25)] ring-1 ring-[#8FAFD4]"
+                            : perfTilt.isHovered
+                            ? "bg-[#0c0f15] border-[#8FAFD4]/60 shadow-[0_0_20px_rgba(143,175,212,0.15)]"
+                            : "bg-[#090C12] border-white/15 hover:border-white/30"
+                        }`}
+                      >
+                        {perfTilt.isHovered && (
+                          <div
+                            className="absolute inset-0 pointer-events-none transition-opacity duration-200"
+                            style={{
+                              background: `radial-gradient(circle 200px at ${perfTilt.mousePos.x}% ${perfTilt.mousePos.y}%, rgba(143, 175, 212, 0.15), transparent 80%)`,
+                            }}
+                          />
+                        )}
 
-                      <div className="space-y-3 relative z-10">
-                        <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                          <span className="bg-[#8FAFD4]/20 text-[#8FAFD4] text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
-                            COMPÉTITION & TEAM
+                        <div className="space-y-3 relative z-10" style={{ transform: "translateZ(15px)" }}>
+                          <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                            <span className="bg-[#8FAFD4]/20 text-[#8FAFD4] text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
+                              COMPÉTITION & TEAM
+                            </span>
+                            <span className="text-[11px] text-[#8FAFD4] tracking-wider font-mono">
+                              90 MINUTES
+                            </span>
+                          </div>
+
+                          <div>
+                            <h4 className="text-xl font-display text-white tracking-wider">
+                              PERFORMANCE
+                            </h4>
+                            <div className="text-2xl font-display text-[#8FAFD4] mt-0.5">
+                              89 €
+                            </div>
+                          </div>
+
+                          <p className="text-[11px] text-white/60 leading-snug">
+                            Immersion totale : VOD review approfondie, simulation de match et routine KovaaK&apos;s sur-mesure.
+                          </p>
+
+                          <div className="space-y-1 pt-1 text-[11px] text-white/70">
+                            <div className="flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 bg-[#8FAFD4] shrink-0" />
+                              <span>Double session VOD & coaching live</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 bg-[#8FAFD4] shrink-0" />
+                              <span>Programme KovaaK&apos;s / Aim Lab</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 bg-[#8FAFD4] shrink-0" />
+                              <span>Suivi Discord prioritaire</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="pt-2 text-right relative z-10">
+                          <span className={`text-[10px] font-bold uppercase tracking-wider ${
+                            selectedPlan === "performance" ? "text-[#8FAFD4]" : "text-white/30"
+                          }`}>
+                            {selectedPlan === "performance" ? "SÉLECTIONNÉ" : "SÉLECTIONNER"}
                           </span>
-                          <span className="text-[11px] text-[#8FAFD4] tracking-wider font-mono">
-                            90 MINUTES
-                          </span>
                         </div>
-
-                        <div>
-                          <h4 className="text-xl font-display text-white tracking-wider">
-                            PERFORMANCE
-                          </h4>
-                          <div className="text-2xl font-display text-[#8FAFD4] mt-0.5">
-                            89 €
-                          </div>
-                        </div>
-
-                        <p className="text-[11px] text-white/60 leading-snug">
-                          Immersion totale : VOD review approfondie, simulation de match et routine KovaaK&apos;s sur-mesure.
-                        </p>
-
-                        <div className="space-y-1 pt-1 text-[11px] text-white/70">
-                          <div className="flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 bg-[#8FAFD4] shrink-0" />
-                            <span>Double session VOD & coaching live</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 bg-[#8FAFD4] shrink-0" />
-                            <span>Programme KovaaK&apos;s / Aim Lab</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 bg-[#8FAFD4] shrink-0" />
-                            <span>Suivi Discord prioritaire</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="pt-2 text-right relative z-10">
-                        <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                          selectedPlan === "performance" ? "text-[#8FAFD4]" : "text-white/30"
-                        }`}>
-                          {selectedPlan === "performance" ? "SÉLECTIONNÉ" : "SÉLECTIONNER"}
-                        </span>
-                      </div>
+                      </motion.div>
                     </div>
                   </div>
                 </div>
