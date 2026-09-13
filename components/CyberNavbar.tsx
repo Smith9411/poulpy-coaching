@@ -11,7 +11,7 @@ import AuthModal from "./AuthModal";
 import { useAuth } from "@/context/AuthContext";
 
 interface CyberNavbarProps {
-  onOpenBooking: () => void;
+  onOpenBooking?: () => void;
 }
 
 export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
@@ -289,32 +289,43 @@ export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
               <div className="relative" ref={userMenuRef}>
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-2 text-xs font-mono tracking-wider text-white hover:text-[#FF7582] transition-colors py-1.5 px-2 border border-white/15 bg-black/40 cursor-pointer"
+                  className="flex items-center gap-2.5 text-xs font-mono tracking-wider text-white hover:text-[#FF7582] transition-colors py-1 px-1 cursor-pointer group"
                 >
-                  <div className="w-5 h-5 bg-[#FF7582]/20 border border-[#FF7582]/40 text-[#FF7582] text-[10px] font-bold flex items-center justify-center">
+                  <div className="w-8 h-8 bg-[#FF7582]/15 border border-[#FF7582]/50 text-[#FF7582] text-xs font-bold flex items-center justify-center overflow-hidden shadow-[0_0_10px_rgba(255,117,130,0.2)]">
                     {user.avatarUrl ? (
                       <img src={user.avatarUrl} alt={user.username} className="w-full h-full object-cover" />
                     ) : (
                       user.initial || user.username[0]?.toUpperCase() || "P"
                     )}
                   </div>
-                  <span className="font-semibold truncate max-w-[90px]">{user.username}</span>
+                  <span className="font-semibold text-white group-hover:text-[#FF7582] transition-colors truncate max-w-[110px]">
+                    {user.username}
+                  </span>
                   {user.isAdmin && (
-                    <span className="text-[9px] font-bold px-1 bg-[#FF7582] text-black">ADMIN</span>
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 bg-[#FF7582] text-black">ADMIN</span>
                   )}
-                  <ChevronDown className="w-3 h-3 text-white/50" />
+                  <ChevronDown className="w-3 h-3 text-white/50 group-hover:text-white transition-colors" />
                 </button>
 
                 {userMenuOpen && (
-                  <div className="absolute top-full right-0 mt-2 w-56 bg-[#090c10] border border-[#FF7582]/40 shadow-[0_10px_40px_rgba(0,0,0,0.9)] p-2 space-y-1 font-mono text-xs z-50">
-                    <div className="p-2 border-b border-white/10 mb-1">
+                  <div className="absolute top-full right-0 mt-2 w-60 bg-[#090c10] border border-[#FF7582]/40 shadow-[0_10px_40px_rgba(0,0,0,0.9)] p-2 space-y-1 font-mono text-xs z-50">
+                    <div className="p-2.5 border-b border-white/10 mb-1 bg-black/40">
                       <div className="text-[10px] text-white/40 uppercase">CONNECTÉ EN TANT QUE</div>
-                      <div className="text-white font-bold truncate">{user.email || user.username}</div>
+                      <div className="text-white font-bold truncate">{user.username}</div>
+                      <div className="text-[10px] text-white/50 truncate">{user.email}</div>
                     </div>
+                    <Link
+                      href="/profile"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="w-full p-2 hover:bg-white/5 text-white/90 hover:text-[#FF7582] flex items-center gap-2.5 transition-colors font-medium"
+                    >
+                      <User className="w-3.5 h-3.5 text-[#FF7582]" />
+                      <span>MON PROFIL</span>
+                    </Link>
                     <Link
                       href="/coaching"
                       onClick={() => setUserMenuOpen(false)}
-                      className="w-full p-2 hover:bg-white/5 text-white/80 hover:text-white flex items-center gap-2 transition-colors"
+                      className="w-full p-2 hover:bg-white/5 text-white/80 hover:text-white flex items-center gap-2.5 transition-colors"
                     >
                       <LayoutDashboard className="w-3.5 h-3.5 text-[#8FAFD4]" />
                       <span>ESPACE ÉLÈVE</span>
@@ -322,7 +333,7 @@ export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
                     <Link
                       href="/coaching/sheet"
                       onClick={() => setUserMenuOpen(false)}
-                      className="w-full p-2 hover:bg-white/5 text-white/80 hover:text-white flex items-center gap-2 transition-colors"
+                      className="w-full p-2 hover:bg-white/5 text-white/80 hover:text-white flex items-center gap-2.5 transition-colors"
                     >
                       <Film className="w-3.5 h-3.5 text-[#A4DE87]" />
                       <span>FICHES & SUIVI</span>
@@ -331,7 +342,7 @@ export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
                       <Link
                         href="/admin"
                         onClick={() => setUserMenuOpen(false)}
-                        className="w-full p-2 hover:bg-[#FF7582]/10 text-[#FF7582] flex items-center gap-2 transition-colors font-bold"
+                        className="w-full p-2 hover:bg-[#FF7582]/10 text-[#FF7582] flex items-center gap-2.5 transition-colors font-bold"
                       >
                         <Shield className="w-3.5 h-3.5 text-[#FF7582]" />
                         <span>PANNEAU ADMIN</span>
@@ -342,7 +353,7 @@ export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
                         setUserMenuOpen(false);
                         logout();
                       }}
-                      className="w-full p-2 hover:bg-red-500/10 text-red-400 hover:text-red-300 flex items-center gap-2 transition-colors text-left border-t border-white/10 mt-1"
+                      className="w-full p-2 hover:bg-red-500/10 text-red-400 hover:text-red-300 flex items-center gap-2.5 transition-colors text-left border-t border-white/10 mt-1 cursor-pointer"
                     >
                       <LogOut className="w-3.5 h-3.5" />
                       <span>DÉCONNEXION</span>
@@ -363,7 +374,13 @@ export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
 
             {/* Prominent CTA Button */}
             <button
-              onClick={onOpenBooking}
+              onClick={() => {
+                if (onOpenBooking) {
+                  onOpenBooking();
+                } else {
+                  window.location.href = "/#booking";
+                }
+              }}
               className="btn-cyber-primary text-xs py-2 px-4 font-bold"
             >
               <span>RÉSERVER</span>
@@ -446,7 +463,11 @@ export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
               <button
                 onClick={() => {
                   setMobileOpen(false);
-                  onOpenBooking();
+                  if (onOpenBooking) {
+                    onOpenBooking();
+                  } else {
+                    window.location.href = "/#booking";
+                  }
                 }}
                 className="btn-cyber-primary w-full justify-center text-xs py-3"
               >

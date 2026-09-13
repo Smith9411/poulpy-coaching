@@ -2,13 +2,15 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { User, Mail, Settings, LogOut, Shield, Clock, Award, Camera, Trash2, Edit2, Check, X, Loader2, MessageSquare, Quote, Film, Calendar, Gamepad2, AlertCircle, FileText } from 'lucide-react';
+import { User, Mail, Settings, LogOut, Shield, Clock, Award, Camera, Trash2, Edit2, Check, X, Loader2, MessageSquare, Quote, Film, Calendar, Gamepad2, AlertCircle, FileText, ArrowLeft } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { useState, useRef, useEffect } from 'react';
 import FavoriteGames from '@/components/FavoriteGames';
 import SocialLinks from '@/components/SocialLinks';
 import { CoachingBooking } from '@/components/booking/types';
+import CyberNavbar from '@/components/CyberNavbar';
+import ThemeToggle from '@/components/ThemeToggle';
 
 const MAGIC_BYTES: Record<string, number[]> = {
   'image/png': [0x89, 0x50, 0x4e, 0x47],
@@ -117,25 +119,27 @@ export default function Profile() {
 
   if (authLoading) {
     return (
-      <main className="min-h-screen page-bg py-24 flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      <main className="min-h-screen bg-[#07090D] flex items-center justify-center font-mono">
+        <div className="w-8 h-8 border-2 border-[#FF7582] border-t-transparent animate-spin" />
       </main>
     );
   }
 
   if (!user) {
     return (
-      <main className="min-h-screen page-bg py-24 flex items-center justify-center">
-        <div className="text-center card rounded-2xl p-12 max-w-md mx-auto px-4">
-          <User size={64} className="mx-auto mb-6 text-gray-500" />
-          <h1 className="text-3xl font-bold mb-4">Non connecté</h1>
-          <p className="text-gray-400 mb-8">Connecte-toi pour accéder à ton espace personnel.</p>
+      <main className="min-h-screen bg-[#07090D] text-white flex items-center justify-center font-mono px-4">
+        <CyberNavbar />
+        <ThemeToggle />
+        <div className="text-center reticle-box bg-[#090c10] border border-white/10 p-12 max-w-md mx-auto">
+          <User size={48} className="mx-auto mb-4 text-white/30" />
+          <h1 className="text-2xl font-display uppercase tracking-wider mb-2">ACCÈS NON AUTHENTIFIÉ</h1>
+          <p className="text-xs text-white/60 mb-6">Connecte-toi pour accéder à ton espace personnel et ton suivi.</p>
           <Link
             href="/auth"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all"
+            className="btn-cyber-primary text-xs w-full justify-center"
           >
-            Se connecter
-            <Award size={20} />
+            <span>SE CONNECTER</span>
+            <Award size={14} />
           </Link>
         </div>
       </main>
@@ -158,7 +162,7 @@ export default function Profile() {
 
     const isValidImage = await verifyImageMagicBytes(file);
     if (!isValidImage) {
-      showStatus('error', "Le fichier n'est pas une image valide. Le contenu ne correspond pas à l'extension.");
+      showStatus('error', "Le fichier n'est pas une image valide.");
       return;
     }
 
@@ -207,7 +211,7 @@ export default function Profile() {
     }
   };
 
-const handleSaveUsername = async () => {
+  const handleSaveUsername = async () => {
     const trimmed = newName.trim();
     if (!trimmed || trimmed === user.username) {
       setIsEditingName(false);
@@ -217,7 +221,7 @@ const handleSaveUsername = async () => {
       showStatus('error', 'Le pseudo doit contenir entre 2 et 30 caractères.');
       return;
     }
-    if (!/^[a-zA-Z0-9_\-À-ÿ ]+$/.test(trimmed)) {
+    if (!/^[a-zA-Z0-9_-À-ÿ ]+$/.test(trimmed)) {
       showStatus('error', 'Le pseudo contient des caractères non autorisés.');
       return;
     }
@@ -259,96 +263,97 @@ const handleSaveUsername = async () => {
   };
 
   return (
-    <main className="min-h-screen page-bg py-24">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-[#07090D] text-white selection:bg-[#FF7582] selection:text-black pt-28 pb-20 font-mono relative z-10">
+      <CyberNavbar />
+      <ThemeToggle />
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
-        <div className="mb-12">
-          <div className="inline-block glass px-4 py-2 rounded-full mb-4">
-            <span className="text-sm text-purple-400 font-medium">ESPACE PERSONNEL</span>
+        <div className="mb-10 pb-6 border-b border-white/10">
+          <div className="flex items-center gap-3 mb-3">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1.5 text-xs font-mono text-[#8FAFD4] hover:text-white transition-colors uppercase tracking-wider"
+            >
+              <ArrowLeft size={13} />
+              <span>RETOUR AU SITE</span>
+            </Link>
+            <span className="text-white/20">/</span>
+            <span className="data-badge data-badge-laser">ESPACE PERSONNEL</span>
           </div>
-          <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-            Bienvenue, <span className="text-gradient">{user.username}</span>
+
+          <h1 className="text-3xl sm:text-5xl font-display uppercase tracking-wider text-white">
+            BIENVENUE, <span className="text-[#FF7582]">{user.username}</span>
           </h1>
-          <p className="text-xl text-gray-300 max-w-2xl">
-            Ton espace personnel pour gérer ton profil, ta progression et tes sessions.
+          <p className="text-xs text-white/60 mt-1 tracking-wide">
+            Espace de gestion de compte, sessions réservées et suivi e-sport.
           </p>
         </div>
 
         {/* Status Toast */}
         {statusMsg && (
           <div
-            className={`mb-6 p-4 rounded-xl text-sm font-medium flex items-center gap-2 ${
+            className={`mb-6 p-3 text-xs font-mono flex items-center gap-2 border ${
               statusMsg.type === 'success'
-                ? 'bg-green-500/20 border border-green-500/30 text-green-400'
-                : 'bg-red-500/20 border border-red-500/30 text-red-400'
+                ? 'bg-[#A4DE87]/10 border-[#A4DE87]/40 text-[#A4DE87]'
+                : 'bg-[#FF7582]/10 border-[#FF7582]/40 text-[#FF7582]'
             }`}
           >
-            {statusMsg.type === 'success' ? <Check size={18} /> : <X size={18} />}
+            {statusMsg.type === 'success' ? <Check size={16} /> : <X size={16} />}
             <span>{statusMsg.text}</span>
           </div>
         )}
 
-        {/* Alertes de coaching (séance déplacée ou annulée) */}
+        {/* Alerts */}
         {studentAlerts.map((alert) => (
           <div
             key={alert.id}
-            className={`mb-6 p-5 rounded-2xl border backdrop-blur-md shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-in slide-in-from-top-3 ${
+            className={`mb-6 p-4 border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono text-xs ${
               alert.status === 'cancelled'
-                ? 'bg-red-500/15 border-red-500/30 text-red-200'
-                : 'bg-purple-500/15 border-purple-500/30 text-purple-200'
+                ? 'bg-red-500/10 border-red-500/30 text-red-200'
+                : 'bg-[#FF7582]/10 border-[#FF7582]/30 text-white'
             }`}
           >
-            <div className="flex items-start gap-3">
-              <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold shrink-0 ${
-                  alert.status === 'cancelled'
-                    ? 'bg-red-500/20 text-red-400 border border-red-500/40'
-                    : 'bg-purple-500/20 text-purple-300 border border-purple-500/40'
-                }`}
-              >
-                {alert.status === 'cancelled' ? '⚠️' : '📅'}
-              </div>
-              <div className="space-y-1">
-                <p className="font-bold text-white text-sm">
-                  {alert.status === 'cancelled'
-                    ? `Séance de coaching annulée (${alert.plan_name})`
-                    : `Séance de coaching reportée (${alert.plan_name})`}
-                </p>
-                <p className="text-xs text-gray-300">
-                  {alert.status === 'cancelled' ? (
-                    <>La séance initialement prévue le <strong className="text-white">{new Date(alert.booking_date).toLocaleDateString('fr-FR')} à {alert.booking_time}</strong> a été annulée par le coach.</>
-                  ) : (
-                    <>Nouvelle date retenue : <strong className="text-white">{new Date(alert.booking_date).toLocaleDateString('fr-FR')} à {alert.booking_time}</strong>.</>
-                  )}
-                </p>
-                {alert.admin_notes && (
-                  <p className="text-xs italic text-gray-400">
-                    Message du coach : &laquo; {alert.admin_notes} &raquo;
-                  </p>
+            <div className="space-y-1">
+              <p className="font-bold text-sm">
+                {alert.status === 'cancelled'
+                  ? `⚠️ Séance de coaching annulée (${alert.plan_name})`
+                  : `📅 Séance de coaching reportée (${alert.plan_name})`}
+              </p>
+              <p className="text-xs text-white/70">
+                {alert.status === 'cancelled' ? (
+                  <>La séance prévue le <strong className="text-white">{new Date(alert.booking_date).toLocaleDateString('fr-FR')} à {alert.booking_time}</strong> a été annulée.</>
+                ) : (
+                  <>Nouvelle date retenue : <strong className="text-white">{new Date(alert.booking_date).toLocaleDateString('fr-FR')} à {alert.booking_time}</strong>.</>
                 )}
-              </div>
+              </p>
+              {alert.admin_notes && (
+                <p className="text-[11px] italic text-white/50">
+                  Message du coach : &laquo; {alert.admin_notes} &raquo;
+                </p>
+              )}
             </div>
 
             <button
               type="button"
               onClick={() => dismissAlert(alert.id)}
-              className="px-4 py-2 rounded-xl glass hover:bg-white/10 text-white text-xs font-semibold shrink-0 transition-colors cursor-pointer"
+              className="btn-cyber-ghost text-xs py-1.5 px-3 shrink-0"
             >
-              J&apos;ai compris
+              COMPRIS
             </button>
           </div>
         ))}
 
         {/* Profile Card */}
-        <div className="card rounded-2xl p-8 mb-12">
-          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-8">
+        <div className="reticle-box bg-[#090c10] border border-white/10 p-6 sm:p-8 mb-8">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
 
-            {/* Avatar with Custom Upload */}
+            {/* Avatar */}
             <div className="relative group">
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="w-32 h-32 rounded-2xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-4xl font-bold text-white overflow-hidden cursor-pointer relative shadow-lg group-hover:ring-4 group-hover:ring-purple-500/40 transition-all"
+                className="w-24 h-24 sm:w-28 sm:h-28 bg-[#FF7582]/15 border border-[#FF7582]/40 flex items-center justify-center text-3xl font-bold text-[#FF7582] overflow-hidden cursor-pointer relative shadow-[0_0_15px_rgba(255,117,130,0.15)] group-hover:border-[#FF7582] transition-colors"
                 title="Cliquer pour changer de photo"
               >
                 {user.avatarUrl ? (
@@ -357,25 +362,18 @@ const handleSaveUsername = async () => {
                   user.initial
                 )}
 
-                {/* Hover overlay */}
-                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-xs gap-1">
+                <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-[10px] gap-1 font-mono">
                   {isUploading ? (
-                    <Loader2 size={24} className="animate-spin" />
+                    <Loader2 size={18} className="animate-spin" />
                   ) : (
                     <>
-                      <Camera size={24} />
-                      <span>Changer</span>
+                      <Camera size={18} />
+                      <span>MODIFIER</span>
                     </>
                   )}
                 </div>
               </div>
 
-              {/* Status badge */}
-              <div className="absolute bottom-0 right-0 w-8 h-8 bg-green-500 rounded-full border-4 border-page flex items-center justify-center" title="Compte vérifié">
-                <Shield size={16} className="text-white" />
-              </div>
-
-              {/* Hidden file input */}
               <input
                 type="file"
                 ref={fileInputRef}
@@ -388,107 +386,104 @@ const handleSaveUsername = async () => {
 
             {/* Info */}
             <div className="flex-1 text-center sm:text-left">
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mb-2">
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-1">
                 {isEditingName ? (
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
                       value={newName}
                       onChange={(e) => setNewName(e.target.value)}
-                      className="px-3 py-1.5 rounded-lg bg-white/10 border border-white/20 text-inherit text-xl font-bold focus:outline-none focus:border-purple-500"
+                      className="px-2.5 py-1 bg-black border border-white/20 text-white text-lg font-bold font-mono focus:border-[#FF7582]"
                       autoFocus
                     />
                     <button
                       onClick={handleSaveUsername}
                       disabled={isSavingName}
-                      className="p-1.5 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30"
+                      className="p-1.5 bg-[#A4DE87]/20 text-[#A4DE87] border border-[#A4DE87]/40 text-xs"
                       title="Enregistrer"
                     >
-                      {isSavingName ? <Loader2 size={18} className="animate-spin" /> : <Check size={18} />}
+                      {isSavingName ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                     </button>
                     <button
                       onClick={() => setIsEditingName(false)}
-                      className="p-1.5 rounded-lg bg-white/5 text-gray-400 hover:bg-white/10"
+                      className="p-1.5 bg-white/5 text-white/50 hover:text-white text-xs"
                       title="Annuler"
                     >
-                      <X size={18} />
+                      <X size={14} />
                     </button>
                   </div>
                 ) : (
                   <>
-                    <h2 className="text-3xl font-bold">{user.username}</h2>
+                    <h2 className="text-2xl font-bold font-display tracking-wider uppercase text-white">{user.username}</h2>
                     <button
                       onClick={() => {
                         setNewName(user.username);
                         setIsEditingName(true);
                       }}
-                      className="p-1.5 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                      className="p-1 text-white/40 hover:text-white transition-colors cursor-pointer"
                       title="Modifier mon pseudo"
                     >
-                      <Edit2 size={16} />
+                      <Edit2 size={14} />
                     </button>
                   </>
                 )}
               </div>
 
-              <p className="text-purple-400 font-medium mb-4">
-                {user.isAdmin ? '👑 Administrateur Poulpy Coaching' : 'Membre Poulpy Coaching'}
-              </p>
+              <div className="mb-3">
+                {user.isAdmin ? (
+                  <span className="data-badge data-badge-acid text-[10px]">ADMINISTRATEUR POULPY</span>
+                ) : (
+                  <span className="data-badge data-badge-laser text-[10px]">MEMBRE POULPY COACHING</span>
+                )}
+              </div>
 
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 mb-4">
-                <div className="flex items-center gap-2 text-gray-300 text-sm">
-                  <Mail size={16} className="text-gray-500" />
-                  <span>{user.email}</span>
-                </div>
+              <div className="flex items-center justify-center sm:justify-start gap-2 text-white/60 text-xs mb-4">
+                <Mail size={13} className="text-[#8FAFD4]" />
+                <span>{user.email}</span>
               </div>
 
               {/* Photo controls */}
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-2 border-t border-white/5">
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-3 border-t border-white/10">
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-medium text-gray-300 transition-colors disabled:opacity-50"
+                  className="btn-cyber-ghost text-[10px] py-1 px-2.5 disabled:opacity-50"
                 >
-                  <Camera size={14} />
-                  {user.avatarUrl ? 'Changer la photo' : 'Ajouter une photo'}
+                  <Camera size={12} />
+                  <span>{user.avatarUrl ? 'CHANGER PHOTO' : 'AJOUTER PHOTO'}</span>
                 </button>
                 {user.avatarUrl && (
                   <button
                     type="button"
                     onClick={handleRemoveAvatar}
                     disabled={isUploading}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-xs font-medium text-red-400 transition-colors disabled:opacity-50"
+                    className="px-2.5 py-1 text-[10px] bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition-colors font-mono disabled:opacity-50 cursor-pointer"
                   >
-                    <Trash2 size={14} />
-                    Supprimer la photo
+                    <Trash2 size={12} className="inline mr-1" />
+                    SUPPRIMER
                   </button>
                 )}
               </div>
             </div>
 
-            {/* Logout button */}
+            {/* Logout */}
             <button
               onClick={logout}
-              className="flex items-center gap-2 px-6 py-3 glass rounded-xl text-gray-300 hover:text-red-400 hover:bg-red-500/10 border border-white/5 transition-all"
+              className="btn-cyber-ghost text-xs py-2 px-4 hover:border-red-500 hover:text-red-400 cursor-pointer"
             >
-              <LogOut size={18} />
-              Déconnexion
+              <LogOut size={14} />
+              <span>DÉCONNEXION</span>
             </button>
           </div>
         </div>
 
         {/* Bio */}
-        <div className="card rounded-2xl p-8 mb-12">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
-                <Quote size={20} className="text-white" />
-              </div>
-              <div>
-                <h3 className="font-bold text-lg">Ma bio</h3>
-                <p className="text-xs text-gray-500">Visible par l&apos;équipe de coaching</p>
-              </div>
+        <div className="reticle-box bg-[#090c10] border border-white/10 p-6 mb-8">
+          <div className="flex items-center justify-between mb-3 pb-3 border-b border-white/10">
+            <div className="flex items-center gap-2">
+              <Quote size={16} className="text-[#FF7582]" />
+              <h3 className="font-bold text-sm uppercase tracking-wider text-white">MA BIO // PRÉSENTATION</h3>
             </div>
             {!isEditingBio && (
               <button
@@ -497,11 +492,9 @@ const handleSaveUsername = async () => {
                   setBioDraft(user.bio || '');
                   setIsEditingBio(true);
                 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-medium text-gray-300 transition-colors"
-                title={user.bio ? 'Modifier ma bio' : 'Ajouter une bio'}
+                className="text-[10px] text-[#8FAFD4] hover:text-white uppercase font-bold tracking-wider cursor-pointer"
               >
-                <Edit2 size={14} />
-                {user.bio ? 'Modifier' : 'Ajouter'}
+                {user.bio ? '[ MODIFIER ]' : '[ AJOUTER ]'}
               </button>
             )}
           </div>
@@ -511,91 +504,87 @@ const handleSaveUsername = async () => {
               <textarea
                 value={bioDraft}
                 onChange={(e) => setBioDraft(e.target.value.slice(0, 280))}
-                placeholder="Présente-toi en quelques lignes : ton jeu principal, ton rang, tes objectifs, ce que tu attends du coaching…"
+                placeholder="Présente ton niveau de jeu, ton rang actuel et tes objectifs e-sport..."
                 rows={4}
                 maxLength={280}
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500 resize-none"
+                className="w-full p-3 bg-black border border-white/20 text-white placeholder-white/30 text-xs focus:border-[#FF7582] resize-none font-mono"
                 autoFocus
               />
-              <div className="flex items-center justify-between mt-3">
-                <span className={`text-xs ${bioDraft.length >= 260 ? 'text-orange-400' : 'text-gray-500'}`}>
-                  {bioDraft.length} / 280
-                </span>
+              <div className="flex items-center justify-between mt-2">
+                <span className="text-[10px] text-white/40">{bioDraft.length} / 280</span>
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => setIsEditingBio(false)}
                     disabled={isSavingBio}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-medium text-gray-300 transition-colors disabled:opacity-50"
+                    className="px-3 py-1 bg-white/5 hover:bg-white/10 text-white/60 text-xs"
                   >
-                    <X size={14} />
                     Annuler
                   </button>
                   <button
                     type="button"
                     onClick={handleSaveBio}
                     disabled={isSavingBio}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-green-500/20 hover:bg-green-500/30 text-xs font-medium text-green-400 transition-colors disabled:opacity-50"
+                    className="btn-cyber-primary text-xs py-1 px-3"
                   >
-                    {isSavingBio ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
-                    Enregistrer
+                    {isSavingBio ? 'Enregistrement...' : 'Sauvegarder'}
                   </button>
                 </div>
               </div>
             </div>
           ) : user.bio ? (
-            <p className="text-gray-200 whitespace-pre-wrap leading-relaxed">{user.bio}</p>
+            <p className="text-xs text-white/80 whitespace-pre-wrap leading-relaxed">{user.bio}</p>
           ) : (
-            <p className="text-sm text-gray-500 italic">
-              Aucune bio pour l&apos;instant. Ajoute quelques lignes pour que ton coach puisse mieux te connaître.
+            <p className="text-xs text-white/40 italic">
+              Aucune bio renseignée. Ajoute quelques lignes pour que Poulpy adapte ses sessions à tes attentes.
             </p>
           )}
         </div>
 
         {/* Social Links */}
-        <div className="mb-12">
+        <div className="mb-8">
           <SocialLinks editable />
         </div>
 
         {/* Favorite Games */}
         {!user.isAdmin && (
-          <div className="mb-12">
+          <div className="mb-8">
             <FavoriteGames />
           </div>
         )}
 
         {/* Active Coaching Bookings */}
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-            <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2.5">
-              <Calendar size={22} className="text-cyan-400" />
-              <span>Mes Séances de Coaching Réservées</span>
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4 pb-2 border-b border-white/10">
+            <h2 className="text-lg font-display uppercase tracking-wider text-white flex items-center gap-2">
+              <Calendar size={18} className="text-[#8FAFD4]" />
+              <span>SÉANCES DE COACHING RÉSERVÉES</span>
             </h2>
             <Link
               href="/#booking"
-              className="text-xs sm:text-sm font-semibold text-purple-400 hover:text-purple-300 transition-colors flex items-center gap-1"
+              className="text-xs text-[#FF7582] hover:underline font-bold"
             >
-              + Réserver une autre session
+              + RÉSERVER UN NOUVEAU CRÉNEAU
             </Link>
           </div>
 
           {bookingsLoading ? (
-            <div className="card rounded-2xl p-8 text-center">
-              <Loader2 size={24} className="animate-spin text-purple-500 mx-auto mb-2" />
-              <p className="text-xs text-gray-400">Chargement de tes réservations...</p>
+            <div className="reticle-box bg-[#090c10] border border-white/10 p-8 text-center">
+              <div className="w-6 h-6 border-2 border-[#FF7582] border-t-transparent animate-spin mx-auto mb-2" />
+              <p className="text-xs text-white/50">Chargement de tes réservations...</p>
             </div>
           ) : studentBookings.length === 0 ? (
-            <div className="card rounded-2xl p-8 text-center border border-white/5">
-              <Clock size={36} className="mx-auto mb-3 text-gray-500" />
-              <p className="text-sm font-semibold text-white mb-1">Aucune session de coaching planifiée</p>
-              <p className="text-xs text-gray-400 mb-4 max-w-md mx-auto">
-                Choisis ton pack et sélectionne une date disponible pour démarrer ton entraînement personnalisé avec Poulpy.
+            <div className="reticle-box bg-[#090c10] border border-white/10 p-8 text-center">
+              <Clock size={32} className="mx-auto mb-3 text-white/30" />
+              <p className="text-xs font-bold text-white uppercase tracking-wider mb-1">AUCUNE SESSION PROGRAMMÉE</p>
+              <p className="text-xs text-white/50 mb-4 max-w-md mx-auto">
+                Choisis ta formule pour bloquer ton créneau et démarrer ton entraînement d&apos;élite.
               </p>
               <Link
                 href="/#booking"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-bold text-xs shadow-md hover:shadow-cyan-500/20 transition-all"
+                className="btn-cyber-primary text-xs"
               >
-                <span>Choisir un créneau disponible</span>
+                <span>CHOISIR UN CRÉNEAU DISPONIBLE</span>
                 <Award size={14} />
               </Link>
             </div>
@@ -604,26 +593,26 @@ const handleSaveUsername = async () => {
               {studentBookings.map((b) => (
                 <div
                   key={b.id}
-                  className="card rounded-2xl p-5 border border-purple-500/30 hover:border-purple-400/60 transition-all flex flex-col justify-between space-y-3"
+                  className="reticle-box bg-[#090c10] border border-white/15 hover:border-[#FF7582]/50 transition-colors p-5 flex flex-col justify-between space-y-3"
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300">
+                      <span className="data-badge data-badge-laser text-[9px]">
                         {b.plan_name}
                       </span>
                       <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        className={`data-badge text-[9px] ${
                           b.status === 'rescheduled'
-                            ? 'bg-purple-500/20 text-purple-300'
-                            : 'bg-green-500/20 text-green-300'
+                            ? 'data-badge-acid'
+                            : 'data-badge-laser'
                         }`}
                       >
-                        {b.status === 'rescheduled' ? 'Reportée' : 'Confirmée'}
+                        {b.status === 'rescheduled' ? 'REPORTÉE' : 'CONFIRMÉE'}
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-2 text-white font-extrabold text-base sm:text-lg">
-                      <Calendar size={18} className="text-cyan-400" />
+                    <div className="text-sm font-bold text-white flex items-center gap-2">
+                      <Calendar size={15} className="text-[#8FAFD4]" />
                       <span>
                         {new Date(b.booking_date).toLocaleDateString('fr-FR', {
                           weekday: 'short',
@@ -633,22 +622,22 @@ const handleSaveUsername = async () => {
                         à {b.booking_time}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-400 mt-0.5">
-                      {b.plan_duration} • Jeu : <span className="text-amber-300 font-semibold">{b.game}</span>
+                    <p className="text-xs text-white/60 mt-1">
+                      {b.plan_duration} • Discipline : <span className="text-[#FF7582] font-bold">{b.game}</span>
                     </p>
                   </div>
 
                   <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-2 text-xs">
-                    <span className="text-gray-400 text-[11px]">
+                    <span className="text-white/50 text-[11px]">
                       Discord : <strong className="text-white">{b.student_discord}</strong>
                     </span>
                     <a
                       href="https://discord.gg/rJMg3ZZRkp"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-3 py-1.5 rounded-lg glass hover:bg-white/10 text-cyan-300 font-medium text-[11px] transition-colors"
+                      className="px-2.5 py-1 bg-[#8FAFD4]/10 border border-[#8FAFD4]/30 text-[#8FAFD4] hover:text-white text-[10px] font-bold uppercase"
                     >
-                      Discord
+                      DISCORD
                     </a>
                   </div>
                 </div>
@@ -657,83 +646,47 @@ const handleSaveUsername = async () => {
           )}
         </div>
 
-        {/* Stats / Upcoming sections */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        {/* Quick Access Modules */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <Link
             href="/profile/coaching"
-            className="card rounded-2xl p-6 text-center hover:bg-white/5 transition-all group cursor-pointer"
+            className="reticle-box bg-[#090c10] border border-white/10 hover:border-[#8FAFD4] p-5 text-center transition-colors group cursor-pointer"
           >
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-              <MessageSquare size={24} className="text-white" />
-            </div>
-            <h3 className="font-bold mb-1">Messages Coaching</h3>
-            <p className="text-sm text-gray-400">Retours de ton coach</p>
+            <MessageSquare size={22} className="text-[#8FAFD4] mx-auto mb-2 group-hover:scale-110 transition-transform" />
+            <h3 className="font-bold text-xs uppercase tracking-wider mb-0.5">MESSAGES COACH</h3>
+            <p className="text-[10px] text-white/50">Retours & feed-back</p>
           </Link>
 
           <Link
             href="/profile/vod"
-            className="card rounded-2xl p-6 text-center hover:bg-white/5 transition-all group cursor-pointer"
+            className="reticle-box bg-[#090c10] border border-white/10 hover:border-[#FF7582] p-5 text-center transition-colors group cursor-pointer"
           >
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-500 to-yellow-500 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-              <Film size={24} className="text-white" />
-            </div>
-            <h3 className="font-bold mb-1">Clips VOD</h3>
-            <p className="text-sm text-gray-400">Analyses de tes replays</p>
+            <Film size={22} className="text-[#FF7582] mx-auto mb-2 group-hover:scale-110 transition-transform" />
+            <h3 className="font-bold text-xs uppercase tracking-wider mb-0.5">CLIPS VOD</h3>
+            <p className="text-[10px] text-white/50">Analyses de replays</p>
           </Link>
 
-          <div className="card rounded-2xl p-6 text-center hover:bg-white/5 transition-all group">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-              <Clock size={24} className="text-white" />
-            </div>
-            <h3 className="font-bold text-lg mb-2">Sessions à venir</h3>
-            <p className="text-gray-400 text-sm mb-4">
+          <Link
+            href="/#booking"
+            className="reticle-box bg-[#090c10] border border-white/10 hover:border-[#A4DE87] p-5 text-center transition-colors group cursor-pointer"
+          >
+            <Clock size={22} className="text-[#A4DE87] mx-auto mb-2 group-hover:scale-110 transition-transform" />
+            <h3 className="font-bold text-xs uppercase tracking-wider mb-0.5">SESSIONS</h3>
+            <p className="text-[10px] text-white/50">
               {studentBookings.length > 0
-                ? `${studentBookings.length} session${studentBookings.length > 1 ? 's' : ''} planifiée${studentBookings.length > 1 ? 's' : ''}`
-                : 'Aucune session planifiée'}
+                ? `${studentBookings.length} planifiée(s)`
+                : 'Réserver'}
             </p>
-            <Link
-              href="/#booking"
-              className="inline-flex items-center gap-1 text-purple-400 hover:text-purple-300 text-sm font-medium transition-colors"
-            >
-              Réserver
-              <Award size={14} />
-            </Link>
-          </div>
+          </Link>
 
           <Link
             href="/profile/sheet"
-            className="card rounded-2xl p-6 text-center hover:bg-white/5 transition-all group cursor-pointer"
+            className="reticle-box bg-[#090c10] border border-white/10 hover:border-white p-5 text-center transition-colors group cursor-pointer"
           >
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-indigo-600 to-purple-500 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-lg shadow-indigo-500/20">
-              <FileText size={24} className="text-white" />
-            </div>
-            <h3 className="font-bold text-lg mb-1">Fiche Perso</h3>
-            <p className="text-gray-400 text-sm mb-4">Objectifs & plan coach</p>
-            <span className="inline-flex items-center gap-1 text-indigo-400 group-hover:text-indigo-300 text-sm font-medium transition-colors">
-              Consulter ma fiche →
-            </span>
+            <FileText size={22} className="text-white mx-auto mb-2 group-hover:scale-110 transition-transform" />
+            <h3 className="font-bold text-xs uppercase tracking-wider mb-0.5">FICHE PERSO</h3>
+            <p className="text-[10px] text-white/50">Objectifs & axes</p>
           </Link>
-        </div>
-
-        {/* Info section */}
-        <div className="card rounded-2xl p-8">
-          <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
-            <Shield size={24} className="text-purple-400" />
-            À propos de cet espace
-          </h3>
-          <div className="space-y-4 text-gray-300">
-            <p>Cet espace personnel te permet de gérer ton profil et suivre tes coachings :</p>
-            <ul className="space-y-3 pl-6 list-disc">
-              <li>Photo de profil personnalisée et modification de pseudo instantanée</li>
-              <li>Voir l&apos;historique de tes sessions de coaching</li>
-              <li>Suivre ta progression de rang (Valorant, Apex, Aim)</li>
-              <li>Accéder à tes VOD review et analyses</li>
-              <li>Gérer tes créneaux de réservation</li>
-            </ul>
-            <p className="text-sm text-gray-500 pt-4 border-t border-white/5">
-              Pour toute question, rejoins le <a href="https://discord.gg/rJMg3ZZRkp" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300 underline">Discord</a>.
-            </p>
-          </div>
         </div>
       </div>
     </main>
