@@ -2,96 +2,109 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Target, Dumbbell, TrendingUp, ChevronRight, Zap, Activity, ArrowRight, CheckCircle2 } from "lucide-react";
+import { Search, Target, Dumbbell, TrendingUp, Layers, CheckCircle2, ChevronRight, Shield, Zap, ArrowDown } from "lucide-react";
 import DecryptedText from "./DecryptedText";
 import CornerBrackets from "./CornerBrackets";
 
 export default function Methodology() {
-  const [activeStep, setActiveStep] = useState<number | null>(null);
+  const [activeCardIndex, setActiveCardIndex] = useState<number>(0);
 
   const steps = [
     {
       num: "01",
-      code: "PHASE_01 // DIAGNOSTIC",
+      code: "PHASE_01 // AUDIT CLINIQUE & CARTOGRAPHIE",
       icon: Search,
-      title: "ANALYSE CLINIQUE",
-      subtitle: "Diagnostic complet de ton gameplay",
+      title: "ANALYSE CLINIQUE DU GAMEPLAY",
+      subtitle: "Diagnostic chirurgical de tes réflexes et de ta posture",
       description:
-        "Étude chirurgicale de tes statistiques, de ta sensibilité eDPI, de ton matériel (grip, posture) et de ta prise de décision en match pour cartographier tes réflexes.",
+        "Étude exhaustive de tes replays et statistiques : nous décortiquons ta sensibilité eDPI (calibration cm/360), ton type de grip, ta posture physique, ton temps de réaction sub-pixel et tes choix de placement sous haute pression.",
       metrics: [
-        { label: "Analyse VOD", val: "Image par image" },
-        { label: "Sensibilité", val: "Calibration cm/360" },
+        { label: "Analyse VOD", val: "Frame par frame (60fps)" },
+        { label: "Sensibilité & eDPI", val: "Calibration optimale cm/360" },
+        { label: "Audit Matériel", val: "Tapis, grip, posture validés" },
+        { label: "Temps d'audit", val: "Diagnostic initial 30 min" },
       ],
-      tag: "AUDIT GLOBAL",
+      tag: "AUDIT GLOBAL // POINT ZÉRO",
       accent: "laser",
       color: "#8FAFD4",
+      bgGradient: "from-[#8FAFD4]/15 via-black to-[#090c10]",
+      borderHighlight: "border-[#8FAFD4]/50 hover:border-[#8FAFD4]",
     },
     {
       num: "02",
-      code: "PHASE_02 // CIBLAGE",
+      code: "PHASE_02 // ISOLATION DES FAIBLESSES",
       icon: Target,
-      title: "IDENTIFICATION DES FAIBLESSES",
-      subtitle: "Ciblage précis des axes d'amélioration",
+      title: "IDENTIFICATION & CIBLAGE DES BLOCAGES",
+      subtitle: "Isolation formelle des 3 freins qui bloquent ton rang",
       description:
-        "Isolation formelle des 2 à 3 facteurs bloquants majeurs qui limitent ta montée en grade : sur-déplacement, micro-hésitation de visée ou mauvais timing de décalage.",
+        "Nous isolons précisément les micro-défauts invisibles à l'œil nu : micro-hésitation de visée lors des duels en mouvement, mauvais timing de contre-strafe, mauvaise lecture de map ou communication confuse en situation de clutch.",
       metrics: [
-        { label: "Axes prioritaires", val: "3 blocages clés" },
-        { label: "Diagnostic", val: "Immédiat" },
+        { label: "Axes prioritaires", val: "3 blocages majeurs identifiés" },
+        { label: "Score d'impact", val: "Hiérarchisation par priorité" },
+        { label: "Clarté décisionnelle", val: "Objectifs nets immédiats" },
+        { label: "Rapport", val: "Fiche d'axes sur-mesure" },
       ],
-      tag: "CIBLAGE CHIRURGICAL",
+      tag: "CIBLAGE CHIRURGICAL // PRÉCISION",
       accent: "acid",
       color: "#FF7582",
+      bgGradient: "from-[#FF7582]/15 via-black to-[#090c10]",
+      borderHighlight: "border-[#FF7582]/50 hover:border-[#FF7582]",
     },
     {
       num: "03",
-      code: "PHASE_03 // ENTRAÎNEMENT",
+      code: "PHASE_03 // RECALIBRAGE & ROUTINES",
       icon: Dumbbell,
-      title: "TRAVAIL & ROUTINES",
-      subtitle: "Entraînement guidé & Exercices pratiques",
+      title: "ENTRAÎNEMENT GUIDÉ & ROUTINES D'ÉLITE",
+      subtitle: "Exercices pratiques quotidiens et conditionnement mécanique",
       description:
-        "Mise en place de routines d'aim personnalisées (KovaaK's / Aimlabs), d'exercices de placement de réticule et de drills de crosshair placement adaptés à ta façon de jouer.",
+        "Mise en place de routines d'entraînement intensives personnalisées (KovaaK's / Aimlabs / Playlists dédiées), d'exercices de placement de réticule et de drills de crosshair placement automatisés adaptés à tes agents et cartes favorites.",
       metrics: [
-        { label: "Routine quotidienne", val: "20 min / jour" },
-        { label: "Exercices", val: "100% sur-mesure" },
+        { label: "Temps quotidien", val: "20 min / jour de drill" },
+        { label: "Playlists Aim", val: "100% calibrées à tes manques" },
+        { label: "Exercices en jeu", val: "Drills pré-shoot & décalages" },
+        { label: "Mémoire musculaire", val: "Automatisation sous 7 jours" },
       ],
-      tag: "MÉCANIQUE PURE",
+      tag: "MÉCANIQUE PURE // DISCIPLINE",
       accent: "laser",
       color: "#8FAFD4",
+      bgGradient: "from-[#8FAFD4]/15 via-black to-[#090c10]",
+      borderHighlight: "border-[#8FAFD4]/50 hover:border-[#8FAFD4]",
     },
     {
       num: "04",
-      code: "PHASE_04 // ASCENSION",
+      code: "PHASE_04 // ASCENSION & VALIDATION",
       icon: TrendingUp,
-      title: "PROGRESSION & SUIVI",
-      subtitle: "Mesure continue & Montée en rang",
+      title: "MONTÉE EN RANG & SUIVI CONTINU",
+      subtitle: "Mesure continue des gains et accompagnement privé 7j/7",
       description:
-        "Évaluation continue de tes gains de niveau après chaque séance. Ajustement du plan tactique, canal privé Discord 7j/7 et garantie formelle de franchir ton palier bloquant.",
+        "Évaluation continue de tes victoires et montée de rang après chaque session. Ajustement de ta stratégie, canal vocal privé Discord direct 7j/7 avec Poulpy et garantie formelle de franchir le rang sur lequel tu stagnais.",
       metrics: [
-        { label: "Suivi Discord", val: "7j / 7 direct" },
-        { label: "Garantie", val: "Rank up sous 14j" },
+        { label: "Support Discord", val: "Canal privé direct 7j/7" },
+        { label: "Garantie de palier", val: "Rank up sous 14 jours" },
+        { label: "Suivi continu", val: "Débriefs vocaux réguliers" },
+        { label: "Résultat garanti", val: "Progression mesurée & pérenne" },
       ],
-      tag: "RÉSULTAT GARANTI",
+      tag: "RÉSULTAT GARANTI // RANG VALIDÉ",
       accent: "acid",
       color: "#FF7582",
+      bgGradient: "from-[#FF7582]/15 via-black to-[#090c10]",
+      borderHighlight: "border-[#FF7582]/50 hover:border-[#FF7582]",
     },
   ];
 
   return (
-    <section id="methodology" className="py-32 px-6 sm:px-12 lg:px-16 bg-[#07090D] border-t border-[rgba(255,255,255,0.08)] font-mono relative overflow-hidden">
-      {/* Background ambient grid flow */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_40%_at_50%_0%,rgba(255,117,130,0.06),transparent)] pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto space-y-16 relative z-10">
+    <section id="methodology" className="py-32 px-6 sm:px-12 lg:px-16 bg-[#07090D] border-t border-[rgba(255,255,255,0.08)] font-mono relative">
+      <div className="max-w-6xl mx-auto space-y-16">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-8">
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               <span className="data-badge data-badge-acid">
-                <DecryptedText text="OPTION 1 : TIMELINE CIRCUIT D'ARMEMENT" />
+                <DecryptedText text="OPTION 2 : STACKING DECK // DOSSIER TACTIQUE" />
               </span>
               <span className="text-xs text-white/40 font-mono flex items-center gap-1.5">
-                <Activity className="w-3.5 h-3.5 text-[#FF7582] animate-pulse" />
-                FLUX LINÉAIRE CONTINU
+                <Layers className="w-3.5 h-3.5 text-[#FF7582]" />
+                SUPERPOSITION AU DÉFILEMENT
               </span>
             </div>
 
@@ -99,180 +112,178 @@ export default function Methodology() {
               UNE MÉTHODE. PAS DE <span className="text-[#FF7582]">RECETTE MAGIQUE.</span>
             </h2>
             <p className="text-xs sm:text-sm text-white/50 max-w-2xl leading-relaxed">
-              Un circuit tactique en 4 phases successives et interconnectées pour transformer tes mécaniques et sécuriser ta montée en grade.
+              Fais défiler la page pour découvrir les 4 phases du protocole qui s&apos;empilent comme les dossiers tactiques d&apos;une préparation e-sport pro.
             </p>
           </div>
 
-          {/* Interactive Step Quick Tracker */}
-          <div className="hidden lg:flex items-center gap-2 text-xs">
-            {steps.map((s, i) => (
-              <button
-                key={s.num}
-                onClick={() => setActiveStep(activeStep === i ? null : i)}
-                className={`px-3 py-1 border transition-all cursor-pointer font-mono text-[11px] ${
-                  activeStep === i
-                    ? "border-[#FF7582] bg-[#FF7582] text-black font-bold shadow-[0_0_12px_rgba(255,117,130,0.4)]"
-                    : "border-white/15 bg-black/60 text-white/60 hover:text-white hover:border-white/30"
-                }`}
-              >
-                PHASE {s.num}
-              </button>
-            ))}
+          <div className="flex items-center gap-2 text-xs text-white/60 bg-black/60 border border-white/10 px-4 py-2">
+            <ArrowDown className="w-4 h-4 text-[#FF7582] animate-bounce" />
+            <span>SCROLLE POUR EMPILER LES DOSSIERS</span>
           </div>
         </div>
 
         {/* ═══════════════════════════════════════════════════════════════
-            CIRCUIT D'ARMEMENT : TIMELINE AVEC LIGNE D'ÉNERGIE CONNECTÉE
+            STACKING DECK CONTAINER : CARTES QUI SE SUPERPOSENT AU SCROLL
            ═══════════════════════════════════════════════════════════════ */}
-        <div className="relative">
-          {/* Ligne de faisceau continue sur Desktop */}
-          <div className="hidden lg:block absolute top-[28px] left-[5%] right-[5%] h-[2px] bg-white/10 z-0">
-            {/* Rayon d'impulsion énergétique en flux continu */}
-            <motion.div
-              animate={{
-                x: ["-100%", "200%"],
-                opacity: [0, 1, 1, 0],
-              }}
-              transition={{
-                repeat: Infinity,
-                duration: 3.5,
-                ease: "easeInOut",
-              }}
-              className="w-1/3 h-full bg-gradient-to-r from-transparent via-[#FF7582] to-transparent shadow-[0_0_15px_#FF7582]"
-            />
-          </div>
+        <div className="space-y-12 relative pb-16">
+          {steps.map((step, index) => {
+            const Icon = step.icon;
+            const isAcid = step.accent === "acid";
+            // Sticky stacking offset: chaque carte s'arrête légèrement en dessous de la précédente
+            const topOffset = 100 + index * 24;
 
-          {/* Grille des 4 étapes */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
-            {steps.map((step, index) => {
-              const Icon = step.icon;
-              const isAcid = step.accent === "acid";
-              const isHighlighted = activeStep === index;
-
-              return (
-                <motion.div
-                  key={step.num}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{
-                    duration: 0.5,
-                    delay: index * 0.15,
-                    ease: [0.23, 1, 0.32, 1],
-                  }}
-                  onMouseEnter={() => setActiveStep(index)}
-                  onMouseLeave={() => setActiveStep(null)}
-                  className={`group relative reticle-box ${
-                    isAcid ? "" : "reticle-laser"
-                  } p-7 flex flex-col justify-between space-y-6 bg-[#090c10] border transition-all duration-300 ${
-                    isHighlighted
-                      ? "border-[#FF7582] shadow-[0_0_35px_rgba(255,117,130,0.25)] -translate-y-2 bg-[#0d1017]"
-                      : "border-white/10 hover:border-[#FF7582]/60 hover:-translate-y-1"
-                  }`}
+            return (
+              <div
+                key={step.num}
+                style={{
+                  top: `${topOffset}px`,
+                  zIndex: index + 1,
+                }}
+                className="sticky transition-all duration-300"
+              >
+                <div
+                  className={`reticle-box bg-gradient-to-br ${step.bgGradient} border ${step.borderHighlight} p-8 sm:p-12 shadow-[0_-25px_60px_rgba(0,0,0,0.95)] relative overflow-hidden backdrop-blur-xl transition-all duration-300`}
                 >
                   <CornerBrackets />
 
-                  {/* Top Connector Node */}
-                  <div className="flex items-center justify-between pb-4 border-b border-white/10 relative">
-                    {/* Node Circle Indicator */}
-                    <div className="flex items-center gap-2.5">
-                      <div className={`w-3.5 h-3.5 rounded-none border flex items-center justify-center transition-all duration-300 ${
-                        isHighlighted
-                          ? "border-[#FF7582] bg-[#FF7582] shadow-[0_0_12px_#FF7582]"
-                          : "border-white/30 bg-black group-hover:border-[#FF7582]"
-                      }`}>
-                        <div className={`w-1.5 h-1.5 ${isHighlighted ? "bg-black" : "bg-[#FF7582] animate-pulse"}`} />
-                      </div>
-                      <span className="text-[10px] text-white/50 font-mono uppercase tracking-widest">
-                        {step.code}
-                      </span>
-                    </div>
-
-                    {/* Step Big Number */}
-                    <div className="text-3xl sm:text-4xl font-display text-white group-hover:text-[#FF7582] transition-colors">
-                      {step.num}
-                    </div>
+                  {/* Watermark Big Background Number */}
+                  <div className="absolute right-4 -bottom-6 text-[120px] sm:text-[180px] font-display text-white/[0.03] select-none pointer-events-none tracking-tighter">
+                    {step.num}
                   </div>
 
-                  {/* Icon & Title */}
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className={`w-11 h-11 border flex items-center justify-center transition-transform duration-300 group-hover:scale-110 ${
+                  <div className="relative z-10 space-y-8">
+                    {/* Header bar of the card */}
+                    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-5">
+                      <div className="flex items-center gap-3">
+                        <span className={`text-xs font-bold px-3 py-1 uppercase tracking-widest ${
                           isAcid
-                            ? "border-[#FF7582]/40 text-[#FF7582] bg-[#FF7582]/10 group-hover:bg-[#FF7582]/25"
-                            : "border-[#8FAFD4]/40 text-[#8FAFD4] bg-[#8FAFD4]/10 group-hover:bg-[#8FAFD4]/25"
+                            ? "bg-[#FF7582] text-black"
+                            : "bg-[#8FAFD4] text-black"
+                        }`}>
+                          ÉTAPE {step.num}
+                        </span>
+                        <span className="text-xs text-white/50 font-mono tracking-wider">
+                          {step.code}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-white/40 uppercase tracking-widest hidden sm:inline">
+                          PHASE ACTIVE
+                        </span>
+                        <div className={`w-2.5 h-2.5 ${isAcid ? "bg-[#FF7582]" : "bg-[#8FAFD4]"} animate-pulse`} />
+                      </div>
+                    </div>
+
+                    {/* Main content grid: Left Title & Description, Right Metrics */}
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                      {/* Left: Icon, Title, Description */}
+                      <div className="lg:col-span-7 space-y-4">
+                        <div className="flex items-center gap-4">
+                          <div
+                            className={`w-14 h-14 border flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(0,0,0,0.5)] ${
+                              isAcid
+                                ? "border-[#FF7582]/40 text-[#FF7582] bg-[#FF7582]/10"
+                                : "border-[#8FAFD4]/40 text-[#8FAFD4] bg-[#8FAFD4]/10"
+                            }`}
+                          >
+                            <Icon className="w-7 h-7" />
+                          </div>
+                          <div>
+                            <h3 className="text-2xl sm:text-3xl font-display text-white tracking-wider">
+                              {step.title}
+                            </h3>
+                            <div className={`text-xs font-medium ${isAcid ? "text-[#FF7582]" : "text-[#8FAFD4]"}`}>
+                              {step.subtitle}
+                            </div>
+                          </div>
+                        </div>
+
+                        <p className="text-xs sm:text-sm text-white/70 leading-relaxed pt-2">
+                          {step.description}
+                        </p>
+
+                        <div className="pt-2 flex items-center gap-2 text-xs text-white/40">
+                          <span className="w-1.5 h-1.5 bg-white/30" />
+                          <span>{step.tag}</span>
+                        </div>
+                      </div>
+
+                      {/* Right: Key Metrics Grid */}
+                      <div className="lg:col-span-5 bg-black/70 border border-white/10 p-5 space-y-3">
+                        <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+                          <span className="text-[10px] text-white/50 uppercase tracking-widest font-bold">
+                            INDICATEURS DE CETTE PHASE
+                          </span>
+                          <span className={`text-[10px] font-bold ${isAcid ? "text-[#FF7582]" : "text-[#8FAFD4]"}`}>
+                            LIVRABLE
+                          </span>
+                        </div>
+
+                        <div className="space-y-2.5 text-xs">
+                          {step.metrics.map((m, idx) => (
+                            <div
+                              key={idx}
+                              className="flex items-center justify-between p-2 bg-white/[0.02] border border-white/5"
+                            >
+                              <span className="text-white/60 text-[11px]">{m.label} :</span>
+                              <strong className="text-white font-mono text-xs">{m.val}</strong>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Bottom Step Progression Breadcrumb */}
+                    <div className="pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs">
+                      <div className="flex items-center gap-2">
+                        {steps.map((s, i) => (
+                          <div
+                            key={s.num}
+                            className={`px-2 py-0.5 text-[10px] border ${
+                              i === index
+                                ? isAcid ? "border-[#FF7582] bg-[#FF7582] text-black font-bold" : "border-[#8FAFD4] bg-[#8FAFD4] text-black font-bold"
+                                : i < index
+                                ? "border-white/20 bg-white/10 text-white/60"
+                                : "border-white/5 text-white/20"
+                            }`}
+                          >
+                            P{s.num}
+                          </div>
+                        ))}
+                      </div>
+
+                      <a
+                        href="#booking"
+                        className={`inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider transition-colors ${
+                          isAcid ? "text-[#FF7582] hover:text-white" : "text-[#8FAFD4] hover:text-white"
                         }`}
                       >
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-display text-white tracking-wider leading-tight">
-                          {step.title}
-                        </h3>
-                        <div className="text-[11px] text-[#FF7582] font-medium leading-snug">
-                          {step.subtitle}
-                        </div>
-                      </div>
-                    </div>
-
-                    <p className="text-xs text-white/60 leading-relaxed pt-1">
-                      {step.description}
-                    </p>
-                  </div>
-
-                  {/* Metrics with Linear Circuit Bars */}
-                  <div className="space-y-2.5 pt-4 border-t border-white/10 text-xs">
-                    {step.metrics.map((m, idx) => (
-                      <div key={idx} className="p-2 bg-black/60 border border-white/5 space-y-1">
-                        <div className="flex items-center justify-between text-[11px]">
-                          <span className="text-white/50">{m.label} :</span>
-                          <strong className="text-white font-mono">{m.val}</strong>
-                        </div>
-                        {/* Technical mini progress line */}
-                        <div className="w-full h-1 bg-white/5 overflow-hidden">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            whileInView={{ width: "100%" }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.8, delay: index * 0.2 + idx * 0.1 }}
-                            className={`h-full ${isAcid ? "bg-[#FF7582]" : "bg-[#8FAFD4]"}`}
-                          />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Footer Connection Arrow */}
-                  <div className="pt-3 border-t border-white/5 flex items-center justify-between text-[10px] text-white/40 group-hover:text-white transition-colors relative z-10">
-                    <span className="tracking-wider">{step.tag}</span>
-                    <div className="flex items-center gap-1 text-[#FF7582] font-bold">
-                      <span className="text-[9px] uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                        ACTIF
-                      </span>
-                      <ArrowRight className="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" />
+                        <span>RÉSERVER CETTE FORMULE</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </a>
                     </div>
                   </div>
-                </motion.div>
-              );
-            })}
-          </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
-        {/* Bottom Flow Summary Banner */}
-        <div className="p-4 bg-[#090c10] border border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/60">
+        {/* Bottom Callout Banner */}
+        <div className="p-6 bg-[#090c10] border border-white/15 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/70">
           <div className="flex items-center gap-3">
-            <CheckCircle2 className="w-4 h-4 text-[#A4DE87] shrink-0" />
-            <span>
-              <strong className="text-white">PROTOCOLE EN CONTINU :</strong> Chaque étape débloque les analyses nécessaires à la phase suivante sans interruption.
-            </span>
+            <CheckCircle2 className="w-5 h-5 text-[#A4DE87] shrink-0" />
+            <div>
+              <div className="font-bold text-white uppercase tracking-wider">MÉTHODOLOGIE APPROUVÉE EN COMPÉTITION</div>
+              <div className="text-[11px] text-white/50">Plus de 150 joueurs accompagnés du rang Silver jusqu&apos;à Radiant / Predator.</div>
+            </div>
           </div>
           <a
             href="#booking"
-            className="text-xs text-[#FF7582] hover:text-white font-bold uppercase tracking-wider flex items-center gap-1 shrink-0 transition-colors"
+            className="btn-cyber-primary py-2.5 px-6 text-xs uppercase font-bold shrink-0"
           >
-            <span>DÉMARRER LA PHASE 01</span>
-            <ChevronRight className="w-3.5 h-3.5" />
+            <span>DÉMARRER MON COACHING</span>
           </a>
         </div>
       </div>
