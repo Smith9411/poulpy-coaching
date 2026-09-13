@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Calendar, Clock, User, Shield, ChevronRight, ChevronLeft, ArrowRight, Send, Loader2, AlertCircle, Crosshair } from "lucide-react";
+import { Check, Calendar, Clock, User, Shield, ChevronRight, ChevronLeft, ArrowRight, Send, Loader2, AlertCircle, Crosshair, Sparkles } from "lucide-react";
 import DecryptedText from "./DecryptedText";
 import CornerBrackets from "./CornerBrackets";
 import { useAuth } from "@/context/AuthContext";
@@ -21,7 +21,7 @@ interface PlanOption {
 const PLANS: PlanOption[] = [
   {
     id: "session",
-    name: "SESSION",
+    name: "SESSION FLASH",
     duration: "30 MIN",
     price: "29 €",
     description: "Idéal pour un premier diagnostic rapide et précis de ton gameplay.",
@@ -29,7 +29,7 @@ const PLANS: PlanOption[] = [
   },
   {
     id: "pro",
-    name: "PRO",
+    name: "COACHING PRO",
     duration: "60 MIN",
     price: "49 €",
     popular: true,
@@ -89,17 +89,15 @@ const MONTHS_FULL = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Jui
 
 const STANDARD_HOURS = ["10:00", "11:30", "14:00", "15:30", "17:00", "18:30", "20:00", "21:30"];
 
-// 3D Tilt HUD Plan Card Component
+// Compact 3D Tilt HUD Plan Card Component
 function TiltPlanCard({
   plan,
   isSelected,
   onSelect,
-  isSpotlight = false,
 }: {
   plan: PlanOption;
   isSelected: boolean;
   onSelect: () => void;
-  isSpotlight?: boolean;
 }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [rotate, setRotate] = useState({ x: 0, y: 0 });
@@ -118,8 +116,8 @@ function TiltPlanCard({
     const percentX = (x / rect.width) * 100;
     const percentY = (y / rect.height) * 100;
 
-    const rotX = ((y - rect.height / 2) / (rect.height / 2)) * -12;
-    const rotY = ((x - rect.width / 2) / (rect.width / 2)) * 12;
+    const rotX = ((y - rect.height / 2) / (rect.height / 2)) * -8;
+    const rotY = ((x - rect.width / 2) / (rect.width / 2)) * 8;
 
     setRotate({ x: rotX, y: rotY });
     setMousePos({ x: percentX, y: percentY });
@@ -139,13 +137,13 @@ function TiltPlanCard({
       onMouseLeave={handleMouseLeave}
       onClick={onSelect}
       className="perspective-1000 h-full cursor-pointer"
-      style={{ perspective: "1200px" }}
+      style={{ perspective: "1000px" }}
     >
       <motion.div
         animate={{
           rotateX: rotate.x,
           rotateY: rotate.y,
-          scale: isHovered ? 1.015 : 1,
+          scale: isHovered ? 1.01 : 1,
         }}
         transition={{
           type: "spring",
@@ -153,25 +151,23 @@ function TiltPlanCard({
           damping: 20,
         }}
         style={{ transformStyle: "preserve-3d" }}
-        className={`relative h-full reticle-box flex flex-col justify-between overflow-hidden transition-colors duration-200 select-none ${
-          isSpotlight ? "p-8 sm:p-10 space-y-8" : "p-7 space-y-5"
-        } ${
+        className={`relative h-full reticle-box flex flex-col justify-between overflow-hidden transition-colors duration-200 select-none p-5 sm:p-6 space-y-4 ${
           isSelected
             ? isAcid
-              ? "bg-[#FF7582]/10 border-[#FF7582] shadow-[0_0_40px_rgba(255,117,130,0.3)] ring-1 ring-[#FF7582]"
+              ? "bg-[#FF7582]/10 border-[#FF7582] shadow-[0_0_30px_rgba(255,117,130,0.25)] ring-1 ring-[#FF7582]"
               : isSlate
-              ? "bg-[#8FAFD4]/10 border-[#8FAFD4] shadow-[0_0_40px_rgba(143,175,212,0.3)] ring-1 ring-[#8FAFD4]"
-              : "bg-white/10 border-white shadow-[0_0_40px_rgba(255,255,255,0.2)] ring-1 ring-white"
+              ? "bg-[#8FAFD4]/10 border-[#8FAFD4] shadow-[0_0_30px_rgba(143,175,212,0.25)] ring-1 ring-[#8FAFD4]"
+              : "bg-white/10 border-white shadow-[0_0_30px_rgba(255,255,255,0.2)] ring-1 ring-white"
             : isHovered
             ? isAcid
-              ? "border-[#FF7582]/70 shadow-[0_0_30px_rgba(255,117,130,0.15)] bg-[#0d1017]"
+              ? "border-[#FF7582]/70 shadow-[0_0_20px_rgba(255,117,130,0.15)] bg-[#0d1017]"
               : isSlate
-              ? "border-[#8FAFD4]/70 shadow-[0_0_30px_rgba(143,175,212,0.15)] bg-[#0d1017]"
+              ? "border-[#8FAFD4]/70 shadow-[0_0_20px_rgba(143,175,212,0.15)] bg-[#0d1017]"
               : "border-white/40 bg-[#0d1017]"
             : "bg-[#090C12] border-white/15"
         }`}
       >
-        {/* Corner Brackets / Encoches conservées */}
+        {/* Corner Brackets / Encoches */}
         <CornerBrackets color={isSlate ? "slate" : "coral"} />
 
         {/* Dynamic Specular Light Follower (Spotlight) */}
@@ -179,106 +175,72 @@ function TiltPlanCard({
           <div
             className="absolute inset-0 pointer-events-none transition-opacity duration-200"
             style={{
-              background: `radial-gradient(circle 260px at ${mousePos.x}% ${mousePos.y}%, ${
+              background: `radial-gradient(circle 200px at ${mousePos.x}% ${mousePos.y}%, ${
                 isAcid
-                  ? "rgba(255, 117, 130, 0.2)"
+                  ? "rgba(255, 117, 130, 0.15)"
                   : isSlate
-                  ? "rgba(143, 175, 212, 0.2)"
-                  : "rgba(255, 255, 255, 0.12)"
+                  ? "rgba(143, 175, 212, 0.15)"
+                  : "rgba(255, 255, 255, 0.08)"
               }, transparent 80%)`,
             }}
           />
         )}
 
-        {/* HUD Target Badge */}
-        <div
-          className={`absolute top-3 right-3 text-[10px] font-mono tracking-widest flex items-center gap-1 transition-opacity duration-200 ${
-            isHovered || isSelected ? "opacity-100 text-[#FF7582]" : "opacity-0"
-          }`}
-        >
-          <Crosshair className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: "6s" }} />
-          <span>{isSelected ? "ACTIF" : "TARGET"}</span>
-        </div>
+        {/* Popular / Recommended Badge */}
+        {plan.popular && (
+          <div className="absolute top-2.5 right-2.5 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-[#FF7582] text-black">
+            RECOMMANDE
+          </div>
+        )}
 
-        {/* 3D Content Container */}
-        <div className="space-y-5 relative z-10" style={{ transform: "translateZ(24px)" }}>
-          {/* Top Category Badge */}
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
-            <span
-              className={`text-[10px] font-bold px-3 py-1 uppercase tracking-widest ${
-                isAcid
-                  ? "bg-[#FF7582] text-black"
-                  : isSlate
-                  ? "bg-[#8FAFD4]/20 text-[#8FAFD4]"
-                  : "bg-white/10 text-white/70"
-              }`}
-            >
-              {plan.id === "pro"
-                ? "FORMULE DE RÉFÉRENCE"
-                : plan.id === "performance"
-                ? "COMPÉTITION & TEAM"
-                : "DIAGNOSTIC FLASH"}
+        {/* Content */}
+        <div className="space-y-3.5 relative z-10">
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+            <span className="text-[10px] text-white/50 uppercase tracking-widest font-mono">
+              FORMULE {plan.duration}
             </span>
-            <span className={`text-xs tracking-widest font-semibold ${isSlate ? "text-[#8FAFD4]" : "text-[#8FAFD4]"}`}>
-              DURÉE : {plan.duration}
-            </span>
+            <div className={`w-2 h-2 rounded-full ${isSelected ? (isAcid ? "bg-[#FF7582]" : isSlate ? "bg-[#8FAFD4]" : "bg-white") : "bg-white/20"}`} />
           </div>
 
           <div>
-            <span className="text-[10px] text-white/40 uppercase tracking-widest block">
-              {plan.id === "pro"
-                ? "COACHING INDIVIDUEL COMPLET"
-                : plan.id === "performance"
-                ? "IMMERSION HAUT NIVEAU"
-                : "AUDIT EXPRESS DU GAMEPLAY"}
-            </span>
-            <h3 className={`font-display text-white tracking-wider mt-1 ${isSpotlight ? "text-4xl sm:text-5xl" : "text-2xl sm:text-3xl"}`}>
-              {plan.name === "pro" ? "COACHING PRO" : plan.name}
+            <h3 className="text-xl sm:text-2xl font-display text-white tracking-wider">
+              {plan.name}
             </h3>
 
-            {/* Price without glitch-text */}
-            <div className="flex items-baseline gap-3 mt-2" style={{ transform: "translateZ(30px)" }}>
-              <span className={`font-display text-white ${isAcid ? "text-[#FF7582]" : isSlate ? "text-[#8FAFD4]" : "text-white"} ${isSpotlight ? "text-5xl" : "text-3xl"}`}>
+            {/* Price without any glitch or extra clutter */}
+            <div className="flex items-baseline gap-2 mt-1">
+              <span className={`text-3xl font-display ${isAcid ? "text-[#FF7582]" : isSlate ? "text-[#8FAFD4]" : "text-white"}`}>
                 {plan.price}
               </span>
-              <span className="text-xs text-white/40">/ SÉANCE INTENSIVE</span>
+              <span className="text-[10px] text-white/40 font-mono uppercase">/ SÉANCE</span>
             </div>
           </div>
 
-          <p className="text-xs text-white/70 leading-relaxed max-w-xl">
+          <p className="text-[11px] text-white/60 leading-relaxed line-clamp-2">
             {plan.description}
           </p>
 
-          <div className="space-y-2.5 pt-3 border-t border-white/10">
-            <span className="text-[10px] text-white/40 uppercase tracking-widest block">CONTENU DU PROTOCOLE :</span>
-            <div className={`grid gap-2 text-xs text-white/80 ${isSpotlight ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"}`}>
-              {plan.features.map((feat, i) => (
-                <div key={i} className="p-2.5 bg-black/60 border border-white/5 flex items-start gap-2">
-                  <span className={`w-1.5 h-1.5 shrink-0 mt-1.5 ${isAcid ? "bg-[#FF7582]" : isSlate ? "bg-[#8FAFD4]" : "bg-white/60"}`} />
-                  <span className="text-[11px] leading-snug">{feat}</span>
-                </div>
-              ))}
-            </div>
+          <div className="space-y-1.5 pt-2.5 border-t border-white/10">
+            {plan.features.map((feat, i) => (
+              <div key={i} className="flex items-center gap-2 text-[11px] text-white/80">
+                <span className={`w-1 h-1 shrink-0 ${isAcid ? "bg-[#FF7582]" : isSlate ? "bg-[#8FAFD4]" : "bg-white/50"}`} />
+                <span className="truncate">{feat}</span>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Card Footer Button Indicator */}
-        <div
-          className="relative z-10 pt-4 border-t border-white/10 flex items-center justify-between text-xs"
-          style={{ transform: "translateZ(15px)" }}
-        >
-          <span className="text-[10px] text-white/50">
-            {plan.id === "pro"
-              ? "Idéal pour débloquer un palier de ranked tenace"
-              : plan.id === "performance"
-              ? "Double session VOD & live"
-              : "Audit ciblé immédiat"}
+        <div className="relative z-10 pt-3 border-t border-white/10 flex items-center justify-between text-[11px]">
+          <span className="text-[10px] text-white/40">
+            {plan.id === "pro" ? "Le choix favori des élèves" : plan.id === "performance" ? "Programme intensif" : "Audit rapide"}
           </span>
-          <div className={`flex items-center gap-1 font-bold text-[11px] uppercase tracking-wider ${
+          <div className={`flex items-center gap-1 font-bold text-[10px] uppercase tracking-wider ${
             isSelected ? (isAcid ? "text-[#FF7582]" : isSlate ? "text-[#8FAFD4]" : "text-white") : "text-white/40"
           }`}>
             <span>{isSelected ? "SÉLECTIONNÉ" : "CHOISIR"}</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight className="w-3 h-3" />
           </div>
         </div>
       </motion.div>
@@ -493,18 +455,18 @@ export default function Booking() {
   };
 
   return (
-    <section id="booking" className="py-32 px-6 sm:px-12 lg:px-16 bg-[#07090D] border-t border-[rgba(255,255,255,0.08)] font-mono relative z-20">
-      <div className="max-w-7xl mx-auto space-y-16">
+    <section id="booking" className="py-20 px-6 sm:px-12 lg:px-16 bg-[#07090D] border-t border-[rgba(255,255,255,0.08)] font-mono relative z-20">
+      <div className="max-w-7xl mx-auto space-y-10">
         {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-8">
-          <div className="space-y-3">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-6">
+          <div className="space-y-2">
             <span className="data-badge data-badge-laser">
               <DecryptedText text="MODULE DE RÉSERVATION" />
             </span>
-            <h2 className="text-4xl sm:text-6xl font-display text-white tracking-wider">
+            <h2 className="text-3xl sm:text-5xl font-display text-white tracking-wider">
               RÉSERVE TON <span className="text-[#FF7582]">COACHING</span>
             </h2>
-            <p className="text-xs sm:text-sm text-white/50 max-w-2xl leading-relaxed">
+            <p className="text-xs text-white/50 max-w-2xl leading-relaxed">
               Verrouille ton créneau tactique avec Poulpy. Sélectionne ta formule, consulte les créneaux disponibles en direct et transmets tes informations.
             </p>
           </div>
@@ -525,7 +487,7 @@ export default function Booking() {
                   onClick={() => {
                     if (isDone) setStep(s.id);
                   }}
-                  className={`px-3.5 py-1.5 text-xs font-bold border transition-all ${
+                  className={`px-3 py-1.5 text-xs font-bold border transition-all ${
                     isDone ? "cursor-pointer" : ""
                   } ${
                     isActive
@@ -543,9 +505,9 @@ export default function Booking() {
         </div>
 
         {/* Dynamic Step Container */}
-        <div className="reticle-box p-6 sm:p-10 bg-[#090c10] border border-white/20 relative min-h-[500px] flex flex-col justify-between shadow-[0_0_50px_rgba(0,0,0,0.9)]">
+        <div className="reticle-box p-6 sm:p-8 bg-[#090c10] border border-white/20 relative shadow-[0_0_50px_rgba(0,0,0,0.9)]">
           <AnimatePresence mode="wait" initial={false}>
-            {/* STEP 1: FORMULE SELECTION (WITH 3D TILT HUD AND CORNER ENCOCHES) */}
+            {/* STEP 1: FORMULE SELECTION (COMPACT 3 COLUMNS SIDE BY SIDE) */}
             {step === 1 && (
               <motion.div
                 key="step1"
@@ -553,9 +515,9 @@ export default function Booking() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.15 }}
-                className="space-y-8"
+                className="space-y-6"
               >
-                <div className="flex items-center justify-between border-b border-white/15 pb-4">
+                <div className="flex items-center justify-between border-b border-white/15 pb-3">
                   <div className="text-xs text-white/70 uppercase tracking-wider font-bold flex items-center gap-2">
                     <span className="w-2 h-2 bg-[#FF7582]" />
                     ÉTAPE 01 : SÉLECTION DU PROTOCOLE D&apos;ENTRAÎNEMENT
@@ -563,43 +525,26 @@ export default function Booking() {
                   <span className="text-xs text-[#FF7582] font-bold tracking-wider">3 FORMULES DISPONIBLES</span>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-                  {/* Carte PRO — spotlight 7 cols */}
-                  <div className="lg:col-span-7">
+                {/* 3 cards in 3 equal columns */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
+                  {PLANS.map((plan) => (
                     <TiltPlanCard
-                      plan={PLANS[1]}
-                      isSelected={selectedPlan === "pro"}
-                      onSelect={() => setSelectedPlan("pro")}
-                      isSpotlight={true}
+                      key={plan.id}
+                      plan={plan}
+                      isSelected={selectedPlan === plan.id}
+                      onSelect={() => setSelectedPlan(plan.id)}
                     />
-                  </div>
-
-                  {/* Cartes satellites — 5 cols empilées */}
-                  <div className="lg:col-span-5 flex flex-col gap-6">
-                    <div className="flex-1">
-                      <TiltPlanCard
-                        plan={PLANS[0]}
-                        isSelected={selectedPlan === "session"}
-                        onSelect={() => setSelectedPlan("session")}
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <TiltPlanCard
-                        plan={PLANS[2]}
-                        isSelected={selectedPlan === "performance"}
-                        onSelect={() => setSelectedPlan("performance")}
-                      />
-                    </div>
-                  </div>
+                  ))}
                 </div>
 
-                <div className="pt-6 border-t border-white/15 flex flex-col sm:flex-row items-center justify-between gap-4">
+                {/* Bottom Action Bar */}
+                <div className="pt-5 border-t border-white/15 flex flex-col sm:flex-row items-center justify-between gap-4">
                   <span className="text-xs text-white/60">
-                    SÉLECTION ACTUELLE : <strong className="text-white font-mono">{activePlan.name} ({activePlan.price} - {activePlan.duration})</strong>
+                    SÉLECTION : <strong className="text-white font-mono">{activePlan.name} ({activePlan.price} - {activePlan.duration})</strong>
                   </span>
                   <button
                     onClick={handleNextStep}
-                    className="btn-cyber-primary flex items-center gap-2 py-3.5 px-8 text-xs font-bold uppercase tracking-wider w-full sm:w-auto justify-center cursor-pointer"
+                    className="btn-cyber-primary flex items-center gap-2 py-3 px-8 text-xs font-bold uppercase tracking-wider w-full sm:w-auto justify-center cursor-pointer"
                   >
                     <span>CHOISIR LE CRÉNEAU</span>
                     <ArrowRight className="w-4 h-4" />
@@ -616,9 +561,9 @@ export default function Booking() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.15 }}
-                className="space-y-8"
+                className="space-y-6"
               >
-                <div className="flex items-center justify-between border-b border-white/15 pb-4">
+                <div className="flex items-center justify-between border-b border-white/15 pb-3">
                   <div className="text-xs text-white/70 uppercase tracking-wider font-bold flex items-center gap-2">
                     <span className="w-2 h-2 bg-[#FF7582]" />
                     ÉTAPE 02 : VERROUILLAGE DU CALENDRIER // CRÉNEAUX EN DIRECT
@@ -626,7 +571,7 @@ export default function Booking() {
                   <span className="text-xs text-[#FF7582] font-bold tracking-wider">FORMULE: {activePlan.name}</span>
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-5">
                   {/* Days Bar */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
@@ -683,7 +628,7 @@ export default function Booking() {
                   </div>
 
                   {/* Time Slots Section for Selected Day */}
-                  <div className="space-y-3 pt-4 border-t border-white/10">
+                  <div className="space-y-3 pt-3 border-t border-white/10">
                     <div className="flex items-center justify-between">
                       <label className="text-xs text-white/70 block uppercase font-bold tracking-wider">
                         2. SÉLECTIONNER L&apos;HORAIRE POUR LE {currentDay.fullDateLabel.toUpperCase()} :
@@ -692,17 +637,17 @@ export default function Booking() {
                     </div>
 
                     {currentDay.availableCount === 0 ? (
-                      <div className="p-8 bg-black/80 border border-white/10 text-center space-y-2">
-                        <Clock className="w-8 h-8 text-white/30 mx-auto mb-1" />
-                        <h4 className="text-sm font-bold text-white uppercase tracking-wider">
+                      <div className="p-6 bg-black/80 border border-white/10 text-center space-y-2">
+                        <Clock className="w-7 h-7 text-white/30 mx-auto mb-1" />
+                        <h4 className="text-xs font-bold text-white uppercase tracking-wider">
                           AUCUN CRÉNEAU DISPONIBLE POUR CETTE DATE
                         </h4>
                         <p className="text-xs text-white/50 max-w-md mx-auto">
-                          Le coach n&apos;a pas ouvert de disponibilités pour ce jour ou tous les créneaux ont déjà été réservés. Choisis un autre jour dans la liste ci-dessus !
+                          Le coach n&apos;a pas ouvert de disponibilités pour ce jour ou tous les créneaux ont déjà été réservés.
                         </p>
                       </div>
                     ) : (
-                      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 gap-3">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 gap-2.5">
                         {currentDay.slots.map((s) => {
                           const isTimeSelected = selectedTime === s.time;
                           const isAvailable = s.available;
@@ -713,7 +658,7 @@ export default function Booking() {
                               type="button"
                               disabled={!isAvailable}
                               onClick={() => handleSelectSlot(s)}
-                              className={`p-4 border text-center transition-all flex flex-col items-center justify-center gap-1.5 ${
+                              className={`p-3 border text-center transition-all flex flex-col items-center justify-center gap-1 ${
                                 !isAvailable
                                   ? "border-white/5 bg-white/[0.02] text-white/30 cursor-not-allowed line-through opacity-40"
                                   : isTimeSelected
@@ -723,7 +668,7 @@ export default function Booking() {
                             >
                               <div className="flex items-center gap-1.5">
                                 <Clock className="w-3.5 h-3.5" />
-                                <span className="text-base font-display tracking-wider">{s.time}</span>
+                                <span className="text-sm font-display tracking-wider">{s.time}</span>
                               </div>
 
                               <span className={`text-[9px] uppercase font-bold tracking-widest ${
@@ -738,7 +683,7 @@ export default function Booking() {
                     )}
 
                     {/* Legend */}
-                    <div className="flex flex-wrap items-center justify-center gap-6 pt-3 text-[11px] text-white/50 font-mono">
+                    <div className="flex flex-wrap items-center justify-center gap-6 pt-2 text-[10px] text-white/50 font-mono">
                       <div className="flex items-center gap-2">
                         <span className="w-2 h-2 bg-[#A4DE87]" />
                         <span>DISPONIBLE</span>
@@ -756,14 +701,14 @@ export default function Booking() {
 
                   {/* Selected Summary Badge */}
                   {selectedTime && (
-                    <div className="p-4 bg-black border border-[#FF7582]/40 flex items-center justify-between text-xs animate-in fade-in">
+                    <div className="p-3 bg-black border border-[#FF7582]/40 flex items-center justify-between text-xs">
                       <div className="flex items-center gap-3">
                         <Calendar className="w-4 h-4 text-[#FF7582]" />
                         <span>
                           CRÉNEAU SÉLECTIONNÉ : <strong className="text-white">{currentDay.fullDateLabel} à {selectedTime}</strong>
                         </span>
                       </div>
-                      <span className="text-[#A4DE87] font-bold">[ CRÉNEAU VALIDÉ ]</span>
+                      <span className="text-[#A4DE87] font-bold text-[11px]">[ CRÉNEAU VALIDÉ ]</span>
                     </div>
                   )}
 
@@ -775,10 +720,10 @@ export default function Booking() {
                   )}
                 </div>
 
-                <div className="pt-6 border-t border-white/10 flex items-center justify-between">
+                <div className="pt-4 border-t border-white/10 flex items-center justify-between">
                   <button
                     onClick={() => setStep(1)}
-                    className="btn-cyber-ghost flex items-center gap-2 py-3 px-6 text-xs uppercase cursor-pointer"
+                    className="btn-cyber-ghost flex items-center gap-2 py-2.5 px-5 text-xs uppercase cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />
                     <span>RETOUR FORMULES</span>
@@ -786,7 +731,7 @@ export default function Booking() {
                   <button
                     disabled={!selectedTime}
                     onClick={handleNextStep}
-                    className="btn-cyber-primary flex items-center gap-2 py-3 px-8 text-xs font-bold uppercase disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                    className="btn-cyber-primary flex items-center gap-2 py-2.5 px-6 text-xs font-bold uppercase disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                   >
                     <span>RENSEIGNER MON PROFIL</span>
                     <ArrowRight className="w-4 h-4" />
@@ -795,7 +740,7 @@ export default function Booking() {
               </motion.div>
             )}
 
-            {/* STEP 3: INFOS & FORM */}
+            {/* STEP 3: INFOS ÉLÈVE */}
             {step === 3 && (
               <motion.div
                 key="step3"
@@ -803,104 +748,104 @@ export default function Booking() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.15 }}
-                className="space-y-8"
+                className="space-y-6"
               >
-                <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                  <div className="text-xs text-white/50 uppercase tracking-wider font-bold">
-                    ÉTAPE 03 : PROFIL JOUEUR &amp; DOSSIER TACTIQUE
+                <div className="flex items-center justify-between border-b border-white/15 pb-3">
+                  <div className="text-xs text-white/70 uppercase tracking-wider font-bold flex items-center gap-2">
+                    <span className="w-2 h-2 bg-[#FF7582]" />
+                    ÉTAPE 03 : DOSSIER DU JOUEUR // BRIEF TACTIQUE
                   </div>
-                  <span className="text-xs text-[#FF7582] font-bold">
-                    {activePlan.name} // {currentDay.fullDateLabel} à {selectedTime}
+                  <span className="text-xs text-[#FF7582] font-bold tracking-wider">
+                    {activePlan.name} • {selectedTime}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-4">
                     <div>
-                      <label className="text-xs text-white/70 uppercase block mb-1.5 font-bold">
-                        NOM / PSEUDO JOUEUR :
+                      <label className="text-[11px] text-white/70 block uppercase font-bold tracking-wider mb-1.5">
+                        PSEUDO / PRÉNOM :
                       </label>
                       <input
                         type="text"
-                        placeholder="ex: Alex ou PoulpyFan"
+                        placeholder="Ex: TenZ ou Thomas"
                         value={studentName}
                         onChange={(e) => setStudentName(e.target.value)}
-                        className="w-full bg-black border border-white/15 px-4 py-3 text-xs text-white font-mono outline-none focus:border-[#FF7582]"
+                        className="w-full bg-black/60 border border-white/20 p-3 text-xs text-white placeholder-white/30 focus:border-[#FF7582] focus:outline-none transition-colors"
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs text-white/70 uppercase block mb-1.5 font-bold">
-                        EMAIL DE CONFIRMATION * :
+                      <label className="text-[11px] text-white/70 block uppercase font-bold tracking-wider mb-1.5">
+                        IDENTIFIANT DISCORD <span className="text-[#FF7582]">*</span> :
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Ex: poulpy_94 ou monpseudo#1234"
+                        value={studentDiscord}
+                        onChange={(e) => setStudentDiscord(e.target.value)}
+                        className="w-full bg-black/60 border border-white/20 p-3 text-xs text-white placeholder-white/30 focus:border-[#FF7582] focus:outline-none transition-colors"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-[11px] text-white/70 block uppercase font-bold tracking-wider mb-1.5">
+                        ADRESSE EMAIL <span className="text-[#FF7582]">*</span> :
                       </label>
                       <input
                         type="email"
-                        required
-                        placeholder="ex: ton.email@gmail.com"
+                        placeholder="Ex: contact@email.com"
                         value={studentEmail}
                         onChange={(e) => setStudentEmail(e.target.value)}
-                        className="w-full bg-black border border-white/15 px-4 py-3 text-xs text-white font-mono outline-none focus:border-[#FF7582]"
+                        className="w-full bg-black/60 border border-white/20 p-3 text-xs text-white placeholder-white/30 focus:border-[#FF7582] focus:outline-none transition-colors"
                       />
-                    </div>
-
-                    <div>
-                      <label className="text-xs text-white/70 uppercase block mb-1.5 font-bold">
-                        IDENTIFIANT DISCORD * :
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        placeholder="ex: poulpy_esport ou Alex#1234"
-                        value={studentDiscord}
-                        onChange={(e) => setStudentDiscord(e.target.value)}
-                        className="w-full bg-black border border-white/15 px-4 py-3 text-xs text-white font-mono outline-none focus:border-[#FF7582]"
-                      />
-                      <span className="text-[10px] text-white/40 block mt-1">
-                        Indispensable pour le salon vocal de coaching.
-                      </span>
-                    </div>
-
-                    <div>
-                      <label className="text-xs text-white/70 uppercase block mb-1.5 font-bold">
-                        DISCIPLINE / TITRE :
-                      </label>
-                      <select
-                        value={game}
-                        onChange={(e) => setGame(e.target.value)}
-                        className="w-full bg-black border border-white/15 px-4 py-3 text-xs text-white font-mono outline-none focus:border-[#FF7582]"
-                      >
-                        <option value="Valorant">VALORANT (RIOT GAMES)</option>
-                        <option value="Apex Legends">APEX LEGENDS (EA)</option>
-                        <option value="Aim Specialist">AIMLABS / KOVAAK&apos;S (VOLTAIC)</option>
-                        <option value="Overwatch 2">OVERWATCH 2 (BLIZZARD)</option>
-                      </select>
                     </div>
                   </div>
 
                   <div className="space-y-4">
-                    <div>
-                      <label className="text-xs text-white/70 uppercase block mb-1.5 font-bold">
-                        RANG ACTUEL &amp; PEAK :
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="ex: Diamant 2 (Peak Ascendant 1)"
-                        value={currentRank}
-                        onChange={(e) => setCurrentRank(e.target.value)}
-                        className="w-full bg-black border border-white/15 px-4 py-3 text-xs text-white font-mono outline-none focus:border-[#FF7582]"
-                      />
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-[11px] text-white/70 block uppercase font-bold tracking-wider mb-1.5">
+                          JEU :
+                        </label>
+                        <select
+                          value={game}
+                          onChange={(e) => setGame(e.target.value)}
+                          className="w-full bg-black/60 border border-white/20 p-3 text-xs text-white focus:border-[#FF7582] focus:outline-none transition-colors"
+                        >
+                          <option value="Valorant">Valorant</option>
+                          <option value="CS2">Counter-Strike 2</option>
+                          <option value="Overwatch 2">Overwatch 2</option>
+                          <option value="Apex Legends">Apex Legends</option>
+                          <option value="Fortnite">Fortnite</option>
+                          <option value="Autre">Autre FPS</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="text-[11px] text-white/70 block uppercase font-bold tracking-wider mb-1.5">
+                          RANG ACTUEL :
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Ex: Diamant 2, Ascendant 1"
+                          value={currentRank}
+                          onChange={(e) => setCurrentRank(e.target.value)}
+                          className="w-full bg-black/60 border border-white/20 p-3 text-xs text-white placeholder-white/30 focus:border-[#FF7582] focus:outline-none transition-colors"
+                        />
+                      </div>
                     </div>
 
                     <div>
-                      <label className="text-xs text-white/70 uppercase block mb-1.5 font-bold">
-                        OBJECTIFS PRIORITAIRES / ATTENTES DU COACHING :
+                      <label className="text-[11px] text-white/70 block uppercase font-bold tracking-wider mb-1.5">
+                        OBJECTIFS / BLOCAGES PRINCIPAUX :
                       </label>
                       <textarea
-                        rows={5}
-                        placeholder="ex: Je perds tous mes duels de clutch en défense. Je veux stabiliser mon crosshair placement et comprendre mes timings de prise d'info."
+                        rows={3}
+                        placeholder="Ex: Difficulté à monter au-delà de Diamant, perte de duels en 1v1, problème de crosshair placement..."
                         value={objective}
                         onChange={(e) => setObjective(e.target.value)}
-                        className="w-full bg-black border border-white/15 px-4 py-3 text-xs text-white font-mono outline-none focus:border-[#FF7582] resize-none"
+                        className="w-full bg-black/60 border border-white/20 p-3 text-xs text-white placeholder-white/30 focus:border-[#FF7582] focus:outline-none transition-colors resize-none"
                       />
                     </div>
                   </div>
@@ -913,27 +858,27 @@ export default function Booking() {
                   </div>
                 )}
 
-                <div className="pt-6 border-t border-white/10 flex items-center justify-between">
+                <div className="pt-4 border-t border-white/10 flex items-center justify-between">
                   <button
                     onClick={() => setStep(2)}
-                    className="btn-cyber-ghost flex items-center gap-2 py-3 px-6 text-xs uppercase cursor-pointer"
+                    className="btn-cyber-ghost flex items-center gap-2 py-2.5 px-5 text-xs uppercase cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />
-                    <span>MODIFIER LE CRÉNEAU</span>
+                    <span>RETOUR CRÉNEAU</span>
                   </button>
                   <button
-                    disabled={!studentDiscord.trim() || !studentEmail.trim() || isSubmitting}
+                    disabled={isSubmitting}
                     onClick={handleNextStep}
-                    className="btn-cyber-primary flex items-center gap-2 py-3 px-8 text-xs font-bold uppercase disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                    className="btn-cyber-primary flex items-center gap-2 py-2.5 px-7 text-xs font-bold uppercase disabled:opacity-50 cursor-pointer"
                   >
                     {isSubmitting ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>ENREGISTREMENT...</span>
+                        <span>VERROUILLAGE EN COURS...</span>
                       </>
                     ) : (
                       <>
-                        <span>CONFIRMER LA RÉSERVATION</span>
+                        <span>CONFIRMER LA SESSION</span>
                         <Send className="w-4 h-4" />
                       </>
                     )}
@@ -948,58 +893,46 @@ export default function Booking() {
                 key="step4"
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
-                className="py-10 text-center space-y-6 max-w-xl mx-auto"
+                transition={{ duration: 0.2 }}
+                className="py-6 text-center space-y-6 max-w-xl mx-auto"
               >
-                <div className="w-16 h-16 border-2 border-[#FF7582] bg-[#FF7582]/10 flex items-center justify-center mx-auto text-[#FF7582] shadow-[0_0_30px_rgba(255,117,130,0.35)]">
+                <div className="w-16 h-16 bg-[#A4DE87]/15 border border-[#A4DE87] text-[#A4DE87] flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(164,222,135,0.3)]">
                   <Check className="w-8 h-8" />
                 </div>
 
                 <div className="space-y-2">
-                  <span className="data-badge data-badge-acid">ORDRE DE MISSION VALIDÉ // {confirmedMissionId}</span>
-                  <h3 className="text-3xl sm:text-4xl font-display text-white tracking-wider">
-                    CRÉNEAU TACTIQUE VERROUILLÉ
+                  <span className="text-xs text-[#A4DE87] font-bold tracking-widest uppercase block">
+                    CRÉNEAU VERROUILLÉ AVEC SUCCÈS
+                  </span>
+                  <h3 className="text-2xl sm:text-3xl font-display text-white tracking-wider">
+                    ORDRE DE MISSION : {confirmedMissionId}
                   </h3>
                   <p className="text-xs text-white/60 leading-relaxed">
-                    Ton dossier est enregistré dans la base de données. Poulpy te contactera sur Discord pour débuter la séance dans le salon vocal dédié.
+                    Ta session <strong className="text-white">{activePlan.name}</strong> du <strong className="text-white">{currentDay.fullDateLabel} à {selectedTime}</strong> a été enregistrée. Poulpy te contactera sur Discord (<strong className="text-[#8FAFD4]">{studentDiscord}</strong>) avant le début de la séance.
                   </p>
                 </div>
 
-                {/* Recap Box */}
-                <div className="p-6 bg-black border border-[#FF7582]/40 text-left space-y-3 text-xs">
-                  <div className="flex justify-between border-b border-white/10 pb-2">
-                    <span className="text-white/50">PROTOCOLE :</span>
+                <div className="p-4 bg-black/60 border border-white/10 text-left text-xs space-y-2">
+                  <div className="flex justify-between border-b border-white/5 pb-1.5">
+                    <span className="text-white/50">Formule :</span>
                     <span className="text-white font-bold">{activePlan.name} ({activePlan.price})</span>
                   </div>
-                  <div className="flex justify-between border-b border-white/10 pb-2">
-                    <span className="text-white/50">HORAIRE :</span>
-                    <span className="text-[#FF7582] font-bold">{currentDay.fullDateLabel} à {selectedTime}</span>
-                  </div>
-                  <div className="flex justify-between border-b border-white/10 pb-2">
-                    <span className="text-white/50">JOUEUR / DISCORD :</span>
-                    <span className="text-white">{studentName || "Non spécifié"} ({studentDiscord})</span>
+                  <div className="flex justify-between border-b border-white/5 pb-1.5">
+                    <span className="text-white/50">Date & Heure :</span>
+                    <span className="text-white font-bold">{currentDay.fullDateLabel} à {selectedTime}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-white/50">DISCIPLINE &amp; RANG :</span>
-                    <span className="text-white">{game} // {currentRank}</span>
+                    <span className="text-white/50">Contact Discord :</span>
+                    <span className="text-[#FF7582] font-bold">{studentDiscord}</span>
                   </div>
                 </div>
 
-                <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
-                  <a
-                    href="https://discord.gg/rJMg3ZZRkp"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="btn-cyber-primary py-3 px-8 text-xs font-bold uppercase inline-flex items-center gap-2"
-                  >
-                    <span>REJOINDRE LE DISCORD DU COACH</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </a>
+                <div className="pt-2 flex justify-center">
                   <button
                     onClick={handleReset}
-                    className="btn-cyber-ghost py-3 px-6 text-xs uppercase cursor-pointer"
+                    className="btn-cyber-ghost py-2.5 px-6 text-xs uppercase cursor-pointer"
                   >
-                    NOUVELLE RÉSERVATION
+                    RÉSERVER UNE AUTRE SESSION
                   </button>
                 </div>
               </motion.div>
