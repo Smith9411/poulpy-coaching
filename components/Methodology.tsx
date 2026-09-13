@@ -208,27 +208,25 @@ function ScrollStackCard({ step, index, total }: { step: StepData; index: number
             </div>
           </div>
 
-          {/* Card Footer */}
-          <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs">
-            <div className="flex items-center gap-2">
-              <Crosshair className={`w-3.5 h-3.5 ${isLast ? "text-[#A4DE87]" : "text-white/40"}`} />
-              <span className={`text-[11px] font-mono tracking-wider font-bold ${
-                isLast ? "text-[#A4DE87]" : "text-white/40"
-              }`}>
-                {step.statusLabel}
-              </span>
-            </div>
+          {/* Card Footer ONLY on the last card (Phase 04) */}
+          {isLast && (
+            <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs">
+              <div className="flex items-center gap-2">
+                <Crosshair className="w-3.5 h-3.5 text-[#A4DE87]" />
+                <span className="text-[11px] font-mono tracking-wider font-bold text-[#A4DE87]">
+                  PROTOCOLE VALIDÉ
+                </span>
+              </div>
 
-            <a
-              href="#booking"
-              className={`flex items-center gap-1.5 font-bold uppercase tracking-wider text-xs transition-colors ${
-                isAcid ? "text-[#FF7582] hover:text-white" : "text-[#8FAFD4] hover:text-white"
-              }`}
-            >
-              <span>CHOISIR MON CRÉNEAU</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </a>
-          </div>
+              <a
+                href="#booking"
+                className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-xs text-[#FF7582] hover:text-white transition-colors"
+              >
+                <span>CHOISIR MON CRÉNEAU</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </a>
+            </div>
+          )}
         </div>
       </motion.div>
     </div>
