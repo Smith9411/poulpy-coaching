@@ -602,12 +602,14 @@ export default function Profile() {
                       </span>
                       <span
                         className={`data-badge text-[9px] ${
-                          b.status === 'rescheduled'
+                          b.status === 'completed'
+                            ? 'border-white/20 bg-white/10 text-white/60'
+                            : b.status === 'rescheduled'
                             ? 'data-badge-acid'
                             : 'data-badge-laser'
                         }`}
                       >
-                        {b.status === 'rescheduled' ? 'REPORTÉE' : 'CONFIRMÉE'}
+                        {b.status === 'completed' ? 'TERMINÉE' : b.status === 'rescheduled' ? 'REPORTÉE' : 'CONFIRMÉE'}
                       </span>
                     </div>
 

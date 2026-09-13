@@ -54,8 +54,34 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ bookings: [] });
     }
 
+    // Auto-complétion automatique des séances passées
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+    const currentHourStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    const pastIdsToComplete: string[] = [];
+    const allBookings = (bookings || []).map((b: any) => {
+      if ((b.status === 'confirmed' || b.status === 'rescheduled') && b.booking_date) {
+        const isPastDate = b.booking_date < todayStr;
+        const isTodayPastTime = b.booking_date === todayStr && b.booking_time && b.booking_time < currentHourStr;
+        if (isPastDate || isTodayPastTime) {
+          pastIdsToComplete.push(b.id);
+          return { ...b, status: 'completed' };
+        }
+      }
+      return b;
+    });
+
+    if (pastIdsToComplete.length > 0) {
+      Promise.resolve(
+        supabase
+          .from('coaching_bookings')
+          .update({ status: 'completed', updated_at: new Date().toISOString() })
+          .in('id', pastIdsToComplete)
+      ).catch((e) => console.error('Error auto-completing bookings:', e));
+    }
+
     // Calcul des statistiques
-    const allBookings = bookings || [];
     const totalCount = allBookings.length;
     const confirmedCount = allBookings.filter((b: { status: string }) => b.status === 'confirmed' || b.status === 'rescheduled').length;
     const completedCount = allBookings.filter((b: { status: string }) => b.status === 'completed').length;

@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Calendar, Clock, User, Shield, ChevronRight, ChevronLeft, ArrowRight, Disc, Send } from "lucide-react";
+import { Check, Calendar, Clock, User, Shield, ChevronRight, ChevronLeft, ArrowRight, Send, Loader2, AlertCircle } from "lucide-react";
 import DecryptedText from "./DecryptedText";
 import CornerBrackets from "./CornerBrackets";
+import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 
 interface PlanOption {
@@ -57,58 +58,233 @@ const PLANS: PlanOption[] = [
   },
 ];
 
-const AVAILABLE_DAYS = [
-  { day: "LUN", date: "15 SEPT", full: "Lundi 15 Septembre" },
-  { day: "MAR", date: "16 SEPT", full: "Mardi 16 Septembre" },
-  { day: "MER", date: "17 SEPT", full: "Mercredi 17 Septembre" },
-  { day: "JEU", date: "18 SEPT", full: "Jeudi 18 Septembre" },
-  { day: "VEN", date: "19 SEPT", full: "Vendredi 19 Septembre" },
-  { day: "SAM", date: "20 SEPT", full: "Samedi 20 Septembre" },
-  { day: "DIM", date: "21 SEPT", full: "Dimanche 21 Septembre" },
-];
+interface RawSlot {
+  id: string;
+  date: string;
+  start_time: string;
+  is_active: boolean;
+  is_booked: boolean;
+}
 
-const TIME_SLOTS = ["14:00", "15:30", "17:00", "18:30", "20:00", "21:30"];
+interface DayOption {
+  dayName: string;
+  dayNumber: number;
+  monthName: string;
+  dateIso: string;
+  fullDateLabel: string;
+  slots: Array<{
+    id?: string;
+    time: string;
+    available: boolean;
+    isBooked: boolean;
+    isActive: boolean;
+  }>;
+  availableCount: number;
+}
+
+const DAYS_SHORT = ["DIM", "LUN", "MAR", "MER", "JEU", "VEN", "SAM"];
+const DAYS_FULL = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+const MONTHS_SHORT = ["JANV", "FÉVR", "MARS", "AVR", "MAI", "JUIN", "JUIL", "AOÛT", "SEPT", "OCT", "NOV", "DÉC"];
+const MONTHS_FULL = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+
+const STANDARD_HOURS = ["10:00", "11:30", "14:00", "15:30", "17:00", "18:30", "20:00", "21:30"];
 
 export default function Booking() {
+  const { user } = useAuth();
   const [step, setStep] = useState<number>(1);
   const [selectedPlan, setSelectedPlan] = useState<string>("pro");
-  const [selectedDay, setSelectedDay] = useState<number>(0);
-  const [selectedTime, setSelectedTime] = useState<string>("18:30");
-  
+
+  // Slots data
+  const [dbSlots, setDbSlots] = useState<RawSlot[]>([]);
+  const [loadingSlots, setLoadingSlots] = useState<boolean>(true);
+  const [selectedDayIndex, setSelectedDayIndex] = useState<number>(0);
+  const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
+  const [selectedTime, setSelectedTime] = useState<string>("");
+
   // Form fields
-  const [inGameName, setInGameName] = useState<string>("");
-  const [discordId, setDiscordId] = useState<string>("");
+  const [studentName, setStudentName] = useState<string>("");
+  const [studentEmail, setStudentEmail] = useState<string>("");
+  const [studentDiscord, setStudentDiscord] = useState<string>("");
   const [game, setGame] = useState<string>("Valorant");
   const [currentRank, setCurrentRank] = useState<string>("Diamant 2");
   const [objective, setObjective] = useState<string>("");
+
+  // Submit states
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [confirmedMissionId, setConfirmedMissionId] = useState<string>("");
 
-  const activePlan = PLANS.find((p) => p.id === selectedPlan) || PLANS[1];
+  // Auto-fill form from user context
+  useEffect(() => {
+    if (user) {
+      if (user.username && !studentName) setStudentName(user.username);
+      if (user.email && !studentEmail) setStudentEmail(user.email);
+    }
+  }, [user, studentName, studentEmail]);
 
-  const handleNextStep = async () => {
-    if (step === 3) {
-      // Generate mission order id
-      const randomCode = Math.floor(1000 + Math.random() * 9000);
-      const missionId = `PLP-${randomCode}-OP`;
-      setConfirmedMissionId(missionId);
+  // Fetch real open slots from API
+  const fetchSlots = async () => {
+    setLoadingSlots(true);
+    try {
+      const res = await fetch("/api/bookings/slots", { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        setDbSlots(data.slots || []);
+      }
+    } catch (err) {
+      console.warn("Erreur fetch slots:", err);
+    } finally {
+      setLoadingSlots(false);
+    }
+  };
 
-      try {
-        const dateObj = (AVAILABLE_DAYS[selectedDay] || AVAILABLE_DAYS[0]).full;
-        await supabase.from("coaching_bookings").insert({
-          plan_name: `${activePlan.name} (${activePlan.price})`,
-          booking_date: dateObj,
-          booking_time: selectedTime,
-          student_name: inGameName || discordId,
-          discord_id: discordId,
-          game: `${game} (${currentRank})`,
-          notes: objective,
-          status: "confirmed",
-        });
-      } catch (err) {
-        console.warn("Booking Supabase save fallback:", err);
+  useEffect(() => {
+    fetchSlots();
+  }, []);
+
+  // Compute 14 upcoming days
+  const daysList: DayOption[] = useMemo(() => {
+    const list: DayOption[] = [];
+    const baseDate = new Date();
+
+    const slotsByDate = new Map<string, RawSlot[]>();
+    dbSlots.forEach((s) => {
+      const arr = slotsByDate.get(s.date) || [];
+      arr.push(s);
+      slotsByDate.set(s.date, arr);
+    });
+
+    for (let i = 1; i <= 14; i++) {
+      const d = new Date(baseDate);
+      d.setDate(baseDate.getDate() + i);
+
+      const dateIso = d.toISOString().split("T")[0];
+      const dayOfWeek = d.getDay();
+      const dayName = DAYS_SHORT[dayOfWeek];
+      const dayFull = DAYS_FULL[dayOfWeek];
+      const dayNum = d.getDate();
+      const monthShort = MONTHS_SHORT[d.getMonth()];
+      const monthFull = MONTHS_FULL[d.getMonth()];
+      const fullDateLabel = `${dayFull} ${dayNum} ${monthFull}`;
+
+      const dayDbSlots = slotsByDate.get(dateIso) || [];
+
+      // Si le coach a configuré des créneaux dans coaching_slots pour ce jour
+      let slotItems: Array<{ id?: string; time: string; available: boolean; isBooked: boolean; isActive: boolean }> = [];
+
+      if (dayDbSlots.length > 0) {
+        slotItems = dayDbSlots.map((s) => ({
+          id: s.id,
+          time: s.start_time,
+          available: Boolean(s.is_active && !s.is_booked),
+          isBooked: Boolean(s.is_booked),
+          isActive: Boolean(s.is_active),
+        }));
+        slotItems.sort((a, b) => a.time.localeCompare(b.time));
+      } else {
+        // Le coach n'a pas configuré ce jour -> tout est indisponible (aucun créneau ouvert)
+        slotItems = STANDARD_HOURS.map((h) => ({
+          time: h,
+          available: false,
+          isBooked: false,
+          isActive: false,
+        }));
       }
 
-      setStep(4);
+      const availableCount = slotItems.filter((s) => s.available).length;
+
+      list.push({
+        dayName,
+        dayNumber: dayNum,
+        monthName: monthShort,
+        dateIso,
+        fullDateLabel,
+        slots: slotItems,
+        availableCount,
+      });
+    }
+
+    return list;
+  }, [dbSlots]);
+
+  const activePlan = PLANS.find((p) => p.id === selectedPlan) || PLANS[1];
+  const currentDay = daysList[selectedDayIndex] || daysList[0];
+
+  const handleSelectSlot = (slot: { id?: string; time: string; available: boolean }) => {
+    if (!slot.available) return;
+    setSelectedSlotId(slot.id || null);
+    setSelectedTime(slot.time);
+  };
+
+  const handleNextStep = async () => {
+    if (step === 2) {
+      if (!selectedTime) {
+        setSubmitError("Veuillez sélectionner un créneau horaire disponible.");
+        return;
+      }
+      setSubmitError(null);
+      setStep(3);
+    } else if (step === 3) {
+      // Validate Step 3
+      if (!studentDiscord.trim()) {
+        setSubmitError("L'identifiant Discord est requis pour initier le salon vocal.");
+        return;
+      }
+      if (!studentEmail.trim()) {
+        setSubmitError("L'adresse email est requise pour la confirmation.");
+        return;
+      }
+
+      setIsSubmitting(true);
+      setSubmitError(null);
+
+      try {
+        const randomCode = Math.floor(1000 + Math.random() * 9000);
+        const missionId = `PLP-${randomCode}-OP`;
+
+        let token: string | undefined;
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          token = session?.access_token;
+        } catch {}
+
+        const headers: Record<string, string> = { "Content-Type": "application/json" };
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+
+        const res = await fetch("/api/bookings/create", {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            slotId: selectedSlotId,
+            bookingDate: currentDay.dateIso,
+            bookingTime: selectedTime,
+            planId: activePlan.id,
+            planName: activePlan.name,
+            planPrice: activePlan.price,
+            planDuration: activePlan.duration,
+            studentName: studentName.trim() || studentDiscord.trim(),
+            studentEmail: studentEmail.trim(),
+            studentDiscord: studentDiscord.trim(),
+            game: `${game} (${currentRank})`,
+            notes: objective.trim(),
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || data.error) {
+          throw new Error(data.error || "Erreur lors de la réservation");
+        }
+
+        setConfirmedMissionId(missionId);
+        setStep(4);
+        fetchSlots(); // Refresh slot states
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "Erreur lors de la réservation";
+        setSubmitError(msg);
+      } finally {
+        setIsSubmitting(false);
+      }
     } else {
       setStep((prev) => prev + 1);
     }
@@ -116,13 +292,14 @@ export default function Booking() {
 
   const handleReset = () => {
     setStep(1);
-    setInGameName("");
-    setDiscordId("");
+    setSelectedTime("");
+    setSelectedSlotId(null);
     setObjective("");
+    setSubmitError(null);
   };
 
   return (
-    <section id="booking" className="py-32 px-6 sm:px-12 lg:px-16 bg-[#07090D] border-t border-[rgba(255,255,255,0.08)] font-mono">
+    <section id="booking" className="py-32 px-6 sm:px-12 lg:px-16 bg-[#07090D] border-t border-[rgba(255,255,255,0.08)] font-mono relative z-20">
       <div className="max-w-7xl mx-auto space-y-16">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-8">
@@ -134,7 +311,7 @@ export default function Booking() {
               RÉSERVE TON <span className="text-[#FF7582]">COACHING</span>
             </h2>
             <p className="text-xs sm:text-sm text-white/50 max-w-2xl leading-relaxed">
-              Verrouille ton créneau tactique avec Poulpy. Sélectionne ta formule, ton horaire et transmets tes données de jeu en moins de 60 secondes.
+              Verrouille ton créneau tactique avec Poulpy. Sélectionne ta formule, consulte les créneaux disponibles en direct et transmets tes informations.
             </p>
           </div>
 
@@ -154,7 +331,9 @@ export default function Booking() {
                   onClick={() => {
                     if (isDone) setStep(s.id);
                   }}
-                  className={`px-3.5 py-1.5 text-xs font-bold border transition-all cursor-pointer ${
+                  className={`px-3.5 py-1.5 text-xs font-bold border transition-all ${
+                    isDone ? "cursor-pointer" : ""
+                  } ${
                     isActive
                       ? "border-[#FF7582] bg-[#FF7582] text-black shadow-[0_0_15px_rgba(255,117,130,0.35)]"
                       : isDone
@@ -191,7 +370,6 @@ export default function Booking() {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-
                   {/* Carte PRO — spotlight 7 cols */}
                   <div
                     onClick={() => setSelectedPlan("pro")}
@@ -255,7 +433,6 @@ export default function Booking() {
 
                   {/* Cartes satellites — 5 cols empilées */}
                   <div className="lg:col-span-5 flex flex-col gap-6">
-
                     {/* SESSION DIAGNOSTIC */}
                     <div
                       onClick={() => setSelectedPlan("session")}
@@ -325,7 +502,6 @@ export default function Booking() {
                         </ul>
                       </div>
                     </div>
-
                   </div>
                 </div>
 
@@ -344,7 +520,7 @@ export default function Booking() {
               </motion.div>
             )}
 
-            {/* STEP 2: CRÉNEAU SELECTION */}
+            {/* STEP 2: CRÉNEAU SELECTION (DYNAMIC SLOTS FROM DATABASE) */}
             {step === 2 && (
               <motion.div
                 key="step2"
@@ -357,7 +533,7 @@ export default function Booking() {
                 <div className="flex items-center justify-between border-b border-white/15 pb-4">
                   <div className="text-xs text-white/70 uppercase tracking-wider font-bold flex items-center gap-2">
                     <span className="w-2 h-2 bg-[#FF7582]" />
-                    ÉTAPE 02 : VERROUILLAGE DU CALENDRIER // CRÉNEAU TACTIQUE
+                    ÉTAPE 02 : VERROUILLAGE DU CALENDRIER // CRÉNEAUX EN DIRECT
                   </div>
                   <span className="text-xs text-[#FF7582] font-bold tracking-wider">FORMULE: {activePlan.name}</span>
                 </div>
@@ -365,79 +541,164 @@ export default function Booking() {
                 <div className="space-y-6">
                   {/* Days Bar */}
                   <div className="space-y-2">
-                    <label className="text-xs text-white/60 block uppercase font-bold">
-                      1. SÉLECTIONNER UN JOUR :
-                    </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2">
-                      {AVAILABLE_DAYS.map((d, index) => {
-                        const isDaySelected = selectedDay === index;
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs text-white/70 block uppercase font-bold tracking-wider">
+                        1. SÉLECTIONNER UN JOUR (14 PROCHAINS JOURS) :
+                      </label>
+                      {loadingSlots && (
+                        <div className="flex items-center gap-1.5 text-xs text-[#8FAFD4]">
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span>Actualisation...</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex gap-2.5 overflow-x-auto pb-3 pt-1 -mx-2 px-2 scrollbar-thin">
+                      {daysList.map((d, index) => {
+                        const isDaySelected = selectedDayIndex === index;
+                        const hasAvailable = d.availableCount > 0;
+
                         return (
                           <div
-                            key={index}
-                            onClick={() => setSelectedDay(index)}
-                            className={`p-3 border text-center cursor-pointer transition-all ${
+                            key={d.dateIso}
+                            onClick={() => {
+                              setSelectedDayIndex(index);
+                              setSelectedTime("");
+                              setSelectedSlotId(null);
+                            }}
+                            className={`flex-shrink-0 w-24 sm:w-28 p-3 border text-center cursor-pointer transition-all flex flex-col justify-between ${
                               isDaySelected
-                                ? "border-[#FF7582] bg-[#FF7582] text-black shadow-[0_0_15px_rgba(255,117,130,0.35)] font-bold"
-                                : "border-white/15 bg-black hover:border-white/40 text-white"
+                                ? "border-[#FF7582] bg-[#FF7582]/15 text-white shadow-[0_0_15px_rgba(255,117,130,0.3)] ring-1 ring-[#FF7582]"
+                                : "border-white/15 bg-black/60 hover:border-white/40 text-white"
                             }`}
                           >
-                            <div className="text-[10px] opacity-75">{d.day}</div>
-                            <div className="text-sm font-display tracking-wider">{d.date}</div>
+                            <div>
+                              <div className="text-[10px] text-white/50 uppercase tracking-wider font-bold">{d.dayName}</div>
+                              <div className="text-lg font-display tracking-wider">{d.dayNumber} {d.monthName}</div>
+                            </div>
+
+                            <div className="mt-2">
+                              {hasAvailable ? (
+                                <span className="text-[9px] font-bold px-1.5 py-0.5 bg-[#A4DE87]/15 border border-[#A4DE87]/40 text-[#A4DE87] uppercase block">
+                                  {d.availableCount} dispo
+                                </span>
+                              ) : (
+                                <span className="text-[9px] font-medium px-1.5 py-0.5 bg-white/5 border border-white/10 text-white/30 uppercase block">
+                                  Complet
+                                </span>
+                              )}
+                            </div>
                           </div>
                         );
                       })}
                     </div>
                   </div>
 
-                  {/* Time Slots */}
-                  <div className="space-y-2">
-                    <label className="text-xs text-white/60 block uppercase font-bold">
-                      2. SÉLECTIONNER L&apos;HORAIRE (HEURE DE PARIS UTC+1) :
-                    </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
-                      {TIME_SLOTS.map((t) => {
-                        const isTimeSelected = selectedTime === t;
-                        return (
-                          <div
-                            key={t}
-                            onClick={() => setSelectedTime(t)}
-                            className={`p-4 border text-center cursor-pointer transition-all flex flex-col items-center justify-center gap-1 ${
-                              isTimeSelected
-                                ? "border-[#8FAFD4] bg-[#8FAFD4]/10 text-[#8FAFD4] font-bold shadow-[0_0_15px_rgba(143,175,212,0.25)]"
-                                : "border-white/15 bg-black hover:border-white/40 text-white/80"
-                            }`}
-                          >
-                            <Clock className="w-3.5 h-3.5" />
-                            <span className="text-sm font-mono">{t}</span>
-                          </div>
-                        );
-                      })}
+                  {/* Time Slots Section for Selected Day */}
+                  <div className="space-y-3 pt-4 border-t border-white/10">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs text-white/70 block uppercase font-bold tracking-wider">
+                        2. SÉLECTIONNER L&apos;HORAIRE POUR LE {currentDay.fullDateLabel.toUpperCase()} :
+                      </label>
+                      <span className="text-xs text-white/40 font-mono">FUSEAU : PARIS (UTC+1)</span>
+                    </div>
+
+                    {currentDay.availableCount === 0 ? (
+                      <div className="p-8 bg-black/80 border border-white/10 text-center space-y-2">
+                        <Clock className="w-8 h-8 text-white/30 mx-auto mb-1" />
+                        <h4 className="text-sm font-bold text-white uppercase tracking-wider">
+                          AUCUN CRÉNEAU DISPONIBLE POUR CETTE DATE
+                        </h4>
+                        <p className="text-xs text-white/50 max-w-md mx-auto">
+                          Le coach n&apos;a pas ouvert de disponibilités pour ce jour ou tous les créneaux ont déjà été réservés. Choisis un autre jour dans la liste ci-dessus !
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 gap-3">
+                        {currentDay.slots.map((s) => {
+                          const isTimeSelected = selectedTime === s.time;
+                          const isAvailable = s.available;
+
+                          return (
+                            <button
+                              key={s.time}
+                              type="button"
+                              disabled={!isAvailable}
+                              onClick={() => handleSelectSlot(s)}
+                              className={`p-4 border text-center transition-all flex flex-col items-center justify-center gap-1.5 ${
+                                !isAvailable
+                                  ? "border-white/5 bg-white/[0.02] text-white/30 cursor-not-allowed line-through opacity-40"
+                                  : isTimeSelected
+                                  ? "border-[#FF7582] bg-[#FF7582] text-black font-bold shadow-[0_0_20px_rgba(255,117,130,0.4)] cursor-pointer"
+                                  : "border-white/15 bg-black/60 hover:border-[#FF7582]/60 text-white cursor-pointer"
+                              }`}
+                            >
+                              <div className="flex items-center gap-1.5">
+                                <Clock className="w-3.5 h-3.5" />
+                                <span className="text-base font-display tracking-wider">{s.time}</span>
+                              </div>
+
+                              <span className={`text-[9px] uppercase font-bold tracking-widest ${
+                                isTimeSelected ? "text-black" : isAvailable ? "text-[#A4DE87]" : "text-white/20"
+                              }`}>
+                                {isTimeSelected ? "SÉLECTIONNÉ" : isAvailable ? "DISPONIBLE" : "INDISPONIBLE"}
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* Legend */}
+                    <div className="flex flex-wrap items-center justify-center gap-6 pt-3 text-[11px] text-white/50 font-mono">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 bg-[#A4DE87]" />
+                        <span>DISPONIBLE</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 bg-[#FF7582]" />
+                        <span>SÉLECTIONNÉ</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 bg-white/20" />
+                        <span className="line-through">INDISPONIBLE / COMPLET</span>
+                      </div>
                     </div>
                   </div>
 
                   {/* Selected Summary Badge */}
-                  <div className="p-4 bg-black border border-white/20 flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-3">
-                      <Calendar className="w-4 h-4 text-[#FF7582]" />
-                      <span>
-                        CRÉNEAU VALIDÉ : <strong className="text-white">{(AVAILABLE_DAYS[selectedDay] || AVAILABLE_DAYS[0]).full} à {selectedTime}</strong>
-                      </span>
+                  {selectedTime && (
+                    <div className="p-4 bg-black border border-[#FF7582]/40 flex items-center justify-between text-xs animate-in fade-in">
+                      <div className="flex items-center gap-3">
+                        <Calendar className="w-4 h-4 text-[#FF7582]" />
+                        <span>
+                          CRÉNEAU SÉLECTIONNÉ : <strong className="text-white">{currentDay.fullDateLabel} à {selectedTime}</strong>
+                        </span>
+                      </div>
+                      <span className="text-[#A4DE87] font-bold">[ CRÉNEAU VALIDÉ ]</span>
                     </div>
-                    <span className="text-[#A4DE87] font-bold">DISPONIBLE</span>
-                  </div>
+                  )}
+
+                  {submitError && (
+                    <div className="p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 shrink-0" />
+                      <span>{submitError}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="pt-6 border-t border-white/10 flex items-center justify-between">
                   <button
                     onClick={() => setStep(1)}
-                    className="btn-cyber-ghost flex items-center gap-2 py-3 px-6 text-xs uppercase"
+                    className="btn-cyber-ghost flex items-center gap-2 py-3 px-6 text-xs uppercase cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />
                     <span>RETOUR FORMULES</span>
                   </button>
                   <button
+                    disabled={!selectedTime}
                     onClick={handleNextStep}
-                    className="btn-cyber-primary flex items-center gap-2 py-3 px-8 text-xs font-bold uppercase"
+                    className="btn-cyber-primary flex items-center gap-2 py-3 px-8 text-xs font-bold uppercase disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                   >
                     <span>RENSEIGNER MON PROFIL</span>
                     <ArrowRight className="w-4 h-4" />
@@ -457,44 +718,62 @@ export default function Booking() {
                 className="space-y-8"
               >
                 <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                  <div className="text-xs text-white/50 uppercase tracking-wider">
+                  <div className="text-xs text-white/50 uppercase tracking-wider font-bold">
                     ÉTAPE 03 : PROFIL JOUEUR &amp; DOSSIER TACTIQUE
                   </div>
                   <span className="text-xs text-[#FF7582] font-bold">
-                    {activePlan.name} // {(AVAILABLE_DAYS[selectedDay] || AVAILABLE_DAYS[0]).date} {selectedTime}
+                    {activePlan.name} // {currentDay.fullDateLabel} à {selectedTime}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div>
-                      <label className="text-xs text-white/60 uppercase block mb-1.5">
-                        PSEUDO IN-GAME &amp; TAG * :
+                      <label className="text-xs text-white/70 uppercase block mb-1.5 font-bold">
+                        NOM / PSEUDO JOUEUR :
                       </label>
                       <input
                         type="text"
-                        placeholder="ex: Poulpy#0001 ou TenZ#NA1"
-                        value={inGameName}
-                        onChange={(e) => setInGameName(e.target.value)}
+                        placeholder="ex: Alex ou PoulpyFan"
+                        value={studentName}
+                        onChange={(e) => setStudentName(e.target.value)}
                         className="w-full bg-black border border-white/15 px-4 py-3 text-xs text-white font-mono outline-none focus:border-[#FF7582]"
                       />
                     </div>
 
                     <div>
-                      <label className="text-xs text-white/60 uppercase block mb-1.5">
+                      <label className="text-xs text-white/70 uppercase block mb-1.5 font-bold">
+                        EMAIL DE CONFIRMATION * :
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        placeholder="ex: ton.email@gmail.com"
+                        value={studentEmail}
+                        onChange={(e) => setStudentEmail(e.target.value)}
+                        className="w-full bg-black border border-white/15 px-4 py-3 text-xs text-white font-mono outline-none focus:border-[#FF7582]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="text-xs text-white/70 uppercase block mb-1.5 font-bold">
                         IDENTIFIANT DISCORD * :
                       </label>
                       <input
                         type="text"
-                        placeholder="ex: poulpy_coach"
-                        value={discordId}
-                        onChange={(e) => setDiscordId(e.target.value)}
+                        required
+                        placeholder="ex: poulpy_esport ou Alex#1234"
+                        value={studentDiscord}
+                        onChange={(e) => setStudentDiscord(e.target.value)}
                         className="w-full bg-black border border-white/15 px-4 py-3 text-xs text-white font-mono outline-none focus:border-[#FF7582]"
                       />
+                      <span className="text-[10px] text-white/40 block mt-1">
+                        Indispensable pour le salon vocal de coaching.
+                      </span>
                     </div>
 
                     <div>
-                      <label className="text-xs text-white/60 uppercase block mb-1.5">
+                      <label className="text-xs text-white/70 uppercase block mb-1.5 font-bold">
                         DISCIPLINE / TITRE :
                       </label>
                       <select
@@ -512,7 +791,7 @@ export default function Booking() {
 
                   <div className="space-y-4">
                     <div>
-                      <label className="text-xs text-white/60 uppercase block mb-1.5">
+                      <label className="text-xs text-white/70 uppercase block mb-1.5 font-bold">
                         RANG ACTUEL &amp; PEAK :
                       </label>
                       <input
@@ -525,11 +804,11 @@ export default function Booking() {
                     </div>
 
                     <div>
-                      <label className="text-xs text-white/60 uppercase block mb-1.5">
-                        OBJECTIFS PRIORITAIRES / BLOCAGES ACTUELS :
+                      <label className="text-xs text-white/70 uppercase block mb-1.5 font-bold">
+                        OBJECTIFS PRIORITAIRES / ATTENTES DU COACHING :
                       </label>
                       <textarea
-                        rows={4}
+                        rows={5}
                         placeholder="ex: Je perds tous mes duels de clutch en défense. Je veux stabiliser mon crosshair placement et comprendre mes timings de prise d'info."
                         value={objective}
                         onChange={(e) => setObjective(e.target.value)}
@@ -539,21 +818,37 @@ export default function Booking() {
                   </div>
                 </div>
 
+                {submitError && (
+                  <div className="p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    <span>{submitError}</span>
+                  </div>
+                )}
+
                 <div className="pt-6 border-t border-white/10 flex items-center justify-between">
                   <button
                     onClick={() => setStep(2)}
-                    className="btn-cyber-ghost flex items-center gap-2 py-3 px-6 text-xs uppercase"
+                    className="btn-cyber-ghost flex items-center gap-2 py-3 px-6 text-xs uppercase cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />
                     <span>MODIFIER LE CRÉNEAU</span>
                   </button>
                   <button
-                    disabled={!discordId.trim()}
+                    disabled={!studentDiscord.trim() || !studentEmail.trim() || isSubmitting}
                     onClick={handleNextStep}
-                    className="btn-cyber-primary flex items-center gap-2 py-3 px-8 text-xs font-bold uppercase disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="btn-cyber-primary flex items-center gap-2 py-3 px-8 text-xs font-bold uppercase disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                   >
-                    <span>CONFIRMER LA RÉSERVATION</span>
-                    <Send className="w-4 h-4" />
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>ENREGISTREMENT...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>CONFIRMER LA RÉSERVATION</span>
+                        <Send className="w-4 h-4" />
+                      </>
+                    )}
                   </button>
                 </div>
               </motion.div>
@@ -578,7 +873,7 @@ export default function Booking() {
                     CRÉNEAU TACTIQUE VERROUILLÉ
                   </h3>
                   <p className="text-xs text-white/60 leading-relaxed">
-                    Ton briefing est enregistré dans le système. Poulpy t&apos;enverra l&apos;invitation privée sur Discord pour initier la séance dans le salon vocal dédié.
+                    Ton dossier est enregistré dans la base de données. Poulpy te contactera sur Discord pour débuter la séance dans le salon vocal dédié.
                   </p>
                 </div>
 
@@ -590,11 +885,11 @@ export default function Booking() {
                   </div>
                   <div className="flex justify-between border-b border-white/10 pb-2">
                     <span className="text-white/50">HORAIRE :</span>
-                    <span className="text-[#FF7582] font-bold">{(AVAILABLE_DAYS[selectedDay] || AVAILABLE_DAYS[0]).full} à {selectedTime}</span>
+                    <span className="text-[#FF7582] font-bold">{currentDay.fullDateLabel} à {selectedTime}</span>
                   </div>
                   <div className="flex justify-between border-b border-white/10 pb-2">
                     <span className="text-white/50">JOUEUR / DISCORD :</span>
-                    <span className="text-white">{inGameName || "Non spécifié"} ({discordId})</span>
+                    <span className="text-white">{studentName || "Non spécifié"} ({studentDiscord})</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-white/50">DISCIPLINE &amp; RANG :</span>
@@ -604,17 +899,17 @@ export default function Booking() {
 
                 <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
                   <a
-                    href="https://discord.gg"
+                    href="https://discord.gg/rJMg3ZZRkp"
                     target="_blank"
                     rel="noreferrer"
                     className="btn-cyber-primary py-3 px-8 text-xs font-bold uppercase inline-flex items-center gap-2"
                   >
-                    <span>REJOINDRE LE DISCORD SÉCURISÉ</span>
+                    <span>REJOINDRE LE DISCORD DU COACH</span>
                     <ArrowRight className="w-4 h-4" />
                   </a>
                   <button
                     onClick={handleReset}
-                    className="btn-cyber-ghost py-3 px-6 text-xs uppercase"
+                    className="btn-cyber-ghost py-3 px-6 text-xs uppercase cursor-pointer"
                   >
                     NOUVELLE RÉSERVATION
                   </button>

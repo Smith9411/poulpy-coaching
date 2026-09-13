@@ -96,14 +96,12 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    // Requête publique (Élève/Visiteur)
+    // Requête publique (Élève/Visiteur) : tous les créneaux configurés sur la plage
     const { data: slots, error } = await supabase
       .from('coaching_slots')
       .select('id, date, start_time, is_active, is_booked')
       .gte('date', today)
       .lte('date', defaultEnd)
-      .eq('is_active', true)
-      .eq('is_booked', false)
       .order('date', { ascending: true })
       .order('start_time', { ascending: true });
 
