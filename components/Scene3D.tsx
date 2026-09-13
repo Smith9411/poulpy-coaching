@@ -10,7 +10,7 @@ export default function Scene3D() {
     let unmounted = false;
     let cleanupFn: (() => void) | undefined;
 
-    // Asynchronously import Three.js in client microtask so main thread UI/scroll never wait
+    // Asynchronously import Three.js so main UI/scroll never block
     import("three").then((THREE) => {
       if (unmounted || !mountRef.current) return;
       const mount = mountRef.current;
@@ -35,7 +35,7 @@ export default function Scene3D() {
       renderer.setClearColor(0x000000, 0);
       mount.appendChild(renderer.domElement);
 
-      // 2. Procedural Soft Glow Droplet Texture (In-memory, 0ms latency)
+      // 2. Soft Glow Droplet Texture (In-memory)
       const canvas = document.createElement("canvas");
       canvas.width = 32;
       canvas.height = 32;
@@ -51,18 +51,21 @@ export default function Scene3D() {
       }
       const particleTexture = new THREE.CanvasTexture(canvas);
 
-      // 3. Option 2: L'Encre Vivante & Pollen Solaire (Fluid Sumi-e Vortex)
-      const PARTICLE_COUNT = 6000;
+      // 3. Permanent Infinite Tentacle Spiral (Fluid Coherent Flow)
+      const PARTICLE_COUNT = 6500;
       const geometry = new THREE.BufferGeometry();
       const positions = new Float32Array(PARTICLE_COUNT * 3);
       const colors = new Float32Array(PARTICLE_COUNT * 3);
 
-      const radii = new Float32Array(PARTICLE_COUNT);
-      const angles = new Float32Array(PARTICLE_COUNT);
-      const speeds = new Float32Array(PARTICLE_COUNT);
-      const zOffsets = new Float32Array(PARTICLE_COUNT);
-      const verticalWaves = new Float32Array(PARTICLE_COUNT);
-      const isPollen = new Uint8Array(PARTICLE_COUNT);
+      // Spiral particle parameters
+      const ARMS_COUNT = 4; // 4 Organic Poulpy Tentacle Spiral Arms
+      const baseArm = new Uint8Array(PARTICLE_COUNT);
+      const armProgress = new Float32Array(PARTICLE_COUNT);
+      const armOffsetAngle = new Float32Array(PARTICLE_COUNT);
+      const armScatterR = new Float32Array(PARTICLE_COUNT);
+      const armScatterZ = new Float32Array(PARTICLE_COUNT);
+      const flowSpeed = new Float32Array(PARTICLE_COUNT);
+      const isAmbient = new Uint8Array(PARTICLE_COUNT);
 
       // Pastel Palette
       const cCoral = new THREE.Color(0xff7582);      // Core Pastel Coral
@@ -72,35 +75,43 @@ export default function Scene3D() {
       const cWhiteInk = new THREE.Color(0xf6f6f2);   // Sumi-e Pearl / Pollen
 
       for (let i = 0; i < PARTICLE_COUNT; i++) {
-        const isAmbient = i > PARTICLE_COUNT * 0.8;
-        isPollen[i] = isAmbient ? 1 : 0;
+        const ambient = i > PARTICLE_COUNT * 0.85;
+        isAmbient[i] = ambient ? 1 : 0;
 
-        if (!isAmbient) {
-          // Vortex Spiral Arms
-          const armIndex = i % 3;
-          const armOffset = (armIndex * (Math.PI * 2)) / 3;
+        if (!ambient) {
+          // Distributed along 4 spiral tentacle arms
+          const arm = i % ARMS_COUNT;
+          baseArm[i] = arm;
 
-          const progress = Math.pow(Math.random(), 1.6);
-          const r = 25 + progress * 580;
-          const theta = armOffset + r * 0.012 + (Math.random() - 0.5) * 0.45;
-          const z = (Math.random() - 0.5) * (180 - progress * 80);
+          // Normalized distance along the tentacle curve (0.0 to 1.0)
+          const p = Math.pow(Math.random(), 1.4);
+          armProgress[i] = p;
 
-          radii[i] = r;
-          angles[i] = theta;
-          // Calibrated slow, serene fluid vortex rotation
-          speeds[i] = (0.0008 + 0.0016 / (r * 0.018 + 1)) * (0.8 + Math.random() * 0.4);
-          zOffsets[i] = z;
-          verticalWaves[i] = Math.random() * Math.PI * 2;
+          // Subtle natural scatter around the core spiral spine
+          armOffsetAngle[i] = (Math.random() - 0.5) * (0.28 + (1 - p) * 0.15);
+          armScatterR[i] = (Math.random() - 0.5) * (18 + p * 32);
+          armScatterZ[i] = (Math.random() - 0.5) * (60 + p * 90);
+
+          // Flow speed along the spiral curve
+          flowSpeed[i] = 0.00045 + Math.random() * 0.00035;
+
+          // Compute initial position
+          const armAngle = (arm * (Math.PI * 2)) / ARMS_COUNT;
+          const r = 25 + p * 580 + armScatterR[i];
+          const spiralCurvature = 0.0075;
+          const theta = armAngle + r * spiralCurvature + armOffsetAngle[i];
+          const z = armScatterZ[i];
 
           positions[i * 3] = r * Math.cos(theta);
           positions[i * 3 + 1] = r * Math.sin(theta);
           positions[i * 3 + 2] = z;
 
+          // Color gradation from center coral to outer slate / matcha
           let col = cCoral;
-          if (r < 120) {
-            col = Math.random() > 0.4 ? cCoral : cCoralLight;
-          } else if (r < 320) {
-            col = Math.random() > 0.35 ? cSlate : cCoral;
+          if (p < 0.22) {
+            col = Math.random() > 0.35 ? cCoral : cCoralLight;
+          } else if (p < 0.65) {
+            col = Math.random() > 0.4 ? cSlate : cCoral;
           } else {
             col = Math.random() > 0.5 ? cSlate : cMatcha;
           }
@@ -109,23 +120,22 @@ export default function Scene3D() {
           colors[i * 3 + 1] = col.g;
           colors[i * 3 + 2] = col.b;
         } else {
-          // Ambient Solar Pollen / Floating Spores
-          const r = 100 + Math.random() * 650;
+          // Ambient drifting spores
+          const r = 80 + Math.random() * 700;
           const theta = Math.random() * Math.PI * 2;
-          const z = (Math.random() - 0.5) * 600;
+          const z = (Math.random() - 0.5) * 500;
 
-          radii[i] = r;
-          angles[i] = theta;
-          speeds[i] = (Math.random() - 0.5) * 0.0004;
-          zOffsets[i] = z;
-          verticalWaves[i] = Math.random() * Math.PI * 2;
+          armProgress[i] = r;
+          armOffsetAngle[i] = theta;
+          flowSpeed[i] = (Math.random() - 0.5) * 0.0003;
+          armScatterZ[i] = z;
 
           positions[i * 3] = r * Math.cos(theta);
           positions[i * 3 + 1] = r * Math.sin(theta);
           positions[i * 3 + 2] = z;
 
           const rand = Math.random();
-          const col = rand > 0.5 ? cMatcha : rand > 0.25 ? cWhiteInk : cSlate;
+          const col = rand > 0.6 ? cMatcha : rand > 0.3 ? cWhiteInk : cSlate;
           colors[i * 3] = col.r;
           colors[i * 3 + 1] = col.g;
           colors[i * 3 + 2] = col.b;
@@ -140,7 +150,7 @@ export default function Scene3D() {
         map: particleTexture,
         vertexColors: true,
         transparent: true,
-        opacity: 0.85,
+        opacity: 0.88,
         blending: THREE.AdditiveBlending,
         depthWrite: false,
       });
@@ -167,12 +177,13 @@ export default function Scene3D() {
       };
       window.addEventListener("resize", onResize);
 
-      // Immediate synchronous initial render
+      // Immediate initial render
       renderer.render(scene, camera);
 
-      // 5. Living Kinetic Animation Loop
+      // 5. Infinite Coherent Living Spiral Animation Loop
       let animId: number;
       let lastTime = performance.now();
+      let globalRotation = 0;
 
       const animate = () => {
         animId = requestAnimationFrame(animate);
@@ -187,46 +198,58 @@ export default function Scene3D() {
         mouseX += (targetX - mouseX) * 0.045;
         mouseY += (targetY - mouseY) * 0.045;
 
-        // Camera: parallax + plunge tunnel forward on scroll
+        // Camera positioning with smooth scroll parallax
         camera.position.x = mouseX * 0.32;
         camera.position.y = -mouseY * 0.32;
         camera.position.z = Math.max(200, 560 - currentScroll * 0.48);
         camera.lookAt(0, 0, 0);
 
-        // Slow, tranquil, elegant vortex rotation
-        vortexMesh.rotation.z += 0.0006;
+        // Constant, serene global rotation of the entire tentacle system
+        globalRotation += delta * 0.16;
         vortexMesh.rotation.x = -mouseY * 0.00035 + 0.12;
         vortexMesh.rotation.y = mouseX * 0.00035;
 
-        // Update particle positions inside buffer
+        // Update particle positions while strictly maintaining the permanent spiral geometry
         const posAttr = geometry.attributes.position as THREE.BufferAttribute;
         const posArray = posAttr.array as Float32Array;
 
         const vortexCenterX = mouseX * 0.18;
         const vortexCenterY = -mouseY * 0.18;
+        const spiralCurvature = 0.0075;
 
         for (let i = 0; i < PARTICLE_COUNT; i++) {
-          angles[i] += speeds[i];
-          verticalWaves[i] += delta * 0.55;
-
-          const r = radii[i];
-          const theta = angles[i];
           const i3 = i * 3;
 
-          if (isPollen[i] === 0) {
-            const waveZ = Math.sin(verticalWaves[i] + r * 0.02) * 14;
+          if (isAmbient[i] === 0) {
+            // Tentacle particles smoothly advance along the curve and cycle seamlessly
+            let p = armProgress[i] + flowSpeed[i] * (delta * 60);
+            if (p > 1.0) p -= 1.0;
+            armProgress[i] = p;
+
+            const arm = baseArm[i];
+            const armAngle = (arm * (Math.PI * 2)) / ARMS_COUNT + globalRotation;
+            const r = 25 + p * 580 + armScatterR[i];
+            const theta = armAngle + r * spiralCurvature + armOffsetAngle[i];
+
+            // Organic breathing wave
+            const waveZ = Math.sin(now * 0.0018 + p * 8 + arm) * (8 + p * 14);
+
             posArray[i3] = vortexCenterX + r * Math.cos(theta);
             posArray[i3 + 1] = vortexCenterY + r * Math.sin(theta);
-            posArray[i3 + 2] = zOffsets[i] + waveZ;
+            posArray[i3 + 2] = armScatterZ[i] + waveZ;
           } else {
+            // Ambient solar spores gently drift
+            armOffsetAngle[i] += flowSpeed[i] * (delta * 60);
+            const r = armProgress[i];
+            const theta = armOffsetAngle[i];
+
             posArray[i3] = vortexCenterX + r * Math.cos(theta);
             posArray[i3 + 1] = vortexCenterY + r * Math.sin(theta);
-            posArray[i3 + 2] = zOffsets[i] + Math.sin(verticalWaves[i]) * 16;
+            posArray[i3 + 2] = armScatterZ[i] + Math.sin(now * 0.001 + i) * 12;
           }
         }
 
         posAttr.needsUpdate = true;
-
         renderer.render(scene, camera);
       };
 
