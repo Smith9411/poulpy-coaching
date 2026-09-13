@@ -171,7 +171,7 @@ export default function CyberNavbar({ onOpenBooking }: CyberNavbarProps) {
           >
             <div className="flex items-center gap-2 font-mono">
               <span className="w-2.5 h-2.5 bg-[#FF7582] shadow-[0_0_10px_#FF7582] inline-block animate-pulse" />
-              <span className="text-xl font-display text-white tracking-widest">
+              <span className="text-xl font-display text-white group-hover:text-[#FF7582] transition-colors duration-150 tracking-widest font-bold">
                 POULPY<span className="text-[#FF7582]">.</span>
               </span>
             </div>
