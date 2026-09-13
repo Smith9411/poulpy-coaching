@@ -2,61 +2,11 @@
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Calendar, Clock, User, Shield, ChevronRight, ChevronLeft, ArrowRight, Send, Loader2, AlertCircle, Crosshair, Sparkles } from "lucide-react";
+import { Check, Calendar, Clock, User, Shield, ChevronRight, ChevronLeft, ArrowRight, Send, Loader2, AlertCircle, Crosshair } from "lucide-react";
 import DecryptedText from "./DecryptedText";
 import CornerBrackets from "./CornerBrackets";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
-
-interface PlanOption {
-  id: string;
-  name: string;
-  duration: string;
-  price: string;
-  description: string;
-  features: string[];
-  popular?: boolean;
-}
-
-const PLANS: PlanOption[] = [
-  {
-    id: "session",
-    name: "SESSION FLASH",
-    duration: "30 MIN",
-    price: "29 €",
-    description: "Idéal pour un premier diagnostic rapide et précis de ton gameplay.",
-    features: ["Analyse rapide de gameplay", "Conseils personnalisés immédiats", "Exercices ciblés de recalibrage", "Compte-rendu écrit"],
-  },
-  {
-    id: "pro",
-    name: "COACHING PRO",
-    duration: "60 MIN",
-    price: "49 €",
-    popular: true,
-    description: "Le standard pour progresser durablement et monter de rank garanti.",
-    features: [
-      "Analyse complète de gameplay",
-      "Coaching personnalisé en vocal",
-      "Travail d'aim & placement du viseur",
-      "Plan de progression 4 semaines",
-      "Suivi Discord VIP 7j/7",
-    ],
-  },
-  {
-    id: "performance",
-    name: "PERFORMANCE",
-    duration: "90 MIN",
-    price: "89 €",
-    description: "Pour les compétiteurs et objectifs ambitieux (rank up, tournois).",
-    features: [
-      "Analyse approfondie multicritères",
-      "Coaching live & VOD review complète",
-      "Aim training KovaaK's & Aimlabs",
-      "Plan personnalisé 8 semaines",
-      "Suivi continu Discord prioritaire",
-    ],
-  },
-];
 
 interface RawSlot {
   id: string;
@@ -89,169 +39,21 @@ const MONTHS_FULL = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Jui
 
 const STANDARD_HOURS = ["10:00", "11:30", "14:00", "15:30", "17:00", "18:30", "20:00", "21:30"];
 
-// Compact 3D Tilt HUD Plan Card Component
-function TiltPlanCard({
-  plan,
-  isSelected,
-  onSelect,
-}: {
-  plan: PlanOption;
-  isSelected: boolean;
-  onSelect: () => void;
-}) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [rotate, setRotate] = useState({ x: 0, y: 0 });
-  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
-  const [isHovered, setIsHovered] = useState(false);
-
-  const isAcid = plan.id === "pro";
-  const isSlate = plan.id === "performance";
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const percentX = (x / rect.width) * 100;
-    const percentY = (y / rect.height) * 100;
-
-    const rotX = ((y - rect.height / 2) / (rect.height / 2)) * -8;
-    const rotY = ((x - rect.width / 2) / (rect.width / 2)) * 8;
-
-    setRotate({ x: rotX, y: rotY });
-    setMousePos({ x: percentX, y: percentY });
-  };
-
-  const handleMouseEnter = () => setIsHovered(true);
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    setRotate({ x: 0, y: 0 });
-  };
-
-  return (
-    <div
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onClick={onSelect}
-      className="perspective-1000 h-full cursor-pointer"
-      style={{ perspective: "1000px" }}
-    >
-      <motion.div
-        animate={{
-          rotateX: rotate.x,
-          rotateY: rotate.y,
-          scale: isHovered ? 1.01 : 1,
-        }}
-        transition={{
-          type: "spring",
-          stiffness: 260,
-          damping: 20,
-        }}
-        style={{ transformStyle: "preserve-3d" }}
-        className={`relative h-full reticle-box flex flex-col justify-between overflow-hidden transition-colors duration-200 select-none p-5 sm:p-6 space-y-4 ${
-          isSelected
-            ? isAcid
-              ? "bg-[#FF7582]/10 border-[#FF7582] shadow-[0_0_30px_rgba(255,117,130,0.25)] ring-1 ring-[#FF7582]"
-              : isSlate
-              ? "bg-[#8FAFD4]/10 border-[#8FAFD4] shadow-[0_0_30px_rgba(143,175,212,0.25)] ring-1 ring-[#8FAFD4]"
-              : "bg-white/10 border-white shadow-[0_0_30px_rgba(255,255,255,0.2)] ring-1 ring-white"
-            : isHovered
-            ? isAcid
-              ? "border-[#FF7582]/70 shadow-[0_0_20px_rgba(255,117,130,0.15)] bg-[#0d1017]"
-              : isSlate
-              ? "border-[#8FAFD4]/70 shadow-[0_0_20px_rgba(143,175,212,0.15)] bg-[#0d1017]"
-              : "border-white/40 bg-[#0d1017]"
-            : "bg-[#090C12] border-white/15"
-        }`}
-      >
-        {/* Corner Brackets / Encoches */}
-        <CornerBrackets color={isSlate ? "slate" : "coral"} />
-
-        {/* Dynamic Specular Light Follower (Spotlight) */}
-        {isHovered && (
-          <div
-            className="absolute inset-0 pointer-events-none transition-opacity duration-200"
-            style={{
-              background: `radial-gradient(circle 200px at ${mousePos.x}% ${mousePos.y}%, ${
-                isAcid
-                  ? "rgba(255, 117, 130, 0.15)"
-                  : isSlate
-                  ? "rgba(143, 175, 212, 0.15)"
-                  : "rgba(255, 255, 255, 0.08)"
-              }, transparent 80%)`,
-            }}
-          />
-        )}
-
-        {/* Popular / Recommended Badge */}
-        {plan.popular && (
-          <div className="absolute top-2.5 right-2.5 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-[#FF7582] text-black">
-            RECOMMANDE
-          </div>
-        )}
-
-        {/* Content */}
-        <div className="space-y-3.5 relative z-10">
-          {/* Header */}
-          <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
-            <span className="text-[10px] text-white/50 uppercase tracking-widest font-mono">
-              FORMULE {plan.duration}
-            </span>
-            <div className={`w-2 h-2 rounded-full ${isSelected ? (isAcid ? "bg-[#FF7582]" : isSlate ? "bg-[#8FAFD4]" : "bg-white") : "bg-white/20"}`} />
-          </div>
-
-          <div>
-            <h3 className="text-xl sm:text-2xl font-display text-white tracking-wider">
-              {plan.name}
-            </h3>
-
-            {/* Price without any glitch or extra clutter */}
-            <div className="flex items-baseline gap-2 mt-1">
-              <span className={`text-3xl font-display ${isAcid ? "text-[#FF7582]" : isSlate ? "text-[#8FAFD4]" : "text-white"}`}>
-                {plan.price}
-              </span>
-              <span className="text-[10px] text-white/40 font-mono uppercase">/ SÉANCE</span>
-            </div>
-          </div>
-
-          <p className="text-[11px] text-white/60 leading-relaxed line-clamp-2">
-            {plan.description}
-          </p>
-
-          <div className="space-y-1.5 pt-2.5 border-t border-white/10">
-            {plan.features.map((feat, i) => (
-              <div key={i} className="flex items-center gap-2 text-[11px] text-white/80">
-                <span className={`w-1 h-1 shrink-0 ${isAcid ? "bg-[#FF7582]" : isSlate ? "bg-[#8FAFD4]" : "bg-white/50"}`} />
-                <span className="truncate">{feat}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Card Footer Button Indicator */}
-        <div className="relative z-10 pt-3 border-t border-white/10 flex items-center justify-between text-[11px]">
-          <span className="text-[10px] text-white/40">
-            {plan.id === "pro" ? "Le choix favori des élèves" : plan.id === "performance" ? "Programme intensif" : "Audit rapide"}
-          </span>
-          <div className={`flex items-center gap-1 font-bold text-[10px] uppercase tracking-wider ${
-            isSelected ? (isAcid ? "text-[#FF7582]" : isSlate ? "text-[#8FAFD4]" : "text-white") : "text-white/40"
-          }`}>
-            <span>{isSelected ? "SÉLECTIONNÉ" : "CHOISIR"}</span>
-            <ArrowRight className="w-3 h-3" />
-          </div>
-        </div>
-      </motion.div>
-    </div>
-  );
-}
-
 export default function Booking() {
   const { user } = useAuth();
   const [step, setStep] = useState<number>(1);
   const [selectedPlan, setSelectedPlan] = useState<string>("pro");
+
+  // Mouse hover states for interactive spotlight
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
+
+  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setMousePos({ x, y });
+  };
 
   // Slots data
   const [dbSlots, setDbSlots] = useState<RawSlot[]>([]);
@@ -364,8 +166,15 @@ export default function Booking() {
     return list;
   }, [dbSlots]);
 
-  const activePlan = PLANS.find((p) => p.id === selectedPlan) || PLANS[1];
   const currentDay = daysList[selectedDayIndex] || daysList[0];
+
+  const planDetails: Record<string, { name: string; price: string; duration: string }> = {
+    pro: { name: "COACHING PRO", price: "49 €", duration: "60 MINUTES" },
+    session: { name: "SESSION DIAGNOSTIC", price: "29 €", duration: "30 MINUTES" },
+    performance: { name: "PERFORMANCE", price: "89 €", duration: "90 MINUTES" },
+  };
+
+  const activePlan = planDetails[selectedPlan] || planDetails["pro"];
 
   const handleSelectSlot = (slot: { id?: string; time: string; available: boolean }) => {
     if (!slot.available) return;
@@ -414,7 +223,7 @@ export default function Booking() {
             slotId: selectedSlotId,
             bookingDate: currentDay.dateIso,
             bookingTime: selectedTime,
-            planId: activePlan.id,
+            planId: selectedPlan,
             planName: activePlan.name,
             planPrice: activePlan.price,
             planDuration: activePlan.duration,
@@ -456,9 +265,9 @@ export default function Booking() {
 
   return (
     <section id="booking" className="py-20 px-6 sm:px-12 lg:px-16 bg-[#07090D] border-t border-[rgba(255,255,255,0.08)] font-mono relative z-20">
-      <div className="max-w-7xl mx-auto space-y-10">
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-6">
+      <div className="max-w-6xl mx-auto space-y-8">
+        {/* Top Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
           <div className="space-y-2">
             <span className="data-badge data-badge-laser">
               <DecryptedText text="MODULE DE RÉSERVATION" />
@@ -466,9 +275,6 @@ export default function Booking() {
             <h2 className="text-3xl sm:text-5xl font-display text-white tracking-wider">
               RÉSERVE TON <span className="text-[#FF7582]">COACHING</span>
             </h2>
-            <p className="text-xs text-white/50 max-w-2xl leading-relaxed">
-              Verrouille ton créneau tactique avec Poulpy. Sélectionne ta formule, consulte les créneaux disponibles en direct et transmets tes informations.
-            </p>
           </div>
 
           {/* Stepper Progress Badges */}
@@ -487,7 +293,7 @@ export default function Booking() {
                   onClick={() => {
                     if (isDone) setStep(s.id);
                   }}
-                  className={`px-3 py-1.5 text-xs font-bold border transition-all ${
+                  className={`px-3 py-1 text-xs font-bold border transition-all ${
                     isDone ? "cursor-pointer" : ""
                   } ${
                     isActive
@@ -507,7 +313,9 @@ export default function Booking() {
         {/* Dynamic Step Container */}
         <div className="reticle-box p-6 sm:p-8 bg-[#090c10] border border-white/20 relative shadow-[0_0_50px_rgba(0,0,0,0.9)]">
           <AnimatePresence mode="wait" initial={false}>
-            {/* STEP 1: FORMULE SELECTION (COMPACT 3 COLUMNS SIDE BY SIDE) */}
+            {/* ======================================================== */}
+            {/* STEP 1: EXACT PNG REPRODUCTION WITH SMOOTH HOVER EFFECT */}
+            {/* ======================================================== */}
             {step === 1 && (
               <motion.div
                 key="step1"
@@ -517,28 +325,261 @@ export default function Booking() {
                 transition={{ duration: 0.15 }}
                 className="space-y-6"
               >
-                <div className="flex items-center justify-between border-b border-white/15 pb-3">
-                  <div className="text-xs text-white/70 uppercase tracking-wider font-bold flex items-center gap-2">
+                {/* Step Subheader matching PNG */}
+                <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                  <div className="text-xs text-white/80 uppercase tracking-wider font-bold flex items-center gap-2">
                     <span className="w-2 h-2 bg-[#FF7582]" />
                     ÉTAPE 01 : SÉLECTION DU PROTOCOLE D&apos;ENTRAÎNEMENT
                   </div>
                   <span className="text-xs text-[#FF7582] font-bold tracking-wider">3 FORMULES DISPONIBLES</span>
                 </div>
 
-                {/* 3 cards in 3 equal columns */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-5 items-stretch">
-                  {PLANS.map((plan) => (
-                    <TiltPlanCard
-                      key={plan.id}
-                      plan={plan}
-                      isSelected={selectedPlan === plan.id}
-                      onSelect={() => setSelectedPlan(plan.id)}
-                    />
-                  ))}
+                {/* Main Grid: Left Pro (7 cols) + Right Stacked Satellite cards (5 cols) */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+                  {/* ========================================= */}
+                  {/* LEFT CARD: COACHING PRO (7 cols) */}
+                  {/* ========================================= */}
+                  <div
+                    onClick={() => setSelectedPlan("pro")}
+                    onMouseEnter={() => setHoveredCard("pro")}
+                    onMouseLeave={() => setHoveredCard(null)}
+                    onMouseMove={handleCardMouseMove}
+                    className={`lg:col-span-7 relative p-7 flex flex-col justify-between cursor-pointer transition-all duration-300 border overflow-hidden select-none ${
+                      selectedPlan === "pro"
+                        ? "bg-[#0c0f15] border-[#FF7582] shadow-[0_0_35px_rgba(255,117,130,0.25)] ring-1 ring-[#FF7582]"
+                        : hoveredCard === "pro"
+                        ? "bg-[#0c0f15] border-[#FF7582]/60 shadow-[0_0_25px_rgba(255,117,130,0.15)]"
+                        : "bg-[#090C12] border-white/15 hover:border-white/30"
+                    }`}
+                  >
+                    {/* Corner Brackets */}
+                    <CornerBrackets color="coral" />
+
+                    {/* Dynamic Spotlight Follower on Hover */}
+                    {hoveredCard === "pro" && (
+                      <div
+                        className="absolute inset-0 pointer-events-none transition-opacity duration-200"
+                        style={{
+                          background: `radial-gradient(circle 280px at ${mousePos.x}% ${mousePos.y}%, rgba(255, 117, 130, 0.14), transparent 80%)`,
+                        }}
+                      />
+                    )}
+
+                    <div className="space-y-6 relative z-10">
+                      {/* Top Badges */}
+                      <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                        <span className="bg-[#FF7582] text-black text-[10px] font-bold px-3 py-1 uppercase tracking-widest">
+                          FORMULE DE RÉFÉRENCE
+                        </span>
+                        <span className="text-xs text-white/70 tracking-widest font-mono">
+                          DURÉE : 60 MINUTES
+                        </span>
+                      </div>
+
+                      {/* Title & Price */}
+                      <div>
+                        <span className="text-[10px] text-white/40 uppercase tracking-widest block font-mono">
+                          COACHING INDIVIDUEL COMPLET
+                        </span>
+                        <h3 className="text-3xl sm:text-4xl font-display text-white tracking-wider mt-1">
+                          COACHING PRO
+                        </h3>
+                        <div className="flex items-baseline gap-2 mt-2">
+                          <span className="text-4xl sm:text-5xl font-display text-[#FF7582]">
+                            49 €
+                          </span>
+                          <span className="text-xs text-white/40 font-mono">/ SÉANCE INTENSIVE</span>
+                        </div>
+                      </div>
+
+                      {/* Description */}
+                      <p className="text-xs text-white/70 leading-relaxed max-w-xl">
+                        L&apos;expérience centrale de l&apos;Atelier Poulpy : diagnostic en direct, recalibrage biomécanique du viseur et correction chirurgicale de vos prises d&apos;information.
+                      </p>
+
+                      {/* Features Matrix (2 columns of dark boxes) */}
+                      <div className="space-y-2.5 pt-2">
+                        <span className="text-[10px] text-white/40 uppercase tracking-widest block font-mono">
+                          CONTENU DU PROTOCOLE :
+                        </span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                          {[
+                            "Analyse complète de gameplay",
+                            "Coaching personnalisé en vocal",
+                            "Travail d'aim & placement du viseur",
+                            "Feuille de route Notion 4 semaines",
+                            "Suivi Discord VIP 7j/7",
+                          ].map((feat, i) => (
+                            <div key={i} className="p-2.5 bg-black/70 border border-white/5 flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 bg-[#FF7582] shrink-0" />
+                              <span className="text-white/80 text-[11px] leading-tight">{feat}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Footer note */}
+                    <div className="pt-5 mt-6 border-t border-white/10 text-[10px] text-white/40 font-mono flex items-center justify-between relative z-10">
+                      <span>Idéal pour débloquer un palier de ranked tenace</span>
+                      <span className={`font-bold uppercase tracking-wider text-[11px] ${
+                        selectedPlan === "pro" ? "text-[#FF7582]" : "text-white/30"
+                      }`}>
+                        {selectedPlan === "pro" ? "CHOISI" : "CLIQUE POUR CHOISIR"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* ========================================= */}
+                  {/* RIGHT COLUMN: 2 SATELLITE CARDS (5 cols) */}
+                  {/* ========================================= */}
+                  <div className="lg:col-span-5 flex flex-col gap-4">
+                    {/* Top Right: SESSION DIAGNOSTIC */}
+                    <div
+                      onClick={() => setSelectedPlan("session")}
+                      onMouseEnter={() => setHoveredCard("session")}
+                      onMouseLeave={() => setHoveredCard(null)}
+                      onMouseMove={handleCardMouseMove}
+                      className={`flex-1 relative p-5 flex flex-col justify-between cursor-pointer transition-all duration-300 border overflow-hidden select-none ${
+                        selectedPlan === "session"
+                          ? "bg-[#0c0f15] border-white shadow-[0_0_25px_rgba(255,255,255,0.2)] ring-1 ring-white"
+                          : hoveredCard === "session"
+                          ? "bg-[#0c0f15] border-white/50 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+                          : "bg-[#090C12] border-white/15 hover:border-white/30"
+                      }`}
+                    >
+                      {hoveredCard === "session" && (
+                        <div
+                          className="absolute inset-0 pointer-events-none transition-opacity duration-200"
+                          style={{
+                            background: `radial-gradient(circle 200px at ${mousePos.x}% ${mousePos.y}%, rgba(255, 255, 255, 0.08), transparent 80%)`,
+                          }}
+                        />
+                      )}
+
+                      <div className="space-y-3 relative z-10">
+                        <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                          <span className="bg-white/10 text-white/70 text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
+                            DIAGNOSTIC FLASH
+                          </span>
+                          <span className="text-[11px] text-white/50 tracking-wider font-mono">
+                            30 MINUTES
+                          </span>
+                        </div>
+
+                        <div>
+                          <h4 className="text-xl font-display text-white tracking-wider">
+                            SESSION DIAGNOSTIC
+                          </h4>
+                          <div className="text-2xl font-display text-white mt-0.5">
+                            29 €
+                          </div>
+                        </div>
+
+                        <p className="text-[11px] text-white/60 leading-snug">
+                          Audit ciblé pour isoler rapidement les défauts majeurs de viseur ou de crosshair placement.
+                        </p>
+
+                        <div className="space-y-1 pt-1 text-[11px] text-white/70">
+                          <div className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-white/40 shrink-0" />
+                            <span>Analyse rapide de gameplay</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-white/40 shrink-0" />
+                            <span>Conseils personnalisés immédiats</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-white/40 shrink-0" />
+                            <span>Compte-rendu écrit</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 text-right relative z-10">
+                        <span className={`text-[10px] font-bold uppercase tracking-wider ${
+                          selectedPlan === "session" ? "text-white" : "text-white/30"
+                        }`}>
+                          {selectedPlan === "session" ? "SÉLECTIONNÉ" : "SÉLECTIONNER"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Bottom Right: PERFORMANCE */}
+                    <div
+                      onClick={() => setSelectedPlan("performance")}
+                      onMouseEnter={() => setHoveredCard("performance")}
+                      onMouseLeave={() => setHoveredCard(null)}
+                      onMouseMove={handleCardMouseMove}
+                      className={`flex-1 relative p-5 flex flex-col justify-between cursor-pointer transition-all duration-300 border overflow-hidden select-none ${
+                        selectedPlan === "performance"
+                          ? "bg-[#0c0f15] border-[#8FAFD4] shadow-[0_0_25px_rgba(143,175,212,0.25)] ring-1 ring-[#8FAFD4]"
+                          : hoveredCard === "performance"
+                          ? "bg-[#0c0f15] border-[#8FAFD4]/60 shadow-[0_0_20px_rgba(143,175,212,0.15)]"
+                          : "bg-[#090C12] border-white/15 hover:border-white/30"
+                      }`}
+                    >
+                      {hoveredCard === "performance" && (
+                        <div
+                          className="absolute inset-0 pointer-events-none transition-opacity duration-200"
+                          style={{
+                            background: `radial-gradient(circle 200px at ${mousePos.x}% ${mousePos.y}%, rgba(143, 175, 212, 0.12), transparent 80%)`,
+                          }}
+                        />
+                      )}
+
+                      <div className="space-y-3 relative z-10">
+                        <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                          <span className="bg-[#8FAFD4]/20 text-[#8FAFD4] text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
+                            COMPÉTITION & TEAM
+                          </span>
+                          <span className="text-[11px] text-[#8FAFD4] tracking-wider font-mono">
+                            90 MINUTES
+                          </span>
+                        </div>
+
+                        <div>
+                          <h4 className="text-xl font-display text-white tracking-wider">
+                            PERFORMANCE
+                          </h4>
+                          <div className="text-2xl font-display text-[#8FAFD4] mt-0.5">
+                            89 €
+                          </div>
+                        </div>
+
+                        <p className="text-[11px] text-white/60 leading-snug">
+                          Immersion totale : VOD review approfondie, simulation de match et routine KovaaK&apos;s sur-mesure.
+                        </p>
+
+                        <div className="space-y-1 pt-1 text-[11px] text-white/70">
+                          <div className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-[#8FAFD4] shrink-0" />
+                            <span>Double session VOD & coaching live</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-[#8FAFD4] shrink-0" />
+                            <span>Programme KovaaK&apos;s / Aim Lab</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 bg-[#8FAFD4] shrink-0" />
+                            <span>Suivi Discord prioritaire</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="pt-2 text-right relative z-10">
+                        <span className={`text-[10px] font-bold uppercase tracking-wider ${
+                          selectedPlan === "performance" ? "text-[#8FAFD4]" : "text-white/30"
+                        }`}>
+                          {selectedPlan === "performance" ? "SÉLECTIONNÉ" : "SÉLECTIONNER"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Bottom Action Bar */}
-                <div className="pt-5 border-t border-white/15 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="pt-4 border-t border-white/15 flex flex-col sm:flex-row items-center justify-between gap-4">
                   <span className="text-xs text-white/60">
                     SÉLECTION : <strong className="text-white font-mono">{activePlan.name} ({activePlan.price} - {activePlan.duration})</strong>
                   </span>
