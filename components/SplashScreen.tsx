@@ -1,114 +1,106 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
 
 export default function SplashScreen() {
-  const { isLoading: authLoading } = useAuth();
   const [isVisible, setIsVisible] = useState(true);
+  const [progress, setProgress] = useState(15);
   const [isFadingOut, setIsFadingOut] = useState(false);
 
   useEffect(() => {
-    // Si l'écran d'ouverture a déjà été affiché durant cette session d'onglet, on ne le rejoue pas
-    const hasShown = sessionStorage.getItem('poulpy_splash_shown');
-    if (hasShown) {
-      setIsVisible(false);
-      return;
-    }
+    // Progress increment simulation
+    const p1 = setTimeout(() => setProgress(45), 250);
+    const p2 = setTimeout(() => setProgress(82), 600);
+    const p3 = setTimeout(() => setProgress(100), 950);
 
-    // Durée minimale d'apparition (700ms) pour garantir l'effet splash d'application native
-    // sans bloquer l'utilisateur
-    const minTimer = setTimeout(() => {
-      if (!authLoading) {
-        triggerFadeOut();
+    // Fade out after completion
+    const fadeTimer = setTimeout(() => {
+      setIsFadingOut(true);
+      if (typeof window !== "undefined") {
+        window.dispatchEvent(new CustomEvent("poulpy_splash_reveal"));
       }
-    }, 700);
+    }, 1100);
 
-    return () => clearTimeout(minTimer);
-  }, [authLoading]);
-
-  // Si l'authentification termine après le timer minimal
-  useEffect(() => {
-    if (!authLoading && isVisible && !isFadingOut) {
-      triggerFadeOut();
-    }
-  }, [authLoading, isVisible, isFadingOut]);
-
-  const triggerFadeOut = () => {
-    setIsFadingOut(true);
-    sessionStorage.setItem('poulpy_splash_shown', 'true');
-    const exitTimer = setTimeout(() => {
+    // Completely unmount after transition
+    const unmountTimer = setTimeout(() => {
       setIsVisible(false);
-    }, 450); // durée du fade-out CSS
-    return () => clearTimeout(exitTimer);
-  };
+    }, 1650);
+
+    return () => {
+      clearTimeout(p1);
+      clearTimeout(p2);
+      clearTimeout(p3);
+      clearTimeout(fadeTimer);
+      clearTimeout(unmountTimer);
+    };
+  }, []);
 
   if (!isVisible) return null;
 
   return (
     <div
-      className={`fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#07090E] transition-all duration-450 ease-out select-none ${
+      className={`fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#06080a] font-mono select-none transition-all duration-500 ease-out ${
         isFadingOut
-          ? 'opacity-0 scale-105 pointer-events-none'
-          : 'opacity-100 scale-100 pointer-events-auto'
+          ? "opacity-0 scale-105 pointer-events-none"
+          : "opacity-100 scale-100 pointer-events-auto"
       }`}
-      aria-hidden={isFadingOut}
     >
-      {/* Halo néon d'ambiance en arrière-plan */}
-      <div className="absolute w-72 h-72 sm:w-96 sm:h-96 rounded-full bg-gradient-to-tr from-purple-600/35 via-pink-500/25 to-cyan-500/35 blur-3xl animate-pulse pointer-events-none" />
+      {/* Background Cyber Grid */}
+      <div className="absolute inset-0 cyber-grid opacity-30 pointer-events-none" />
 
-      {/* Conteneur Logo avec Lueur Néon */}
-      <div className="relative flex flex-col items-center">
-        {/* Lueur néon intense concentrée directement derrière le logo */}
-        <div className="absolute inset-0 -m-4 rounded-3xl bg-gradient-to-br from-purple-500/60 via-pink-500/40 to-cyan-400/60 blur-xl opacity-80 animate-pulse pointer-events-none" />
+      {/* Ambient Radial Coral Glow */}
+      <div className="absolute w-80 h-80 sm:w-96 sm:h-96 rounded-full bg-[#FF7582]/15 blur-3xl pointer-events-none" />
 
-        {/* L'icône du poulpe dans son squircle */}
-        <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden shadow-[0_0_40px_rgba(168,85,247,0.7),0_0_80px_rgba(6,182,212,0.4)] border border-white/20 animate-bounce-subtle">
-          <img
-            src="/icons/icon-512x512.png"
-            alt="Poulpy Logo"
-            className="w-full h-full object-cover"
-          />
+      {/* Center Container */}
+      <div className="relative z-10 flex flex-col items-center text-center space-y-6 max-w-sm px-6">
+        {/* Logo Frame with Corner Reticles */}
+        <div className="relative p-2 bg-black border border-[#FF7582]/40 shadow-[0_0_30px_rgba(255,117,130,0.25)]">
+          <div className="absolute -top-1 -left-1 w-2.5 h-2.5 border-t-2 border-l-2 border-[#FF7582]" />
+          <div className="absolute -top-1 -right-1 w-2.5 h-2.5 border-t-2 border-r-2 border-[#FF7582]" />
+          <div className="absolute -bottom-1 -left-1 w-2.5 h-2.5 border-b-2 border-l-2 border-[#FF7582]" />
+          <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 border-b-2 border-r-2 border-[#FF7582]" />
+
+          <div className="w-20 h-20 sm:w-24 sm:h-24 relative overflow-hidden bg-black flex items-center justify-center">
+            <Image
+              src="/icons/icon-192x192.png"
+              alt="Poulpy Logo"
+              width={96}
+              height={96}
+              className="w-full h-full object-cover animate-pulse"
+              priority
+            />
+          </div>
         </div>
 
-        {/* Titre avec point néon */}
-        <div className="mt-6 flex items-center gap-1.5">
-          <span className="text-2xl sm:text-3xl font-black tracking-wider text-white">
-            POULPY
-          </span>
-          <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-purple-400 to-cyan-400 shadow-[0_0_12px_rgba(168,85,247,1)]" />
+        {/* Brand Title & Subtitle */}
+        <div className="space-y-1">
+          <div className="flex items-center justify-center gap-2">
+            <span className="w-2 h-2 bg-[#FF7582] shadow-[0_0_8px_#FF7582] inline-block animate-ping" />
+            <span className="text-2xl sm:text-3xl font-display text-white tracking-widest">
+              POULPY<span className="text-[#FF7582]">.</span>
+            </span>
+          </div>
+          <p className="text-[10px] text-white/50 tracking-widest uppercase">
+            SYSTÈME DE COACHING E-SPORT // V2.4
+          </p>
         </div>
 
-        {/* Barre de chargement néon stylisée */}
-        <div className="mt-4 w-32 sm:w-40 h-1 bg-white/10 rounded-full overflow-hidden relative">
-          <div className="absolute inset-y-0 w-1/2 bg-gradient-to-r from-transparent via-purple-400 to-cyan-400 rounded-full animate-shimmer" />
+        {/* Technical Boot Progress Bar */}
+        <div className="w-48 sm:w-56 space-y-2">
+          <div className="w-full h-1 bg-white/10 overflow-hidden relative border border-white/5">
+            <div
+              className="h-full bg-gradient-to-r from-[#FF7582] to-[#8FAFD4] transition-all duration-300 ease-out shadow-[0_0_10px_#FF7582]"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+
+          <div className="flex items-center justify-between text-[10px] text-white/40">
+            <span>CHARGEMENT 3D</span>
+            <span className="text-[#FF7582] font-bold">{progress}%</span>
+          </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes bounceSubtle {
-          0%, 100% {
-            transform: translateY(0) scale(1);
-          }
-          50% {
-            transform: translateY(-4px) scale(1.02);
-          }
-        }
-        @keyframes shimmer {
-          0% {
-            left: -50%;
-          }
-          100% {
-            left: 100%;
-          }
-        }
-        .animate-bounce-subtle {
-          animation: bounceSubtle 2.2s ease-in-out infinite;
-        }
-        .animate-shimmer {
-          animation: shimmer 1.2s ease-in-out infinite;
-        }
-      `}</style>
     </div>
   );
 }

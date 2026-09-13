@@ -1,192 +1,209 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { TrendingUp, Target, Zap, Activity, BarChart3 } from 'lucide-react';
-import { useState } from 'react';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { TrendingUp, Target, Zap, Activity, BarChart3, ChevronRight, Shield } from "lucide-react";
+import DecryptedText from "./DecryptedText";
 
-// Data per game view: progress metrics + RR/LP curve
-const views = {
+interface Metric {
+  label: string;
+  subLabel: string;
+  value: number;
+  color: string;
+  accent: string;
+  icon: React.ComponentType<{ className?: string }>;
+}
+
+interface SessionData {
+  s: string;
+  rr: number;
+}
+
+interface GameView {
+  label: string;
+  tag: string;
+  description: string;
+  metrics: Metric[];
+  sessions: SessionData[];
+  strokeColor: string;
+  fillColor: string;
+  pointColor: string;
+}
+
+const views: Record<"global" | "valorant" | "apex", GameView> = {
   global: {
-    label: 'Global',
+    label: "GLOBAL TELEMETRY",
+    tag: "TOUS TITRES CONFONDUS",
+    description: "Moyenne pondérée des performances mécaniques et cognitives mesurées sur l'ensemble de nos élèves actifs.",
     metrics: [
-      { label: 'Aim Score', subLabel: 'Flick / Tracking', value: 78, color: ['#06b6d4', '#22d3ee'], icon: Target },
-      { label: 'Game Sense', subLabel: '& Vision tactique', value: 72, color: ['#a855f7', '#c084fc'], icon: Zap },
-      { label: 'Mouvement', subLabel: 'Fluidité', value: 68, color: ['#f97316', '#fb923c'], icon: Activity },
-      { label: 'Consistency', subLabel: 'Régularité', value: 81, color: ['#10b981', '#34d399'], icon: BarChart3 },
+      { label: "AIM SCORE", subLabel: "FLICK / TRACKING SUB-PIXEL", value: 78, color: "#00ff41", accent: "rgba(0,255,65,0.2)", icon: Target },
+      { label: "GAME SENSE", subLabel: "MACRO & VISION TACTIQUE", value: 72, color: "#00f0ff", accent: "rgba(0,240,255,0.2)", icon: Zap },
+      { label: "MOUVEMENT", subLabel: "FLUIDITÉ & TIMING DEADZONE", value: 68, color: "#ff0033", accent: "rgba(255,0,51,0.2)", icon: Activity },
+      { label: "CONSISTENCY", subLabel: "RÉGULARITÉ EN CLUTCH", value: 81, color: "#00ff41", accent: "rgba(0,255,65,0.2)", icon: BarChart3 },
     ],
     sessions: [
-      { s: 'S1', rr: 0 },
-      { s: 'S2', rr: 18 },
-      { s: 'S3', rr: 42 },
-      { s: 'S4', rr: 71 },
-      { s: 'S5', rr: 105 },
+      { s: "S1 // AUDIT", rr: 0 },
+      { s: "S2 // DRILL", rr: 18 },
+      { s: "S3 // CALIB", rr: 42 },
+      { s: "S4 // REPAIR", rr: 71 },
+      { s: "S5 // MASTERY", rr: 105 },
     ],
-    color1: '#a855f7',
-    color2: '#06b6d4',
+    strokeColor: "#00ff41",
+    fillColor: "rgba(0,255,65,0.15)",
+    pointColor: "#00ff41",
   },
   valorant: {
-    label: 'Valorant',
+    label: "VALORANT PROTOCOL",
+    tag: "RIOT COMPETITIVE // IMMORTAL+",
+    description: "Métriques spécifiques à l'écosystème Valorant : crosshair placement, first-bullet accuracy et timing d'utilitaires.",
     metrics: [
-      { label: 'Aim Score', subLabel: 'Flick / Tracking', value: 82, color: ['#ef4444', '#f87171'], icon: Target },
-      { label: 'Game Sense', subLabel: '& Vision tactique', value: 76, color: ['#a855f7', '#c084fc'], icon: Zap },
-      { label: 'Mouvement', subLabel: 'Fluidité', value: 70, color: ['#f97316', '#fb923c'], icon: Activity },
-      { label: 'Consistency', subLabel: 'Régularité', value: 84, color: ['#10b981', '#34d399'], icon: BarChart3 },
+      { label: "AIM SCORE", subLabel: "HEADSHOT % & FIRST-BULLET", value: 84, color: "#00f0ff", accent: "rgba(0,240,255,0.2)", icon: Target },
+      { label: "GAME SENSE", subLabel: "ROTATIONS & UTIL TIMING", value: 76, color: "#00ff41", accent: "rgba(0,255,65,0.2)", icon: Zap },
+      { label: "MOUVEMENT", subLabel: "COUNTER-STRAFING & JIGGLE", value: 74, color: "#ff0033", accent: "rgba(255,0,51,0.2)", icon: Activity },
+      { label: "CONSISTENCY", subLabel: "K/D RATIO EN SITUATION DE RETAKE", value: 86, color: "#00f0ff", accent: "rgba(0,240,255,0.2)", icon: BarChart3 },
     ],
     sessions: [
-      { s: 'S1', rr: 0 },
-      { s: 'S2', rr: 22 },
-      { s: 'S3', rr: 48 },
-      { s: 'S4', rr: 80 },
-      { s: 'S5', rr: 120 },
+      { s: "S1 // AUDIT", rr: 0 },
+      { s: "S2 // DRILL", rr: 22 },
+      { s: "S3 // CALIB", rr: 48 },
+      { s: "S4 // REPAIR", rr: 80 },
+      { s: "S5 // MASTERY", rr: 120 },
     ],
-    color1: '#ef4444',
-    color2: '#f97316',
+    strokeColor: "#00f0ff",
+    fillColor: "rgba(0,240,255,0.15)",
+    pointColor: "#00f0ff",
   },
   apex: {
-    label: 'Apex Legends',
+    label: "APEX LEGENDS MATRIX",
+    tag: "ALGS PREDATOR STANDARD",
+    description: "Métriques axées sur les combats haute vélocité : tracking continu, tap-strafing, shield-swap et rotations de zone.",
     metrics: [
-      { label: 'Aim Score', subLabel: 'Flick / Tracking', value: 75, color: ['#06b6d4', '#22d3ee'], icon: Target },
-      { label: 'Game Sense', subLabel: '& Vision tactique', value: 79, color: ['#a855f7', '#c084fc'], icon: Zap },
-      { label: 'Mouvement', subLabel: 'Fluidité', value: 88, color: ['#f97316', '#fb923c'], icon: Activity },
-      { label: 'Consistency', subLabel: 'Régularité', value: 73, color: ['#10b981', '#34d399'], icon: BarChart3 },
+      { label: "AIM SCORE", subLabel: "SMG TRACKING & BEAM ACCURACY", value: 88, color: "#ff0033", accent: "rgba(255,0,51,0.2)", icon: Target },
+      { label: "GAME SENSE", subLabel: "ZONE READING & THIRD-PARTY", value: 79, color: "#00ff41", accent: "rgba(0,255,65,0.2)", icon: Zap },
+      { label: "MOUVEMENT", subLabel: "TAP-STRAFE / WALLBOUNCE / EVASION", value: 92, color: "#00f0ff", accent: "rgba(0,240,255,0.2)", icon: Activity },
+      { label: "CONSISTENCY", subLabel: "SURVIVAL TIME & TOP 3 FINISH", value: 75, color: "#ff0033", accent: "rgba(255,0,51,0.2)", icon: BarChart3 },
     ],
     sessions: [
-      { s: 'S1', rr: 0 },
-      { s: 'S2', rr: 15 },
-      { s: 'S3', rr: 38 },
-      { s: 'S4', rr: 65 },
-      { s: 'S5', rr: 95 },
+      { s: "S1 // AUDIT", rr: 0 },
+      { s: "S2 // DRILL", rr: 15 },
+      { s: "S3 // CALIB", rr: 38 },
+      { s: "S4 // REPAIR", rr: 65 },
+      { s: "S5 // MASTERY", rr: 95 },
     ],
-    color1: '#06b6d4',
-    color2: '#3b82f6',
+    strokeColor: "#ff0033",
+    fillColor: "rgba(255,0,51,0.15)",
+    pointColor: "#ff0033",
   },
 };
 
 export default function Progression() {
-  const [activeView, setActiveView] = useState<'global' | 'valorant' | 'apex'>('global');
-  const view = views[activeView];
+  const [activeTab, setActiveTab] = useState<"global" | "valorant" | "apex">("global");
+  const view = views[activeTab];
 
-  // Build smooth path from session data
-  const buildPath = (data: { s: string; rr: number }[], maxRR: number, width: number, height: number) => {
-    const padX = 40;
-    const padY = 40;
-    const usableW = width - padX * 2;
-    const usableH = height - padY * 2;
-    return data.map((d, i) => {
-      const x = padX + (i / (data.length - 1)) * usableW;
-      const y = padY + (1 - d.rr / maxRR) * usableH;
-      return { x, y, ...d };
-    });
-  };
-
-  const chartW = 500;
+  const chartW = 540;
   const chartH = 320;
   const maxRR = 130;
-  const points = buildPath(view.sessions, maxRR, chartW, chartH);
-  const linePath = points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ');
-  const areaPath = `${linePath} L ${points[points.length - 1].x} ${chartH - 40} L ${points[0].x} ${chartH - 40} Z`;
+  const padX = 45;
+  const padY = 40;
+  const usableW = chartW - padX * 2;
+  const usableH = chartH - padY * 2;
 
-  const handleCTAClick = () => {
-    const booking = document.getElementById('booking');
-    if (booking) booking.scrollIntoView({ behavior: 'smooth' });
+  const points = view.sessions.map((d, i) => {
+    const x = padX + (i / (view.sessions.length - 1)) * usableW;
+    const y = padY + (1 - d.rr / maxRR) * usableH;
+    return { x, y, ...d };
+  });
+
+  const linePath = points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ");
+  const areaPath = `${linePath} L ${points[points.length - 1].x} ${chartH - 35} L ${points[0].x} ${chartH - 35} Z`;
+
+  const scrollToBooking = () => {
+    const el = document.getElementById("booking");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
-    <section id="progression" className="py-20 relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <section id="progression" className="py-24 px-6 lg:px-12 bg-black border-t border-[rgba(255,255,255,0.08)] font-mono">
+      <div className="max-w-7xl mx-auto space-y-12">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-10"
-        >
-          <div className="inline-block glass px-4 py-2 rounded-full mb-4">
-            <span className="text-sm text-purple-400 font-medium">SUIVI MÉTRIQUE RIGOUREUX</span>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-6">
+          <div className="space-y-2">
+            <span className="data-badge data-badge-acid">
+              <DecryptedText text="SUIVI MÉTRIQUE RIGOUREUX // TELEMETRY" />
+            </span>
+            <h2 className="text-4xl sm:text-6xl font-display text-white tracking-wider">
+              TA PROGRESSION <span className="text-[#00ff41]">VISUALISÉE</span>
+            </h2>
+            <p className="text-xs sm:text-sm text-white/50 max-w-xl leading-relaxed">
+              Après chaque session. Visualise objectivement tes gains de performance, ton taux de conversion de duels et ton ascension en RR/LP.
+            </p>
           </div>
-          <h2 className="text-4xl sm:text-5xl font-bold mb-3">
-            Ta progression <span className="text-gradient">visualisée.</span>
-          </h2>
-          <p className="text-lg text-gray-400 max-w-3xl mx-auto">
-            Après chaque session. Visualise objectivement tes gains de performance et d'aim.
-          </p>
-        </motion.div>
 
-        {/* Analytics Window */}
-        <motion.div
-          initial={{ opacity: 0, y: 30, scale: 0.98 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="glass-dark rounded-2xl overflow-hidden border border-white/10 backdrop-blur-2xl"
-        >
-          {/* macOS-style Window Header */}
-          <div className="flex items-center justify-between px-4 py-3 bg-black/30 border-b border-white/5 backdrop-blur-xl">
-            {/* Traffic lights + title grouped on left */}
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5">
-                <div className="w-3 h-3 rounded-full bg-red-500/80 hover:bg-red-500 transition-colors" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500/80 hover:bg-yellow-500 transition-colors" />
-                <div className="w-3 h-3 rounded-full bg-green-500/80 hover:bg-green-500 transition-colors" />
-              </div>
-              <span className="glass px-2 py-0.5 rounded text-xs font-mono text-gray-400">Poulpy_analytics_V2.4.exe</span>
-            </div>
-
-            {/* Game view toggles on right */}
-            <div className="flex items-center gap-1 glass px-1 py-1 rounded-lg">
-              {(['global', 'valorant', 'apex'] as const).map((key) => (
+          {/* Tab Switchers */}
+          <div className="flex items-center gap-2 border border-white/15 bg-[#040404] p-1">
+            {(["global", "valorant", "apex"] as const).map((key) => {
+              const active = activeTab === key;
+              return (
                 <button
                   key={key}
-                  onClick={() => setActiveView(key)}
-                  className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${
-                    activeView === key
-                      ? 'bg-gradient-to-r from-purple-600 to-cyan-500 text-white shadow-lg'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  onClick={() => setActiveTab(key)}
+                  className={`px-4 py-2 text-xs uppercase font-bold transition-all ${
+                    active
+                      ? "bg-[#00ff41] text-black shadow-[0_0_15px_rgba(0,255,65,0.3)]"
+                      : "text-white/60 hover:text-white hover:bg-white/5"
                   }`}
                 >
-                  {key === 'global' ? 'Global' : key === 'valorant' ? 'Valorant' : 'Apex'}
+                  {key === "global" ? "GLOBAL" : key === "valorant" ? "VALORANT" : "APEX"}
                 </button>
-              ))}
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Analytics Brutalist Frame */}
+        <div className="reticle-box bg-[#040404] border border-white/10 overflow-hidden">
+          {/* Terminal Sub-header */}
+          <div className="px-6 py-3 border-b border-white/10 bg-black/80 flex flex-wrap items-center justify-between text-xs text-white/40 gap-4">
+            <div className="flex items-center gap-3">
+              <span className="w-2 h-2 bg-[#00ff41] animate-pulse" />
+              <span className="text-white font-bold">{view.label}</span>
+              <span className="text-white/30">//</span>
+              <span>{view.tag}</span>
+            </div>
+            <div className="text-[11px] text-white/50">
+              GAINS MOYENS CONSTATÉS: <span className="text-[#00ff41] font-bold">+105 à +120 RR EN 5 SÉANCES</span>
             </div>
           </div>
 
-          {/* Divider */}
-          <div className="h-px bg-white/5" />
-
-          {/* Main Content Area */}
-          <div className="grid lg:grid-cols-2 gap-0">
-            {/* LEFT: Ascension Curve Chart */}
-            <div className="p-6 lg:p-8 min-h-[420px] flex flex-col">
-              <div className="flex items-center justify-between mb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 divide-y lg:divide-y-0 lg:divide-x divide-white/10">
+            {/* Left: Ascension Curve */}
+            <div className="lg:col-span-7 p-6 sm:p-8 space-y-6 flex flex-col justify-between">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <TrendingUp size={18} className="text-cyan-400" />
-                  <span className="font-semibold text-white">Courbe d'ascension</span>
+                  <TrendingUp className="w-4 h-4 text-[#00ff41]" />
+                  <span className="text-sm font-bold text-white tracking-wider">
+                    COURBE D&apos;ASCENSION COMPETITIVE
+                  </span>
                 </div>
-                <span className="text-xs text-gray-500 font-mono">RR / LP par session</span>
+                <span className="text-xs text-white/40 font-mono">GAIN CUMULÉ RR / LP</span>
               </div>
 
-              {/* Chart Container */}
-              <div className="flex-1 relative">
+              {/* Chart SVG */}
+              <div className="w-full aspect-[16/9] min-h-[260px] relative">
                 <svg
                   viewBox={`0 0 ${chartW} ${chartH}`}
                   className="w-full h-full"
                   preserveAspectRatio="none"
                 >
                   <defs>
-                    <linearGradient id="curveStroke" x1="0" y1="0" x2="1" y2="0">
-                      <stop offset="0%" stopColor={view.color1} />
-                      <stop offset="100%" stopColor={view.color2} />
+                    <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={view.strokeColor} stopOpacity="0.25" />
+                      <stop offset="100%" stopColor={view.strokeColor} stopOpacity="0" />
                     </linearGradient>
-                    <linearGradient id="curveFill" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor={view.color1} stopOpacity="0.35" />
-                      <stop offset="100%" stopColor={view.color1} stopOpacity="0" />
-                    </linearGradient>
-                    <linearGradient id="curveReflection" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor={view.color2} stopOpacity="0.15" />
-                      <stop offset="100%" stopColor={view.color2} stopOpacity="0" />
-                    </linearGradient>
-                    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                      <feGaussianBlur stdDeviation="4" result="blur" />
+                    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+                      <feGaussianBlur stdDeviation="3" result="blur" />
                       <feMerge>
                         <feMergeNode in="blur" />
                         <feMergeNode in="SourceGraphic" />
@@ -194,132 +211,193 @@ export default function Progression() {
                     </filter>
                   </defs>
 
-                  {/* Grid lines */}
-                  {[0, 25, 50, 75, 100].map((pct, i) => {
-                    const y = 40 + (1 - pct / 100) * (chartH - 80);
+                  {/* Grid Lines */}
+                  {[0, 25, 50, 75, 100].map((pct) => {
+                    const y = padY + (1 - pct / 100) * usableH;
                     return (
                       <g key={pct}>
-                        <line x1={40} y1={y} x2={chartW - 30} y2={y} stroke="#ffffff" strokeOpacity="0.05" strokeWidth={1} />
-                        <text x={30} y={y + 4} textAnchor="end" fill="#ffffff" fillOpacity="0.4" fontSize={10} fontFamily="monospace">
+                        <line
+                          x1={padX}
+                          y1={y}
+                          x2={chartW - 20}
+                          y2={y}
+                          stroke="rgba(255,255,255,0.08)"
+                          strokeDasharray="2,4"
+                          strokeWidth={1}
+                        />
+                        <text
+                          x={padX - 8}
+                          y={y + 3}
+                          textAnchor="end"
+                          fill="rgba(255,255,255,0.3)"
+                          fontSize={9}
+                          fontFamily="monospace"
+                        >
                           {pct}%
                         </text>
                       </g>
                     );
                   })}
 
-                  {/* X-axis labels */}
-                  {points.map((p, i) => (
-                    <text key={p.s} x={p.x} y={chartH - 15} textAnchor="middle" fill="#ffffff" fillOpacity="0.5" fontSize={11} fontFamily="monospace">
-                      {p.s}
-                    </text>
-                  ))}
-
-                  {/* Reflection (mirrored curve below) */}
-                  <path
-                    d={points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ` L ${points[points.length - 1].x} ${chartH - 40} L ${points[0].x} ${chartH - 40} Z`}
-                    fill="url(#curveReflection)"
-                    opacity={0.4}
+                  {/* Area Fill Animated */}
+                  <motion.path
+                    key={`area-${activeTab}`}
+                    d={areaPath}
+                    fill="url(#chartGradient)"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 1.2, delay: 0.3 }}
                   />
 
-                  {/* Area fill */}
-                  <path d={areaPath} fill="url(#curveFill)" />
-
-                  {/* Main curve line with glow */}
-                  <path
+                  {/* Main Line with Motion Draw & Neon Glow */}
+                  <motion.path
+                    key={`line-${activeTab}`}
                     d={linePath}
-                    stroke="url(#curveStroke)"
+                    stroke={view.strokeColor}
                     strokeWidth={3}
                     fill="none"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    filter="url(#glow)"
+                    filter="url(#neonGlow)"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 1.4, ease: [0.23, 1, 0.32, 1] }}
                   />
 
-                  {/* Data points */}
-                  {points.map((p, i) => (
-                    <g key={p.s}>
-                      <circle cx={p.x} cy={p.y} r={5} fill={view.color2} stroke="#0a0a0f" strokeWidth={2} />
-                      <circle cx={p.x} cy={p.y} r={2} fill="#fff" />
-                      {/* RR value label above point */}
-                      <text x={p.x} y={p.y - 12} textAnchor="middle" fill="#ffffff" fillOpacity="0.8" fontSize={10} fontFamily="monospace">
-                        +{p.rr}
+                  {/* Animated Points, Glow Rings & Labels */}
+                  {points.map((p, idx) => (
+                    <motion.g
+                      key={`${activeTab}-${idx}`}
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.3 + idx * 0.15, duration: 0.5, ease: "easeOut" }}
+                    >
+                      {/* Outer Ping Glow on last point */}
+                      {idx === points.length - 1 && (
+                        <circle
+                          cx={p.x}
+                          cy={p.y}
+                          r={12}
+                          fill="none"
+                          stroke={view.strokeColor}
+                          strokeWidth={1.5}
+                          className="animate-ping"
+                          opacity={0.6}
+                        />
+                      )}
+                      <circle
+                        cx={p.x}
+                        cy={p.y}
+                        r={5.5}
+                        fill="#000000"
+                        stroke={view.strokeColor}
+                        strokeWidth={2.5}
+                      />
+                      <circle cx={p.x} cy={p.y} r={2} fill="#ffffff" />
+                      <text
+                        x={p.x}
+                        y={p.y - 14}
+                        textAnchor="middle"
+                        fill="#ffffff"
+                        fontSize={11}
+                        fontWeight="bold"
+                        fontFamily="monospace"
+                        className="drop-shadow-[0_0_8px_rgba(0,0,0,0.9)]"
+                      >
+                        +{p.rr} RR
                       </text>
-                    </g>
+                      <text
+                        x={p.x}
+                        y={chartH - 12}
+                        textAnchor="middle"
+                        fill="rgba(255,255,255,0.6)"
+                        fontSize={9}
+                        fontFamily="monospace"
+                      >
+                        {p.s}
+                      </text>
+                    </motion.g>
                   ))}
                 </svg>
               </div>
+
+              <div className="text-[11px] text-white/40 pt-2 border-t border-white/5 flex items-center justify-between">
+                <span>MESURE PROTOCOLAIRE // 5 SEMAINES</span>
+                <span className="text-[#00ff41]">+100% SUCCÈS CLUTCH</span>
+              </div>
             </div>
 
-            {/* RIGHT: Progress Bars */}
-            <div className="p-6 lg:p-8 min-h-[420px] flex flex-col justify-center border-l border-white/5 bg-black/20">
-              <div className="flex items-center justify-between mb-8">
+            {/* Right: Telemetry Metrics Meters */}
+            <div className="lg:col-span-5 p-6 sm:p-8 space-y-6 flex flex-col justify-between bg-black/40">
+              <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <BarChart3 size={18} className="text-purple-400" />
-                  <span className="font-semibold text-white">Score d'évaluation</span>
+                  <BarChart3 className="w-4 h-4 text-[#00f0ff]" />
+                  <span className="text-sm font-bold text-white tracking-wider">
+                    SCORES D&apos;ÉVALUATION
+                  </span>
                 </div>
-                <span className="text-xs text-gray-500 font-mono">Mécanique & Tactique</span>
+                <span className="text-xs text-white/40">CALIBRATION 0-100</span>
               </div>
 
               <div className="space-y-6">
-                {view.metrics.map((metric, index) => (
-                  <motion.div
-                    key={metric.label}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.2 + index * 0.1 }}
-                    className="group"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <metric.icon size={16} className="text-gray-400 group-hover:text-white transition-colors" />
-                        <div>
-                          <div className="font-medium text-white text-sm">{metric.label}</div>
-                          <div className="text-xs text-gray-500">{metric.subLabel}</div>
+                {view.metrics.map((m, idx) => {
+                  const Icon = m.icon;
+                  return (
+                    <div key={idx} className="space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2">
+                          <Icon className="w-3.5 h-3.5 text-white/50" />
+                          <div>
+                            <span className="font-bold text-white tracking-wide">{m.label}</span>
+                            <span className="text-[10px] text-white/40 block">{m.subLabel}</span>
+                          </div>
                         </div>
+                        <span className="font-mono text-base font-bold text-white">{m.value}%</span>
                       </div>
-                      <span className="font-mono font-bold text-lg text-white">{metric.value}%</span>
+
+                      {/* Brutalist Progress Bar with Laser Pulse */}
+                      <div className="h-2.5 w-full bg-white/5 border border-white/10 relative overflow-hidden">
+                        <motion.div
+                          key={`${activeTab}-${m.label}`}
+                          initial={{ width: 0 }}
+                          animate={{ width: `${m.value}%` }}
+                          transition={{ duration: 0.9, delay: idx * 0.1, ease: [0.23, 1, 0.32, 1] }}
+                          className="h-full relative shadow-[0_0_12px_currentColor]"
+                          style={{ backgroundColor: m.color, color: m.color }}
+                        >
+                          <span className="absolute right-0 top-0 bottom-0 w-2 bg-white shadow-[0_0_8px_#ffffff]" />
+                        </motion.div>
+                      </div>
                     </div>
-                    <div className="h-2.5 bg-black/40 rounded-full overflow-hidden relative">
-                      <div className="absolute inset-0 bg-gradient-to-r from-white/5 to-white/10" />
-                      <motion.div
-                        initial={{ width: 0 }}
-                        whileInView={{ width: `${metric.value}%` }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1.2, delay: 0.3 + index * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
-                        className="h-full rounded-full relative"
-                        style={{ background: `linear-gradient(90deg, ${metric.color[0]}, ${metric.color[1]})` }}
-                      >
-                        {/* Glow effect */}
-                        <div className="absolute inset-0 bg-white/20 blur-sm" />
-                      </motion.div>
-                    </div>
-                  </motion.div>
-                ))}
+                  );
+                })}
+              </div>
+
+              <div className="pt-4 border-t border-white/10 flex items-center justify-between">
+                <div className="text-[10px] text-white/40">
+                  ÉVALUATION MISE À JOUR EN DIRECT APRÈS CHAQUE VOD REVIEW
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Bottom CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.7 }}
-            className="px-6 py-6 bg-black/20 border-t border-white/5 flex items-center justify-center"
-          >
+          {/* Bottom Action Bar */}
+          <div className="px-6 py-5 bg-[#080808] border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <Shield className="w-5 h-5 text-[#00ff41]" />
+              <div className="text-xs text-white/70">
+                <span className="text-white font-bold">GARANTIE D&apos;ÉLÉVATION COMPÉTITIVE :</span> Montée de palier minimum de +1 division ou séances offertes.
+              </div>
+            </div>
             <button
-              onClick={handleCTAClick}
-              className="group relative px-8 py-4 rounded-xl font-semibold text-lg bg-gradient-to-r from-purple-600 to-cyan-500 hover:shadow-lg hover:shadow-purple-500/50 transition-all hover:scale-105 flex items-center gap-3"
+              onClick={scrollToBooking}
+              className="btn-cyber-primary py-2.5 px-6 text-xs whitespace-nowrap"
             >
-              <Activity size={22} className="group-hover:rotate-12 transition-transform" />
-              Prêt à mesurer ta vraie valeur ??
-              <TrendingUp size={22} className="group-hover:translate-x-1 transition-transform" />
-              {/* Animated glow border */}
-              <span className="absolute inset-0 rounded-xl bg-gradient-to-r from-purple-400/0 via-cyan-400/30 to-purple-400/0 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
+              <span>RÉSERVER MON AUDIT DE DÉPART</span>
+              <ChevronRight className="w-4 h-4" />
             </button>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
     </section>
   );
