@@ -62,9 +62,6 @@ export default function RootLayout({
           <SplashScreen />
           <PwaRegister />
 
-          {/* Subtle CRT Scanlines Texture */}
-          <div className="scanlines-overlay" aria-hidden="true" />
-
           {/* Global Hairline Cyber Grid Overlay */}
           <div className="fixed inset-0 cyber-grid pointer-events-none z-0" aria-hidden="true" />
 

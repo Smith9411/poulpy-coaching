@@ -86,12 +86,12 @@ export default function HeroCyber({ onOpenBooking }: HeroCyberProps) {
           {titleString.split("").map((letter, idx) => (
             <span
               key={idx}
-              className="letter-reveal inline-block will-change-transform text-white hover:text-[#FF7582] transition-colors duration-150 cursor-crosshair font-display font-bold"
+              className="letter-reveal inline-block will-change-transform text-white hover:text-[#FF7582] transition-colors duration-150 cursor-crosshair"
             >
               {letter}
             </span>
           ))}
-          <span className="letter-reveal text-[#FF7582] inline-block ml-2 will-change-transform animate-pulse font-display font-bold">
+          <span className="letter-reveal text-[#FF7582] inline-block ml-2 will-change-transform animate-pulse">
             .
           </span>
         </div>
