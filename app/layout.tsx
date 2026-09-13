@@ -21,7 +21,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "POULPY // CYBERCORE ESPORT PROVING GROUND",
+  title: "Poulpy Coaching",
   description:
     "Plateforme de coaching e-sport d'élite pour Valorant et Apex Legends. Ballistic WebGL Engine, VOD chirurgie, analyse réflexe sub-pixel.",
   manifest: "/manifest.json",
@@ -31,8 +31,16 @@ export const metadata: Metadata = {
     title: "Poulpy Coaching",
   },
   icons: {
-    icon: "/icons/icon-192x192.png",
-    apple: "/icons/apple-touch-icon.png",
+    icon: [
+      { url: "/poulpy-octopus.png", type: "image/png" },
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/poulpy-octopus.png" },
+      { url: "/icons/apple-touch-icon.png", sizes: "180x180" },
+    ],
+    shortcut: "/poulpy-octopus.png",
   },
 };
 
