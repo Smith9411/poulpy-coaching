@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Calendar, Clock, User, Shield, ChevronRight, ChevronLeft, ArrowRight, Send, Loader2, AlertCircle } from "lucide-react";
+import { Check, Calendar, Clock, User, Shield, ChevronRight, ChevronLeft, ArrowRight, Send, Loader2, AlertCircle, Crosshair } from "lucide-react";
 import DecryptedText from "./DecryptedText";
 import CornerBrackets from "./CornerBrackets";
 import { useAuth } from "@/context/AuthContext";
@@ -89,6 +89,203 @@ const MONTHS_FULL = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Jui
 
 const STANDARD_HOURS = ["10:00", "11:30", "14:00", "15:30", "17:00", "18:30", "20:00", "21:30"];
 
+// 3D Tilt HUD Plan Card Component
+function TiltPlanCard({
+  plan,
+  isSelected,
+  onSelect,
+  isSpotlight = false,
+}: {
+  plan: PlanOption;
+  isSelected: boolean;
+  onSelect: () => void;
+  isSpotlight?: boolean;
+}) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [rotate, setRotate] = useState({ x: 0, y: 0 });
+  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
+  const [isHovered, setIsHovered] = useState(false);
+
+  const isAcid = plan.id === "pro";
+  const isSlate = plan.id === "performance";
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const percentX = (x / rect.width) * 100;
+    const percentY = (y / rect.height) * 100;
+
+    const rotX = ((y - rect.height / 2) / (rect.height / 2)) * -12;
+    const rotY = ((x - rect.width / 2) / (rect.width / 2)) * 12;
+
+    setRotate({ x: rotX, y: rotY });
+    setMousePos({ x: percentX, y: percentY });
+  };
+
+  const handleMouseEnter = () => setIsHovered(true);
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    setRotate({ x: 0, y: 0 });
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onClick={onSelect}
+      className="perspective-1000 h-full cursor-pointer"
+      style={{ perspective: "1200px" }}
+    >
+      <motion.div
+        animate={{
+          rotateX: rotate.x,
+          rotateY: rotate.y,
+          scale: isHovered ? 1.015 : 1,
+        }}
+        transition={{
+          type: "spring",
+          stiffness: 260,
+          damping: 20,
+        }}
+        style={{ transformStyle: "preserve-3d" }}
+        className={`relative h-full reticle-box flex flex-col justify-between overflow-hidden transition-colors duration-200 select-none ${
+          isSpotlight ? "p-8 sm:p-10 space-y-8" : "p-7 space-y-5"
+        } ${
+          isSelected
+            ? isAcid
+              ? "bg-[#FF7582]/10 border-[#FF7582] shadow-[0_0_40px_rgba(255,117,130,0.3)] ring-1 ring-[#FF7582]"
+              : isSlate
+              ? "bg-[#8FAFD4]/10 border-[#8FAFD4] shadow-[0_0_40px_rgba(143,175,212,0.3)] ring-1 ring-[#8FAFD4]"
+              : "bg-white/10 border-white shadow-[0_0_40px_rgba(255,255,255,0.2)] ring-1 ring-white"
+            : isHovered
+            ? isAcid
+              ? "border-[#FF7582]/70 shadow-[0_0_30px_rgba(255,117,130,0.15)] bg-[#0d1017]"
+              : isSlate
+              ? "border-[#8FAFD4]/70 shadow-[0_0_30px_rgba(143,175,212,0.15)] bg-[#0d1017]"
+              : "border-white/40 bg-[#0d1017]"
+            : "bg-[#090C12] border-white/15"
+        }`}
+      >
+        {/* Corner Brackets / Encoches conservées */}
+        <CornerBrackets color={isSlate ? "slate" : "coral"} />
+
+        {/* Dynamic Specular Light Follower (Spotlight) */}
+        {isHovered && (
+          <div
+            className="absolute inset-0 pointer-events-none transition-opacity duration-200"
+            style={{
+              background: `radial-gradient(circle 260px at ${mousePos.x}% ${mousePos.y}%, ${
+                isAcid
+                  ? "rgba(255, 117, 130, 0.2)"
+                  : isSlate
+                  ? "rgba(143, 175, 212, 0.2)"
+                  : "rgba(255, 255, 255, 0.12)"
+              }, transparent 80%)`,
+            }}
+          />
+        )}
+
+        {/* HUD Target Badge */}
+        <div
+          className={`absolute top-3 right-3 text-[10px] font-mono tracking-widest flex items-center gap-1 transition-opacity duration-200 ${
+            isHovered || isSelected ? "opacity-100 text-[#FF7582]" : "opacity-0"
+          }`}
+        >
+          <Crosshair className="w-3.5 h-3.5 animate-spin" style={{ animationDuration: "6s" }} />
+          <span>{isSelected ? "ACTIF" : "TARGET"}</span>
+        </div>
+
+        {/* 3D Content Container */}
+        <div className="space-y-5 relative z-10" style={{ transform: "translateZ(24px)" }}>
+          {/* Top Category Badge */}
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
+            <span
+              className={`text-[10px] font-bold px-3 py-1 uppercase tracking-widest ${
+                isAcid
+                  ? "bg-[#FF7582] text-black"
+                  : isSlate
+                  ? "bg-[#8FAFD4]/20 text-[#8FAFD4]"
+                  : "bg-white/10 text-white/70"
+              }`}
+            >
+              {plan.id === "pro"
+                ? "FORMULE DE RÉFÉRENCE"
+                : plan.id === "performance"
+                ? "COMPÉTITION & TEAM"
+                : "DIAGNOSTIC FLASH"}
+            </span>
+            <span className={`text-xs tracking-widest font-semibold ${isSlate ? "text-[#8FAFD4]" : "text-[#8FAFD4]"}`}>
+              DURÉE : {plan.duration}
+            </span>
+          </div>
+
+          <div>
+            <span className="text-[10px] text-white/40 uppercase tracking-widest block">
+              {plan.id === "pro"
+                ? "COACHING INDIVIDUEL COMPLET"
+                : plan.id === "performance"
+                ? "IMMERSION HAUT NIVEAU"
+                : "AUDIT EXPRESS DU GAMEPLAY"}
+            </span>
+            <h3 className={`font-display text-white tracking-wider mt-1 ${isSpotlight ? "text-4xl sm:text-5xl" : "text-2xl sm:text-3xl"}`}>
+              {plan.name === "pro" ? "COACHING PRO" : plan.name}
+            </h3>
+
+            {/* Price without glitch-text */}
+            <div className="flex items-baseline gap-3 mt-2" style={{ transform: "translateZ(30px)" }}>
+              <span className={`font-display text-white ${isAcid ? "text-[#FF7582]" : isSlate ? "text-[#8FAFD4]" : "text-white"} ${isSpotlight ? "text-5xl" : "text-3xl"}`}>
+                {plan.price}
+              </span>
+              <span className="text-xs text-white/40">/ SÉANCE INTENSIVE</span>
+            </div>
+          </div>
+
+          <p className="text-xs text-white/70 leading-relaxed max-w-xl">
+            {plan.description}
+          </p>
+
+          <div className="space-y-2.5 pt-3 border-t border-white/10">
+            <span className="text-[10px] text-white/40 uppercase tracking-widest block">CONTENU DU PROTOCOLE :</span>
+            <div className={`grid gap-2 text-xs text-white/80 ${isSpotlight ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"}`}>
+              {plan.features.map((feat, i) => (
+                <div key={i} className="p-2.5 bg-black/60 border border-white/5 flex items-start gap-2">
+                  <span className={`w-1.5 h-1.5 shrink-0 mt-1.5 ${isAcid ? "bg-[#FF7582]" : isSlate ? "bg-[#8FAFD4]" : "bg-white/60"}`} />
+                  <span className="text-[11px] leading-snug">{feat}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Card Footer Button Indicator */}
+        <div
+          className="relative z-10 pt-4 border-t border-white/10 flex items-center justify-between text-xs"
+          style={{ transform: "translateZ(15px)" }}
+        >
+          <span className="text-[10px] text-white/50">
+            {plan.id === "pro"
+              ? "Idéal pour débloquer un palier de ranked tenace"
+              : plan.id === "performance"
+              ? "Double session VOD & live"
+              : "Audit ciblé immédiat"}
+          </span>
+          <div className={`flex items-center gap-1 font-bold text-[11px] uppercase tracking-wider ${
+            isSelected ? (isAcid ? "text-[#FF7582]" : isSlate ? "text-[#8FAFD4]" : "text-white") : "text-white/40"
+          }`}>
+            <span>{isSelected ? "SÉLECTIONNÉ" : "CHOISIR"}</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 export default function Booking() {
   const { user } = useAuth();
   const [step, setStep] = useState<number>(1);
@@ -169,7 +366,6 @@ export default function Booking() {
 
       const dayDbSlots = slotsByDate.get(dateIso) || [];
 
-      // Si le coach a configuré des créneaux dans coaching_slots pour ce jour
       let slotItems: Array<{ id?: string; time: string; available: boolean; isBooked: boolean; isActive: boolean }> = [];
 
       if (dayDbSlots.length > 0) {
@@ -182,7 +378,6 @@ export default function Booking() {
         }));
         slotItems.sort((a, b) => a.time.localeCompare(b.time));
       } else {
-        // Le coach n'a pas configuré ce jour -> tout est indisponible (aucun créneau ouvert)
         slotItems = STANDARD_HOURS.map((h) => ({
           time: h,
           available: false,
@@ -225,7 +420,6 @@ export default function Booking() {
       setSubmitError(null);
       setStep(3);
     } else if (step === 3) {
-      // Validate Step 3
       if (!studentDiscord.trim()) {
         setSubmitError("L'identifiant Discord est requis pour initier le salon vocal.");
         return;
@@ -278,7 +472,7 @@ export default function Booking() {
 
         setConfirmedMissionId(missionId);
         setStep(4);
-        fetchSlots(); // Refresh slot states
+        fetchSlots();
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : "Erreur lors de la réservation";
         setSubmitError(msg);
@@ -351,7 +545,7 @@ export default function Booking() {
         {/* Dynamic Step Container */}
         <div className="reticle-box p-6 sm:p-10 bg-[#090c10] border border-white/20 relative min-h-[500px] flex flex-col justify-between shadow-[0_0_50px_rgba(0,0,0,0.9)]">
           <AnimatePresence mode="wait" initial={false}>
-            {/* STEP 1: FORMULE SELECTION */}
+            {/* STEP 1: FORMULE SELECTION (WITH 3D TILT HUD AND CORNER ENCOCHES) */}
             {step === 1 && (
               <motion.div
                 key="step1"
@@ -371,136 +565,30 @@ export default function Booking() {
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
                   {/* Carte PRO — spotlight 7 cols */}
-                  <div
-                    onClick={() => setSelectedPlan("pro")}
-                    className={`group lg:col-span-7 reticle-box p-8 sm:p-10 flex flex-col justify-between space-y-8 relative overflow-hidden cursor-pointer transition-all duration-300 ${
-                      selectedPlan === "pro"
-                        ? "bg-[#FF7582]/10 border border-[#FF7582] shadow-[0_0_40px_rgba(255,117,130,0.25)]"
-                        : "bg-[#090C12] border border-white/20 hover:border-[#FF7582]/60"
-                    }`}
-                  >
-                    <CornerBrackets />
-                    <div className="space-y-5 relative z-10">
-                      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-4">
-                        <span className="bg-[#FF7582] text-black text-[10px] font-bold px-3 py-1 uppercase tracking-widest">
-                          FORMULE DE RÉFÉRENCE
-                        </span>
-                        <span className="text-xs text-[#8FAFD4] tracking-widest font-semibold">
-                          DURÉE : 60 MINUTES
-                        </span>
-                      </div>
-
-                      <div>
-                        <span className="text-[10px] text-white/40 uppercase tracking-widest block">
-                          COACHING INDIVIDUEL COMPLET
-                        </span>
-                        <h3 className="text-4xl sm:text-5xl font-display text-white tracking-wider mt-1">
-                          COACHING PRO
-                        </h3>
-                        <div className="flex items-baseline gap-3 mt-3">
-                          <span className="glitch-text text-5xl font-display text-[#FF7582]">49 €</span>
-                          <span className="text-xs text-white/40">/ SÉANCE INTENSIVE</span>
-                        </div>
-                      </div>
-
-                      <p className="text-xs sm:text-sm text-white/70 leading-relaxed max-w-xl">
-                        L&apos;expérience centrale de l&apos;Atelier Poulpy : diagnostic en direct, recalibrage biomécanique du viseur et correction chirurgicale de vos prises d&apos;information.
-                      </p>
-
-                      <div className="space-y-3 pt-4 border-t border-white/10">
-                        <span className="text-[10px] text-white/40 uppercase tracking-widest block">CONTENU DU PROTOCOLE :</span>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-white/80">
-                          {[
-                            "Analyse complète de gameplay",
-                            "Coaching personnalisé en vocal",
-                            "Travail d'aim & placement du viseur",
-                            "Feuille de route Notion 4 semaines",
-                            "Suivi Discord VIP 7j/7",
-                          ].map((feat, i) => (
-                            <div key={i} className="p-3 bg-black/60 border border-white/5 flex items-start gap-2.5">
-                              <span className="w-1.5 h-1.5 bg-[#FF7582] shrink-0 mt-1.5" />
-                              <span>{feat}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="relative z-10 pt-4 border-t border-white/10">
-                      <span className="text-[10px] text-white/50">Idéal pour débloquer un palier de ranked tenace</span>
-                    </div>
+                  <div className="lg:col-span-7">
+                    <TiltPlanCard
+                      plan={PLANS[1]}
+                      isSelected={selectedPlan === "pro"}
+                      onSelect={() => setSelectedPlan("pro")}
+                      isSpotlight={true}
+                    />
                   </div>
 
                   {/* Cartes satellites — 5 cols empilées */}
                   <div className="lg:col-span-5 flex flex-col gap-6">
-                    {/* SESSION DIAGNOSTIC */}
-                    <div
-                      onClick={() => setSelectedPlan("session")}
-                      className={`group relative flex-1 p-7 flex flex-col justify-between space-y-5 cursor-pointer transition-all ${
-                        selectedPlan === "session"
-                          ? "bg-[#FF7582]/10 border border-[#FF7582] shadow-[0_0_25px_rgba(255,117,130,0.2)]"
-                          : "bg-[#090C12] border border-white/15 hover:border-white/40"
-                      }`}
-                    >
-                      <CornerBrackets />
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                          <span className="text-[10px] font-bold px-2.5 py-0.5 uppercase tracking-wider bg-white/10 text-white/70">
-                            DIAGNOSTIC FLASH
-                          </span>
-                          <span className="text-xs text-white/40">30 MINUTES</span>
-                        </div>
-                        <div>
-                          <h4 className="text-2xl font-display text-white tracking-wider">SESSION DIAGNOSTIC</h4>
-                          <div className="text-3xl font-display text-white mt-1">29 €</div>
-                        </div>
-                        <p className="text-xs text-white/60 leading-relaxed">
-                          Audit ciblé pour isoler rapidement les défauts majeurs de viseur ou de crosshair placement.
-                        </p>
-                        <ul className="space-y-2 text-xs text-white/70 pt-3 border-t border-white/10">
-                          {["Analyse rapide de gameplay", "Conseils personnalisés immédiats", "Compte-rendu écrit"].map((f, i) => (
-                            <li key={i} className="flex items-start gap-2">
-                              <span className="w-1.5 h-1.5 bg-white/40 shrink-0 mt-1.5" />
-                              <span>{f}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                    <div className="flex-1">
+                      <TiltPlanCard
+                        plan={PLANS[0]}
+                        isSelected={selectedPlan === "session"}
+                        onSelect={() => setSelectedPlan("session")}
+                      />
                     </div>
-
-                    {/* PERFORMANCE */}
-                    <div
-                      onClick={() => setSelectedPlan("performance")}
-                      className={`group relative flex-1 p-7 flex flex-col justify-between space-y-5 cursor-pointer transition-all ${
-                        selectedPlan === "performance"
-                          ? "bg-[#8FAFD4]/10 border border-[#8FAFD4] shadow-[0_0_25px_rgba(143,175,212,0.2)]"
-                          : "bg-[#090C12] border border-white/15 hover:border-white/40"
-                      }`}
-                    >
-                      <CornerBrackets color="slate" />
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                          <span className="text-[10px] font-bold px-2.5 py-0.5 uppercase tracking-wider bg-[#8FAFD4]/20 text-[#8FAFD4]">
-                            COMPÉTITION & TEAM
-                          </span>
-                          <span className="text-xs text-[#8FAFD4]">90 MINUTES</span>
-                        </div>
-                        <div>
-                          <h4 className="text-2xl font-display text-white tracking-wider">PERFORMANCE</h4>
-                          <div className="text-3xl font-display text-white mt-1">89 €</div>
-                        </div>
-                        <p className="text-xs text-white/60 leading-relaxed">
-                          Immersion totale : VOD review approfondie, simulation de match et routine KovaaK&apos;s sur-mesure.
-                        </p>
-                        <ul className="space-y-2 text-xs text-white/70 pt-3 border-t border-white/10">
-                          {["Double session VOD & coaching live", "Programme KovaaK's / Aim Lab", "Suivi Discord prioritaire"].map((f, i) => (
-                            <li key={i} className="flex items-start gap-2">
-                              <span className="w-1.5 h-1.5 bg-[#8FAFD4] shrink-0 mt-1.5" />
-                              <span>{f}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+                    <div className="flex-1">
+                      <TiltPlanCard
+                        plan={PLANS[2]}
+                        isSelected={selectedPlan === "performance"}
+                        onSelect={() => setSelectedPlan("performance")}
+                      />
                     </div>
                   </div>
                 </div>
@@ -511,7 +599,7 @@ export default function Booking() {
                   </span>
                   <button
                     onClick={handleNextStep}
-                    className="btn-cyber-primary flex items-center gap-2 py-3.5 px-8 text-xs font-bold uppercase tracking-wider w-full sm:w-auto justify-center"
+                    className="btn-cyber-primary flex items-center gap-2 py-3.5 px-8 text-xs font-bold uppercase tracking-wider w-full sm:w-auto justify-center cursor-pointer"
                   >
                     <span>CHOISIR LE CRÉNEAU</span>
                     <ArrowRight className="w-4 h-4" />
@@ -520,7 +608,7 @@ export default function Booking() {
               </motion.div>
             )}
 
-            {/* STEP 2: CRÉNEAU SELECTION (DYNAMIC SLOTS FROM DATABASE) */}
+            {/* STEP 2: CRÉNEAU SELECTION */}
             {step === 2 && (
               <motion.div
                 key="step2"
