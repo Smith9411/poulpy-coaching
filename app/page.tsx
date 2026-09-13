@@ -57,7 +57,7 @@ export default function CybercorePoulpyPage() {
       </div>
 
       {/* Solid unified dark background for the lower half of the page */}
-      <div className="bg-[#07090D] relative z-20">
+      <div className="bg-black relative z-20">
         {/* 03. Pourquoi Poulpy (06 piliers avec défilement horizontal fluide) */}
         <WhyPoulpy />
 

@@ -121,7 +121,7 @@ export default function HeroCyber({ onOpenBooking }: HeroCyberProps) {
             </button>
             <a
               href="#methodology"
-              className="btn-cyber-ghost text-xs text-center justify-center"
+              className="px-6 py-3 border border-transparent hover:border-[#8FAFD4] hover:bg-[#8FAFD4]/10 hover:shadow-[0_0_15px_rgba(143,175,212,0.25)] text-white/50 hover:text-[#8FAFD4] text-xs font-mono font-bold tracking-wider uppercase transition-all duration-200 flex items-center justify-center text-center cursor-pointer"
             >
               <span>EXPLORER LA MÉTHODE</span>
             </a>

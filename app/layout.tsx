@@ -70,9 +70,6 @@ export default function RootLayout({
           <SplashScreen />
           <PwaRegister />
 
-          {/* Global Hairline Cyber Grid Overlay */}
-          <div className="fixed inset-0 cyber-grid pointer-events-none z-0" aria-hidden="true" />
-
           {/* Smooth Scroll Engine */}
           <SmoothScroll>
             <div className="relative z-10">{children}</div>
