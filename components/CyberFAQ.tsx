@@ -9,24 +9,36 @@ export default function CyberFAQ() {
 
   const faqs = [
     {
-      q: "À quel niveau / rang s'adresse le coaching ?",
-      a: "Le coaching s'adresse à tout joueur déterminé à progresser, qu'il soit bloqué en Argent/Or ou qu'il cherche à franchir le cap de l'Immortel/Radiant. L'approche est personnalisée : nous analysons vos forces et faiblesses individuelles sans jugement.",
+      q: "Comment se déroule une session ?",
+      a: "Les sessions se déroulent sur Discord avec partage d'écran. On analyse ensemble ton gameplay, on identifie les points à améliorer, et on met en place un plan d'action concret.",
     },
     {
-      q: "Comment se déroule concrètement une séance de 60 minutes ?",
-      a: "Nous commençons par un débriefing de 10 minutes sur votre ressenti et vos objectifs, suivi de 30 minutes de dissection chirurgicale de votre VOD (arrêts sur image, tracés de lignes de tir), puis 20 minutes d'entraînement pratique in-game ou d'exercices personnalisés. Vous repartez avec un plan d'action écrit.",
+      q: "Dois-je avoir un certain niveau ?",
+      a: "Non, tous les niveaux sont acceptés. Que tu sois débutant ou joueur confirmé, le coaching s'adapte à ton niveau actuel et tes objectifs.",
     },
     {
-      q: "Que dois-je préparer avant la première séance ?",
-      a: "Il vous suffit d'avoir Discord installé avec un microphone clair et d'enregistrer au moins un match classé récent représentatif (victoire ou défaite serrée) en résolution minimale 1080p via OBS, Medal ou GeForce Experience.",
+      q: "Est-ce que tu coaches les débutants ?",
+      a: "Absolument ! Le coaching est adapté à tous les niveaux. Pour les débutants, on se concentre sur les fondamentaux essentiels pour progresser rapidement.",
     },
     {
-      q: "Que couvre la garantie de résultat sous 14 jours ?",
-      a: "Si après avoir suivi 4 séances d'accompagnement et appliqué rigoureusement les routines quotidiennes prescrites vous ne gagnez aucun palier compétitif, les sessions complémentaires de recalibrage vous sont offertes jusqu'à validation de votre rang cible.",
+      q: "Les sessions sont disponibles sur Discord ?",
+      a: "Oui, toutes les sessions se font via Discord avec partage d'écran et communication vocale pour un coaching interactif en temps réel.",
     },
     {
-      q: "Le coaching est-il adapté aux joueurs manette / controller ?",
-      a: "Poulpy est spécialisé dans la mécanique souris pure (MNK - Mouse & Keyboard). Bien que 70% des notions tactiques (macro-game, timing d'angles, prise de décision) soient universelles, le calibrage biomécanique s'adresse principalement aux joueurs clavier/souris.",
+      q: "Puis-je faire analyser une VOD ?",
+      a: "Oui ! L'analyse de VOD est incluse dans les sessions de 60 et 90 minutes. Tu peux m'envoyer tes replays avant la session.",
+    },
+    {
+      q: "Quel jeu dois-je choisir ?",
+      a: "Choisis le jeu sur lequel tu veux progresser. Si tu hésites, on peut faire une session mixte pour évaluer tes besoins sur plusieurs jeux.",
+    },
+    {
+      q: "Puis-je réserver plusieurs sessions ?",
+      a: "Bien sûr ! Pour une progression optimale, je recommande au moins 2-3 sessions espacées pour mesurer les résultats et ajuster le plan.",
+    },
+    {
+      q: "Comment fonctionne le paiement ?",
+      a: "Le paiement se fait en ligne de manière sécurisée lors de la réservation. Tu reçois ensuite une confirmation avec tous les détails de ta session.",
     },
   ];
 
