@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
   <defs>
-    <linearGradient id="poulpyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#E15B64"/>
-      <stop offset="45%" stop-color="#A855F7"/>
-      <stop offset="100%" stop-color="#6366F1"/>
+    <linearGradient id="poulpyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9333ea" />
+      <stop offset="50%" stop-color="#ec4899" />
+      <stop offset="100%" stop-color="#06b6d4" />
     </linearGradient>
   </defs>
-  <rect width="100" height="100" rx="28" fill="url(#poulpyGradient)"/>
+  <rect width="100" height="100" rx="26" fill="url(#poulpyGrad)" />
   <text x="50" y="69" font-size="62" text-anchor="middle" font-family="'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif">🐙</text>
 </svg>
