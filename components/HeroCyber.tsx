@@ -70,10 +70,10 @@ export default function HeroCyber({ onOpenBooking }: HeroCyberProps) {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-[90vh] flex flex-col justify-between pt-40 pb-20 px-6 sm:px-12 lg:px-16 z-10"
+      className="relative min-h-[90vh] flex flex-col justify-between pt-36 sm:pt-40 pb-16 sm:pb-20 px-4 sm:px-12 lg:px-16 z-10 overflow-hidden"
     >
       {/* Center Monumental Architectural Title */}
-      <div className="my-auto py-16 flex flex-col items-start select-none">
+      <div className="my-auto py-12 sm:py-16 flex flex-col items-start select-none max-w-full">
         <div className="data-badge data-badge-acid mb-6">
           <span>COACHING E-SPORT HAUT NIVEAU</span>
         </div>
@@ -81,7 +81,7 @@ export default function HeroCyber({ onOpenBooking }: HeroCyberProps) {
         {/* Huge Title Animated by GSAP */}
         <div
           ref={titleLettersRef}
-          className="relative overflow-hidden flex items-center leading-[0.82] text-[clamp(4.5rem,16vw,18.5rem)] font-display text-white tracking-tighter py-2"
+          className="relative overflow-hidden flex items-center leading-[0.82] text-[clamp(2.75rem,13.5vw,18.5rem)] font-display text-white tracking-tighter py-2 max-w-full"
         >
           {titleString.split("").map((letter, idx) => (
             <span

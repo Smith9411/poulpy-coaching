@@ -48,6 +48,7 @@
 html {
   background-color: #000000;
   color: #ffffff;
+  max-width: 100%;
 }
 
 body {
@@ -56,6 +57,7 @@ body {
   background-color: #000000;
   color: #ffffff;
   min-height: 100vh;
+  max-width: 100%;
   font-family: var(--font-mono);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

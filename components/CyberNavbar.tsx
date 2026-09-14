@@ -27,6 +27,7 @@ import DecryptedText from "./DecryptedText";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 import AuthModal from "./AuthModal";
+import ThemeToggle from "./ThemeToggle";
 
 interface RealNotificationItem {
   id: string;
@@ -377,8 +378,11 @@ export default function CyberNavbar({
             })}
           </nav>
 
-          {/* Action Row: Notifications + Connexion + Réserver CTA */}
-          <div className="hidden sm:flex items-center gap-3 pr-10 lg:pr-12">
+          {/* Action Row: Notifications + ThemeToggle + Connexion + Réserver CTA */}
+          <div className="hidden sm:flex items-center gap-3">
+            {/* Theme Toggle (Light / Dark) */}
+            <ThemeToggle className="text-white/70 hover:text-white" />
+
             {/* Notification Bell with Dropdown (REAL NOTIFICATIONS ONLY) */}
             <div className="relative" ref={notifsRef}>
               <button
@@ -580,8 +584,9 @@ export default function CyberNavbar({
             </button>
           </div>
 
-          {/* Mobile Hamburger Button */}
+          {/* Mobile Actions: ThemeToggle + Hamburger Button */}
           <div className="flex sm:hidden items-center gap-2">
+            <ThemeToggle className="p-2 text-white/80 hover:text-white border border-white/20" />
             <button
               onClick={() => setMobileOpen(!mobileOpen)}
               className="p-2 text-white/80 hover:text-white border border-white/20"

@@ -4,7 +4,6 @@ import React, { useEffect } from "react";
 import gsap from "gsap";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import CyberNavbar from "@/components/CyberNavbar";
-import ThemeToggle from "@/components/ThemeToggle";
 import HeroCyber from "@/components/HeroCyber";
 import WhyPoulpy from "@/components/WhyPoulpy";
 import CyberGames from "@/components/CyberGames";
@@ -41,12 +40,9 @@ export default function CybercorePoulpyPage() {
   };
 
   return (
-    <main className="w-full block text-white selection:bg-[#FF7582] selection:text-black relative z-10">
+    <main className="w-full block text-white selection:bg-[#FF7582] selection:text-black relative z-10 overflow-x-clip">
       {/* 3D WebGL Background Scene (Asynchronously decoupled, non-blocking) */}
       <Scene3D />
-
-      {/* Floating Minimalist Theme Toggle (Moon / Sun in top right corner) */}
-      <ThemeToggle />
 
       {/* 01. Complete Poulpy Cyber Navbar */}
       <CyberNavbar onOpenBooking={scrollToBooking} />

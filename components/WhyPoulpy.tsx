@@ -195,11 +195,11 @@ export default function WhyPoulpy() {
     <section
       id="coaching"
       ref={sectionRef}
-      className="relative w-full bg-[#07090D] border-t border-[rgba(255,255,255,0.08)] font-mono min-h-[4200px]"
+      className="relative w-full bg-[#07090D] border-t border-[rgba(255,255,255,0.08)] font-mono min-h-[4200px] overflow-x-clip"
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-24 sm:pt-28 pb-8 sm:pb-10 z-20 bg-[#07090D]">
         {/* Top Telemetry Bar */}
-        <div className="w-full max-w-7xl mx-auto px-6 sm:px-12 flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4 z-20">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-12 flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4 z-20">
           <div className="flex items-center gap-3">
             <span className="data-badge data-badge-acid">
               <DecryptedText text="POURQUOI CHOISIR POULPY ? // 06 PILIERS" />
