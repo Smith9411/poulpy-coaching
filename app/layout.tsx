@@ -32,14 +32,14 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+      { url: "/poulpy-favicon.png?v=3", type: "image/png" },
+      { url: "/icons/icon-192x192.png?v=3", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512x512.png?v=3", sizes: "512x512", type: "image/png" },
     ],
     apple: [
-      { url: "/icons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+      { url: "/poulpy-favicon.png?v=3", sizes: "180x180", type: "image/png" },
     ],
-    shortcut: "/favicon.ico",
+    shortcut: "/poulpy-favicon.png?v=3",
   },
 };
 
@@ -57,6 +57,9 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning className={`${bebasNeue.variable} ${jetbrainsMono.variable}`}>
       <head>
+        <link rel="icon" type="image/png" href="/poulpy-favicon.png?v=3" />
+        <link rel="shortcut icon" type="image/png" href="/poulpy-favicon.png?v=3" />
+        <link rel="apple-touch-icon" href="/poulpy-favicon.png?v=3" />
         <script
           dangerouslySetInnerHTML={{
             __html:
