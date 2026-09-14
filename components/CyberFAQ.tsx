@@ -10,35 +10,35 @@ export default function CyberFAQ() {
   const faqs = [
     {
       q: "Comment se déroule une session ?",
-      a: "Les sessions se déroulent sur Discord avec partage d'écran. On analyse ensemble ton gameplay, on identifie les points à améliorer, et on met en place un plan d'action concret.",
+      a: "La séance se déroule en direct sur Discord en vocal et partage d'écran haute fluidité. Nous commençons par un diagnostic ciblé de tes objectifs et de tes blocages actuels, puis nous analysons ton gameplay ou ta VOD séquence par séquence (placement de viseur, prise d'informations, prise de décision). La session se termine par des exercices pratiques ciblés et la remise d'une fiche de suivi personnalisée avec tes axes prioritaires de travail.",
     },
     {
       q: "Dois-je avoir un certain niveau ?",
-      a: "Non, tous les niveaux sont acceptés. Que tu sois débutant ou joueur confirmé, le coaching s'adapte à ton niveau actuel et tes objectifs.",
+      a: "Non, aucun niveau minimum n'est requis. Le coaching est 100% individualisé : que tu fasses tes premiers pas en parties classées (Fer / Bronze / Argent) ou que tu vises les plus hauts échelons compétitifs (Ascendant / Immortel / Radiant / Predator), chaque session est calibrée sur mesure selon ton rang actuel et ton potentiel.",
     },
     {
       q: "Est-ce que tu coaches les débutants ?",
-      a: "Absolument ! Le coaching est adapté à tous les niveaux. Pour les débutants, on se concentre sur les fondamentaux essentiels pour progresser rapidement.",
+      a: "Absolument ! Accompagner un joueur débutant permet d'ancrer immédiatement les bonnes habitudes (réglages eDPI optimaux, posture, crosshair placement, lecture de carte) et d'éviter les erreurs fondamentales qui freinent la progression sur le long terme.",
     },
     {
       q: "Les sessions sont disponibles sur Discord ?",
-      a: "Oui, toutes les sessions se font via Discord avec partage d'écran et communication vocale pour un coaching interactif en temps réel.",
+      a: "Oui, l'intégralité du coaching a lieu sur Discord via un salon privé dédié. Tu as simplement besoin d'un micro fonctionnel, d'une connexion stable et de Discord installé sur ton PC pour partager ton écran ou suivre les retours en direct en temps réel.",
     },
     {
       q: "Puis-je faire analyser une VOD ?",
-      a: "Oui ! L'analyse de VOD est incluse dans les sessions de 60 et 90 minutes. Tu peux m'envoyer tes replays avant la session.",
+      a: "Oui, l'analyse VOD est au cœur de la méthode. Tu peux enregistrer l'une de tes parties représentatives (via YouTube en non répertorié, Medal.tv ou Twitch) et l'envoyer avant la séance, ou la déposer directement dans ton espace élève. Nous la décortiquons ensemble pour identifier précisément chaque moment clé.",
     },
     {
       q: "Quel jeu dois-je choisir ?",
-      a: "Choisis le jeu sur lequel tu veux progresser. Si tu hésites, on peut faire une session mixte pour évaluer tes besoins sur plusieurs jeux.",
+      a: "Le coaching est spécialisé sur Valorant et Apex Legends. Tu choisis la discipline sur laquelle tu souhaites te concentrer lors de la réservation. Si tu pratiques les deux jeux, nous pouvons également structurer un accompagnement pour perfectionner tes fondamentaux FPS transversaux (aiming, tracking, réactivité, positionnement).",
     },
     {
       q: "Puis-je réserver plusieurs sessions ?",
-      a: "Bien sûr ! Pour une progression optimale, je recommande au moins 2-3 sessions espacées pour mesurer les résultats et ajuster le plan.",
+      a: "Tout à fait. Pour constater une transformation durable de ton niveau de jeu, un suivi régulier sur plusieurs séances espacées de 1 à 2 semaines est fortement recommandé. Cela permet d'assimiler les corrections, de pratiquer entre chaque séance et de mesurer concrètement tes gains de rang.",
     },
     {
       q: "Comment fonctionne le paiement ?",
-      a: "Le paiement se fait en ligne de manière sécurisée lors de la réservation. Tu reçois ensuite une confirmation avec tous les détails de ta session.",
+      a: "Le règlement s'effectue directement en ligne de manière 100% sécurisée (carte bancaire, Apple Pay, Google Pay) au moment de sélectionner ton créneau. Dès validation, ton créneau est instantanément bloqué dans l'agenda et tu reçois ta confirmation détaillée par email ainsi que sur ton espace personnel.",
     },
   ];
 
