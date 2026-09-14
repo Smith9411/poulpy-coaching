@@ -167,9 +167,28 @@ export default function WhyPoulpy() {
 
   const goToCard = (index: number) => {
     const section = sectionRef.current;
-    if (!section) return;
-    const target = section.offsetTop + (index / 6) * trackDistanceRef.current;
-    window.scrollTo({ top: target, behavior: "smooth" });
+    const track = trackRef.current;
+    if (!section || !track) return;
+
+    const cards = track.children;
+    const targetCard = cards[index] as HTMLElement;
+    const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+
+    let targetY = sectionTop;
+    if (targetCard) {
+      const cardOffset = targetCard.offsetLeft - 48;
+      const maxScroll = Math.max(0, track.scrollWidth - window.innerWidth + 140);
+      const clampedOffset = Math.min(maxScroll, Math.max(0, cardOffset));
+      targetY = sectionTop + clampedOffset;
+    } else {
+      targetY = sectionTop + (index / (pillars.length - 1)) * trackDistanceRef.current;
+    }
+
+    gsap.to(window, {
+      scrollTo: { y: targetY, autoKill: false },
+      duration: 0.8,
+      ease: "power2.inOut",
+    });
   };
 
   return (
@@ -193,12 +212,12 @@ export default function WhyPoulpy() {
           {/* Pill Navigation & Live Progress */}
           <div className="flex items-center gap-4 text-xs">
             {/* Direct Card Jump Pills */}
-            <div className="hidden lg:flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5">
               {pillars.map((p, idx) => (
                 <button
                   key={p.num}
                   onClick={() => goToCard(idx)}
-                  className={`px-2 py-0.5 text-[10px] font-bold border transition-all ${
+                  className={`px-2 py-0.5 text-[10px] font-bold border transition-all cursor-pointer ${
                     activeIndex === idx
                       ? "border-[#FF7582] bg-[#FF7582] text-black shadow-[0_0_10px_rgba(255,117,130,0.4)]"
                       : "border-white/15 text-white/50 hover:border-white/40 hover:text-white bg-black/40"
@@ -207,23 +226,6 @@ export default function WhyPoulpy() {
                   {p.num}
                 </button>
               ))}
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => goToCard(Math.max(0, activeIndex - 1))}
-                className="px-2 py-1 border border-white/15 text-white/60 hover:text-white hover:border-[#FF7582] text-xs transition-colors"
-                title="Précédent"
-              >
-                ←
-              </button>
-              <button
-                onClick={() => goToCard(Math.min(5, activeIndex + 1))}
-                className="px-2 py-1 border border-white/15 text-white/60 hover:text-white hover:border-[#FF7582] text-xs transition-colors"
-                title="Suivant"
-              >
-                →
-              </button>
             </div>
 
             <span className="text-white/40 hidden sm:inline">AVANCEMENT :</span>
