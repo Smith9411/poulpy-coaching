@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import gsap from "gsap";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
@@ -41,6 +42,10 @@ export default function CyberNavbar({
 }: {
   onOpenBooking?: () => void;
 }) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const isHomePage = pathname === "/";
+
   const { user, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -245,11 +250,41 @@ export default function CyberNavbar({
       window.removeEventListener("resize", handleScroll);
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [isHomePage]);
+
+  // Smooth scroll to target hash on homepage arrival
+  useEffect(() => {
+    if (!isHomePage) return;
+    if (typeof window !== "undefined" && window.location.hash) {
+      const hash = window.location.hash.replace("#", "");
+      const target = document.getElementById(hash);
+      if (target) {
+        const timer = setTimeout(() => {
+          const navOffset = 70;
+          const targetTop = target.getBoundingClientRect().top + window.scrollY - navOffset;
+          gsap.to(window, {
+            scrollTo: { y: targetTop, autoKill: false },
+            duration: 1.2,
+            ease: "power3.inOut",
+          });
+        }, 200);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [isHomePage, pathname]);
 
   const handleNavClick = (e: React.MouseEvent, href: string) => {
     e.preventDefault();
     setMobileOpen(false);
+
+    if (!isHomePage) {
+      if (href === "#hero" || href === "#" || href === "/") {
+        router.push("/");
+      } else {
+        router.push(`/${href}`);
+      }
+      return;
+    }
 
     if (href === "#hero" || href === "#") {
       gsap.to(window, {
@@ -523,9 +558,19 @@ export default function CyberNavbar({
               onClick={() => {
                 if (onOpenBooking) {
                   onOpenBooking();
+                } else if (!isHomePage) {
+                  router.push("/#booking");
                 } else {
                   const el = document.getElementById("booking");
-                  if (el) el.scrollIntoView({ behavior: "smooth" });
+                  if (el) {
+                    const navOffset = 70;
+                    const targetTop = el.getBoundingClientRect().top + window.scrollY - navOffset;
+                    gsap.to(window, {
+                      scrollTo: { y: targetTop, autoKill: false },
+                      duration: 1.2,
+                      ease: "power3.inOut",
+                    });
+                  }
                 }
               }}
               className="btn-cyber-primary py-2 px-4 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer"
@@ -605,7 +650,22 @@ export default function CyberNavbar({
                 <button
                   onClick={() => {
                     setMobileOpen(false);
-                    if (onOpenBooking) onOpenBooking();
+                    if (onOpenBooking) {
+                      onOpenBooking();
+                    } else if (!isHomePage) {
+                      router.push("/#booking");
+                    } else {
+                      const el = document.getElementById("booking");
+                      if (el) {
+                        const navOffset = 70;
+                        const targetTop = el.getBoundingClientRect().top + window.scrollY - navOffset;
+                        gsap.to(window, {
+                          scrollTo: { y: targetTop, autoKill: false },
+                          duration: 1.2,
+                          ease: "power3.inOut",
+                        });
+                      }
+                    }
                   }}
                   className="btn-cyber-primary w-full py-3 text-center uppercase cursor-pointer font-bold tracking-wider"
                 >
