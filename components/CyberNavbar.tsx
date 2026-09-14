@@ -252,7 +252,6 @@ export default function CyberNavbar({
     setMobileOpen(false);
 
     if (href === "#hero" || href === "#") {
-      setActiveSection("");
       gsap.to(window, {
         scrollTo: { y: 0, autoKill: false },
         duration: 1.2,
@@ -265,7 +264,6 @@ export default function CyberNavbar({
     const targetEl = document.getElementById(targetId);
 
     if (targetEl) {
-      setActiveSection(targetId === "apropos" || targetId === "media" ? "apropos" : targetId);
       const navOffset = 70;
       const targetTop = targetEl.getBoundingClientRect().top + window.scrollY - navOffset;
       const distance = Math.abs(targetTop - window.scrollY);
