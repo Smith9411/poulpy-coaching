@@ -298,18 +298,18 @@ export default function CyberNavbar({
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 flex items-center justify-between gap-4">
-          {/* Typographic Brand Logo with Cute Octopus Emoji Badge */}
+          {/* Typographic Brand Logo */}
           <a
             href="#hero"
             onClick={(e) => handleNavClick(e, "#hero")}
-            className="flex items-center gap-2.5 group flex-shrink-0"
+            className="flex items-center gap-3 group flex-shrink-0"
           >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 via-pink-500 to-cyan-500 flex items-center justify-center text-xl group-hover:scale-110 transition-transform shadow-[0_0_15px_rgba(168,85,247,0.35)]">
-              🐙
+            <div className="flex items-center gap-2 font-mono">
+              <span className="w-2.5 h-2.5 bg-[#FF7582] shadow-[0_0_10px_#FF7582] inline-block animate-pulse" />
+              <span className="text-xl font-display text-white group-hover:text-[#FF7582] transition-colors duration-150 tracking-widest font-bold">
+                POULPY<span className="text-[#FF7582]">.</span>
+              </span>
             </div>
-            <span className="text-xl font-display text-white group-hover:text-[#FF7582] transition-colors duration-150 tracking-widest font-bold">
-              POULPY<span className="text-[#FF7582]">.</span>
-            </span>
           </a>
 
           {/* Desktop Navigation Links */}
