@@ -167,10 +167,10 @@ export default function CyberTestimonials() {
         <div className="text-center pt-2">
           <Link
             href="/avis"
-            className="inline-flex items-center gap-2 text-xs py-3 px-6 bg-black/80 border border-white/15 hover:border-[#FF7582] text-white/80 hover:text-white transition-all font-mono tracking-widest uppercase shadow-md group"
+            className="inline-flex items-center justify-center gap-2 text-xs py-3.5 px-6 sm:px-8 bg-black/80 border border-white/15 hover:border-[#FF7582] text-white/90 hover:text-white transition-all font-mono tracking-widest uppercase shadow-md group w-full sm:w-auto"
           >
-            <span>CONSULTER TOUS LES RETOURS D'ÉLÈVES (+120)</span>
-            <ArrowUpRight className="w-3.5 h-3.5 text-[#FF7582] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            <span>CONSULTER LES AVIS</span>
+            <ArrowUpRight className="w-4 h-4 text-[#FF7582] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform shrink-0" />
           </Link>
         </div>
       </div>
