@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Calendar, Clock, User, Shield, ChevronRight, ChevronLeft, ArrowRight, Send, Loader2, AlertCircle, Crosshair } from "lucide-react";
+import { Check, Calendar, Clock, User, Shield, ChevronRight, ChevronLeft, ArrowRight, Send, Loader2, AlertCircle, Crosshair, MessageCircle, ExternalLink } from "lucide-react";
 import DecryptedText from "./DecryptedText";
 import CornerBrackets from "./CornerBrackets";
 import { useAuth } from "@/context/AuthContext";
@@ -1211,6 +1211,37 @@ export default function Booking() {
                   <div className="flex justify-between">
                     <span className="text-white/50">Contact Discord :</span>
                     <span className="text-[#FF7582] font-bold">{studentDiscord}</span>
+                  </div>
+                </div>
+
+                {/* Discord CTA with IMPORTANT badge */}
+                <div className="relative p-5 bg-[#0c0f15] border border-[#FF7582] shadow-[0_0_25px_rgba(255,117,130,0.2)] text-left">
+                  {/* Badge matching the pack badges */}
+                  <div className="absolute top-2 right-2 px-2 py-0.5 text-[9px] font-bold bg-[#FF7582] text-black uppercase tracking-wider shadow-[0_0_10px_rgba(255,117,130,0.5)]">
+                    IMPORTANT !
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
+                    <div className="space-y-1 pr-0 sm:pr-4">
+                      <div className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <span className="w-2 h-2 bg-[#FF7582] animate-pulse" />
+                        <span>REJOINDRE LE SERVEUR DISCORD</span>
+                      </div>
+                      <p className="text-[11px] text-white/70 leading-relaxed">
+                        Le salon vocal et le partage d'écran de coaching se déroulent exclusivement sur le serveur Discord de Poulpy.
+                      </p>
+                    </div>
+
+                    <a
+                      href="https://discord.gg/rJMg3ZZRkp"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-cyber-primary flex items-center justify-center gap-2 py-3 px-6 text-xs font-bold uppercase tracking-wider shrink-0 cursor-pointer shadow-[0_0_20px_rgba(255,117,130,0.3)]"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      <span>REJOINDRE LE DISCORD</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
                   </div>
                 </div>
 
