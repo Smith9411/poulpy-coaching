@@ -166,8 +166,8 @@ export default function WhyPoulpy() {
       const firstItemLeft = items[0].offsetLeft;
       const cardPositions = items.map((el) => Math.min(maxScroll, Math.max(0, el.offsetLeft - firstItemLeft)));
 
-      // Calibrated scroll distance
-      const totalScrollDistance = Math.max(2600, maxScroll * 2.0);
+      // Calibrated scroll distance: spacious, comfortable pacing per vignette
+      const totalScrollDistance = Math.max(3400, maxScroll * 2.5);
       scrollDistanceRef.current = totalScrollDistance;
 
       ctx = gsap.context(() => {
@@ -179,13 +179,14 @@ export default function WhyPoulpy() {
           }
         });
 
+        // Thresholds calibrated: Card 0 flips around 9%, each card gets comfortable inspection time
         const thresholds = [
-          { forward: 0.04, backward: 0.02 },
-          { forward: 0.19, backward: 0.15 },
-          { forward: 0.35, backward: 0.31 },
-          { forward: 0.51, backward: 0.47 },
-          { forward: 0.67, backward: 0.63 },
-          { forward: 0.83, backward: 0.79 },
+          { forward: 0.09, backward: 0.06 },
+          { forward: 0.24, backward: 0.20 },
+          { forward: 0.40, backward: 0.36 },
+          { forward: 0.56, backward: 0.52 },
+          { forward: 0.72, backward: 0.68 },
+          { forward: 0.86, backward: 0.82 },
         ];
 
         const tl = gsap.timeline({
@@ -211,11 +212,11 @@ export default function WhyPoulpy() {
               // Active pill indicator
               const activeIdx = Math.min(
                 5,
-                progress < 0.16 ? 0
-                  : progress < 0.32 ? 1
-                  : progress < 0.48 ? 2
-                  : progress < 0.64 ? 3
-                  : progress < 0.80 ? 4
+                progress < 0.17 ? 0
+                  : progress < 0.33 ? 1
+                  : progress < 0.49 ? 2
+                  : progress < 0.65 ? 3
+                  : progress < 0.81 ? 4
                   : 5
               );
               if (activeIdx !== activeIndexRef.current) {
@@ -236,13 +237,13 @@ export default function WhyPoulpy() {
           },
         });
 
-        // Smooth horizontal track progression with gentle stepped pacing
-        tl.to(track, { x: 0, duration: 0.2, ease: "none" });
+        // Smooth horizontal track progression with generous holds per card
+        tl.to(track, { x: 0, duration: 0.4, ease: "none" });
         for (let i = 1; i <= 5; i++) {
-          tl.to(track, { x: -cardPositions[i], duration: 0.8, ease: "power1.inOut" });
-          tl.to(track, { x: -cardPositions[i], duration: 0.3, ease: "none" });
+          tl.to(track, { x: -cardPositions[i], duration: 0.85, ease: "power1.inOut" });
+          tl.to(track, { x: -cardPositions[i], duration: 0.45, ease: "none" });
         }
-        tl.to(track, { x: -maxScroll, duration: 0.6, ease: "power1.inOut" });
+        tl.to(track, { x: -maxScroll, duration: 0.7, ease: "power1.inOut" });
       }, section);
     };
 
@@ -272,7 +273,7 @@ export default function WhyPoulpy() {
     const section = sectionRef.current;
     if (!section) return;
 
-    const cardTargetProgress = [0.07, 0.23, 0.39, 0.55, 0.71, 0.87];
+    const cardTargetProgress = [0.09, 0.25, 0.41, 0.57, 0.73, 0.87];
     const targetProgress = cardTargetProgress[index] ?? (index / 5) * 0.85;
     const sectionTop = section.getBoundingClientRect().top + window.scrollY;
     const targetY = sectionTop + targetProgress * scrollDistanceRef.current;
