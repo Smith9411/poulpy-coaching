@@ -133,7 +133,10 @@ function PillarVideoPlayer({
         loop
         muted
         playsInline
-        preload="auto"
+        preload="metadata"
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        onPlaying={() => setIsPlaying(true)}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
         className="w-full h-full object-cover"
