@@ -134,17 +134,19 @@ export default function WhyPoulpy() {
 
       ctx = gsap.context(() => {
         gsap.to(track, {
-          x: -scrollDistance,
+          x: () => -Math.max(0, track.scrollWidth - window.innerWidth + 120),
           ease: "none",
           scrollTrigger: {
             id: "whypoulpy-scroll",
             trigger: section,
             start: "top top",
-            end: () => `+=${scrollDistance}`,
+            end: () => `+=${Math.max(0, track.scrollWidth - window.innerWidth + 120)}`,
             pin: true,
-            scrub: 0.8,
+            scrub: 0.3,
             anticipatePin: 1,
             invalidateOnRefresh: true,
+            fastScrollEnd: false,
+            preventOverlaps: false,
             onUpdate: (self: { progress: number }) => {
               const progress = self.progress;
               if (scrollPctRef.current) {
@@ -249,10 +251,15 @@ export default function WhyPoulpy() {
         </div>
       </div>
 
-      {/* Horizontal Sliding Track */}
+      {/* Horizontal Sliding Track (Hardware Accelerated GPU Layer) */}
       <div
         ref={trackRef}
-        className="flex items-center w-max pl-6 sm:pl-12 pr-32 space-x-8 sm:space-x-12 my-auto select-none"
+        className="flex items-center w-max pl-6 sm:pl-12 pr-32 space-x-8 sm:space-x-12 my-auto select-none will-change-transform transform-gpu"
+        style={{
+          willChange: "transform",
+          transform: "translate3d(0, 0, 0)",
+          backfaceVisibility: "hidden",
+        }}
       >
         {pillars.map((item) => {
           const Icon = item.icon;
@@ -260,9 +267,10 @@ export default function WhyPoulpy() {
           return (
             <div
               key={item.num}
+              style={{ transform: "translateZ(0)", contain: "layout style paint" }}
               className={`group w-[85vw] sm:w-[500px] lg:w-[560px] shrink-0 reticle-box ${
                 isAcid ? "" : "reticle-laser"
-              } p-8 sm:p-10 space-y-6 bg-[#090c10] border border-white/10 relative overflow-hidden shadow-[0_4px_30px_rgba(0,0,0,0.8)] transition-colors duration-300 ${
+              } p-8 sm:p-10 space-y-6 bg-[#090c10] border border-white/10 relative overflow-hidden shadow-2xl shadow-black/80 transition-colors duration-150 ${
                 isAcid ? "hover:border-[#FF7582]/50" : "hover:border-[#8FAFD4]/50"
               }`}
             >
@@ -338,7 +346,10 @@ export default function WhyPoulpy() {
         })}
 
         {/* Final Callout Card at End of Scroll */}
-        <div className="w-[85vw] sm:w-[480px] shrink-0 reticle-box p-8 sm:p-10 flex flex-col justify-between space-y-6 bg-black border border-[#FF7582]/50 relative overflow-hidden shadow-[0_4px_30px_rgba(255,117,130,0.2)]">
+        <div
+          style={{ transform: "translateZ(0)", contain: "layout style paint" }}
+          className="w-[85vw] sm:w-[480px] shrink-0 reticle-box p-8 sm:p-10 flex flex-col justify-between space-y-6 bg-black border border-[#FF7582]/50 relative overflow-hidden shadow-2xl shadow-black/80"
+        >
           <div className="space-y-3 relative z-10">
             <span className="data-badge data-badge-acid">PRÊT POUR L&apos;ASCENSION ?</span>
             <h3 className="text-3xl sm:text-4xl font-display text-white tracking-wider">

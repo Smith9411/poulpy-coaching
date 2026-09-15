@@ -180,7 +180,7 @@ export default function Scene3D() {
         const currentScroll = typeof window !== "undefined" ? window.scrollY : 0;
 
         // When user scrolls past hero section, pause rendering to free 100% CPU/GPU for smooth scrolling
-        if (currentScroll > window.innerHeight * 1.05) {
+        if (currentScroll > window.innerHeight * 0.75) {
           return;
         }
 

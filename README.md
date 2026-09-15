@@ -269,6 +269,10 @@ Fonctionnement côté app : après le retour Google, `/auth/callback` vérifie l
   - **Token expiré géré côté client** : ajout `supabase.auth.refreshSession()` automatique dans `handleAdminResponse` quand le token est expiré, avec message clair "Session expirée, reconnectez-vous"
   - **UI mode déroulant améliorée** : bouton "Réponse de l'équipe Poulpy" avec gradient purple→cyan bien visible, **chevron rotatif** (ChevronDown + rotate-180 quand déployé), animation framer-motion easeInOut, **avatar "Équipe Poulpy" + date de réponse** dans le panneau déplié
   - **Fix build** : `discordUrl` manquant dans `setSettings` de `components/About.tsx` (erreur TS2345)
+- 2026-09-15 (optimisation ultra-haute performance scroll horizontal WhyPoulpy & 0-overhead Three.js) :
+  - **Calibrage scrub réactif (`scrub: 0.3`)** : remplacement du scrub lourd 0.8s (qui créait une sensation de traînée/lag après le refresh et sur trackpad de PC portable) par un scrub vif et fluide 0.3s
+  - **Isolation GPU & Composition matérielle** : application de `transform: translate3d(0,0,0)`, `will-change: transform`, `backface-visibility: hidden` sur la piste de défilement (`trackRef`) et `contain: layout style paint` sur chaque carte individuelle pour éliminer les recalculs de rasterisation CPU
+  - **Suspension anticipée de Three.js `Scene3D`** : abaissement du seuil de veille de la scène 3D à `0.75 * innerHeight` (dès que le hero commence à sortir de l'écran) pour libérer 100% du CPU/GPU avant même le début du scroll horizontal
 - 2026-09-15 (refonte architecture scroll horizontal GSAP pin: true à 120 FPS) :
   - **Passage à GSAP `pin: true` & `anticipatePin: 1`** : remplacement du conteneur CSS `sticky` (qui causait une désynchronisation entre le thread de scroll natif du navigateur et le thread de rendu GSAP) par le système de pinning natif matériel de ScrollTrigger
   - **Fluidité 120 FPS constante** : scrubbing calé à `0.8`, calcul de distance exact `+=${scrollDistance}`, mise en cache directe des boutons de pills dans `pillBtnsRef`, et suppression de toutes les animations laser concurrentes sur la dernière carte
