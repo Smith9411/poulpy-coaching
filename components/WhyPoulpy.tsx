@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, useAnimationControls } from "framer-motion";
 import DecryptedText from "./DecryptedText";
 import CornerBrackets from "./CornerBrackets";
 import { Target, Brain, Crosshair, TrendingUp, ShieldCheck, Flame, ChevronRight, ArrowRight, Play, RotateCcw, X, Film } from "lucide-react";
@@ -101,14 +101,33 @@ const PILLARS = [
 
 function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
   const [isFlipped, setIsFlipped] = useState(false);
-  const [hasInteracted, setHasInteracted] = useState(false);
+  const controls = useAnimationControls();
+  const isAnimatingRef = useRef(false);
   const Icon = item.icon;
   const isAcid = item.color === "acid";
 
   const handleFlip = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setHasInteracted(true);
-    setIsFlipped((prev) => !prev);
+    if (isAnimatingRef.current) return;
+    isAnimatingRef.current = true;
+
+    const nextFlipped = !isFlipped;
+    setIsFlipped(nextFlipped);
+
+    controls
+      .start({
+        y: [0, -52, 0],
+        scale: [1, 1.04, 1],
+        rotateY: nextFlipped ? [0, 90, 180] : [180, 90, 0],
+        transition: {
+          duration: 0.72,
+          times: [0, 0.5, 1],
+          ease: "easeInOut",
+        },
+      })
+      .then(() => {
+        isAnimatingRef.current = false;
+      });
   };
 
   return (
@@ -117,24 +136,8 @@ function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
       style={{ perspective: "1400px" }}
     >
       <motion.div
-        animate={
-          hasInteracted
-            ? {
-                y: [0, -48, -48, 0],
-                scale: [1, 1.05, 1.05, 1],
-                rotateY: isFlipped ? [0, 0, 180, 180] : [180, 180, 0, 0],
-              }
-            : {
-                y: 0,
-                scale: 1,
-                rotateY: 0,
-              }
-        }
-        transition={{
-          duration: 0.82,
-          times: [0, 0.26, 0.74, 1],
-          ease: "easeInOut",
-        }}
+        animate={controls}
+        initial={{ y: 0, scale: 1, rotateY: 0 }}
         style={{
           transformStyle: "preserve-3d",
           transformOrigin: "50% 50%",
@@ -279,7 +282,7 @@ function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
             <button
               type="button"
               onClick={handleFlip}
-              className="btn-cyber-ghost text-[10px] py-1 px-2.5 flex items-center gap-1.5 hover:border-[#FF7582] hover:text-[#FF7582] cursor-pointer"
+              className="btn-cyber-ghost text-[10px] py-1.5 px-3 flex items-center gap-1.5 hover:border-[#FF7582] hover:text-[#FF7582] cursor-pointer"
             >
               <RotateCcw className="w-3 h-3" />
               <span>RETOUR [✕]</span>
@@ -314,19 +317,14 @@ function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
             </div>
           </div>
 
-          {/* Back Footer */}
+          {/* Back Footer (Clean Single-Line Note) */}
           <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs relative z-10">
-            <span className="text-[10px] text-white/60 truncate pr-2">
+            <span className="text-[10px] text-white/60 truncate">
               Démonstration : <strong className="text-white">{item.subtitle}</strong>
             </span>
-            <button
-              type="button"
-              onClick={handleFlip}
-              className="btn-cyber-primary py-1.5 px-4 text-[10px] font-bold uppercase shrink-0 flex items-center gap-1.5 cursor-pointer"
-            >
-              <RotateCcw className="w-3 h-3" />
-              <span>RETOURNER LA CARTE</span>
-            </button>
+            <span className="text-[9px] font-mono text-[#FF7582] uppercase tracking-wider">
+              [LECTEUR ACTIF]
+            </span>
           </div>
         </div>
       </motion.div>
