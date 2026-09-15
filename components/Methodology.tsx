@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Target, Dumbbell, TrendingUp, ChevronRight, CheckCircle2, Crosshair, ArrowRight, Sparkles, Layers, Shield } from "lucide-react";
+import { Search, Target, Dumbbell, TrendingUp, ChevronRight, CheckCircle2, Crosshair, ArrowRight, Layers, Shield } from "lucide-react";
 import DecryptedText from "./DecryptedText";
 import CornerBrackets from "./CornerBrackets";
 
@@ -257,13 +257,8 @@ export default function Methodology() {
               UNE MÉTHODE. PAS DE <span className="text-[#FF7582]">RECETTE MAGIQUE.</span>
             </h2>
             <p className="text-xs sm:text-sm text-white/50 max-w-2xl leading-relaxed">
-              Fais défiler la page vers le bas : chaque phase se verrouille et s&apos;empile naturellement pour révéler l&apos;intégralité de la stratégie.
+              Chaque phase se verrouille et s&apos;empile naturellement pour révéler l&apos;intégralité de la stratégie.
             </p>
-          </div>
-
-          <div className="flex items-center gap-2 text-xs text-white/60 bg-black/60 border border-white/10 px-3.5 py-2">
-            <Sparkles className="w-4 h-4 text-[#FF7582]" />
-            <span>DÉFILE VERS LE BAS</span>
           </div>
         </div>
 

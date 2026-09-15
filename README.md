@@ -271,6 +271,8 @@ Fonctionnement côté app : après le retour Google, `/auth/callback` vérifie l
   - **Token expiré géré côté client** : ajout `supabase.auth.refreshSession()` automatique dans `handleAdminResponse` quand le token est expiré, avec message clair "Session expirée, reconnectez-vous"
   - **UI mode déroulant améliorée** : bouton "Réponse de l'équipe Poulpy" avec gradient purple→cyan bien visible, **chevron rotatif** (ChevronDown + rotate-180 quand déployé), animation framer-motion easeInOut, **avatar "Équipe Poulpy" + date de réponse** dans le panneau déplié
   - **Fix build** : `discordUrl` manquant dans `setSettings` de `components/About.tsx` (erreur TS2345)
+- 2026-09-15 (simplification header Méthodologie) :
+  - **Nettoyage UI Méthodologie (`components/Methodology.tsx`)** : suppression de la pastille et mention « Défile vers le bas » au profit d'une présentation épurée et directe des 4 phases chirurgicales.
 - 2026-09-15 (nettoyage UI boutons de thème dupliqués) :
   - **Suppression du toggle de thème flottant** : retrait du composant `<ThemeToggle />` orphelin en haut à gauche des pages `/profile` et `/avis` (le toggle officiel est déjà parfaitement intégré et accessible dans la barre de navigation `CyberNavbar`).
 - 2026-09-15 (calibrage fuseau horaire Paris Europe/Paris & durée exacte des séances Notion) :
