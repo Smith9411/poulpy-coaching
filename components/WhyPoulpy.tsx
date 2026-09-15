@@ -3,7 +3,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import DecryptedText from "./DecryptedText";
 import CornerBrackets from "./CornerBrackets";
-import { Target, Brain, Crosshair, TrendingUp, ShieldCheck, Flame, ArrowRight, Play, Film } from "lucide-react";
+import { Target, Brain, Crosshair, TrendingUp, ShieldCheck, Flame, ArrowRight, Play } from "lucide-react";
 
 const PILLARS = [
   {
@@ -15,11 +15,11 @@ const PILLARS = [
     description:
       "Nous analysons tes replays en 4K image par image. Chaque élimination subie est décortiquée : micro-déficit d'angle, mauvais tempo de décalage ou exposition inutile.",
     specs: [
-      { label: "Précision", val: "Sub-pixel & 60 FPS" },
-      { label: "Erreurs", val: "15 à 20 / session" },
-      { label: "Rapport", val: "Fiche Notion" },
+      { label: "Précision d'analyse", val: "Sub-pixel & 60 FPS" },
+      { label: "Erreurs corrigées", val: "15 à 20 par session" },
+      { label: "Rapport", val: "Fiche Notion exportable" },
     ],
-    videoDuration: "00:45 / 01:30",
+    videoDuration: "00:45 • 1080p",
     color: "laser",
   },
   {
@@ -31,11 +31,11 @@ const PILLARS = [
     description:
       "Apprends à décoder les intentions ennemies 15 secondes avant qu'elles ne se produisent. Maîtrise des rotations, timing d'utilitaires et domination psychologique en clutch 1v2+.",
     specs: [
-      { label: "Clutch", val: "+45% en 3 sem." },
-      { label: "Carte", val: "Prédiction macro" },
-      { label: "Décision", val: "Instantanée" },
+      { label: "Survie en clutch", val: "+45% en 3 semaines" },
+      { label: "Lecture de carte", val: "Prédiction macro" },
+      { label: "Prise de décision", val: "Instantanée sous stress" },
     ],
-    videoDuration: "00:52 / 02:10",
+    videoDuration: "00:52 • 1080p",
     color: "acid",
   },
   {
@@ -47,11 +47,11 @@ const PILLARS = [
     description:
       "Programme sur-mesure axé sur la régularité pure : placement du viseur sub-pixel, tracking sans saccade, synchronisation mouvement/tir et posture physique adaptée.",
     specs: [
-      { label: "Routine", val: "20 min KovaaK" },
-      { label: "Sensibilité", val: "Calibration cm" },
-      { label: "Headshot %", val: "+18% moyen" },
+      { label: "Routine sur-mesure", val: "20 min KovaaK / Aimlabs" },
+      { label: "Sensibilité eDPI", val: "Calibration cm/360" },
+      { label: "Headshot %", val: "+18% en moyenne" },
     ],
-    videoDuration: "00:38 / 01:45",
+    videoDuration: "00:38 • 1080p",
     color: "laser",
   },
   {
@@ -63,11 +63,11 @@ const PILLARS = [
     description:
       "Le talent mécanique ne vaut rien si le mental flanche en prolongation. Travail sur la gestion émotionnelle, les routines respiratoires de match et l'élimination des spirales négatives.",
     specs: [
-      { label: "Anti-tilt", val: "Protocole panique" },
-      { label: "Sang-froid", val: "BPM stabilisé" },
-      { label: "Mentalité", val: "Posture Pro" },
+      { label: "Résistance au tilt", val: "Protocole anti-panique" },
+      { label: "Sang-froid mesuré", val: "BPM stabilisé en 1v1" },
+      { label: "Mentalité", val: "Posture de compétiteur pro" },
     ],
-    videoDuration: "00:40 / 01:20",
+    videoDuration: "00:40 • 1080p",
     color: "acid",
   },
   {
@@ -79,11 +79,11 @@ const PILLARS = [
     description:
       "Un accompagnement rigoureux basé sur tes objectifs réels de compétition. Après chaque session, tes métriques sont mises à jour pour mesurer tes gains de performance tangibles.",
     specs: [
-      { label: "Gain moyen", val: "+350 à +450 RR" },
-      { label: "Liaison", val: "Discord 7j/7" },
-      { label: "Debriefing", val: "Après match" },
+      { label: "Gain moyen", val: "+350 à +450 RR constatés" },
+      { label: "Liaison", val: "Canal privé Discord 7j/7" },
+      { label: "Debriefing", val: "Suivi continu après match" },
     ],
-    videoDuration: "00:55 / 02:00",
+    videoDuration: "00:55 • 1080p",
     color: "laser",
   },
   {
@@ -95,11 +95,11 @@ const PILLARS = [
     description:
       "Si après avoir suivi le protocole et appliqué les routines prescrites tu ne progresses pas en compétition, les séances de recalibrage sont offertes jusqu'à validation de ton objectif.",
     specs: [
-      { label: "Garantie", val: "+1 division min" },
+      { label: "Garantie", val: "+1 division minimum" },
       { label: "Délai moyen", val: "9 à 14 jours" },
       { label: "Engagement", val: "100% formalisé" },
     ],
-    videoDuration: "00:30 / 01:15",
+    videoDuration: "00:30 • 1080p",
     color: "acid",
   },
 ];
@@ -274,106 +274,108 @@ export default function WhyPoulpy() {
           return (
             <div
               key={item.num}
-              className={`w-[85vw] sm:w-[480px] lg:w-[520px] h-[550px] shrink-0 reticle-box ${
+              className={`w-[85vw] sm:w-[500px] lg:w-[560px] h-[520px] shrink-0 reticle-box ${
                 isAcid ? "" : "reticle-laser"
-              } p-6 sm:p-7 space-y-4 bg-[#090c10] border border-white/10 shadow-2xl shadow-black/80 hover:border-[#FF7582]/50 transition-colors duration-200 flex flex-col justify-between group/card relative`}
+              } p-8 sm:p-10 space-y-6 bg-[#090c10] border border-white/10 shadow-2xl shadow-black/80 transition-colors duration-150 flex flex-col justify-between ${
+                isAcid ? "hover:border-[#FF7582]/50" : "hover:border-[#8FAFD4]/50"
+              }`}
               style={{
                 transform: "translateZ(0)",
               }}
             >
               <CornerBrackets color={isAcid ? "coral" : "slate"} />
 
-              {/* 1. Header: Badge, Pilier #, Icon */}
-              <div className="flex items-center justify-between border-b border-white/10 pb-3 relative z-10">
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider ${
-                      isAcid
-                        ? "bg-[#FF7582]/10 text-[#FF7582] border border-[#FF7582]/30"
-                        : "bg-[#8FAFD4]/10 text-[#8FAFD4] border border-[#8FAFD4]/30"
-                    }`}
-                  >
-                    {item.badge}
-                  </span>
-                  <span className="text-xl font-display text-white tracking-wider">
-                    PILIER {item.num}
-                  </span>
-                </div>
-
-                <div
-                  className={`w-9 h-9 border flex items-center justify-center ${
-                    isAcid
-                      ? "border-[#FF7582]/40 text-[#FF7582] bg-[#FF7582]/5"
-                      : "border-[#8FAFD4]/40 text-[#8FAFD4] bg-[#8FAFD4]/5"
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                </div>
-              </div>
-
-              {/* 2. Mini Player Vidéo (Au milieu en haut de chaque vignette) */}
-              <div className="relative aspect-video w-full bg-black/90 border border-white/15 overflow-hidden group/player shadow-inner flex flex-col justify-between p-3 relative z-10 transition-all duration-300 group-hover/card:border-[#FF7582]/50">
-                {/* Grid & Scanlines */}
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#FF7582]/10 via-transparent to-black pointer-events-none" />
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:12px_12px] pointer-events-none" />
-
-                {/* Player Top Bar */}
-                <div className="relative z-10 flex items-center justify-between text-[9px] font-mono">
-                  <span className="bg-black/80 px-2 py-0.5 border border-white/10 text-white/70 flex items-center gap-1.5">
-                    <Film className="w-3 h-3 text-[#FF7582]" />
-                    <span>EXTRAIT VOD</span>
-                  </span>
-                  <span className="text-[#FF7582] font-bold tracking-wider">
-                    1080P 60FPS
-                  </span>
-                </div>
-
-                {/* Center Play Button */}
-                <div className="relative z-10 flex flex-col items-center justify-center my-auto gap-1.5">
-                  <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#FF7582]/20 border-2 border-[#FF7582] flex items-center justify-center text-[#FF7582] shadow-[0_0_20px_rgba(255,117,130,0.5)] group-hover/player:scale-110 transition-transform cursor-pointer">
-                    <Play className="w-4 h-4 fill-current ml-0.5" />
-                  </div>
-                  <span className="text-[10px] text-white/80 font-display tracking-wider block">
-                    CLIP DISPONIBLE TRÈS BIENTÔT
-                  </span>
-                </div>
-
-                {/* Player Bottom Bar */}
-                <div className="relative z-10 flex items-center justify-between text-[8px] font-mono text-white/50">
-                  <span className="bg-black/80 px-1.5 py-0.5 border border-white/10">{item.videoDuration}</span>
-                  <span className="text-white/40 uppercase">POULPY REPLAY ARCHIVE</span>
-                </div>
-              </div>
-
-              {/* 3. Card Content: Title, Subtitle, Description */}
-              <div className="space-y-1 relative z-10">
-                <h3 className="text-lg font-display text-white tracking-wider">
-                  {item.title}
-                </h3>
-                <div className="text-[11px] text-[#FF7582] font-medium">
-                  {item.subtitle}
-                </div>
-                <p className="text-[11px] text-white/60 leading-relaxed line-clamp-2 pt-1">
-                  {item.description}
-                </p>
-              </div>
-
-              {/* 4. Specs Grid */}
-              <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/10 relative z-10">
-                {item.specs.map((s, sIdx) => (
-                  <div key={sIdx} className="p-2 bg-black/80 border border-white/5 space-y-0.5">
-                    <span className="text-[8px] text-white/40 uppercase block truncate">
-                      {s.label}
-                    </span>
-                    <strong
-                      className={`text-[11px] font-mono font-bold block truncate ${
-                        isAcid ? "text-[#FF7582]" : "text-[#8FAFD4]"
+              <div>
+                {/* Card Header with Mini Player in upper-middle */}
+                <div className="flex items-start justify-between border-b border-white/10 pb-4 relative z-10 gap-2">
+                  <div className="space-y-1">
+                    <span
+                      className={`text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider ${
+                        isAcid
+                          ? "bg-[#FF7582]/10 text-[#FF7582] border border-[#FF7582]/30"
+                          : "bg-[#8FAFD4]/10 text-[#8FAFD4] border border-[#8FAFD4]/30"
                       }`}
                     >
-                      {s.val}
-                    </strong>
+                      {item.badge}
+                    </span>
+                    <div className="text-4xl sm:text-6xl font-display text-white tracking-wider">
+                      {item.num}
+                    </div>
                   </div>
-                ))}
+
+                  {/* Mini Player au milieu en haut dans l'espace disponible */}
+                  <div className="flex items-center gap-2.5 p-1.5 sm:p-2 bg-black/90 border border-white/15 hover:border-[#FF7582]/60 transition-colors group/mini cursor-pointer self-center shadow-lg">
+                    <div className="relative w-14 sm:w-16 h-9 sm:h-10 bg-[#07090D] border border-white/20 flex items-center justify-center overflow-hidden shrink-0">
+                      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:6px_6px] pointer-events-none" />
+                      <div className="w-5 h-5 rounded-full bg-[#FF7582]/20 border border-[#FF7582] flex items-center justify-center text-[#FF7582] group-hover/mini:scale-110 transition-transform shadow-[0_0_8px_rgba(255,117,130,0.5)]">
+                        <Play className="w-2.5 h-2.5 fill-current ml-0.5" />
+                      </div>
+                    </div>
+                    <div className="space-y-0.5 text-left pr-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#FF7582] animate-pulse" />
+                        <span className="text-[9px] font-bold text-white tracking-wider font-mono uppercase">VOD CLIP</span>
+                      </div>
+                      <span className="text-[8px] text-white/50 font-mono block">{item.videoDuration}</span>
+                    </div>
+                  </div>
+
+                  <div
+                    className={`w-12 h-12 border flex items-center justify-center shrink-0 ${
+                      isAcid
+                        ? "border-[#FF7582]/40 text-[#FF7582] bg-[#FF7582]/5"
+                        : "border-[#8FAFD4]/40 text-[#8FAFD4] bg-[#8FAFD4]/5"
+                    }`}
+                  >
+                    <Icon className="w-6 h-6" />
+                  </div>
+                </div>
+
+                {/* Card Body */}
+                <div className="space-y-2 pt-4 relative z-10">
+                  <h3 className="text-2xl font-display text-white tracking-wider">
+                    {item.title}
+                  </h3>
+                  <div className="text-xs text-[#FF7582] font-medium">
+                    {item.subtitle}
+                  </div>
+                  <p className="text-xs text-white/60 leading-relaxed pt-2">
+                    {item.description}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                {/* Specs & Metrics */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-4 border-t border-white/10 relative z-10">
+                  {item.specs.map((s, sIdx) => (
+                    <div key={sIdx} className="p-2.5 bg-black/80 border border-white/5 space-y-1">
+                      <span className="text-[9px] text-white/40 uppercase block truncate">
+                        {s.label}
+                      </span>
+                      <strong
+                        className={`text-xs font-mono font-bold block ${
+                          isAcid ? "text-[#FF7582]" : "text-[#8FAFD4]"
+                        }`}
+                      >
+                        {s.val}
+                      </strong>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Footer Indicator */}
+                <div className="pt-4 mt-4 border-t border-white/5 flex items-center justify-between text-[10px] text-white/40 relative z-10">
+                  <span>PILIER {item.num} // 06</span>
+                  
+                  <div className="flex items-center gap-2 text-white/50 font-mono text-[10px] uppercase">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF7582] opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF7582]" />
+                    </span>
+                    <span className="text-[#FF7582] font-bold">EXTRAIT DISPONIBLE</span>
+                  </div>
+                </div>
               </div>
             </div>
           );
@@ -382,7 +384,7 @@ export default function WhyPoulpy() {
         {/* Final Callout Card at End of Scroll */}
         <div
           style={{ transform: "translateZ(0)", contain: "layout style paint" }}
-          className="w-[85vw] sm:w-[480px] h-[550px] shrink-0 reticle-box p-8 sm:p-10 flex flex-col justify-between space-y-6 bg-black border border-[#FF7582]/50 relative overflow-hidden shadow-2xl shadow-black/80"
+          className="w-[85vw] sm:w-[480px] h-[520px] shrink-0 reticle-box p-8 sm:p-10 flex flex-col justify-between space-y-6 bg-black border border-[#FF7582]/50 relative overflow-hidden shadow-2xl shadow-black/80"
         >
           <div className="space-y-3 relative z-10">
             <span className="data-badge data-badge-acid">PRÊT POUR L&apos;ASCENSION ?</span>
