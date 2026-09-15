@@ -133,13 +133,17 @@ function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
   return (
     <div
       className="w-[85vw] sm:w-[500px] lg:w-[560px] h-[520px] shrink-0 relative"
-      style={{ perspective: "1400px" }}
+      style={{
+        perspective: "1400px",
+        transform: "translateZ(0)",
+      }}
     >
       <motion.div
         animate={controls}
         initial={{ y: 0, scale: 1, rotateY: 0 }}
         style={{
           transformStyle: "preserve-3d",
+          WebkitTransformStyle: "preserve-3d",
           transformOrigin: "50% 50%",
           willChange: "transform",
         }}
@@ -156,7 +160,10 @@ function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
             height: "100%",
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",
-            transform: "rotateY(0deg) translateZ(2px)",
+            transform: "rotateY(0deg) translateZ(1px)",
+            willChange: "transform",
+            transformStyle: "preserve-3d",
+            WebkitTransformStyle: "preserve-3d",
           }}
           className={`reticle-box ${
             isAcid ? "" : "reticle-laser"
@@ -263,9 +270,12 @@ function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
             height: "100%",
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",
-            transform: "rotateY(180deg) translateZ(2px)",
+            transform: "rotateY(180deg) translateZ(1px)",
+            willChange: "transform",
+            transformStyle: "preserve-3d",
+            WebkitTransformStyle: "preserve-3d",
           }}
-          className="reticle-box p-6 sm:p-8 bg-[#090C12] border-2 border-[#FF7582] shadow-[0_0_35px_rgba(255,117,130,0.3)] flex flex-col justify-between overflow-hidden"
+          className="reticle-box p-6 sm:p-8 bg-[#090C12] border-2 border-[#FF7582] shadow-[0_0_35px_rgba(255,117,130,0.3)] flex flex-col justify-between"
         >
           <CornerBrackets color="coral" />
 
