@@ -101,206 +101,223 @@ const PILLARS = [
 
 function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
   const [isFlipped, setIsFlipped] = useState(false);
+  const [showBack, setShowBack] = useState(false);
+  const [isRotating, setIsRotating] = useState(false);
   const Icon = item.icon;
   const isAcid = item.color === "acid";
 
   const handleFlip = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (isRotating) return;
+    setIsRotating(true);
+
+    // Toggle 3D rotation
     setIsFlipped((prev) => !prev);
+
+    // Swap face content exactly at the 90deg midpoint (250ms)
+    setTimeout(() => {
+      setShowBack((prev) => !prev);
+    }, 250);
+
+    // Unlock after animation finishes (550ms)
+    setTimeout(() => {
+      setIsRotating(false);
+    }, 550);
   };
 
   return (
     <div
-      className="w-[85vw] sm:w-[500px] lg:w-[560px] h-[520px] shrink-0 relative [perspective:1400px]"
+      className="w-[85vw] sm:w-[500px] lg:w-[560px] h-[520px] shrink-0 relative"
+      style={{ perspective: 1200 }}
     >
-      <div
-        className="w-full h-full relative transition-transform duration-700 ease-[cubic-bezier(0.23,1,0.32,1)]"
-        style={{
-          transformStyle: "preserve-3d",
-          transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+      <motion.div
+        animate={{
+          rotateY: isFlipped ? 180 : 0,
         }}
+        transition={{
+          duration: 0.5,
+          ease: [0.23, 1, 0.32, 1],
+        }}
+        className="w-full h-full relative"
       >
-        {/* ======================================================== */}
-        {/* FACE AVANT (FRONT) */}
-        {/* ======================================================== */}
         <div
           style={{
-            backfaceVisibility: "hidden",
-            WebkitBackfaceVisibility: "hidden",
-            transform: "rotateY(0deg)",
+            transform: showBack ? "rotateY(180deg)" : "none",
           }}
-          className={`absolute inset-0 w-full h-full reticle-box ${
-            isAcid ? "" : "reticle-laser"
-          } p-8 sm:p-10 space-y-6 bg-[#090c10] border border-white/10 shadow-2xl shadow-black/80 transition-colors duration-150 flex flex-col justify-between ${
-            isAcid ? "hover:border-[#FF7582]/50" : "hover:border-[#8FAFD4]/50"
-          }`}
+          className="w-full h-full"
         >
-          <CornerBrackets color={isAcid ? "coral" : "slate"} />
+          {showBack ? (
+            /* ======================================================== */
+            /* FACE ARRIÈRE (BACK - LECTEUR CLIP VIDÉO) */
+            /* ======================================================== */
+            <div className="w-full h-full reticle-box p-6 sm:p-8 bg-[#090C12] border-2 border-[#FF7582] shadow-[0_0_35px_rgba(255,117,130,0.3)] flex flex-col justify-between overflow-hidden">
+              <CornerBrackets color="coral" />
 
-          <div>
-            {/* Card Header */}
-            <div className="flex items-start justify-between border-b border-white/10 pb-4 relative z-10">
-              <div className="space-y-1">
-                <span
-                  className={`text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider ${
-                    isAcid
-                      ? "bg-[#FF7582]/10 text-[#FF7582] border border-[#FF7582]/30"
-                      : "bg-[#8FAFD4]/10 text-[#8FAFD4] border border-[#8FAFD4]/30"
-                  }`}
+              {/* Back Header */}
+              <div className="flex items-center justify-between border-b border-white/10 pb-3 relative z-10">
+                <div className="flex items-center gap-2">
+                  <span className="bg-[#FF7582] text-black text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
+                    EXTRAIT VOD // PILIER {item.num}
+                  </span>
+                  <span className="text-xs text-white/70 font-display hidden sm:inline">
+                    {item.title}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleFlip}
+                  className="btn-cyber-ghost text-[10px] py-1 px-2.5 flex items-center gap-1.5 hover:border-[#FF7582] hover:text-[#FF7582] cursor-pointer"
                 >
-                  {item.badge}
-                </span>
-                <div className="text-4xl sm:text-6xl font-display text-white tracking-wider">
-                  {item.num}
+                  <RotateCcw className="w-3 h-3" />
+                  <span>RETOUR [✕]</span>
+                </button>
+              </div>
+
+              {/* Video Mockup Container */}
+              <div className="relative my-auto aspect-video w-full bg-black/90 border border-white/20 flex flex-col items-center justify-center overflow-hidden group/player shadow-inner z-10">
+                {/* Scanlines / Grid effect */}
+                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#FF7582]/10 via-transparent to-black pointer-events-none" />
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
+
+                {/* Play Button with breathing rings */}
+                <div className="relative z-10 flex flex-col items-center gap-3">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#FF7582]/20 border-2 border-[#FF7582] flex items-center justify-center text-[#FF7582] shadow-[0_0_25px_rgba(255,117,130,0.5)] group-hover/player:scale-110 transition-transform cursor-pointer">
+                    <Play className="w-6 h-6 fill-current ml-1" />
+                  </div>
+                  <div className="text-center space-y-0.5">
+                    <span className="text-xs font-bold font-display tracking-wider text-white block">
+                      CLIP VOD DISPONIBLE TRÈS BIENTÔT
+                    </span>
+                    <span className="text-[10px] text-white/50 font-mono block">
+                      Format vidéo YouTube // 1080p 60 FPS
+                    </span>
+                  </div>
+                </div>
+
+                {/* Bottom bar overlay */}
+                <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-[9px] font-mono text-white/60 z-10">
+                  <span className="bg-black/80 px-2 py-0.5 border border-white/10">00:45 / 01:30</span>
+                  <span className="text-[#FF7582] font-bold">COACH POULPY REPLAY ARCHIVE</span>
                 </div>
               </div>
 
-              <div
-                className={`w-12 h-12 border flex items-center justify-center ${
-                  isAcid
-                    ? "border-[#FF7582]/40 text-[#FF7582] bg-[#FF7582]/5"
-                    : "border-[#8FAFD4]/40 text-[#8FAFD4] bg-[#8FAFD4]/5"
-                }`}
-              >
-                <Icon className="w-6 h-6" />
+              {/* Back Footer */}
+              <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs relative z-10">
+                <span className="text-[10px] text-white/60 truncate pr-2">
+                  Démonstration : <strong className="text-white">{item.subtitle}</strong>
+                </span>
+                <button
+                  type="button"
+                  onClick={handleFlip}
+                  className="btn-cyber-primary py-1.5 px-4 text-[10px] font-bold uppercase shrink-0 flex items-center gap-1.5 cursor-pointer"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  <span>RETOURNER LA CARTE</span>
+                </button>
               </div>
             </div>
+          ) : (
+            /* ======================================================== */
+            /* FACE AVANT (FRONT) */
+            /* ======================================================== */
+            <div
+              className={`w-full h-full reticle-box ${
+                isAcid ? "" : "reticle-laser"
+              } p-8 sm:p-10 space-y-6 bg-[#090c10] border border-white/10 shadow-2xl shadow-black/80 transition-colors duration-150 flex flex-col justify-between ${
+                isAcid ? "hover:border-[#FF7582]/50" : "hover:border-[#8FAFD4]/50"
+              }`}
+            >
+              <CornerBrackets color={isAcid ? "coral" : "slate"} />
 
-            {/* Card Body */}
-            <div className="space-y-2 pt-4 relative z-10">
-              <h3 className="text-2xl font-display text-white tracking-wider">
-                {item.title}
-              </h3>
-              <div className="text-xs text-[#FF7582] font-medium">
-                {item.subtitle}
-              </div>
-              <p className="text-xs text-white/60 leading-relaxed pt-2">
-                {item.description}
-              </p>
-            </div>
-          </div>
+              <div>
+                {/* Card Header */}
+                <div className="flex items-start justify-between border-b border-white/10 pb-4 relative z-10">
+                  <div className="space-y-1">
+                    <span
+                      className={`text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider ${
+                        isAcid
+                          ? "bg-[#FF7582]/10 text-[#FF7582] border border-[#FF7582]/30"
+                          : "bg-[#8FAFD4]/10 text-[#8FAFD4] border border-[#8FAFD4]/30"
+                      }`}
+                    >
+                      {item.badge}
+                    </span>
+                    <div className="text-4xl sm:text-6xl font-display text-white tracking-wider">
+                      {item.num}
+                    </div>
+                  </div>
 
-          <div>
-            {/* Specs & Metrics */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-4 border-t border-white/10 relative z-10">
-              {item.specs.map((s, sIdx) => (
-                <div key={sIdx} className="p-2.5 bg-black/80 border border-white/5 space-y-1">
-                  <span className="text-[9px] text-white/40 uppercase block truncate">
-                    {s.label}
-                  </span>
-                  <strong
-                    className={`text-xs font-mono font-bold block ${
-                      isAcid ? "text-[#FF7582]" : "text-[#8FAFD4]"
+                  <div
+                    className={`w-12 h-12 border flex items-center justify-center ${
+                      isAcid
+                        ? "border-[#FF7582]/40 text-[#FF7582] bg-[#FF7582]/5"
+                        : "border-[#8FAFD4]/40 text-[#8FAFD4] bg-[#8FAFD4]/5"
                     }`}
                   >
-                    {s.val}
-                  </strong>
+                    <Icon className="w-6 h-6" />
+                  </div>
                 </div>
-              ))}
-            </div>
 
-            {/* Footer Indicator with Prominent Breathing CLIP Button */}
-            <div className="pt-4 mt-4 border-t border-white/5 flex items-center justify-between text-[10px] text-white/40 relative z-10">
-              <span>PILIER {item.num} // 06</span>
-              
-              {/* Breathing CLIP Button */}
-              <button
-                type="button"
-                onClick={handleFlip}
-                className="relative group/clip px-4 py-2 bg-[#FF7582]/15 border border-[#FF7582] text-[#FF7582] hover:bg-[#FF7582] hover:text-black transition-all duration-200 font-mono text-[11px] font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer shadow-[0_0_18px_rgba(255,117,130,0.35)] animate-pulse"
-                title="Voir l'extrait vidéo de coaching"
-              >
-                {/* Glowing ping dot */}
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF7582] opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF7582] group-hover/clip:bg-black" />
-                </span>
-
-                <Play className="w-3.5 h-3.5 fill-current" />
-                <span>CLIP</span>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* ======================================================== */}
-        {/* FACE ARRIÈRE (BACK - LECTEUR CLIP VIDÉO) */}
-        {/* ======================================================== */}
-        <div
-          style={{
-            backfaceVisibility: "hidden",
-            WebkitBackfaceVisibility: "hidden",
-            transform: "rotateY(180deg)",
-          }}
-          className="absolute inset-0 w-full h-full reticle-box p-6 sm:p-8 bg-[#090C12] border-2 border-[#FF7582] shadow-[0_0_35px_rgba(255,117,130,0.3)] flex flex-col justify-between"
-        >
-          <CornerBrackets color="coral" />
-
-          {/* Back Header */}
-          <div className="flex items-center justify-between border-b border-white/10 pb-3 relative z-10">
-            <div className="flex items-center gap-2">
-              <span className="bg-[#FF7582] text-black text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
-                EXTRAIT VOD // PILIER {item.num}
-              </span>
-              <span className="text-xs text-white/70 font-display hidden sm:inline">
-                {item.title}
-              </span>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleFlip}
-              className="btn-cyber-ghost text-[10px] py-1 px-2.5 flex items-center gap-1.5 hover:border-[#FF7582] hover:text-[#FF7582] cursor-pointer"
-            >
-              <RotateCcw className="w-3 h-3" />
-              <span>RETOUR [✕]</span>
-            </button>
-          </div>
-
-          {/* Video Mockup Container */}
-          <div className="relative my-auto aspect-video w-full bg-black/90 border border-white/20 flex flex-col items-center justify-center overflow-hidden group/player shadow-inner z-10">
-            {/* Scanlines / Grid effect */}
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#FF7582]/10 via-transparent to-black pointer-events-none" />
-            <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
-
-            {/* Play Button with breathing rings */}
-            <div className="relative z-10 flex flex-col items-center gap-3">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#FF7582]/20 border-2 border-[#FF7582] flex items-center justify-center text-[#FF7582] shadow-[0_0_25px_rgba(255,117,130,0.5)] group-hover/player:scale-110 transition-transform cursor-pointer">
-                <Play className="w-6 h-6 fill-current ml-1" />
+                {/* Card Body */}
+                <div className="space-y-2 pt-4 relative z-10">
+                  <h3 className="text-2xl font-display text-white tracking-wider">
+                    {item.title}
+                  </h3>
+                  <div className="text-xs text-[#FF7582] font-medium">
+                    {item.subtitle}
+                  </div>
+                  <p className="text-xs text-white/60 leading-relaxed pt-2">
+                    {item.description}
+                  </p>
+                </div>
               </div>
-              <div className="text-center space-y-0.5">
-                <span className="text-xs font-bold font-display tracking-wider text-white block">
-                  CLIP VOD DISPONIBLE TRÈS BIENTÔT
-                </span>
-                <span className="text-[10px] text-white/50 font-mono block">
-                  Format vidéo YouTube // 1080p 60 FPS
-                </span>
+
+              <div>
+                {/* Specs & Metrics */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-4 border-t border-white/10 relative z-10">
+                  {item.specs.map((s, sIdx) => (
+                    <div key={sIdx} className="p-2.5 bg-black/80 border border-white/5 space-y-1">
+                      <span className="text-[9px] text-white/40 uppercase block truncate">
+                        {s.label}
+                      </span>
+                      <strong
+                        className={`text-xs font-mono font-bold block ${
+                          isAcid ? "text-[#FF7582]" : "text-[#8FAFD4]"
+                        }`}
+                      >
+                        {s.val}
+                      </strong>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Footer Indicator with Prominent Breathing CLIP Button */}
+                <div className="pt-4 mt-4 border-t border-white/5 flex items-center justify-between text-[10px] text-white/40 relative z-10">
+                  <span>PILIER {item.num} // 06</span>
+                  
+                  {/* Breathing CLIP Button */}
+                  <button
+                    type="button"
+                    onClick={handleFlip}
+                    className="relative group/clip px-4 py-2 bg-[#FF7582]/15 border border-[#FF7582] text-[#FF7582] hover:bg-[#FF7582] hover:text-black transition-all duration-200 font-mono text-[11px] font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer shadow-[0_0_18px_rgba(255,117,130,0.35)] animate-pulse"
+                    title="Voir l'extrait vidéo de coaching"
+                  >
+                    {/* Glowing ping dot */}
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF7582] opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF7582] group-hover/clip:bg-black" />
+                    </span>
+
+                    <Play className="w-3.5 h-3.5 fill-current" />
+                    <span>CLIP</span>
+                  </button>
+                </div>
               </div>
             </div>
-
-            {/* Bottom bar overlay */}
-            <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-[9px] font-mono text-white/60 z-10">
-              <span className="bg-black/80 px-2 py-0.5 border border-white/10">00:45 / 01:30</span>
-              <span className="text-[#FF7582] font-bold">COACH POULPY REPLAY ARCHIVE</span>
-            </div>
-          </div>
-
-          {/* Back Footer */}
-          <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs relative z-10">
-            <span className="text-[10px] text-white/60 truncate pr-2">
-              Démonstration : <strong className="text-white">{item.subtitle}</strong>
-            </span>
-            <button
-              type="button"
-              onClick={handleFlip}
-              className="btn-cyber-primary py-1.5 px-4 text-[10px] font-bold uppercase shrink-0 flex items-center gap-1.5 cursor-pointer"
-            >
-              <RotateCcw className="w-3 h-3" />
-              <span>RETOURNER LA CARTE</span>
-            </button>
-          </div>
+          )}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
