@@ -1,9 +1,209 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import DecryptedText from "./DecryptedText";
 import CornerBrackets from "./CornerBrackets";
-import { Target, Brain, Crosshair, TrendingUp, ShieldCheck, Flame, ArrowRight, Play, RotateCcw } from "lucide-react";
+import {
+  Target,
+  Brain,
+  Crosshair,
+  TrendingUp,
+  ShieldCheck,
+  Flame,
+  ArrowRight,
+  Play,
+  RotateCcw,
+  Volume2,
+  VolumeX,
+  Pause,
+} from "lucide-react";
+
+interface PillarVideoPlayerProps {
+  videoSrc?: string;
+  clipTitle: string;
+  clipSubtitle: string;
+  isFlipped: boolean;
+  isSectionInView: boolean;
+}
+
+function PillarVideoPlayer({
+  videoSrc,
+  clipTitle,
+  clipSubtitle,
+  isFlipped,
+  isSectionInView,
+}: PillarVideoPlayerProps) {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  // Play automatically without sound in a loop ONLY when card is flipped and section is in view
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !videoSrc) return;
+
+    if (isFlipped && isSectionInView) {
+      video.muted = isMuted;
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => setIsPlaying(true))
+          .catch(() => {
+            // Autoplay policy fallback: force mute and retry
+            video.muted = true;
+            setIsMuted(true);
+            video.play()
+              .then(() => setIsPlaying(true))
+              .catch(() => setIsPlaying(false));
+          });
+      }
+    } else {
+      video.pause();
+      setIsPlaying(false);
+    }
+  }, [isFlipped, isSectionInView, videoSrc, isMuted]);
+
+  const togglePlay = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) {
+      video.play().then(() => setIsPlaying(true)).catch(() => {});
+    } else {
+      video.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  const toggleMute = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = !video.muted;
+    setIsMuted(video.muted);
+  };
+
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      setCurrentTime(videoRef.current.currentTime);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (videoRef.current) {
+      setDuration(videoRef.current.duration);
+    }
+  };
+
+  const formatTime = (secs: number) => {
+    if (isNaN(secs)) return "00:00";
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  };
+
+  const progressPct = duration > 0 ? (currentTime / duration) * 100 : 0;
+
+  if (!videoSrc) {
+    return (
+      <div className="relative my-auto aspect-video w-full bg-black/90 border border-white/20 flex flex-col items-center justify-center overflow-hidden group/player shadow-inner z-10">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#FF7582]/10 via-transparent to-black pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col items-center gap-3">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#FF7582]/20 border-2 border-[#FF7582] flex items-center justify-center text-[#FF7582] shadow-[0_0_25px_rgba(255,117,130,0.5)] group-hover/player:scale-110 transition-transform cursor-pointer">
+            <Play className="w-6 h-6 fill-current ml-1" />
+          </div>
+          <div className="text-center space-y-0.5">
+            <span className="text-xs font-bold font-display tracking-wider text-white block">
+              {clipTitle}
+            </span>
+            <span className="text-[10px] text-white/50 font-mono block">
+              CLIP DISPONIBLE TRÈS BIENTÔT // 1080P 60FPS
+            </span>
+          </div>
+        </div>
+
+        <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-[9px] font-mono text-white/60 z-10">
+          <span className="bg-black/80 px-2 py-0.5 border border-white/10">00:45 / 01:30</span>
+          <span className="text-[#FF7582] font-bold">COACH POULPY REPLAY ARCHIVE</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      onClick={togglePlay}
+      className="relative my-auto aspect-video w-full bg-black border border-[#FF7582]/40 flex flex-col items-center justify-center overflow-hidden group/video shadow-[0_0_25px_rgba(255,117,130,0.2)] z-10 cursor-pointer select-none"
+    >
+      {/* Real Video Element */}
+      <video
+        ref={videoRef}
+        src={videoSrc}
+        loop
+        muted={isMuted}
+        playsInline
+        preload="auto"
+        onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
+        className="w-full h-full object-cover"
+      />
+
+      {/* Subtle Scanline Overlay */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0)_50%,rgba(0,0,0,0.2)_50%)] bg-[size:100%_4px] pointer-events-none opacity-40" />
+
+      {/* Top Bar Controls */}
+      <div className="absolute top-2 left-2.5 right-2.5 flex items-center justify-between pointer-events-auto z-20">
+        <div className="flex items-center gap-1.5 bg-black/75 backdrop-blur-md px-2 py-0.5 border border-white/10 rounded text-[9px] font-mono">
+          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+          <span className="text-white/80 font-bold uppercase tracking-wider">LIVE FEED // AUTO-LOOP</span>
+        </div>
+
+        <button
+          type="button"
+          onClick={toggleMute}
+          title={isMuted ? "Activer le son" : "Couper le son"}
+          className="p-1.5 bg-black/80 backdrop-blur-md border border-white/20 hover:border-[#FF7582] text-white hover:text-[#FF7582] rounded transition-colors cursor-pointer"
+        >
+          {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5 text-[#FF7582]" />}
+        </button>
+      </div>
+
+      {/* Center Play/Pause Indicator if manually paused */}
+      {!isPlaying && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/45 backdrop-blur-[2px] z-10 transition-opacity">
+          <div className="w-12 h-12 rounded-full bg-[#FF7582] text-black flex items-center justify-center shadow-[0_0_20px_rgba(255,117,130,0.6)]">
+            <Play className="w-5 h-5 fill-current ml-0.5" />
+          </div>
+        </div>
+      )}
+
+      {/* Bottom Cyber Progress & Status Bar */}
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/80 to-transparent p-2.5 pt-4 space-y-1.5 z-20 pointer-events-auto">
+        {/* Progress scrub bar */}
+        <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-[#FF7582] transition-all duration-100 ease-linear shadow-[0_0_8px_#FF7582]"
+            style={{ width: `${progressPct}%` }}
+          />
+        </div>
+
+        <div className="flex items-center justify-between text-[9px] font-mono text-white/70">
+          <span className="font-bold text-white tracking-wider">
+            {formatTime(currentTime)} / {formatTime(duration)}
+          </span>
+          <span className="text-[#FF7582] font-bold uppercase flex items-center gap-1">
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#FF7582]" />
+            {isPlaying ? "EN LECTURE" : "PAUSE"}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const PILLARS = [
   {
@@ -20,6 +220,7 @@ const PILLARS = [
       { label: "Progression", val: "Suivi des scores" },
     ],
     hasClip: true,
+    videoSrc: "/videos/why-poulpy/aim.mp4",
     clipTitle: "AIM TRAINING // VALORANT, APEX & KOVAAK",
     clipSubtitle: "Clip Valo puis Apex puis Aim Training",
     color: "laser",
@@ -56,6 +257,7 @@ const PILLARS = [
       { label: "Macro", val: "+1 longueur d'avance" },
     ],
     hasClip: true,
+    videoSrc: "",
     clipTitle: "CLUTCH GAME // VALORANT & 1V3 APEX",
     clipSubtitle: "Clip de clutch Valo et 1v3 Apex Legends",
     color: "laser",
@@ -92,6 +294,7 @@ const PILLARS = [
       { label: "Mindset", val: "Posture compétiteur" },
     ],
     hasClip: true,
+    videoSrc: "",
     clipTitle: "SANG-FROID EN CLUTCH // 1V3 & 1V5",
     clipSubtitle: "Clip clutch et 1v3 Apex Legends",
     color: "laser",
@@ -127,6 +330,9 @@ export default function WhyPoulpy() {
   const activeIndexRef = useRef(0);
   const scrollDistanceRef = useRef(3200);
 
+  const [flippedArray, setFlippedArray] = useState<boolean[]>([false, false, false, false, false, false]);
+  const [isSectionInView, setIsSectionInView] = useState(false);
+
   const updatePills = (activeIdx: number) => {
     pillBtnsRef.current.forEach((btn, idx) => {
       if (!btn) return;
@@ -147,6 +353,12 @@ export default function WhyPoulpy() {
     const el = cardFlippersRef.current[idx];
     if (!el) return;
     flippedStatesRef.current[idx] = targetFlipped;
+    setFlippedArray((prev) => {
+      if (prev[idx] === targetFlipped) return prev;
+      const next = [...prev];
+      next[idx] = targetFlipped;
+      return next;
+    });
 
     gsap.to(el, {
       rotateY: targetFlipped ? 180 : 0,
@@ -291,9 +503,18 @@ export default function WhyPoulpy() {
       ScrollTrigger.refresh();
     };
 
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsSectionInView(entry.isIntersecting);
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(section);
+
     window.addEventListener("resize", handleResize, { passive: true });
 
     return () => {
+      observer.disconnect();
       window.removeEventListener("resize", handleResize);
       if (ctx) ctx.revert();
     };
@@ -552,33 +773,14 @@ export default function WhyPoulpy() {
                       </button>
                     </div>
 
-                    {/* Video Mockup Container */}
-                    <div className="relative my-auto aspect-video w-full bg-black/90 border border-white/20 flex flex-col items-center justify-center overflow-hidden group/player shadow-inner z-10">
-                      {/* Scanlines / Grid effect */}
-                      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#FF7582]/10 via-transparent to-black pointer-events-none" />
-                      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
-
-                      {/* Play Button with breathing rings */}
-                      <div className="relative z-10 flex flex-col items-center gap-3">
-                        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#FF7582]/20 border-2 border-[#FF7582] flex items-center justify-center text-[#FF7582] shadow-[0_0_25px_rgba(255,117,130,0.5)] group-hover/player:scale-110 transition-transform cursor-pointer">
-                          <Play className="w-6 h-6 fill-current ml-1" />
-                        </div>
-                        <div className="text-center space-y-0.5">
-                          <span className="text-xs font-bold font-display tracking-wider text-white block">
-                            {item.clipTitle}
-                          </span>
-                          <span className="text-[10px] text-white/50 font-mono block">
-                            CLIP DISPONIBLE TRÈS BIENTÔT // 1080P 60FPS
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Bottom bar overlay */}
-                      <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-[9px] font-mono text-white/60 z-10">
-                        <span className="bg-black/80 px-2 py-0.5 border border-white/10">00:45 / 01:30</span>
-                        <span className="text-[#FF7582] font-bold">COACH POULPY REPLAY ARCHIVE</span>
-                      </div>
-                    </div>
+                    {/* Video Player Component */}
+                    <PillarVideoPlayer
+                      videoSrc={item.videoSrc}
+                      clipTitle={item.clipTitle}
+                      clipSubtitle={item.clipSubtitle}
+                      isFlipped={flippedArray[idx]}
+                      isSectionInView={isSectionInView}
+                    />
 
                     {/* Back Footer */}
                     <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs relative z-10">
