@@ -21,10 +21,49 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://poulpy-coaching.vercel.app"),
   title: "Poulpy Coaching",
   description:
     "Plateforme de coaching e-sport d'élite pour Valorant et Apex Legends. Ballistic WebGL Engine, VOD chirurgie, analyse réflexe sub-pixel.",
+  applicationName: "Poulpy Coaching",
+  authors: [{ name: "Poulpy" }],
+  generator: "Next.js",
+  keywords: ["Poulpy", "Poulpy Coaching", "Coaching Valorant", "Coaching Apex Legends", "Aim Training", "Esport", "Atheris"],
   manifest: "/manifest.json",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    url: "https://poulpy-coaching.vercel.app",
+    siteName: "Poulpy Coaching",
+    title: "Poulpy Coaching",
+    description:
+      "Plateforme de coaching e-sport d'élite pour Valorant et Apex Legends. Analyse chirurgicale, VOD review et progression garantie.",
+    images: [
+      {
+        url: "/icons/icon-512x512.png",
+        width: 512,
+        height: 512,
+        alt: "Poulpy Coaching Logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: "Poulpy Coaching",
+    description:
+      "Plateforme de coaching e-sport d'élite pour Valorant et Apex Legends.",
+    images: ["/icons/icon-512x512.png"],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -32,14 +71,15 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/poulpy-favicon.png?v=3", type: "image/png" },
-      { url: "/icons/icon-192x192.png?v=3", sizes: "192x192", type: "image/png" },
-      { url: "/icons/icon-512x512.png?v=3", sizes: "512x512", type: "image/png" },
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/icon.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
     ],
     apple: [
-      { url: "/poulpy-favicon.png?v=3", sizes: "180x180", type: "image/png" },
+      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
     ],
-    shortcut: "/poulpy-favicon.png?v=3",
+    shortcut: "/favicon.ico",
   },
 };
 
@@ -47,6 +87,41 @@ export const viewport: Viewport = {
   themeColor: "#FF7582",
   width: "device-width",
   initialScale: 1,
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://poulpy-coaching.vercel.app/#website",
+      "url": "https://poulpy-coaching.vercel.app",
+      "name": "Poulpy Coaching",
+      "alternateName": ["Poulpy", "PoulpyCoaching"],
+      "description": "Plateforme de coaching e-sport d'élite pour Valorant et Apex Legends.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Poulpy Coaching",
+        "url": "https://poulpy-coaching.vercel.app",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://poulpy-coaching.vercel.app/icons/icon-512x512.png"
+        }
+      }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://poulpy-coaching.vercel.app/#organization",
+      "name": "Poulpy Coaching",
+      "url": "https://poulpy-coaching.vercel.app",
+      "logo": "https://poulpy-coaching.vercel.app/icons/icon-512x512.png",
+      "sameAs": [
+        "https://www.youtube.com/@Poulpy_C",
+        "https://www.twitch.tv/poulpy_coaching",
+        "https://discord.gg/rJMg3ZZRkp"
+      ]
+    }
+  ]
 };
 
 export default function RootLayout({
@@ -57,9 +132,13 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning className={`${bebasNeue.variable} ${jetbrainsMono.variable}`}>
       <head>
-        <link rel="icon" type="image/png" href="/poulpy-favicon.png?v=3" />
-        <link rel="shortcut icon" type="image/png" href="/poulpy-favicon.png?v=3" />
-        <link rel="apple-touch-icon" href="/poulpy-favicon.png?v=3" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icon.png" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <script
           dangerouslySetInnerHTML={{
             __html:
