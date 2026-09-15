@@ -86,5 +86,20 @@ CREATE INDEX IF NOT EXISTS idx_coaching_bookings_notion_page
 Pour voir tous vos rendez-vous directement dans l'application **Notion Calendar** (sur Mac, Windows, iOS, Android) :
 1. Ouvrez l'application **Notion Calendar**.
 2. Dans la barre latérale gauche, cliquez sur **"+ Ajouter une base de données Notion"**.
-3. Sélectionnez votre base `🗓️ Planning Coaching Poulpy`.
+3. Sélectionnez votre base `🗓️ Planning Coaching Poulpy` (ou `Planning Coaching`).
 4. Tous les créneaux s'affichent automatiquement avec l'heure exacte, le jeu et le nom de l'élève !
+
+---
+
+## 6. Synchronisation Bidirectionnelle Temps Réel (Notion ➔ Poulpy Coaching)
+
+Pour que toute modification effectuée sur Notion (déplacement d'un créneau, changement d'heure, suppression) mette à jour le site et alerte l'élève :
+
+1. Rendez-vous sur [notion.so/my-integrations](https://www.notion.so/my-integrations) et ouvrez votre intégration `Poulpy Coaching`.
+2. Dans le menu de gauche, cliquez sur **"Webhooks"** (ou *Event Subscriptions*).
+3. Renseignez l'URL de votre Webhook :
+   `https://votre-domaine-poulpy.com/api/webhooks/notion`
+4. Cochez les événements : **Page updated**, **Page deleted**, **Property values updated**.
+5. Cliquez sur **Sauvegarder**.
+6. Dès lors, tout déplacement dans Notion ou Notion Calendar mettra à jour automatiquement le site et enverra une alerte à l'élève !
+

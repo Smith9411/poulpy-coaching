@@ -441,3 +441,157 @@ export async function testNotionConnection(): Promise<{
     };
   }
 }
+
+export interface ParsedNotionBooking {
+  pageId: string;
+  isArchived: boolean;
+  title?: string;
+  bookingDate?: string; // Format 'YYYY-MM-DD'
+  bookingTime?: string; // Format 'HH:MM'
+  status?: string; // 'Confirmé' | 'Reporté' | 'Annulé' | 'Terminé'
+  game?: string;
+  studentName?: string;
+  studentDiscord?: string;
+  studentEmail?: string;
+}
+
+/**
+ * Récupère et parse les données d'une page Notion (pour les Webhooks et la synchronisation)
+ */
+export async function fetchNotionPage(notionPageId: string): Promise<ParsedNotionBooking | null> {
+  const config = getNotionConfig();
+  if (!config || !notionPageId) return null;
+
+  try {
+    const cleanId = cleanNotionId(notionPageId) || notionPageId;
+    const res = await fetch(`${NOTION_API_URL}/pages/${cleanId}`, {
+      headers: {
+        Authorization: `Bearer ${config.apiKey}`,
+        'Notion-Version': NOTION_VERSION,
+      },
+    });
+
+    if (!res.ok) {
+      console.error('[Notion Sync] Erreur fetchNotionPage:', res.status);
+      return null;
+    }
+
+    const page = await res.json();
+    return parseNotionPageObject(page);
+  } catch (err) {
+    console.error('[Notion Sync Exception in fetchNotionPage]:', err);
+    return null;
+  }
+}
+
+/**
+ * Récupère toutes les pages de la base Notion pour la synchronisation globale
+ */
+export async function queryAllNotionBookings(): Promise<ParsedNotionBooking[]> {
+  const config = getNotionConfig();
+  if (!config) return [];
+
+  try {
+    const realDbId = await resolveDatabaseId(config);
+    const res = await fetch(`${NOTION_API_URL}/databases/${realDbId}/query`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${config.apiKey}`,
+        'Notion-Version': NOTION_VERSION,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        page_size: 100,
+      }),
+    });
+
+    if (!res.ok) {
+      console.error('[Notion Sync] Erreur queryAllNotionBookings:', res.status);
+      return [];
+    }
+
+    const data = await res.json();
+    const results: ParsedNotionBooking[] = [];
+
+    for (const page of data.results || []) {
+      const parsed = parseNotionPageObject(page);
+      if (parsed) results.push(parsed);
+    }
+
+    return results;
+  } catch (err) {
+    console.error('[Notion Sync Exception in queryAllNotionBookings]:', err);
+    return [];
+  }
+}
+
+/**
+ * Helper de parsing d'un objet Page Notion
+ */
+function parseNotionPageObject(page: any): ParsedNotionBooking {
+  const props = page.properties || {};
+
+  // Titre
+  let title = '';
+  const titleProp = Object.values(props).find((p: any) => p.type === 'title') as any;
+  if (titleProp?.title?.[0]?.plain_text) {
+    title = titleProp.title[0].plain_text;
+  }
+
+  // Date et heure
+  let bookingDate: string | undefined;
+  let bookingTime: string | undefined;
+  const dateProp = props['Date']?.date;
+  if (dateProp?.start) {
+    const startStr = dateProp.start as string;
+    if (startStr.includes('T')) {
+      const [d, t] = startStr.split('T');
+      bookingDate = d;
+      // Extraire HH:MM
+      bookingTime = t.slice(0, 5);
+    } else {
+      bookingDate = startStr;
+      bookingTime = '14:00'; // Heure par défaut si seule la date a été saisie
+    }
+  }
+
+  // Statut
+  let status: string | undefined;
+  if (props['Statut']?.select?.name) {
+    status = props['Statut'].select.name;
+  } else if (props['Statut']?.status?.name) {
+    status = props['Statut'].status.name;
+  }
+
+  // Jeu
+  let game: string | undefined;
+  if (props['Jeu']?.select?.name) {
+    game = props['Jeu'].select.name;
+  } else if (props['Jeu']?.rich_text?.[0]?.plain_text) {
+    game = props['Jeu'].rich_text[0].plain_text;
+  }
+
+  // Discord
+  let studentDiscord: string | undefined;
+  if (props['Discord']?.rich_text?.[0]?.plain_text) {
+    studentDiscord = props['Discord'].rich_text[0].plain_text;
+  }
+
+  // Email
+  let studentEmail: string | undefined;
+  if (props['Email']?.email) {
+    studentEmail = props['Email'].email;
+  }
+
+  return {
+    pageId: page.id,
+    isArchived: page.archived === true,
+    title,
+    bookingDate,
+    bookingTime,
+    status,
+    game,
+    studentDiscord,
+    studentEmail,
+  };
+}

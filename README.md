@@ -271,6 +271,14 @@ Fonctionnement côté app : après le retour Google, `/auth/callback` vérifie l
   - **Token expiré géré côté client** : ajout `supabase.auth.refreshSession()` automatique dans `handleAdminResponse` quand le token est expiré, avec message clair "Session expirée, reconnectez-vous"
   - **UI mode déroulant améliorée** : bouton "Réponse de l'équipe Poulpy" avec gradient purple→cyan bien visible, **chevron rotatif** (ChevronDown + rotate-180 quand déployé), animation framer-motion easeInOut, **avatar "Équipe Poulpy" + date de réponse** dans le panneau déplié
   - **Fix build** : `discordUrl` manquant dans `setSettings` de `components/About.tsx` (erreur TS2345)
+- 2026-09-15 (synchronisation bidirectionnelle temps réel Notion ➔ Poulpy Coaching & alertes élèves) :
+  - **Route Webhook Notion (`POST /api/webhooks/notion`)** : écoute les événements de modification et de suppression envoyés en direct par Notion / Notion Calendar.
+  - **Gestion dynamique des créneaux & statut** :
+    - *Déplacement d'horaire* : libère l'ancien créneau, verrouille le nouveau, met à jour `booking_date` / `booking_time`, passe le statut à `rescheduled` et active `read_by_student = false`.
+    - *Suppression / Archivage Notion* : passe le statut à `cancelled`, libère le créneau et active `read_by_student = false`.
+  - **Alerte immédiate pour l'élève** : déclenchement automatique de la cloche rouge clignotante dans la barre de navigation et notification détaillée (`SÉANCE REPLANIFIÉE` ou `SÉANCE ANNULÉE`).
+  - **Route de synchronisation globale (`POST /api/admin/notion/sync`)** : réconciliation manuelle à la demande de l'ensemble des rendez-vous Notion.
+  - **Parsing et helpers (`fetchNotionPage`, `queryAllNotionBookings`)** : extraction fiable des dates ISO, fuseaux horaires et statuts depuis l'API Notion.
 - 2026-09-15 (intégration Notion Calendar & synchronisation automatique des réservations) :
   - **Module d'intégration résilient (`lib/notion.ts`)** : création des méthodes `createNotionBooking`, `updateNotionBookingDate`, `cancelNotionBooking` et `completeNotionBooking` via l'API REST officielle Notion v1 (`Notion-Version: 2022-06-28`). En cas d'absence de configuration, le flux de réservation reste 100% fonctionnel sans blocage.
   - **Synchronisation à la création (`POST /api/bookings/create`)** : création instantanée de la page RDV dans Notion avec titre structuré, date/heure, statut `Confirmé`, jeu (`Valorant`/`Apex Legends`), formule, Discord, email et notes, puis enregistrement du `notion_page_id` dans Supabase.
