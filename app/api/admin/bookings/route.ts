@@ -306,7 +306,14 @@ export async function PATCH(req: NextRequest) {
 
       // 4. Synchronisation Notion : mettre à jour la date et le statut dans le calendrier Notion
       if (currentBooking.notion_page_id) {
-        updateNotionBookingDate(currentBooking.notion_page_id, newDate, newTime, 'rescheduled').catch((e) =>
+        updateNotionBookingDate(
+          currentBooking.notion_page_id,
+          newDate,
+          newTime,
+          'rescheduled',
+          currentBooking.plan_duration,
+          currentBooking.plan_name
+        ).catch((e) =>
           console.error('[Notion Sync Error on Reschedule]', e)
         );
       }

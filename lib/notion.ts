@@ -65,29 +65,71 @@ function getNotionConfig() {
 }
 
 /**
- * Calcule la date de début et de fin ISO pour Notion Date
+ * Détermine la durée en minutes selon la formule de coaching ou la chaîne de durée
  */
-function buildNotionDateRange(dateStr: string, timeStr: string, durationStr?: string): { start: string; end?: string } {
+export function getDurationMinutes(durationStr?: string, planName?: string): number {
+  const combined = `${durationStr || ''} ${planName || ''}`.toLowerCase();
+  if (combined.includes('30') || combined.includes('diag') || combined.includes('session')) {
+    return 30;
+  }
+  if (combined.includes('1h30') || combined.includes('90') || combined.includes('perf')) {
+    return 90;
+  }
+  if (combined.includes('2h') || combined.includes('120')) {
+    return 120;
+  }
+  if (combined.includes('45')) {
+    return 45;
+  }
+  return 60;
+}
+
+/**
+ * Calcule le décalage horaire UTC pour Europe/Paris à une date donnée (+02:00 en été, +01:00 en hiver)
+ */
+export function getParisOffsetForDate(dateStr: string): string {
   try {
-    const [hours, minutes] = timeStr.split(':').map(Number);
-    const dateObj = new Date(`${dateStr}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`);
+    const testDate = new Date(`${dateStr}T12:00:00Z`);
+    if (isNaN(testDate.getTime())) return '+02:00';
+    const parisHourStr = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Europe/Paris',
+      hour: 'numeric',
+      hour12: false,
+    }).format(testDate);
+    const parisHour = parseInt(parisHourStr, 10);
+    const offset = parisHour - 12;
+    return offset === 2 ? '+02:00' : '+01:00';
+  } catch {
+    return '+02:00';
+  }
+}
 
-    let durationMinutes = 60;
-    if (durationStr) {
-      if (durationStr.includes('1h30') || durationStr.includes('90')) {
-        durationMinutes = 90;
-      } else if (durationStr.includes('2h') || durationStr.includes('120')) {
-        durationMinutes = 120;
-      } else if (durationStr.includes('1h') || durationStr.includes('60')) {
-        durationMinutes = 60;
-      }
-    }
+/**
+ * Calcule la date de début et de fin ISO pour Notion Date avec décalage Paris dynamique
+ */
+export function buildNotionDateRange(
+  dateStr: string,
+  timeStr: string,
+  durationStr?: string,
+  planName?: string
+): { start: string; end?: string } {
+  try {
+    const [hoursStr, minutesStr] = timeStr.split(':');
+    const hours = parseInt(hoursStr, 10) || 0;
+    const minutes = parseInt(minutesStr, 10) || 0;
+    const durationMinutes = getDurationMinutes(durationStr, planName);
+    const offset = getParisOffsetForDate(dateStr);
 
-    const endObj = new Date(dateObj.getTime() + durationMinutes * 60 * 1000);
+    const totalStartMins = hours * 60 + minutes;
+    const totalEndMins = totalStartMins + durationMinutes;
+
+    const endHours = Math.floor(totalEndMins / 60) % 24;
+    const endMins = totalEndMins % 60;
+    const endTimeStr = `${String(endHours).padStart(2, '0')}:${String(endMins).padStart(2, '0')}`;
 
     return {
-      start: `${dateStr}T${timeStr}:00+02:00`,
-      end: `${dateStr}T${String(endObj.getHours()).padStart(2, '0')}:${String(endObj.getMinutes()).padStart(2, '0')}:00+02:00`,
+      start: `${dateStr}T${timeStr}:00${offset}`,
+      end: `${dateStr}T${endTimeStr}:00${offset}`,
     };
   } catch {
     return { start: dateStr };
@@ -171,7 +213,7 @@ export async function createNotionBooking(payload: NotionBookingPayload): Promis
     const realDbId = await resolveDatabaseId(config);
     const schemaProps = await getDatabaseProperties({ apiKey: config.apiKey, databaseId: realDbId });
 
-    const { start, end } = buildNotionDateRange(payload.bookingDate, payload.bookingTime, payload.planDuration);
+    const { start, end } = buildNotionDateRange(payload.bookingDate, payload.bookingTime, payload.planDuration, payload.planName);
     const title = `[${payload.game.toUpperCase()}] Coaching - ${payload.studentName}`;
 
     // Trouver le nom de la propriété titre (par défaut 'Name' ou première propriété de type 'title')
@@ -275,13 +317,15 @@ export async function updateNotionBookingDate(
   notionPageId: string,
   newDate: string,
   newTime: string,
-  status: 'rescheduled' | 'confirmed' = 'rescheduled'
+  status: 'rescheduled' | 'confirmed' = 'rescheduled',
+  planDuration?: string,
+  planName?: string
 ): Promise<boolean> {
   const config = getNotionConfig();
   if (!config || !notionPageId) return false;
 
   try {
-    const { start, end } = buildNotionDateRange(newDate, newTime);
+    const { start, end } = buildNotionDateRange(newDate, newTime, planDuration, planName);
     const dateProperty: Record<string, any> = { start };
     if (end) dateProperty.end = end;
 
@@ -526,6 +570,51 @@ export async function queryAllNotionBookings(): Promise<ParsedNotionBooking[]> {
 }
 
 /**
+ * Convertit une date ISO Notion vers le fuseau horaire de Paris ('Europe/Paris')
+ */
+export function parseNotionDateToParis(dateStr?: string): { bookingDate?: string; bookingTime?: string } {
+  if (!dateStr) return {};
+
+  if (!dateStr.includes('T')) {
+    return { bookingDate: dateStr, bookingTime: '14:00' };
+  }
+
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) {
+      const [dPart, tPart] = dateStr.split('T');
+      return { bookingDate: dPart, bookingTime: tPart ? tPart.slice(0, 5) : '14:00' };
+    }
+
+    const formatter = new Intl.DateTimeFormat('fr-CA', {
+      timeZone: 'Europe/Paris',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+
+    const parts = formatter.formatToParts(d);
+    const getPart = (type: string) => parts.find((p) => p.type === type)?.value || '';
+    const year = getPart('year');
+    const month = getPart('month');
+    const day = getPart('day');
+    const hour = getPart('hour');
+    const minute = getPart('minute');
+
+    return {
+      bookingDate: `${year}-${month}-${day}`,
+      bookingTime: `${hour}:${minute}`,
+    };
+  } catch {
+    const [dPart, tPart] = dateStr.split('T');
+    return { bookingDate: dPart, bookingTime: tPart ? tPart.slice(0, 5) : '14:00' };
+  }
+}
+
+/**
  * Helper de parsing d'un objet Page Notion (robuste et dynamique)
  */
 function parseNotionPageObject(page: any): ParsedNotionBooking {
@@ -538,35 +627,11 @@ function parseNotionPageObject(page: any): ParsedNotionBooking {
     title = titleProp.title[0].plain_text;
   }
 
-  // Date et heure
-  let bookingDate: string | undefined;
-  let bookingTime: string | undefined;
+  // Date et heure avec conversion fuseau horaire Paris ('Europe/Paris')
   const datePropEntry = Object.entries(props).find(([, p]: [string, any]) => p.type === 'date');
   const dateProp = datePropEntry ? (datePropEntry[1] as any)?.date : props['Date']?.date;
 
-  if (dateProp?.start) {
-    const startStr = dateProp.start as string;
-    if (startStr.includes('T')) {
-      const d = new Date(startStr);
-      if (!isNaN(d.getTime())) {
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        bookingDate = `${year}-${month}-${day}`;
-
-        const hours = String(d.getHours()).padStart(2, '0');
-        const minutes = String(d.getMinutes()).padStart(2, '0');
-        bookingTime = `${hours}:${minutes}`;
-      } else {
-        const [dPart, tPart] = startStr.split('T');
-        bookingDate = dPart;
-        bookingTime = tPart.slice(0, 5);
-      }
-    } else {
-      bookingDate = startStr;
-      bookingTime = '14:00';
-    }
-  }
+  const { bookingDate, bookingTime } = parseNotionDateToParis(dateProp?.start);
 
   // Statut
   let status: string | undefined;

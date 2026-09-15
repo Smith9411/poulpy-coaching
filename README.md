@@ -271,6 +271,10 @@ Fonctionnement côté app : après le retour Google, `/auth/callback` vérifie l
   - **Token expiré géré côté client** : ajout `supabase.auth.refreshSession()` automatique dans `handleAdminResponse` quand le token est expiré, avec message clair "Session expirée, reconnectez-vous"
   - **UI mode déroulant améliorée** : bouton "Réponse de l'équipe Poulpy" avec gradient purple→cyan bien visible, **chevron rotatif** (ChevronDown + rotate-180 quand déployé), animation framer-motion easeInOut, **avatar "Équipe Poulpy" + date de réponse** dans le panneau déplié
   - **Fix build** : `discordUrl` manquant dans `setSettings` de `components/About.tsx` (erreur TS2345)
+- 2026-09-15 (calibrage fuseau horaire Paris Europe/Paris & durée exacte des séances Notion) :
+  - **Calibrage automatique du fuseau horaire (`parseNotionDateToParis`)** : conversion systématique et fiable des dates et heures UTC envoyées par les webhooks Notion (`Intl.DateTimeFormat` avec `timeZone: 'Europe/Paris'`) pour garantir que les déplacements d'événements dans Notion Calendar reflètent exactement l'heure locale sur le site (ex: `13:15` sur le calendrier Notion = `13:15` sur le site et dans l'espace élève, et non `11:15`).
+  - **Calcul dynamique de la durée des formules (`getDurationMinutes`)** : prise en compte stricte de la durée selon la formule sélectionnée (`SESSION DIAGNOSTIC` = 30 min, `COACHING PRO` = 60 min, `PERFORMANCE` = 90 min) lors de la création et du report de séances.
+  - **Gestion dynamique du décalage saisonnier (`getParisOffsetForDate`)** : attribution automatique de l'offset `+02:00` (heure d'été) ou `+01:00` (heure d'hiver) pour la synchronisation Notion.
 - 2026-09-15 (synchronisation bidirectionnelle temps réel Notion ➔ Poulpy Coaching & alertes élèves) :
   - **Route Webhook Notion (`POST /api/webhooks/notion`)** : écoute les événements de modification et de suppression envoyés en direct par Notion / Notion Calendar.
   - **Gestion dynamique des créneaux & statut** :

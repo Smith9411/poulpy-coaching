@@ -179,7 +179,6 @@ export async function POST(req: NextRequest) {
       console.info(`[Notion Webhook] Aucune réservation liée au notion_page_id: ${pageId}`);
       return NextResponse.json({ success: true, message: 'Réservation non trouvée' });
     }
-    const nowIso = new Date().toISOString();
 
     // ── SCÉNARIO A : LA PAGE A ÉTÉ ARCHIVÉE OU STATUT 'ANNULÉ' ─────────────
     if (notionData.isArchived || notionData.status === 'Annulé') {
