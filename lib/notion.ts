@@ -526,7 +526,7 @@ export async function queryAllNotionBookings(): Promise<ParsedNotionBooking[]> {
 }
 
 /**
- * Helper de parsing d'un objet Page Notion
+ * Helper de parsing d'un objet Page Notion (robuste et dynamique)
  */
 function parseNotionPageObject(page: any): ParsedNotionBooking {
   const props = page.properties || {};
@@ -541,17 +541,30 @@ function parseNotionPageObject(page: any): ParsedNotionBooking {
   // Date et heure
   let bookingDate: string | undefined;
   let bookingTime: string | undefined;
-  const dateProp = props['Date']?.date;
+  const datePropEntry = Object.entries(props).find(([, p]: [string, any]) => p.type === 'date');
+  const dateProp = datePropEntry ? (datePropEntry[1] as any)?.date : props['Date']?.date;
+
   if (dateProp?.start) {
     const startStr = dateProp.start as string;
     if (startStr.includes('T')) {
-      const [d, t] = startStr.split('T');
-      bookingDate = d;
-      // Extraire HH:MM
-      bookingTime = t.slice(0, 5);
+      const d = new Date(startStr);
+      if (!isNaN(d.getTime())) {
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        bookingDate = `${year}-${month}-${day}`;
+
+        const hours = String(d.getHours()).padStart(2, '0');
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        bookingTime = `${hours}:${minutes}`;
+      } else {
+        const [dPart, tPart] = startStr.split('T');
+        bookingDate = dPart;
+        bookingTime = tPart.slice(0, 5);
+      }
     } else {
       bookingDate = startStr;
-      bookingTime = '14:00'; // Heure par défaut si seule la date a été saisie
+      bookingTime = '14:00';
     }
   }
 
@@ -583,6 +596,13 @@ function parseNotionPageObject(page: any): ParsedNotionBooking {
     studentEmail = props['Email'].email;
   }
 
+  // Extraction du nom de l'élève depuis le titre si possible (ex: "[VALORANT] Coaching - John")
+  let studentName: string | undefined;
+  if (title.includes('-')) {
+    const parts = title.split('-');
+    studentName = parts[parts.length - 1].trim();
+  }
+
   return {
     pageId: page.id,
     isArchived: page.archived === true,
@@ -591,6 +611,7 @@ function parseNotionPageObject(page: any): ParsedNotionBooking {
     bookingTime,
     status,
     game,
+    studentName,
     studentDiscord,
     studentEmail,
   };

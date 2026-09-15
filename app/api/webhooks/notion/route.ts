@@ -45,15 +45,21 @@ export async function POST(req: NextRequest) {
   try {
     const rawBody = await req.json().catch(() => ({}));
 
-    // 1. Handshake de vérification initial de Notion (Capture et persistance du jeton)
-    const token =
+    // 1. Handshake de vérification initial de Notion
+    const isVerification =
       rawBody.verification_token ||
       rawBody.verificationToken ||
-      rawBody.token ||
-      rawBody.secret ||
-      rawBody.challenge;
+      rawBody.type === 'verification' ||
+      (rawBody.challenge && !rawBody.entity);
 
-    if (token) {
+    if (isVerification) {
+      const token =
+        rawBody.verification_token ||
+        rawBody.verificationToken ||
+        rawBody.token ||
+        rawBody.secret ||
+        rawBody.challenge;
+
       console.info(`[Notion Webhook] Jeton de vérification reçu : ${token}`);
 
       try {
@@ -74,8 +80,9 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // 2. Extraction de l'ID de la page modifiée
+    // 2. Extraction de l'ID de la page modifiée (support de tous les formats Notion Webhook)
     const pageId =
+      rawBody.entity?.id ||
       rawBody.entity_id ||
       rawBody.data?.id ||
       rawBody.page_id ||
@@ -83,7 +90,7 @@ export async function POST(req: NextRequest) {
       rawBody.data?.page_id;
 
     if (!pageId) {
-      // Événement générique ou ping
+      console.info('[Notion Webhook] Événement reçu sans pageId:', JSON.stringify(rawBody));
       return NextResponse.json({ success: true, message: 'Événement reçu sans ID de page' });
     }
 
@@ -105,12 +112,44 @@ export async function POST(req: NextRequest) {
       .or(`notion_page_id.eq.${cleanPageId},notion_page_id.eq.${rawClean},notion_page_id.eq.${pageId}`)
       .limit(1);
 
-    if (findError || !bookings || bookings.length === 0) {
-      console.info(`[Notion Webhook] Aucune réservation liée au notion_page_id: ${pageId}`);
-      return NextResponse.json({ success: true, message: 'Réservation non trouvée (peut-être une page hors-coaching)' });
+    let booking = (bookings || [])[0];
+
+    // Fallback : si notion_page_id n'était pas encore enregistré, faire correspondre par email ou nom
+    if (!booking) {
+      if (notionData.studentEmail) {
+        const { data: byEmail } = await supabase
+          .from('coaching_bookings')
+          .select('*')
+          .eq('student_email', notionData.studentEmail.trim().toLowerCase())
+          .order('created_at', { ascending: false })
+          .limit(1);
+        if (byEmail && byEmail.length > 0) booking = byEmail[0];
+      }
+
+      if (!booking && notionData.studentName) {
+        const { data: byName } = await supabase
+          .from('coaching_bookings')
+          .select('*')
+          .ilike('student_name', `%${notionData.studentName.trim()}%`)
+          .order('created_at', { ascending: false })
+          .limit(1);
+        if (byName && byName.length > 0) booking = byName[0];
+      }
+
+      // Si trouvé par fallback, lier immédiatement notion_page_id dans Supabase
+      if (booking) {
+        await supabase
+          .from('coaching_bookings')
+          .update({ notion_page_id: cleanPageId })
+          .eq('id', booking.id);
+        console.info(`[Notion Webhook] notion_page_id automatiquement lié à la réservation #${booking.id}`);
+      }
     }
 
-    const booking = bookings[0];
+    if (!booking) {
+      console.info(`[Notion Webhook] Aucune réservation liée au notion_page_id: ${pageId}`);
+      return NextResponse.json({ success: true, message: 'Réservation non trouvée' });
+    }
     const nowIso = new Date().toISOString();
 
     // ── SCÉNARIO A : LA PAGE A ÉTÉ ARCHIVÉE OU STATUT 'ANNULÉ' ─────────────
