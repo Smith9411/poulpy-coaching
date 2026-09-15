@@ -542,9 +542,9 @@ USING (student_id = auth.uid());`;
 
   if (authLoading || isLoading) {
     return (
-      <main className="min-h-screen page-bg py-24 flex items-center justify-center">
+      <main className="min-h-screen bg-[#07090D] py-24 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 size={40} className="animate-spin text-purple-500 mx-auto mb-4" />
+          <Loader2 size={40} className="animate-spin text-[#FF7582] mx-auto mb-4" />
           <p className="text-gray-400">Chargement de la fiche personnalisée...</p>
         </div>
       </main>
@@ -553,12 +553,12 @@ USING (student_id = auth.uid());`;
 
   if (!user?.isAdmin) {
     return (
-      <main className="min-h-screen page-bg py-24 flex items-center justify-center px-4">
-        <div className="glass p-8 rounded-2xl max-w-md text-center border border-red-500/30">
+      <main className="min-h-screen bg-[#07090D] py-24 flex items-center justify-center px-4">
+        <div className="bg-black/40 border border-white/10 backdrop-blur-md p-8 max-w-md text-center border-red-500/30">
           <Shield size={48} className="text-red-400 mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2">Accès restreint</h1>
           <p className="text-gray-400 mb-6">Cette page est réservée aux coachs administrateurs.</p>
-          <Link href="/" className="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-medium inline-block">
+          <Link href="/" className="px-6 py-2.5 bg-[#FF7582] text-black font-bold inline-block">
             Retour à l'accueil
           </Link>
         </div>
@@ -567,7 +567,7 @@ USING (student_id = auth.uid());`;
   }
 
   return (
-    <main className="min-h-screen page-bg py-20 pb-28">
+    <main className="min-h-screen bg-[#07090D] py-20 pb-28">
       {/* Hidden file input for images */}
       <input
         type="file"
@@ -595,21 +595,21 @@ USING (student_id = auth.uid());`;
           <div className="flex items-center gap-3">
             <Link
               href={`/admin/coaching/${studentId}`}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-400 border border-cyan-500/20 text-xs sm:text-sm font-medium transition-colors"
+              className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#8FAFD4]/10 hover:bg-[#8FAFD4]/20 text-[#8FAFD4] border border-[#8FAFD4]/20 text-xs sm:text-sm font-medium transition-colors"
             >
               <MessageSquare size={15} />
               Chat avec l'élève
             </Link>
             <Link
               href={`/admin/coaching/${studentId}/clips`}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20 text-xs sm:text-sm font-medium transition-colors"
+              className="inline-flex items-center gap-2 px-3 py-1.5 bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20 text-xs sm:text-sm font-medium transition-colors"
             >
               <Film size={15} />
               Clips VOD
             </Link>
             <button
               onClick={() => window.print()}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg glass hover:bg-white/10 text-gray-300 text-xs sm:text-sm transition-colors"
+              className="inline-flex items-center gap-2 px-3 py-1.5 bg-black/40 border border-white/10 backdrop-blur-md hover:bg-white/10 text-gray-300 text-xs sm:text-sm transition-colors"
               title="Imprimer ou exporter en PDF"
             >
               <Printer size={15} />
@@ -620,7 +620,7 @@ USING (student_id = auth.uid());`;
 
         {/* Alerte table Supabase manquante */}
         {!tableReady && (
-          <div className="mb-6 p-4 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-300 text-sm flex items-start justify-between gap-4 print:hidden">
+          <div className="mb-6 p-4 bg-amber-500/15 border border-amber-500/30 text-amber-300 text-sm flex items-start justify-between gap-4 print:hidden">
             <div className="flex items-start gap-3">
               <AlertCircle size={20} className="mt-0.5 flex-shrink-0 text-amber-400" />
               <div>
@@ -632,7 +632,7 @@ USING (student_id = auth.uid());`;
             </div>
             <button
               onClick={copySqlScript}
-              className="flex-shrink-0 px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+              className="flex-shrink-0 px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors"
             >
               {copiedSql ? <Check size={14} /> : <Copy size={14} />}
               {copiedSql ? 'Copié !' : 'Copier SQL'}
@@ -641,16 +641,16 @@ USING (student_id = auth.uid());`;
         )}
 
         {/* Bannière élève */}
-        <div className="glass-dark rounded-2xl p-6 mb-8 border border-white/10 flex items-center justify-between gap-6 flex-wrap shadow-xl">
+        <div className="bg-[#090c10] border border-white/8 p-6 mb-8 flex items-center justify-between gap-6 flex-wrap shadow-xl">
           <div className="flex items-center gap-4 min-w-0">
             {student?.avatarUrl ? (
               <img
                 src={student.avatarUrl}
                 alt={student.username}
-                className="w-16 h-16 rounded-2xl object-cover border-2 border-purple-500/40 shadow-lg"
+                className="w-16 h-16 object-cover border-2 border-[#FF7582]/40 shadow-lg"
               />
             ) : (
-              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white text-2xl font-black shadow-lg">
+              <div className="w-16 h-16 bg-[#FF7582] flex items-center justify-center text-black text-2xl font-black shadow-lg">
                 {student?.initial}
               </div>
             )}
@@ -660,7 +660,7 @@ USING (student_id = auth.uid());`;
                   {student?.username}
                 </h1>
                 {student?.inCoaching && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold">
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold">
                     <Sparkles size={12} />
                     Coaching actif
                   </span>
@@ -689,11 +689,11 @@ USING (student_id = auth.uid());`;
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-lg ${
+              className={`inline-flex items-center gap-2 px-5 py-2.5 font-semibold text-sm transition-all shadow-lg ${
                 saveSuccess
                   ? 'bg-emerald-500 text-white shadow-emerald-500/30'
                   : isDirty
-                  ? 'bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white shadow-purple-500/40 hover:scale-[1.02]'
+                  ? 'bg-[#FF7582] text-black font-bold hover:bg-[#FF7582]/80 shadow-[0_0_15px_rgba(255,117,130,0.3)] hover:scale-[1.02]'
                   : 'bg-white/10 hover:bg-white/15 text-gray-300 border border-white/10'
               }`}
             >
@@ -718,7 +718,7 @@ USING (student_id = auth.uid());`;
         </div>
 
         {error && (
-          <div className="mb-6 p-4 rounded-xl bg-red-500/15 border border-red-500/30 text-red-400 text-sm flex items-center gap-2 print:hidden">
+          <div className="mb-6 p-4 bg-red-500/15 border border-red-500/30 text-red-400 text-sm flex items-center gap-2 print:hidden">
             <AlertCircle size={16} />
             {error}
           </div>
@@ -734,31 +734,31 @@ USING (student_id = auth.uid());`;
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Titre de la fiche..."
-            className="w-full text-xl sm:text-2xl font-bold bg-white/5 border border-white/10 focus:border-purple-500/60 rounded-xl px-4 py-2.5 text-white focus:outline-none transition-colors"
+            className="w-full text-xl sm:text-2xl font-bold bg-white/5 border border-white/10 focus:border-[#FF7582]/60 px-4 py-2.5 text-white focus:outline-none transition-colors"
           />
         </div>
 
         {/* Barre d'outils / Contrôles éditeur */}
-        <div className="relative z-30 glass-dark rounded-xl p-3 mb-4 border border-white/10 flex items-center justify-between gap-2 flex-wrap print:hidden">
+        <div className="relative z-30 bg-black/40 border border-white/10 backdrop-blur-md-dark p-3 mb-4 border border-white/10 flex items-center justify-between gap-2 flex-wrap print:hidden">
           {/* Outils de mise en page */}
           <div className="flex items-center gap-1 flex-wrap">
             <button
               onClick={() => insertText('# ')}
-              className="p-2 rounded-lg hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
+              className="p-2 hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
               title="Grand Titre (H1)"
             >
               <Heading1 size={17} />
             </button>
             <button
               onClick={() => insertText('## ')}
-              className="p-2 rounded-lg hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
+              className="p-2 hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
               title="Sous-titre (H2)"
             >
               <Heading2 size={17} />
             </button>
             <button
               onClick={() => insertText('### ')}
-              className="p-2 rounded-lg hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
+              className="p-2 hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
               title="Section (H3)"
             >
               <Heading3 size={17} />
@@ -767,21 +767,21 @@ USING (student_id = auth.uid());`;
 
             <button
               onClick={() => insertText('**', '**', 'texte en gras')}
-              className="p-2 rounded-lg hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
+              className="p-2 hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
               title="Gras"
             >
               <Bold size={17} />
             </button>
             <button
               onClick={() => insertText('*', '*', 'texte en italique')}
-              className="p-2 rounded-lg hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
+              className="p-2 hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
               title="Italique"
             >
               <Italic size={17} />
             </button>
             <button
               onClick={() => insertText('> 💡 **Conseil du Coach :** ', '', 'ton conseil ici')}
-              className="p-2 rounded-lg hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
+              className="p-2 hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
               title="Conseil / Citation"
             >
               <Quote size={17} />
@@ -790,21 +790,21 @@ USING (student_id = auth.uid());`;
 
             <button
               onClick={() => insertText('- ')}
-              className="p-2 rounded-lg hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
+              className="p-2 hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
               title="Liste à puces"
             >
               <List size={17} />
             </button>
             <button
               onClick={() => insertText('1. ')}
-              className="p-2 rounded-lg hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
+              className="p-2 hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
               title="Liste numérotée"
             >
               <ListOrdered size={17} />
             </button>
             <button
               onClick={() => insertText('- [ ] ', '', 'Tâche à valider')}
-              className="p-2 rounded-lg hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
+              className="p-2 hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
               title="Case à cocher"
             >
               <CheckSquare size={17} />
@@ -819,10 +819,10 @@ USING (student_id = auth.uid());`;
                 setIsTableModalOpen(true);
                 setShowTemplatesMenu(false);
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600/20 to-cyan-500/20 hover:from-purple-600/35 hover:to-cyan-500/35 text-purple-200 border border-purple-500/30 text-xs font-semibold transition-all hover:scale-105"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#FF7582]/20 to-[#8FAFD4]/20 hover:from-[#FF7582]/30 hover:to-[#8FAFD4]/30 text-[#FF7582] border border-[#FF7582]/30 text-xs font-semibold transition-all hover:scale-105"
               title="Insérer un tableau avec l'éditeur visuel (sans code markdown)"
             >
-              <Table size={15} className="text-cyan-400" />
+              <Table size={15} className="text-[#8FAFD4]" />
               <span>Tableaux</span>
             </button>
 
@@ -830,7 +830,7 @@ USING (student_id = auth.uid());`;
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploadingImage}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 text-xs font-semibold transition-colors disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#8FAFD4]/15 hover:bg-[#8FAFD4]/25 text-[#8FAFD4]/80 border border-[#8FAFD4]/30 text-xs font-semibold transition-colors disabled:opacity-50"
               title="Ajouter une capture d'écran ou coller directement avec Ctrl+V"
             >
               {isUploadingImage ? <Loader2 size={15} className="animate-spin" /> : <ImageIcon size={15} />}
@@ -843,7 +843,7 @@ USING (student_id = auth.uid());`;
                 onClick={() => {
                   setShowTemplatesMenu(!showTemplatesMenu);
                 }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-colors ${
                   showTemplatesMenu ? 'bg-indigo-600 text-white' : 'bg-white/5 hover:bg-white/10 text-gray-300'
                 }`}
                 title="Modèles pré-conçus"
@@ -858,13 +858,13 @@ USING (student_id = auth.uid());`;
                     className="fixed inset-0 z-40 cursor-default"
                     onClick={() => setShowTemplatesMenu(false)}
                   />
-                  <div className="absolute left-0 mt-2 w-72 rounded-xl bg-[#13111C] border border-indigo-500/40 shadow-[0_12px_40px_rgba(0,0,0,0.85)] p-2 z-50 animate-fade-in space-y-1">
+                  <div className="absolute left-0 mt-2 w-72 bg-[#13111C] border border-indigo-500/40 shadow-[0_12px_40px_rgba(0,0,0,0.85)] p-2 z-50 animate-fade-in space-y-1">
                     <button
                       onClick={() => {
                         applyTemplate('complet');
                         setShowTemplatesMenu(false);
                       }}
-                      className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/10 text-xs text-gray-200 transition-colors"
+                      className="w-full text-left px-3 py-2.5 hover:bg-white/10 text-xs text-gray-200 transition-colors"
                     >
                       ✨ <strong className="text-white">Fiche Complète de Suivi</strong>
                       <span className="block text-[10px] text-gray-400 mt-0.5">Diagnostic, Objectifs, Aim & Séances</span>
@@ -874,7 +874,7 @@ USING (student_id = auth.uid());`;
                         applyTemplate('aim');
                         setShowTemplatesMenu(false);
                       }}
-                      className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/10 text-xs text-gray-200 transition-colors"
+                      className="w-full text-left px-3 py-2.5 hover:bg-white/10 text-xs text-gray-200 transition-colors"
                     >
                       🎯 <strong className="text-white">Programme Aim & Mécaniques</strong>
                       <span className="block text-[10px] text-gray-400 mt-0.5">Routines KovaaK's, scores et règles d'or</span>
@@ -884,7 +884,7 @@ USING (student_id = auth.uid());`;
                         applyTemplate('vod');
                         setShowTemplatesMenu(false);
                       }}
-                      className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-white/10 text-xs text-gray-200 transition-colors"
+                      className="w-full text-left px-3 py-2.5 hover:bg-white/10 text-xs text-gray-200 transition-colors"
                     >
                       🎬 <strong className="text-white">Synthèse VOD & Tactique</strong>
                       <span className="block text-[10px] text-gray-400 mt-0.5">Analyse de matchs et plans d'action</span>
@@ -896,7 +896,7 @@ USING (student_id = auth.uid());`;
           </div>
 
           {/* Sélecteur de mode d'affichage */}
-          <div className="flex items-center gap-1 bg-black/40 p-1 rounded-xl border border-white/10">
+          <div className="flex items-center gap-1 bg-black/40 p-1 border border-white/10">
             <button
               onClick={() => {
                 if (viewMode === 'raw') {
@@ -904,9 +904,9 @@ USING (student_id = auth.uid());`;
                 }
                 setViewMode('visual');
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-all ${
                 viewMode === 'visual'
-                  ? 'bg-gradient-to-r from-purple-600 to-cyan-500 text-white shadow-md'
+                  ? 'bg-[#FF7582] text-black font-bold text-white shadow-md'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
@@ -920,8 +920,8 @@ USING (student_id = auth.uid());`;
                 }
                 setViewMode('preview');
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                viewMode === 'preview' ? 'bg-purple-600 text-white shadow-md' : 'text-gray-400 hover:text-white'
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-all ${
+                viewMode === 'preview' ? 'bg-[#FF7582] text-white shadow-md' : 'text-gray-400 hover:text-white'
               }`}
             >
               <Eye size={14} />
@@ -934,8 +934,8 @@ USING (student_id = auth.uid());`;
                 }
                 setViewMode('raw');
               }}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                viewMode === 'raw' ? 'bg-purple-600 text-white shadow-md' : 'text-gray-400 hover:text-white'
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-all ${
+                viewMode === 'raw' ? 'bg-[#FF7582] text-white shadow-md' : 'text-gray-400 hover:text-white'
               }`}
             >
               <Edit3 size={14} />
@@ -946,7 +946,7 @@ USING (student_id = auth.uid());`;
 
         {/* Zone Principale de Travail */}
         {viewMode === 'visual' && (
-          <div className="glass-dark rounded-2xl p-4 sm:p-8 border border-white/10 shadow-2xl">
+          <div className="bg-black/40 border border-white/10 backdrop-blur-md-dark p-4 sm:p-8 border border-white/10 shadow-2xl">
             <VisualSheetEditor
               blocks={blocks}
               onChange={handleBlocksChange}
@@ -957,9 +957,9 @@ USING (student_id = auth.uid());`;
         )}
 
         {viewMode === 'preview' && (
-          <div className="glass-dark rounded-2xl border border-white/10 overflow-hidden shadow-2xl bg-black/40">
+          <div className="bg-black/40 border border-white/10 backdrop-blur-md-dark border border-white/10 overflow-hidden shadow-2xl bg-black/40">
             <div className="px-4 py-2.5 bg-white/5 border-b border-white/10 flex items-center justify-between text-xs text-gray-400">
-              <span className="font-mono text-purple-300 font-semibold">APERÇU FICHE ÉLÈVE</span>
+              <span className="font-mono text-[#FF7582]/80 font-semibold">APERÇU FICHE ÉLÈVE</span>
               <span className="text-[11px] text-gray-500">Rendu final exact tel que l'élève le voit</span>
             </div>
             <div className="p-6 sm:p-10 overflow-y-auto">
@@ -975,7 +975,7 @@ USING (student_id = auth.uid());`;
         )}
 
         {viewMode === 'raw' && (
-          <div className="flex flex-col h-[750px] rounded-2xl glass-dark border border-white/10 overflow-hidden shadow-2xl relative">
+          <div className="flex flex-col h-[750px] bg-black/40 border border-white/10 backdrop-blur-md-dark border border-white/10 overflow-hidden shadow-2xl relative">
             <div className="px-4 py-2.5 bg-white/5 border-b border-white/10 flex items-center justify-between text-xs text-gray-400">
               <span className="font-mono">ÉDITEUR MARKDOWN BRUT</span>
               <span className="text-[11px] text-gray-500">
@@ -995,7 +995,7 @@ USING (student_id = auth.uid());`;
               spellCheck={false}
             />
             {isUploadingImage && (
-              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center gap-3 text-cyan-300 font-medium text-sm">
+              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center gap-3 text-[#8FAFD4]/80 font-medium text-sm">
                 <Loader2 size={24} className="animate-spin" />
                 Téléversement de la capture d'écran...
               </div>

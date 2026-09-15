@@ -92,19 +92,19 @@ export default function AdminStats() {
 
   if (authLoading) {
     return (
-      <main className="min-h-screen page-bg py-24 flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      <main className="min-h-screen bg-[#07090D] py-24 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-[#FF7582] border-t-transparent animate-spin" />
       </main>
     );
   }
 
   if (!user || !user.isAdmin) {
     return (
-      <main className="min-h-screen page-bg py-24 flex items-center justify-center">
-        <div className="text-center card rounded-2xl p-12 max-w-md mx-auto px-4">
+      <main className="min-h-screen bg-[#07090D] py-24 flex items-center justify-center">
+        <div className="text-center reticle-box p-12 max-w-md mx-auto px-4">
           <Shield size={64} className="mx-auto mb-6 text-gray-500" />
           <h1 className="text-3xl font-bold mb-4">Accès refusé</h1>
-          <Link href="/admin" className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all">
+          <Link href="/admin" className="inline-flex items-center gap-2 px-8 py-4 bg-[#FF7582] text-black font-bold font-semibold hover:shadow-lg hover:shadow-[#FF7582]/30 transition-all">
             Retour à l&apos;admin
           </Link>
         </div>
@@ -117,28 +117,28 @@ export default function AdminStats() {
       label: 'Total utilisateurs',
       value: userCount === null ? '…' : String(userCount),
       subtext: adminCount !== null ? `dont ${adminCount} admin(s)` : undefined,
-      gradient: 'from-purple-600 to-purple-400',
+      gradient: 'from-[#FF7582] to-[#FF7582]/60',
       icon: Users,
     },
     {
       label: 'Sessions ce mois',
       value: sessionsThisMonth === null ? '…' : String(sessionsThisMonth),
       subtext: totalSessions !== null ? `${totalSessions} au total` : undefined,
-      gradient: 'from-cyan-600 to-blue-400',
+      gradient: 'from-[#8FAFD4] to-[#8FAFD4]/60',
       icon: Clock,
     },
     {
       label: 'Revenus mensuels',
       value: monthlyRevenue === null ? '…' : `${monthlyRevenue} €`,
       subtext: 'estimé réservations',
-      gradient: 'from-green-600 to-emerald-400',
+      gradient: 'from-[#A4DE87] to-[#A4DE87]/60',
       icon: DollarSign,
     },
     {
       label: 'Taux satisfaction',
       value: '99 %',
       subtext: 'basé sur les avis vérifiés',
-      gradient: 'from-yellow-600 to-orange-400',
+      gradient: 'from-[#FF7582] to-[#8FAFD4]',
       icon: TrendingUp,
     },
   ];
@@ -148,7 +148,7 @@ export default function AdminStats() {
   const apexPct = totalGameSessions > 0 ? 100 - valPct : 50;
 
   return (
-    <main className="min-h-screen page-bg py-24">
+    <main className="min-h-screen bg-[#07090D] py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div className="mb-12">
@@ -157,11 +157,11 @@ export default function AdminStats() {
             Retour admin
           </Link>
           <div>
-            <div className="inline-block glass px-4 py-2 rounded-full mb-4">
-              <span className="text-sm text-cyan-400 font-medium">STATISTIQUES</span>
+            <div className="inline-block data-badge data-badge-acid mb-4">
+              <span className="text-sm text-[#8FAFD4] font-medium">STATISTIQUES</span>
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-              Statistiques <span className="text-gradient">globales</span>
+              Statistiques <span className="text-[#FF7582]">globales</span>
             </h1>
             <p className="text-xl text-gray-300 max-w-2xl">Vue d&apos;ensemble des métriques de la plateforme et du coaching</p>
           </div>
@@ -172,15 +172,15 @@ export default function AdminStats() {
           {stats.map((s) => (
             <div
               key={s.label}
-              className="card rounded-2xl p-6 hover:bg-white/5 transition-all"
+              className="reticle-box p-6 hover:bg-white/5 transition-all"
             >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-400 mb-1">{s.label}</p>
-                  <p className="text-4xl font-bold text-gradient">{s.value}</p>
+                  <p className="text-4xl font-bold text-[#FF7582]">{s.value}</p>
                   {s.subtext && <p className="text-xs text-gray-500 mt-1">{s.subtext}</p>}
                 </div>
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${s.gradient} flex items-center justify-center shrink-0`}>
+                <div className={`w-14 h-14 bg-gradient-to-br ${s.gradient} flex items-center justify-center shrink-0`}>
                   <s.icon size={24} className="text-white" />
                 </div>
               </div>
@@ -191,22 +191,22 @@ export default function AdminStats() {
         {/* Résumé utilisateurs & coaching */}
         <div className="grid md:grid-cols-2 gap-6 mb-12">
           {/* Répartition des comptes */}
-          <div className="card rounded-2xl p-6">
+          <div className="reticle-box p-6">
             <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <Users size={20} className="text-purple-400" />
+              <Users size={20} className="text-[#FF7582]" />
               Répartition des comptes
             </h3>
             <div className="grid grid-cols-3 gap-4 pt-2">
-              <div className="text-center p-3 rounded-xl bg-white/5 border border-white/5">
-                <p className="text-3xl font-bold text-gradient">{userCount ?? '…'}</p>
+              <div className="text-center p-3 bg-white/5 border border-white/5">
+                <p className="text-3xl font-bold text-[#FF7582]">{userCount ?? '…'}</p>
                 <p className="text-xs text-gray-400 mt-1">Total inscrits</p>
               </div>
-              <div className="text-center p-3 rounded-xl bg-white/5 border border-white/5">
+              <div className="text-center p-3 bg-white/5 border border-white/5">
                 <p className="text-3xl font-bold text-yellow-400">{adminCount ?? '…'}</p>
                 <p className="text-xs text-gray-400 mt-1">Admins</p>
               </div>
-              <div className="text-center p-3 rounded-xl bg-white/5 border border-white/5">
-                <p className="text-3xl font-bold text-blue-400">
+              <div className="text-center p-3 bg-white/5 border border-white/5">
+                <p className="text-3xl font-bold text-[#8FAFD4]">
                   {userCount !== null && adminCount !== null ? userCount - adminCount : '…'}
                 </p>
                 <p className="text-xs text-gray-400 mt-1">Membres</p>
@@ -215,26 +215,26 @@ export default function AdminStats() {
           </div>
 
           {/* Statut des réservations */}
-          <div className="card rounded-2xl p-6">
+          <div className="reticle-box p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold flex items-center gap-2">
-                <Calendar size={20} className="text-cyan-400" />
+                <Calendar size={20} className="text-[#8FAFD4]" />
                 Activité Coaching
               </h3>
-              <Link href="/admin/bookings" className="text-xs text-purple-400 hover:text-purple-300 transition-colors">
+              <Link href="/admin/bookings" className="text-xs text-[#FF7582] hover:text-[#FF7582]/80 transition-colors">
                 Gérer l&apos;agenda →
               </Link>
             </div>
             <div className="grid grid-cols-3 gap-4 pt-2">
-              <div className="text-center p-3 rounded-xl bg-white/5 border border-white/5">
-                <p className="text-3xl font-bold text-cyan-400">{sessionsThisMonth ?? '…'}</p>
+              <div className="text-center p-3 bg-white/5 border border-white/5">
+                <p className="text-3xl font-bold text-[#8FAFD4]">{sessionsThisMonth ?? '…'}</p>
                 <p className="text-xs text-gray-400 mt-1">Ce mois-ci</p>
               </div>
-              <div className="text-center p-3 rounded-xl bg-white/5 border border-white/5">
-                <p className="text-3xl font-bold text-purple-400">{totalSessions ?? '…'}</p>
+              <div className="text-center p-3 bg-white/5 border border-white/5">
+                <p className="text-3xl font-bold text-[#FF7582]">{totalSessions ?? '…'}</p>
                 <p className="text-xs text-gray-400 mt-1">Total actives</p>
               </div>
-              <div className="text-center p-3 rounded-xl bg-white/5 border border-white/5">
+              <div className="text-center p-3 bg-white/5 border border-white/5">
                 <p className="text-3xl font-bold text-green-400">{completedSessions ?? '…'}</p>
                 <p className="text-xs text-gray-400 mt-1">Terminées</p>
               </div>
@@ -243,14 +243,14 @@ export default function AdminStats() {
         </div>
 
         {/* Répartition par jeu & Performance */}
-        <div className="card rounded-2xl p-8">
+        <div className="reticle-box p-8">
           <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
-            <Gamepad2 size={24} className="text-cyan-400" />
+            <Gamepad2 size={24} className="text-[#8FAFD4]" />
             Répartition par jeu des sessions
           </h3>
           <div className="grid sm:grid-cols-2 gap-6">
             {/* Valorant */}
-            <div className="glass rounded-xl p-6 space-y-4">
+            <div className="bg-black/40 border border-white/10 backdrop-blur-md p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">🎯</span>
@@ -261,16 +261,16 @@ export default function AdminStats() {
                 </div>
                 <span className="text-2xl font-bold text-red-400">{totalGameSessions > 0 ? `${valPct}%` : '—'}</span>
               </div>
-              <div className="w-full h-3 bg-white/5 rounded-full overflow-hidden">
+              <div className="w-full h-3 bg-white/5 overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-red-600 to-rose-400 rounded-full transition-all duration-500"
+                  className="h-full bg-gradient-to-r from-[#FF7582] to-[#FF7582]/60 transition-all duration-500"
                   style={{ width: `${totalGameSessions > 0 ? valPct : 0}%` }}
                 />
               </div>
             </div>
 
             {/* Apex Legends */}
-            <div className="glass rounded-xl p-6 space-y-4">
+            <div className="bg-black/40 border border-white/10 backdrop-blur-md p-6 space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">⚡</span>
@@ -281,9 +281,9 @@ export default function AdminStats() {
                 </div>
                 <span className="text-2xl font-bold text-amber-400">{totalGameSessions > 0 ? `${apexPct}%` : '—'}</span>
               </div>
-              <div className="w-full h-3 bg-white/5 rounded-full overflow-hidden">
+              <div className="w-full h-3 bg-white/5 overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-amber-600 to-yellow-400 rounded-full transition-all duration-500"
+                  className="h-full bg-gradient-to-r from-[#A4DE87] to-[#A4DE87]/60 transition-all duration-500"
                   style={{ width: `${totalGameSessions > 0 ? apexPct : 0}%` }}
                 />
               </div>

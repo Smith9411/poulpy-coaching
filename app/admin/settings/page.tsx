@@ -143,20 +143,20 @@ export default function AdminSettings() {
 
   if (authLoading || isLoading) {
     return (
-      <main className="min-h-screen page-bg py-24 flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      <main className="min-h-screen bg-[#07090D] py-24 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-[#FF7582] border-t-transparent animate-spin" />
       </main>
     );
   }
 
   if (!user || !user.isAdmin) {
     return (
-      <main className="min-h-screen page-bg py-24 flex items-center justify-center">
-        <div className="text-center card rounded-2xl p-12 max-w-md mx-auto px-4">
+      <main className="min-h-screen bg-[#07090D] py-24 flex items-center justify-center">
+        <div className="text-center reticle-box p-12 max-w-md mx-auto px-4">
           <Shield size={64} className="mx-auto mb-6 text-gray-500" />
           <h1 className="text-3xl font-bold mb-4">Accès refusé</h1>
           <p className="text-gray-400 mb-8">Tu n&apos;as pas les permissions d&apos;administrateur.</p>
-          <Link href="/admin" className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all">
+          <Link href="/admin" className="btn-cyber-primary">
             Retour à l&apos;admin
           </Link>
         </div>
@@ -250,7 +250,7 @@ export default function AdminSettings() {
     {
       section: 'Identité du site',
       icon: Type,
-      color: 'text-purple-400',
+      color: 'text-[#FF7582]',
       items: [
         {
           key: 'siteName' as const,
@@ -282,7 +282,7 @@ export default function AdminSettings() {
     {
       section: 'Réseaux sociaux & médias',
       icon: Globe,
-      color: 'text-cyan-400',
+      color: 'text-[#8FAFD4]',
       items: [
         {
           key: 'discordUrl' as const,
@@ -316,7 +316,7 @@ export default function AdminSettings() {
   ];
 
   return (
-    <main className="min-h-screen page-bg py-24">
+    <main className="min-h-screen bg-[#07090D] py-24">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-12">
           <Link href="/admin" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6">
@@ -324,11 +324,11 @@ export default function AdminSettings() {
             Retour admin
           </Link>
           <div>
-            <div className="inline-block glass px-4 py-2 rounded-full mb-4">
+            <div className="inline-block data-badge data-badge-acid mb-4">
               <span className="text-sm text-yellow-400 font-medium">PARAMÈTRES</span>
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-              Paramètres <span className="text-gradient">du site</span>
+              Paramètres <span className="text-[#FF7582]">du site</span>
             </h1>
             <p className="text-xl text-gray-300 max-w-2xl">
               Configuration globale de la plateforme Poulpy Coaching. Les changements sont sauvegardés en base et s&apos;appliquent immédiatement sur tout le site.
@@ -337,7 +337,7 @@ export default function AdminSettings() {
         </div>
 
         {tableMissing && (
-          <div className="mb-6 p-5 rounded-xl bg-orange-500/10 border border-orange-500/40 text-orange-200">
+          <div className="mb-6 p-5 bg-orange-500/10 border border-orange-500/40 text-orange-200">
             <div className="flex items-start gap-3">
               <AlertTriangle size={22} className="text-orange-400 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
@@ -361,7 +361,7 @@ export default function AdminSettings() {
 
         {status && (
           <div
-            className={`mb-6 p-4 rounded-xl text-sm font-medium flex items-center gap-2 ${
+            className={`mb-6 p-4 text-sm font-medium flex items-center gap-2 ${
               status.type === 'success'
                 ? 'bg-green-500/20 border border-green-500/30 text-green-400'
                 : 'bg-red-500/20 border border-red-500/30 text-red-400'
@@ -374,9 +374,9 @@ export default function AdminSettings() {
 
         <form className="space-y-8" onSubmit={handleSave}>
           {fields.map((section) => (
-            <div key={section.section} className="card rounded-2xl p-6">
+            <div key={section.section} className="reticle-box p-6">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+                <div className="w-10 h-10 bg-white/5 border border-white/10 flex items-center justify-center">
                   <section.icon size={20} className={section.color} />
                 </div>
                 <h3 className="text-xl font-bold">{section.section}</h3>
@@ -400,10 +400,10 @@ export default function AdminSettings() {
                             onChange={(e) => updateField(field.key, e.target.value)}
                             rows={3}
                             placeholder={field.placeholder}
-                            className={`w-full rounded-xl bg-white/5 border text-inherit placeholder-gray-500 focus:outline-none focus:ring-1 transition-all px-4 py-3 ${
+                            className={`w-full bg-white/5 border text-inherit placeholder-gray-500 focus:outline-none focus:ring-1 transition-all px-4 py-3 ${
                               field.error
                                 ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/50'
-                                : 'border-white/10 focus:border-purple-500/50 focus:ring-purple-500/50'
+                                : 'border-white/10 focus:border-[#FF7582]/50 focus:ring-[#FF7582]/50'
                             }`}
                           />
                         ) : (
@@ -412,10 +412,10 @@ export default function AdminSettings() {
                             value={formData[field.key]}
                             onChange={(e) => updateField(field.key, e.target.value)}
                             placeholder={field.placeholder}
-                            className={`w-full rounded-xl bg-white/5 border text-inherit placeholder-gray-500 focus:outline-none focus:ring-1 transition-all px-4 py-3 ${
+                            className={`w-full bg-white/5 border text-inherit placeholder-gray-500 focus:outline-none focus:ring-1 transition-all px-4 py-3 ${
                               field.error
                                 ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/50'
-                                : 'border-white/10 focus:border-purple-500/50 focus:ring-purple-500/50'
+                                : 'border-white/10 focus:border-[#FF7582]/50 focus:ring-[#FF7582]/50'
                             }`}
                           />
                         )}
@@ -431,9 +431,9 @@ export default function AdminSettings() {
           ))}
 
           {/* Live Preview */}
-          <div className="card rounded-2xl p-6">
+          <div className="reticle-box p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+              <div className="w-10 h-10 bg-white/5 flex items-center justify-center">
                 <ExternalLink size={20} className="text-green-400" />
               </div>
               <h3 className="text-xl font-bold">Aperçu en temps réel</h3>
@@ -444,7 +444,7 @@ export default function AdminSettings() {
 
             <div className="grid sm:grid-cols-2 gap-4">
               {/* YouTube preview */}
-              <div className="rounded-xl bg-white/5 border border-white/10 p-4">
+              <div className="bg-white/5 border border-white/10 p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <YoutubeIcon size={18} />
                   <span className="font-semibold text-sm">YouTube</span>
@@ -454,7 +454,7 @@ export default function AdminSettings() {
                     href={`https://www.youtube.com/watch?v=${youtubeId}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block aspect-video w-full rounded-lg overflow-hidden bg-black relative group"
+                    className="block aspect-video w-full overflow-hidden bg-black relative group"
                   >
                     <img
                       src={getYouTubeThumbnail(youtubeId)}
@@ -462,7 +462,7 @@ export default function AdminSettings() {
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center shadow-lg">
+                      <div className="w-16 h-16 bg-red-600 flex items-center justify-center shadow-lg">
                         <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
                           <path d="M8 5v14l11-7z"/>
                         </svg>
@@ -470,7 +470,7 @@ export default function AdminSettings() {
                     </div>
                   </a>
                 ) : (
-                  <div className="aspect-video w-full rounded-lg bg-black/40 flex items-center justify-center text-gray-500 text-xs">
+                  <div className="aspect-video w-full bg-black/40 flex items-center justify-center text-gray-500 text-xs">
                     Aucune vidéo détectée (URL YouTube invalide)
                   </div>
                 )}
@@ -478,7 +478,7 @@ export default function AdminSettings() {
               </div>
 
               {/* Twitch preview */}
-              <div className="rounded-xl bg-white/5 border border-white/10 p-4">
+              <div className="bg-white/5 border border-white/10 p-4">
                 <div className="flex items-center gap-2 mb-2">
                   <TwitchIcon size={18} />
                   <span className="font-semibold text-sm">Twitch</span>
@@ -488,17 +488,17 @@ export default function AdminSettings() {
                     href={`https://www.twitch.tv/${twitchChannel}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block aspect-video w-full rounded-lg overflow-hidden bg-gradient-to-br from-purple-900 to-purple-700 relative group"
+                    className="block aspect-video w-full overflow-hidden bg-gradient-to-br from-[#090c10] to-[#141820] relative group"
                   >
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                       <TwitchIcon size={48} />
                       <div className="mt-3 text-white font-bold text-lg">@{twitchChannel}</div>
-                      <div className="mt-2 text-xs text-purple-200">Ouvrir sur Twitch</div>
+                      <div className="mt-2 text-xs text-[#FF7582]/60">Ouvrir sur Twitch</div>
                     </div>
                     <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </a>
                 ) : (
-                  <div className="aspect-video w-full rounded-lg bg-black/40 flex items-center justify-center text-gray-500 text-xs">
+                  <div className="aspect-video w-full bg-black/40 flex items-center justify-center text-gray-500 text-xs">
                     Aucune chaîne détectée (URL Twitch invalide)
                   </div>
                 )}
@@ -511,7 +511,7 @@ export default function AdminSettings() {
             <button
               type="button"
               onClick={handleReset}
-              className="px-6 py-3 card rounded-xl font-semibold hover:bg-white/10 transition-all flex items-center gap-2"
+              className="px-6 py-3 reticle-box font-semibold hover:bg-white/10 transition-all flex items-center gap-2"
             >
               <RotateCcw size={18} />
               Réinitialiser
@@ -519,11 +519,11 @@ export default function AdminSettings() {
             <button
               type="submit"
               disabled={isSaving || hasErrors || tableMissing}
-              className="px-8 py-3 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-8 py-3 bg-[#FF7582] text-black font-bold font-semibold hover:shadow-lg hover:shadow-[#FF7582]/30 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSaving ? (
                 <>
-                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent animate-spin" />
                   Sauvegarde...
                 </>
               ) : (

@@ -297,9 +297,9 @@ export default function VisualSheetEditor({
   return (
     <div className="space-y-6">
       {/* Barre d'outils d'ajout rapide en tête */}
-      <div className="p-3.5 rounded-2xl bg-[#14121F]/90 border border-purple-500/25 shadow-xl flex items-center justify-between gap-2 flex-wrap">
-        <div className="flex items-center gap-1.5 text-xs text-purple-300 font-semibold uppercase tracking-wider">
-          <Sparkles size={14} className="text-cyan-400" />
+      <div className="p-3.5 bg-[#14121F]/90 border border-purple-500/25 shadow-xl flex items-center justify-between gap-2 flex-wrap">
+        <div className="flex items-center gap-1.5 text-xs text-[#FF7582]/80 font-semibold uppercase tracking-wider">
+          <Sparkles size={14} className="text-[#8FAFD4]" />
           <span>Ajouter au document :</span>
         </div>
 
@@ -307,7 +307,7 @@ export default function VisualSheetEditor({
           <button
             type="button"
             onClick={() => addBlock('table')}
-            className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-600/30 to-cyan-500/30 hover:from-purple-600/50 hover:to-cyan-500/50 text-cyan-300 border border-cyan-500/30 text-xs font-bold flex items-center gap-1.5 transition-all hover:scale-105 shadow-sm"
+            className="px-3 py-1.5 bg-gradient-to-r from-purple-600/30 to-cyan-500/30 hover:from-purple-600/50 hover:to-cyan-500/50 text-[#8FAFD4]/80 border border-[#8FAFD4]/30 text-xs font-bold flex items-center gap-1.5 transition-all hover:scale-105 shadow-sm"
           >
             <Table size={14} />
             <span>+ Tableau</span>
@@ -316,7 +316,7 @@ export default function VisualSheetEditor({
           <button
             type="button"
             onClick={() => addBlock('checklist')}
-            className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+            className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-emerald-300 border border-emerald-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors"
           >
             <CheckSquare size={14} />
             <span>+ Checklist</span>
@@ -325,7 +325,7 @@ export default function VisualSheetEditor({
           <button
             type="button"
             onClick={() => addBlock('quote')}
-            className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-amber-300 border border-amber-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+            className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-amber-300 border border-amber-500/30 text-xs font-semibold flex items-center gap-1.5 transition-colors"
           >
             <Quote size={14} />
             <span>+ Conseil Coach</span>
@@ -334,7 +334,7 @@ export default function VisualSheetEditor({
           <button
             type="button"
             onClick={() => addBlock('h2')}
-            className="px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 text-xs font-semibold flex items-center gap-1 transition-colors"
+            className="px-2.5 py-1.5 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 text-xs font-semibold flex items-center gap-1 transition-colors"
           >
             <Heading2 size={14} />
             <span>+ Titre</span>
@@ -343,7 +343,7 @@ export default function VisualSheetEditor({
           <button
             type="button"
             onClick={() => addBlock('paragraph')}
-            className="px-2.5 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 text-xs font-semibold flex items-center gap-1 transition-colors"
+            className="px-2.5 py-1.5 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 text-xs font-semibold flex items-center gap-1 transition-colors"
           >
             <AlignLeft size={14} />
             <span>+ Texte</span>
@@ -353,13 +353,13 @@ export default function VisualSheetEditor({
 
       {/* Liste des blocs interactifs */}
       {blocks.length === 0 ? (
-        <div className="py-20 text-center border-2 border-dashed border-white/10 rounded-2xl bg-white/[0.01]">
+        <div className="py-20 text-center border-2 border-dashed border-white/10 bg-white/[0.01]">
           <Table size={40} className="text-gray-600 mx-auto mb-3" />
           <p className="text-gray-400 font-medium">La fiche est vide.</p>
           <p className="text-xs text-gray-500 mt-1 mb-4">Clique sur un bouton ci-dessus pour commencer avec un tableau ou un modèle.</p>
           <button
             onClick={() => addBlock('table')}
-            className="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold inline-flex items-center gap-2 transition-colors"
+            className="px-4 py-2 bg-[#FF7582] hover:bg-purple-700 text-white text-xs font-bold inline-flex items-center gap-2 transition-colors"
           >
             <Plus size={15} />
             Créer un premier tableau
@@ -369,7 +369,7 @@ export default function VisualSheetEditor({
         blocks.map((block, idx) => (
           <div
             key={block.id}
-            className="group relative rounded-2xl transition-all"
+            className="group relative transition-all"
           >
             {/* Rendu spécifique selon le type */}
             {block.type === 'table' && (
@@ -393,7 +393,7 @@ export default function VisualSheetEditor({
             )}
 
             {block.type === 'quote' && (
-              <div className="p-4 rounded-2xl bg-purple-950/30 border border-purple-500/30 glass relative shadow-lg">
+              <div className="p-4 bg-purple-950/30 border border-[#FF7582]/30 bg-black/40 border border-white/10 backdrop-blur-md relative shadow-lg">
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <div className="flex items-center gap-2 text-amber-300 text-xs font-bold">
                     <Quote size={15} />
@@ -410,13 +410,13 @@ export default function VisualSheetEditor({
                   onChange={(e) => updateBlock(idx, { ...block, content: e.target.value })}
                   placeholder="Conseil ou recommandation clé pour l'élève..."
                   rows={2}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-gray-200 focus:outline-none focus:border-amber-400/60 leading-relaxed resize-none transition-colors"
+                  className="w-full bg-white/5 border border-white/10 p-3 text-sm text-gray-200 focus:outline-none focus:border-amber-400/60 leading-relaxed resize-none transition-colors"
                 />
               </div>
             )}
 
             {(block.type === 'h1' || block.type === 'h2' || block.type === 'h3') && (
-              <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/10 relative group/title transition-colors">
+              <div className="p-3 bg-white/[0.02] border border-white/5 hover:border-white/10 relative group/title transition-colors">
                 <div className="flex items-center justify-between gap-2 mb-1.5">
                   <span className="text-[10px] uppercase font-bold text-gray-500">
                     {block.type === 'h1' ? 'Titre Principal (H1)' : block.type === 'h2' ? 'Titre de Section (H2)' : 'Sous-titre (H3)'}
@@ -432,7 +432,7 @@ export default function VisualSheetEditor({
                   value={block.content}
                   onChange={(e) => updateBlock(idx, { ...block, content: e.target.value })}
                   placeholder="Titre de la section..."
-                  className={`w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-purple-500 transition-colors ${
+                  className={`w-full bg-white/5 border border-white/10 px-3 py-2 text-white focus:outline-none focus:border-[#FF7582] transition-colors ${
                     block.type === 'h1' ? 'text-2xl font-black' : block.type === 'h2' ? 'text-xl font-bold' : 'text-base font-semibold'
                   }`}
                 />
@@ -440,7 +440,7 @@ export default function VisualSheetEditor({
             )}
 
             {block.type === 'paragraph' && (
-              <div className="p-3 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/10 relative group/para transition-colors">
+              <div className="p-3 bg-white/[0.02] border border-white/5 hover:border-white/10 relative group/para transition-colors">
                 <div className="flex items-center justify-between gap-2 mb-1">
                   <span className="text-[10px] uppercase font-bold text-gray-500">Texte / Notes</span>
                   <BlockControls
@@ -454,7 +454,7 @@ export default function VisualSheetEditor({
                   onChange={(e) => updateBlock(idx, { ...block, content: e.target.value })}
                   placeholder="Écris tes consignes, explications ou remarques..."
                   rows={3}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm text-gray-200 focus:outline-none focus:border-purple-500 leading-relaxed resize-y transition-colors"
+                  className="w-full bg-white/5 border border-white/10 p-3 text-sm text-gray-200 focus:outline-none focus:border-[#FF7582] leading-relaxed resize-y transition-colors"
                 />
               </div>
             )}
@@ -465,7 +465,7 @@ export default function VisualSheetEditor({
                 <button
                   type="button"
                   onClick={() => deleteBlock(idx)}
-                  className="opacity-0 group-hover/div:opacity-100 p-1 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all text-xs flex items-center gap-1"
+                  className="opacity-0 group-hover/div:opacity-100 p-1 text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all text-xs flex items-center gap-1"
                 >
                   <Trash2 size={12} /> Supprimer la ligne
                 </button>
@@ -474,9 +474,9 @@ export default function VisualSheetEditor({
             )}
 
             {block.type === 'image' && (
-              <div className="p-4 rounded-2xl bg-black/40 border border-white/10 relative shadow-xl">
+              <div className="p-4 bg-black/40 border border-white/10 relative shadow-xl">
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <span className="text-xs font-semibold text-cyan-300 flex items-center gap-1.5">
+                  <span className="text-xs font-semibold text-[#8FAFD4]/80 flex items-center gap-1.5">
                     <ImageIcon size={14} /> Capture d'écran
                   </span>
                   <BlockControls
@@ -485,7 +485,7 @@ export default function VisualSheetEditor({
                     onDelete={() => deleteBlock(idx)}
                   />
                 </div>
-                <div className="relative inline-block max-w-full rounded-xl overflow-hidden border border-white/15 bg-black/60">
+                <div className="relative inline-block max-w-full overflow-hidden border border-white/15 bg-black/60">
                   <img
                     src={block.url}
                     alt={block.alt || 'Capture'}
@@ -499,7 +499,7 @@ export default function VisualSheetEditor({
                     value={block.alt}
                     onChange={(e) => updateBlock(idx, { ...block, alt: e.target.value })}
                     placeholder="Légende de l'image (ex: Erreur de placement manche 8)..."
-                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-xs text-gray-300 focus:outline-none focus:border-cyan-400"
+                    className="w-full bg-white/5 border border-white/10 px-3 py-1.5 text-xs text-gray-300 focus:outline-none focus:border-[#8FAFD4]"
                   />
                 </div>
               </div>
@@ -513,7 +513,7 @@ export default function VisualSheetEditor({
         <button
           type="button"
           onClick={() => addBlock('table')}
-          className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-purple-500/30 transition-all hover:scale-105"
+          className="px-5 py-2.5 bg-[#FF7582] text-black font-bold hover:from-purple-500 hover:to-cyan-400 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-purple-500/30 transition-all hover:scale-105"
         >
           <Plus size={16} />
           <span>Ajouter un nouveau tableau</span>
@@ -528,14 +528,14 @@ export default function VisualSheetEditor({
         >
           <button
             onClick={() => setZoomImage(null)}
-            className="absolute top-6 right-6 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white"
+            className="absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 text-white"
           >
             <X size={24} />
           </button>
           <img
             src={zoomImage}
             alt="Plein écran"
-            className="max-h-[90vh] max-w-[90vw] object-contain rounded-xl shadow-2xl border border-white/10"
+            className="max-h-[90vh] max-w-[90vw] object-contain shadow-2xl border border-white/10"
             onClick={(e) => e.stopPropagation()}
           />
         </div>
@@ -613,7 +613,7 @@ function VisualTableBlock({
       {/* Barre supérieure du tableau avec boutons d'actions */}
       <div className="px-5 py-3 bg-white/[0.04] border-b border-white/10 flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white shadow-md">
+          <div className="w-8 h-8 bg-gradient-to-br from-[#FF7582] to-[#8FAFD4] flex items-center justify-center text-white shadow-md">
             <Table size={16} />
           </div>
           <div>
@@ -631,7 +631,7 @@ function VisualTableBlock({
           <button
             type="button"
             onClick={addColumn}
-            className="px-3.5 py-1.5 rounded-xl bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/40 text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all hover:scale-105"
+            className="px-3.5 py-1.5 bg-[#8FAFD4]/20 hover:bg-[#8FAFD4]/30 text-[#8FAFD4]/80 border border-[#8FAFD4]/40 text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all hover:scale-105"
             title="Ajouter une nouvelle colonne vers la droite"
           >
             <Plus size={14} />
@@ -641,7 +641,7 @@ function VisualTableBlock({
           <button
             type="button"
             onClick={addRow}
-            className="px-3.5 py-1.5 rounded-xl bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/40 text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all hover:scale-105"
+            className="px-3.5 py-1.5 bg-[#FF7582]/20 hover:bg-[#FF7582]/30 text-[#FF7582]/80 border border-[#FF7582]/40 text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all hover:scale-105"
             title="Ajouter une nouvelle ligne en bas"
           >
             <Plus size={14} />
@@ -672,13 +672,13 @@ function VisualTableBlock({
                       value={head}
                       onChange={(e) => updateHeader(cIdx, e.target.value)}
                       placeholder={`Colonne ${cIdx + 1}`}
-                      className="w-full px-3 py-2 rounded-xl bg-purple-950/40 border border-purple-500/40 text-purple-200 text-xs font-bold focus:outline-none focus:border-cyan-400 transition-colors shadow-inner"
+                      className="w-full px-3 py-2 bg-[#FF7582]/10 border border-[#FF7582]/40 text-[#FF7582]/60 text-xs font-bold focus:outline-none focus:border-[#8FAFD4] transition-colors shadow-inner"
                     />
                     {block.headers.length > 1 && (
                       <button
                         type="button"
                         onClick={() => removeColumn(cIdx)}
-                        className="p-1 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                        className="p-1 text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                         title="Supprimer cette colonne"
                       >
                         <Trash2 size={13} />
@@ -693,7 +693,7 @@ function VisualTableBlock({
                 <button
                   type="button"
                   onClick={addColumn}
-                  className="px-2.5 py-2 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-dashed border-cyan-500/40 text-xs font-semibold flex items-center gap-1 whitespace-nowrap transition-colors"
+                  className="px-2.5 py-2 bg-[#8FAFD4]/15 hover:bg-[#8FAFD4]/25 text-[#8FAFD4]/80 border border-dashed border-[#8FAFD4]/40 text-xs font-semibold flex items-center gap-1 whitespace-nowrap transition-colors"
                   title="Ajouter une colonne vers la droite"
                 >
                   <Plus size={13} />
@@ -716,7 +716,7 @@ function VisualTableBlock({
                       value={row[cIdx] || ''}
                       onChange={(e) => updateCell(rIdx, cIdx, e.target.value)}
                       placeholder="—"
-                      className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-200 text-xs focus:outline-none focus:border-purple-500 transition-colors"
+                      className="w-full px-3 py-2 bg-white/5 border border-white/10 text-gray-200 text-xs focus:outline-none focus:border-[#FF7582] transition-colors"
                     />
                   </td>
                 ))}
@@ -727,7 +727,7 @@ function VisualTableBlock({
                     <button
                       type="button"
                       onClick={() => removeRow(rIdx)}
-                      className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                      className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                       title="Supprimer cette ligne"
                     >
                       <Trash2 size={13} />
@@ -745,7 +745,7 @@ function VisualTableBlock({
         <button
           type="button"
           onClick={addRow}
-          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 text-xs font-semibold transition-colors"
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#FF7582]/15 hover:bg-purple-500/25 text-[#FF7582]/80 border border-[#FF7582]/30 text-xs font-semibold transition-colors"
         >
           <Plus size={14} />
           <span>+ Ajouter une ligne en bas</span>
@@ -797,7 +797,7 @@ function VisualChecklistBlock({
   };
 
   return (
-    <div className="p-4 rounded-2xl bg-[#110F1B]/80 border border-emerald-500/30 glass shadow-lg">
+    <div className="p-4 bg-[#090c10]/80 border border-emerald-500/30 bg-black/40 border border-white/10 backdrop-blur-md shadow-lg">
       <div className="flex items-center justify-between gap-2 mb-3">
         <div className="flex items-center gap-2 text-emerald-300 text-xs font-bold">
           <CheckSquare size={16} />
@@ -825,7 +825,7 @@ function VisualChecklistBlock({
               value={item.text}
               onChange={(e) => updateText(idx, e.target.value)}
               placeholder="Tâche ou consigne à réaliser..."
-              className={`flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-xs text-gray-200 focus:outline-none focus:border-emerald-500 transition-colors ${
+              className={`flex-1 bg-white/5 border border-white/10 px-3 py-2 text-xs text-gray-200 focus:outline-none focus:border-emerald-500 transition-colors ${
                 item.checked ? 'line-through text-gray-500' : ''
               }`}
             />
@@ -833,7 +833,7 @@ function VisualChecklistBlock({
               <button
                 type="button"
                 onClick={() => removeItem(idx)}
-                className="p-1 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                className="p-1 text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
               >
                 <Trash2 size={13} />
               </button>
@@ -845,7 +845,7 @@ function VisualChecklistBlock({
       <button
         type="button"
         onClick={addItem}
-        className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition-colors"
+        className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border border-emerald-500/30 text-xs font-semibold transition-colors"
       >
         <Plus size={14} />
         <span>Ajouter un objectif</span>
@@ -872,7 +872,7 @@ function BlockControls({
         <button
           type="button"
           onClick={onMoveUp}
-          className="p-1 rounded-lg text-gray-500 hover:text-white hover:bg-white/10 transition-colors"
+          className="p-1 text-gray-500 hover:text-white hover:bg-white/10 transition-colors"
           title="Monter"
         >
           <ArrowUp size={13} />
@@ -882,7 +882,7 @@ function BlockControls({
         <button
           type="button"
           onClick={onMoveDown}
-          className="p-1 rounded-lg text-gray-500 hover:text-white hover:bg-white/10 transition-colors"
+          className="p-1 text-gray-500 hover:text-white hover:bg-white/10 transition-colors"
           title="Descendre"
         >
           <ArrowDown size={13} />
@@ -891,7 +891,7 @@ function BlockControls({
       <button
         type="button"
         onClick={onDelete}
-        className="p-1 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+        className="p-1 text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
         title="Supprimer ce bloc"
       >
         <Trash2 size={13} />

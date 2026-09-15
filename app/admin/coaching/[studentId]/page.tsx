@@ -475,15 +475,15 @@ export default function StudentCoachingPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen page-bg flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+      <div className="min-h-screen bg-[#07090D] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#FF7582]" />
       </div>
     );
   }
 
   if (!user?.isAdmin) {
     return (
-      <div className="min-h-screen page-bg flex items-center justify-center">
+      <div className="min-h-screen bg-[#07090D] flex items-center justify-center">
         <div className="text-center">
           <Shield className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2">Accès refusé</h1>
@@ -494,7 +494,7 @@ export default function StudentCoachingPage() {
   }
 
   return (
-    <main className="min-h-screen page-bg py-24">
+    <main className="min-h-screen bg-[#07090D] py-24">
       {/* Lightbox zoom image */}
       {zoomedImage && (
         <div
@@ -503,14 +503,14 @@ export default function StudentCoachingPage() {
         >
           <button
             onClick={() => setZoomedImage(null)}
-            className="absolute top-6 right-6 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+            className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 text-white transition-colors"
           >
             <X size={24} />
           </button>
           <img
             src={zoomedImage}
             alt="Plein écran"
-            className="max-h-[90vh] max-w-[90vw] object-contain rounded-xl"
+            className="max-h-[90vh] max-w-[90vw] object-contain"
             onClick={(e) => e.stopPropagation()}
           />
         </div>
@@ -526,7 +526,7 @@ export default function StudentCoachingPage() {
             </Link>
             <Link
               href={`/admin/coaching/${studentId}/clips`}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20 text-xs font-semibold transition-colors"
+              className="inline-flex items-center gap-2 px-3 py-1.5 bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20 text-xs font-semibold transition-colors"
             >
               🎬 Voir les clips VOD de l&apos;élève
             </Link>
@@ -543,7 +543,7 @@ export default function StudentCoachingPage() {
                 type="button"
                 onClick={() => setShowConfirmClear(true)}
                 disabled={messages.length === 0}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 text-sm font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                 title="Supprimer définitivement tous les messages de cette conversation"
               >
                 <Trash2 size={16} />
@@ -554,14 +554,14 @@ export default function StudentCoachingPage() {
                 role="dialog"
                 aria-modal="true"
                 aria-label="Confirmation de suppression de la conversation"
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-xl bg-red-500/10 border border-red-500/30"
+                className="inline-flex items-center gap-2 px-3 py-2 bg-red-500/10 border border-red-500/30"
               >
                 <span className="text-sm text-red-300">Confirmer la suppression ?</span>
                 <button
                   type="button"
                   onClick={handleClearConversation}
                   disabled={isClearing}
-                  className="px-3 py-1 rounded-lg bg-red-500 hover:bg-red-600 text-white text-xs font-semibold transition-colors disabled:opacity-50 flex items-center gap-1"
+                  className="px-3 py-1 bg-red-500 hover:bg-red-600 text-white text-xs font-semibold transition-colors disabled:opacity-50 flex items-center gap-1"
                 >
                   {isClearing ? <Loader2 size={12} className="animate-spin" /> : <Trash2 size={12} />}
                   Oui, tout supprimer
@@ -570,7 +570,7 @@ export default function StudentCoachingPage() {
                   type="button"
                   onClick={() => setShowConfirmClear(false)}
                   disabled={isClearing}
-                  className="px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-medium transition-colors disabled:opacity-50"
+                  className="px-3 py-1 bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-medium transition-colors disabled:opacity-50"
                 >
                   Annuler
                 </button>
@@ -581,18 +581,18 @@ export default function StudentCoachingPage() {
 
         {/* Jeux, Rang & Réseaux */}
         {student && (
-          <div className="card rounded-2xl p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
+          <div className="reticle-box p-4 mb-6 flex flex-wrap items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-3">
               {(student.valorantRank || student.apexRank) && (
                 <>
-                  <span className="text-xs uppercase tracking-wide text-gray-500 font-semibold">Jeux & rang</span>
+                  <span className="text-xs uppercase tracking-wide text-gray-500 font-semibold">Jeux &amp; rang</span>
                   {student.valorantRank && (
-                    <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-500/15 border border-red-500/30 text-red-300 text-sm font-medium">
+                    <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-red-500/15 border border-red-500/30 text-red-300 text-sm font-medium">
                       🔫 Valorant · <span className="font-bold">{student.valorantRank}</span>
                     </span>
                   )}
                   {student.apexRank && (
-                    <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-300 text-sm font-medium">
+                    <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-orange-500/15 border border-orange-500/30 text-orange-300 text-sm font-medium">
                       ⚡ Apex Legends · <span className="font-bold">{student.apexRank}</span>
                     </span>
                   )}
@@ -617,13 +617,13 @@ export default function StudentCoachingPage() {
         )}
 
         {error && (
-          <div className="mb-4 p-3 rounded-xl bg-red-500/20 border border-red-500/30 text-red-400 text-sm flex items-center gap-2">
+          <div className="mb-4 p-3 bg-red-500/20 border border-red-500/30 text-red-400 text-sm flex items-center gap-2">
             <AlertCircle size={16} />
             <span>{error}</span>
           </div>
         )}
 
-        <div className="card rounded-2xl overflow-hidden flex flex-col h-[70vh]">
+        <div className="reticle-box overflow-hidden flex flex-col h-[70vh]">
           {/* Zone des messages */}
           <div
             ref={scrollRef}
@@ -635,7 +635,7 @@ export default function StudentCoachingPage() {
           >
             {isLoading ? (
               <div className="flex items-center justify-center h-full">
-                <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+                <Loader2 className="w-8 h-8 animate-spin text-[#FF7582]" />
               </div>
             ) : messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-gray-500">
@@ -648,14 +648,14 @@ export default function StudentCoachingPage() {
                 return (
                   <div key={msg.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
                     <div
-                      className={`max-w-[75%] rounded-2xl px-4 py-3 shadow-lg ${
+                      className={`max-w-[75%] px-4 py-3 shadow-lg ${
                         isMine
-                          ? 'bg-gradient-to-br from-purple-600 to-cyan-500 text-white'
+                          ? 'bg-gradient-to-br from-[#FF7582] to-[#8FAFD4] text-black font-bold'
                           : 'bg-white/5 border border-white/10 text-gray-200'
                       }`}
                     >
                       {!isMine && (
-                        <div className="text-xs font-semibold text-purple-400 mb-1">{student?.username}</div>
+                        <div className="text-xs font-semibold text-[#FF7582] mb-1">{student?.username}</div>
                       )}
                       {isMine && msg.message_type !== 'student' && (
                         <div className="text-xs font-semibold text-white/80 mb-1">{msg.message_type}</div>
@@ -669,7 +669,7 @@ export default function StudentCoachingPage() {
                               src={msg.attachment_url}
                               alt="Capture"
                               onClick={() => setZoomedImage(msg.attachment_url!)}
-                              className="max-h-72 max-w-full rounded-xl object-contain cursor-pointer hover:opacity-95 transition-opacity"
+                              className="max-h-72 max-w-full object-contain cursor-pointer hover:opacity-95 transition-opacity"
                             />
                           )}
                           {msg.attachment_type === 'video' && (
@@ -677,7 +677,7 @@ export default function StudentCoachingPage() {
                               src={msg.attachment_url}
                               controls
                               playsInline
-                              className="max-h-80 max-w-full rounded-xl bg-black"
+                              className="max-h-80 max-w-full bg-black"
                             />
                           )}
                           {msg.attachment_type === 'audio' && (
@@ -724,9 +724,9 @@ export default function StudentCoachingPage() {
                     key={t}
                     type="button"
                     onClick={() => setMessageType(t)}
-                    className={`px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize transition-all ${
+                    className={`px-2.5 py-0.5 text-xs font-semibold capitalize transition-all ${
                       messageType === t
-                        ? 'bg-purple-500/30 text-purple-300 border border-purple-500/50'
+                        ? 'bg-[#FF7582]/20 text-[#FF7582] border border-[#FF7582]/50'
                         : 'bg-white/5 text-gray-400 hover:text-white border border-transparent'
                     }`}
                   >
@@ -738,12 +738,12 @@ export default function StudentCoachingPage() {
 
             {/* Prévisualisation média attaché */}
             {selectedFile && (
-              <div className="mb-2 p-2 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3">
+              <div className="mb-2 p-2 bg-white/5 border border-white/10 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 min-w-0">
                   {selectedFile.type === 'image' ? (
-                    <img src={selectedFile.previewUrl} alt="Preview" className="w-12 h-12 rounded-lg object-cover" />
+                    <img src={selectedFile.previewUrl} alt="Preview" className="w-12 h-12 object-cover" />
                   ) : (
-                    <video src={selectedFile.previewUrl} className="w-12 h-12 rounded-lg object-cover bg-black" />
+                    <video src={selectedFile.previewUrl} className="w-12 h-12 object-cover bg-black" />
                   )}
                   <div className="min-w-0">
                     <p className="text-xs font-semibold text-white truncate">{selectedFile.file.name}</p>
@@ -753,7 +753,7 @@ export default function StudentCoachingPage() {
                 <button
                   type="button"
                   onClick={removeSelectedFile}
-                  className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white transition-colors"
+                  className="p-1.5 bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white transition-colors"
                 >
                   <X size={14} />
                 </button>
@@ -762,9 +762,9 @@ export default function StudentCoachingPage() {
 
             {/* Mode enregistrement vocal en cours */}
             {isRecording ? (
-              <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-xl bg-red-500/10 border border-red-500/30">
+              <div className="flex items-center justify-between gap-3 px-3 py-2 bg-red-500/10 border border-red-500/30">
                 <div className="flex items-center gap-2.5">
-                  <span className="w-3 h-3 rounded-full bg-red-500 animate-ping" />
+                  <span className="w-3 h-3 bg-red-500 animate-ping" />
                   <span className="text-sm font-semibold text-red-300">Enregistrement note vocale...</span>
                   <span className="text-xs font-mono text-red-400 bg-red-500/20 px-2 py-0.5 rounded">
                     {formatRecordTime(recordingSeconds)}
@@ -774,14 +774,14 @@ export default function StudentCoachingPage() {
                   <button
                     type="button"
                     onClick={cancelRecording}
-                    className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-medium transition-colors"
+                    className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-medium transition-colors"
                   >
                     Annuler
                   </button>
                   <button
                     type="button"
                     onClick={stopAndSendRecording}
-                    className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-500 text-white text-xs font-semibold hover:shadow-md transition-all"
+                    className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-[#FF7582] text-black font-bold text-white text-xs font-semibold hover:shadow-md transition-all"
                   >
                     <Send size={12} />
                     Envoyer le vocal
@@ -805,7 +805,7 @@ export default function StudentCoachingPage() {
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isSending}
                   title="Joindre une image ou un extrait vidéo"
-                  className="p-3 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors border border-white/10 disabled:opacity-50"
+                  className="p-3 bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors border border-white/10 disabled:opacity-50"
                 >
                   <Paperclip size={18} />
                 </button>
@@ -816,7 +816,7 @@ export default function StudentCoachingPage() {
                   onClick={startRecording}
                   disabled={isSending}
                   title="Enregistrer une note vocale"
-                  className="p-3 rounded-xl bg-white/5 hover:bg-white/10 text-purple-400 hover:text-purple-300 transition-colors border border-white/10 disabled:opacity-50"
+                  className="p-3 bg-white/5 hover:bg-white/10 text-[#FF7582] hover:text-[#FF7582]/80 transition-colors border border-white/10 disabled:opacity-50"
                 >
                   <Mic size={18} />
                 </button>
@@ -829,14 +829,14 @@ export default function StudentCoachingPage() {
                   placeholder={selectedFile ? "Ajoute un commentaire (optionnel)..." : "Écris un message à l'élève..."}
                   disabled={isSending}
                   maxLength={2000}
-                  className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500 disabled:opacity-50 text-sm"
+                  className="flex-1 px-4 py-3 bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-[#FF7582] disabled:opacity-50 text-sm"
                 />
 
                 {/* Bouton envoyer */}
                 <button
                   type="submit"
                   disabled={isSending || (!newMessage.trim() && !selectedFile)}
-                  className="px-5 py-3 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40 transition-all disabled:opacity-40 flex items-center gap-2 shrink-0"
+                  className="px-5 py-3 bg-[#FF7582] text-black font-bold font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40 transition-all disabled:opacity-40 flex items-center gap-2 shrink-0"
                 >
                   {isSending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
                 </button>

@@ -170,13 +170,13 @@ export default function VisualTableModal({
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
       <div
-        className="bg-[#110F1A] border border-purple-500/30 rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden my-8"
+        className="bg-[#090c10] border border-[#FF7582]/30 w-full max-w-4xl shadow-2xl overflow-hidden my-8"
         onClick={e => e.stopPropagation()}
       >
         {/* Header Modal */}
         <div className="px-6 py-4 bg-white/5 border-b border-white/10 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white shadow-md">
+            <div className="w-9 h-9 bg-gradient-to-br from-[#FF7582] to-[#8FAFD4] flex items-center justify-center text-white shadow-md">
               <Table size={18} />
             </div>
             <div>
@@ -190,7 +190,7 @@ export default function VisualTableModal({
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-2 text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
           >
             <X size={18} />
           </button>
@@ -199,7 +199,7 @@ export default function VisualTableModal({
         {/* Presets rapides (uniquement en mode création) */}
         {mode === 'insert' && (
           <div className="px-6 py-3 bg-white/[0.02] border-b border-white/5 flex items-center gap-2 flex-wrap">
-            <span className="text-xs text-purple-300 font-semibold flex items-center gap-1 mr-2">
+            <span className="text-xs text-[#FF7582]/80 font-semibold flex items-center gap-1 mr-2">
               <Sparkles size={13} /> Modèles :
             </span>
             {Object.entries(PRESETS).map(([key, preset]) => (
@@ -207,7 +207,7 @@ export default function VisualTableModal({
                 key={key}
                 type="button"
                 onClick={() => handleApplyPreset(key)}
-                className="px-3 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-medium border border-white/10 hover:border-purple-500/40 transition-colors flex items-center gap-1.5"
+                className="px-3 py-1 bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-medium border border-white/10 hover:border-[#FF7582]/40 transition-colors flex items-center gap-1.5"
               >
                 <span>{preset.icon}</span>
                 <span>{preset.label}</span>
@@ -232,13 +232,13 @@ export default function VisualTableModal({
                           value={head}
                           onChange={e => handleHeaderChange(colIdx, e.target.value)}
                           placeholder={`Colonne ${colIdx + 1}`}
-                          className="w-full px-3 py-2 rounded-xl bg-purple-950/40 border border-purple-500/40 text-purple-200 text-xs font-bold focus:outline-none focus:border-cyan-400"
+                          className="w-full px-3 py-2 bg-[#FF7582]/10 border border-[#FF7582]/40 text-[#FF7582]/60 text-xs font-bold focus:outline-none focus:border-[#8FAFD4]"
                         />
                         {headers.length > 1 && (
                           <button
                             type="button"
                             onClick={() => handleRemoveColumn(colIdx)}
-                            className="p-1 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                            className="p-1 text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                             title="Supprimer cette colonne"
                           >
                             <Trash2 size={13} />
@@ -253,7 +253,7 @@ export default function VisualTableModal({
                     <button
                       type="button"
                       onClick={handleAddColumn}
-                      className="px-3 py-2 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 text-xs font-bold flex items-center gap-1 whitespace-nowrap shadow-sm hover:scale-105 transition-all"
+                      className="px-3 py-2 bg-[#8FAFD4]/15 hover:bg-[#8FAFD4]/25 text-[#8FAFD4]/80 border border-[#8FAFD4]/30 text-xs font-bold flex items-center gap-1 whitespace-nowrap shadow-sm hover:scale-105 transition-all"
                       title="Ajouter une colonne vers la droite"
                     >
                       <Plus size={14} />
@@ -277,7 +277,7 @@ export default function VisualTableModal({
                           value={row[colIdx] || ''}
                           onChange={e => handleCellChange(rowIdx, colIdx, e.target.value)}
                           placeholder="—"
-                          className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-gray-200 text-xs focus:outline-none focus:border-purple-500 transition-colors"
+                          className="w-full px-3 py-2 bg-white/5 border border-white/10 text-gray-200 text-xs focus:outline-none focus:border-[#FF7582] transition-colors"
                         />
                       </td>
                     ))}
@@ -288,7 +288,7 @@ export default function VisualTableModal({
                         <button
                           type="button"
                           onClick={() => handleRemoveRow(rowIdx)}
-                          className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                          className="p-1.5 text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"
                           title="Supprimer cette ligne"
                         >
                           <Trash2 size={14} />
@@ -306,7 +306,7 @@ export default function VisualTableModal({
             <button
               type="button"
               onClick={handleAddRow}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 text-xs font-semibold shadow-sm transition-all hover:scale-102"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#FF7582]/15 hover:bg-purple-500/25 text-[#FF7582]/80 border border-[#FF7582]/30 text-xs font-semibold shadow-sm transition-all hover:scale-102"
             >
               <Plus size={15} />
               <span>Ajouter une ligne en bas</span>
@@ -316,13 +316,13 @@ export default function VisualTableModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 text-xs font-medium transition-colors"
+                className="px-4 py-2 text-gray-400 hover:text-white hover:bg-white/5 text-xs font-medium transition-colors"
               >
                 Annuler
               </button>
               <button
                 type="submit"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white text-xs font-bold shadow-lg shadow-purple-500/30 transition-all hover:scale-105"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FF7582] text-black font-bold hover:from-purple-500 hover:to-cyan-400 text-white text-xs font-bold shadow-lg shadow-purple-500/30 transition-all hover:scale-105"
               >
                 <Check size={16} />
                 <span>{mode === 'edit' ? 'Mettre à jour le tableau' : 'Insérer dans la fiche'}</span>

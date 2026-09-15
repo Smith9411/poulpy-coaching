@@ -29,7 +29,7 @@ export default function SheetMarkdownPreview({
 
   if (!content || !content.trim()) {
     return (
-      <div className="text-gray-500 italic py-16 text-center border border-dashed border-white/10 rounded-2xl bg-white/[0.01]">
+      <div className="text-gray-500 italic py-16 text-center border border-dashed border-white/10 bg-white/[0.01]">
         <p className="font-medium text-gray-400 mb-1">La fiche est vide pour le moment.</p>
         <p className="text-xs text-gray-500">Utilise la barre d&apos;outils ou les modèles ci-dessus pour ajouter des objectifs, des routines ou des captures.</p>
       </div>
@@ -57,12 +57,12 @@ export default function SheetMarkdownPreview({
           <span key={`img-${keyIdx++}`} className="inline-block my-2 max-w-full">
             <span
               onClick={() => setZoomImage(src)}
-              className="group relative inline-block cursor-zoom-in rounded-xl overflow-hidden border border-white/20 bg-black/40 shadow-lg hover:border-purple-500/50 transition-all"
+              className="group relative inline-block cursor-zoom-in overflow-hidden border border-white/20 bg-black/40 shadow-lg hover:border-[#FF7582]/50 transition-all"
             >
               <img
                 src={src}
                 alt={alt}
-                className="max-h-80 max-w-full rounded-xl object-contain hover:scale-[1.01] transition-transform"
+                className="max-h-80 max-w-full object-contain hover:scale-[1.01] transition-transform"
                 loading="lazy"
               />
               <span className="absolute bottom-2 right-2 px-2 py-1 rounded-md bg-black/70 text-white text-[11px] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
@@ -87,7 +87,7 @@ export default function SheetMarkdownPreview({
             href={linkMatch[2]}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-cyan-400 hover:text-cyan-300 underline inline-flex items-center gap-0.5"
+            className="text-[#8FAFD4] hover:text-[#8FAFD4]/80 underline inline-flex items-center gap-0.5"
           >
             {linkMatch[1]}
             <ExternalLink size={12} className="inline ml-0.5" />
@@ -188,7 +188,7 @@ export default function SheetMarkdownPreview({
       }
       i = nextIdx; // saute après le bloc fermant
       blocks.push(
-        <pre key={`codeblock-${i}`} className="p-4 rounded-xl bg-black/50 border border-white/10 overflow-x-auto text-sm text-cyan-300 font-mono my-4">
+        <pre key={`codeblock-${i}`} className="p-4 bg-black/50 border border-white/10 overflow-x-auto text-sm text-[#8FAFD4]/80 font-mono my-4">
           <code>{codeLines.join('\n')}</code>
         </pre>
       );
@@ -203,21 +203,21 @@ export default function SheetMarkdownPreview({
         const titleText = match[2];
         if (level === 1) {
           blocks.push(
-            <h1 key={`h1-${i}`} className="text-2xl sm:text-3xl font-black text-white mt-6 mb-3 pb-2 border-b border-purple-500/30 flex items-center gap-2">
-              <span className="w-2 h-6 bg-gradient-to-b from-purple-500 to-cyan-500 rounded-full inline-block flex-shrink-0" />
+            <h1 key={`h1-${i}`} className="text-2xl sm:text-3xl font-black text-white mt-6 mb-3 pb-2 border-b border-[#FF7582]/30 flex items-center gap-2">
+              <span className="w-2 h-6 bg-gradient-to-b from-[#FF7582] to-[#8FAFD4] inline-block flex-shrink-0" />
               <span>{renderInline(titleText)}</span>
             </h1>
           );
         } else if (level === 2) {
           blocks.push(
             <h2 key={`h2-${i}`} className="text-xl sm:text-2xl font-bold text-white mt-5 mb-2 flex items-center gap-2">
-              <span className="w-1.5 h-4 bg-purple-400 rounded-full inline-block flex-shrink-0" />
+              <span className="w-1.5 h-4 bg-purple-400 inline-block flex-shrink-0" />
               <span>{renderInline(titleText)}</span>
             </h2>
           );
         } else if (level === 3) {
           blocks.push(
-            <h3 key={`h3-${i}`} className="text-lg font-semibold text-purple-200 mt-4 mb-2">
+            <h3 key={`h3-${i}`} className="text-lg font-semibold text-[#FF7582]/60 mt-4 mb-2">
               {renderInline(titleText)}
             </h3>
           );
@@ -244,7 +244,7 @@ export default function SheetMarkdownPreview({
       blocks.push(
         <blockquote
           key={`quote-${i}`}
-          className="my-4 p-4 rounded-xl bg-purple-950/20 border-l-4 border-purple-500 text-gray-200 text-sm leading-relaxed glass shadow-sm"
+          className="my-4 p-4 bg-[#FF7582]/5 border-l-4 border-purple-500 text-gray-200 text-sm leading-relaxed bg-black/40 border border-white/10 backdrop-blur-md shadow-sm"
         >
           {quoteLines.map((ql, qIdx) => (
             <div key={qIdx} className={qIdx > 0 ? 'mt-1' : ''}>
@@ -283,18 +283,18 @@ export default function SheetMarkdownPreview({
         );
 
         blocks.push(
-          <div key={`table-${i}`} className="my-6 rounded-xl border border-white/10 bg-black/25 shadow-lg overflow-hidden group">
+          <div key={`table-${i}`} className="my-6 border border-white/10 bg-black/25 shadow-lg overflow-hidden group">
             {/* Barre d'action rapide sur le tableau si éditable */}
             {editable && (
               <div className="px-4 py-2 bg-white/[0.03] border-b border-white/10 flex items-center justify-between gap-2 flex-wrap print:hidden">
-                <span className="text-[11px] font-semibold text-purple-300/80 flex items-center gap-1.5 uppercase tracking-wide">
+                <span className="text-[11px] font-semibold text-[#FF7582]/80/80 flex items-center gap-1.5 uppercase tracking-wide">
                   <Table size={13} /> Tableau #{thisTableIndex + 1}
                 </span>
                 <div className="flex items-center gap-1.5">
                   <button
                     type="button"
                     onClick={() => onAddColumnToTable?.(thisTableIndex)}
-                    className="px-2.5 py-1 rounded-lg bg-cyan-500/15 hover:bg-cyan-500/25 text-cyan-300 border border-cyan-500/30 text-xs font-semibold flex items-center gap-1 transition-all hover:scale-105"
+                    className="px-2.5 py-1 bg-[#8FAFD4]/15 hover:bg-[#8FAFD4]/25 text-[#8FAFD4]/80 border border-[#8FAFD4]/30 text-xs font-semibold flex items-center gap-1 transition-all hover:scale-105"
                     title="Ajouter une colonne vers la droite"
                   >
                     <Plus size={13} />
@@ -303,7 +303,7 @@ export default function SheetMarkdownPreview({
                   <button
                     type="button"
                     onClick={() => onAddRowToTable?.(thisTableIndex)}
-                    className="px-2.5 py-1 rounded-lg bg-purple-500/15 hover:bg-purple-500/25 text-purple-300 border border-purple-500/30 text-xs font-semibold flex items-center gap-1 transition-all hover:scale-105"
+                    className="px-2.5 py-1 bg-[#FF7582]/15 hover:bg-purple-500/25 text-[#FF7582]/80 border border-[#FF7582]/30 text-xs font-semibold flex items-center gap-1 transition-all hover:scale-105"
                     title="Ajouter une ligne en bas"
                   >
                     <Plus size={13} />
@@ -312,7 +312,7 @@ export default function SheetMarkdownPreview({
                   <button
                     type="button"
                     onClick={() => onEditTable?.(thisTableIndex, { headers: headerCells, rows: parsedRows })}
-                    className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 text-xs font-semibold flex items-center gap-1 transition-all"
+                    className="px-2.5 py-1 bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-white/10 text-xs font-semibold flex items-center gap-1 transition-all"
                     title="Ouvrir l'éditeur visuel pour modifier les cellules"
                   >
                     <Edit3 size={13} />
@@ -325,7 +325,7 @@ export default function SheetMarkdownPreview({
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm border-collapse">
                 <thead>
-                  <tr className="bg-white/5 border-b border-white/15 text-purple-300 font-semibold uppercase tracking-wider text-xs">
+                  <tr className="bg-white/5 border-b border-white/15 text-[#FF7582]/80 font-semibold uppercase tracking-wider text-xs">
                     {headerCells.map((cell, cIdx) => (
                       <th key={cIdx} className="px-4 py-3 whitespace-nowrap">
                         {renderInline(cell)}
@@ -447,12 +447,12 @@ export default function SheetMarkdownPreview({
         <div key={`block-img-${i}`} className="my-6">
           <div
             onClick={() => setZoomImage(src)}
-            className="group relative cursor-zoom-in rounded-2xl overflow-hidden border border-white/15 bg-black/40 shadow-xl inline-block max-w-full"
+            className="group relative cursor-zoom-in overflow-hidden border border-white/15 bg-black/40 shadow-xl inline-block max-w-full"
           >
             <img
               src={src}
               alt={alt}
-              className="max-h-96 max-w-full rounded-2xl object-contain hover:scale-[1.01] transition-transform"
+              className="max-h-96 max-w-full object-contain hover:scale-[1.01] transition-transform"
               loading="lazy"
             />
             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 text-white font-medium text-sm pointer-events-none">
@@ -487,14 +487,14 @@ export default function SheetMarkdownPreview({
         >
           <button
             onClick={() => setZoomImage(null)}
-            className="absolute top-6 right-6 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+            className="absolute top-6 right-6 p-2 bg-white/10 hover:bg-white/20 text-white transition-colors"
           >
             <X size={24} />
           </button>
           <img
             src={zoomImage}
             alt="Capture plein écran"
-            className="max-h-[90vh] max-w-[90vw] object-contain rounded-xl shadow-2xl border border-white/10"
+            className="max-h-[90vh] max-w-[90vw] object-contain shadow-2xl border border-white/10"
             onClick={e => e.stopPropagation()}
           />
         </div>

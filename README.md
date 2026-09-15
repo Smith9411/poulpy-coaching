@@ -269,7 +269,9 @@ Fonctionnement côté app : après le retour Google, `/auth/callback` vérifie l
   - **Token expiré géré côté client** : ajout `supabase.auth.refreshSession()` automatique dans `handleAdminResponse` quand le token est expiré, avec message clair "Session expirée, reconnectez-vous"
   - **UI mode déroulant améliorée** : bouton "Réponse de l'équipe Poulpy" avec gradient purple→cyan bien visible, **chevron rotatif** (ChevronDown + rotate-180 quand déployé), animation framer-motion easeInOut, **avatar "Équipe Poulpy" + date de réponse** dans le panneau déplié
   - **Fix build** : `discordUrl` manquant dans `setSettings` de `components/About.tsx` (erreur TS2345)
-  - Testé en local : build OK (TS strict), routes API bien générées
+- 2026-09-15 (unification DA Cybercore panneau admin) :
+  - **Refonte DA panneau admin** : application intégrale de la DA Cybercore / E-sport Brutaliste de l'accueil sur toutes les pages d'administration (`/admin`, `/admin/bookings`, `/admin/students`, `/admin/coaching`, `/admin/coaching/[studentId]`, `/admin/coaching/[studentId]/clips`, `/admin/coaching/[studentId]/sheet`, `/admin/stats`, `/admin/settings`, `/admin/users`) et sur les composants d'administration (`SheetMarkdownPreview`, `VisualSheetEditor`, `VisualTableModal`)
+  - **Harmonisation visuelle** : suppression des gradients violets/cyans legacy, suppression des classes `rounded-*`, `card`, `glass` et `page-bg` au profit du fond technique sombre `#07090D` / `#090c10`, des bordures subtiles `border-white/8`, des reticles d'angle `reticle-box`, des accents `--acid` `#FF7582`, `--laser` `#8FAFD4` et boutons cyber brutalistes
 - 2026-09-03 (session audit complet) :
   - Ajout feature **bio** élève (visible par admin) — `0f16a7e`
   - **Sécurité** : auth + admin sur tous les endpoints sensibles — `61eb82d`

@@ -71,15 +71,15 @@ export default function AdminStudentsPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen page-bg flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+      <div className="min-h-screen bg-[#07090D] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#FF7582]" />
       </div>
     );
   }
 
   if (!user?.isAdmin) {
     return (
-      <div className="min-h-screen page-bg flex items-center justify-center">
+      <div className="min-h-screen bg-[#07090D] flex items-center justify-center">
         <div className="text-center">
           <Shield className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2">Accès refusé</h1>
@@ -102,7 +102,7 @@ export default function AdminStudentsPage() {
   const apexCount = users.filter((u) => u.apexRank).length;
 
   return (
-    <main className="min-h-screen page-bg py-24">
+    <main className="min-h-screen bg-[#07090D] py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <Link href="/admin" className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-4 transition-colors">
@@ -114,29 +114,29 @@ export default function AdminStudentsPage() {
         </div>
 
         {error && (
-          <div className="mb-6 p-4 rounded-xl bg-red-500/20 border border-red-500/30 text-red-400 text-sm">
+          <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 text-red-400 text-sm">
             {error}
           </div>
         )}
 
         {/* Stats */}
         <div className="grid sm:grid-cols-3 gap-4 mb-6">
-          <div className="card rounded-xl p-5">
+          <div className="reticle-box p-5">
             <div className="text-sm text-gray-400 mb-1">Total élèves</div>
             <div className="text-3xl font-bold">{users.length}</div>
           </div>
-          <div className="card rounded-xl p-5">
+          <div className="reticle-box p-5">
             <div className="text-sm text-gray-400 mb-1">Joueurs Valorant</div>
             <div className="text-3xl font-bold text-red-400">🔫 {valorantCount}</div>
           </div>
-          <div className="card rounded-xl p-5">
+          <div className="reticle-box p-5">
             <div className="text-sm text-gray-400 mb-1">Joueurs Apex</div>
             <div className="text-3xl font-bold text-orange-400">⚡ {apexCount}</div>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="card rounded-xl p-4 mb-6 flex flex-col sm:flex-row gap-3">
+        <div className="reticle-box p-4 mb-6 flex flex-col sm:flex-row gap-3">
           <div className="flex-1 relative">
             <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
@@ -144,7 +144,7 @@ export default function AdminStudentsPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Rechercher un élève..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500"
+              className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-[#FF7582]"
             />
           </div>
           <div className="flex gap-2">
@@ -157,9 +157,9 @@ export default function AdminStudentsPage() {
                 key={f.value}
                 type="button"
                 onClick={() => setGameFilter(f.value)}
-                className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                className={`px-4 py-2 text-sm font-medium transition-all ${
                   gameFilter === f.value
-                    ? 'bg-purple-600 text-white'
+                    ? 'bg-[#FF7582] text-white'
                     : 'bg-white/5 text-gray-400 hover:bg-white/10'
                 }`}
               >
@@ -170,10 +170,10 @@ export default function AdminStudentsPage() {
         </div>
 
         {/* Table */}
-        <div className="card rounded-xl overflow-hidden">
+        <div className="reticle-box overflow-hidden">
           {isLoading ? (
             <div className="p-12 text-center">
-              <Loader2 className="w-8 h-8 animate-spin text-purple-500 mx-auto" />
+              <Loader2 className="w-8 h-8 animate-spin text-[#FF7582] mx-auto" />
             </div>
           ) : error ? (
             <div className="p-12 text-center text-red-400">{error}</div>
@@ -200,7 +200,7 @@ export default function AdminStudentsPage() {
                     <tr key={u.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white font-bold text-sm overflow-hidden shrink-0">
+                          <div className="w-9 h-9 bg-gradient-to-br from-[#FF7582] to-[#8FAFD4] flex items-center justify-center text-white font-bold text-sm overflow-hidden shrink-0">
                             {u.avatarUrl ? (
                               <img src={u.avatarUrl} alt={u.username} className="w-full h-full object-cover" />
                             ) : (
@@ -230,7 +230,7 @@ export default function AdminStudentsPage() {
                       </td>
                       <td className="px-4 py-3">
                         {u.valorantRank ? (
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-red-500/15 border border-red-500/30 text-red-300 text-xs font-medium">
+                          <span className="inline-flex items-center px-2.5 py-1 bg-red-500/15 border border-red-500/30 text-red-300 text-xs font-medium">
                             {u.valorantRank}
                           </span>
                         ) : (
@@ -239,7 +239,7 @@ export default function AdminStudentsPage() {
                       </td>
                       <td className="px-4 py-3">
                         {u.apexRank ? (
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-orange-500/15 border border-orange-500/30 text-orange-300 text-xs font-medium">
+                          <span className="inline-flex items-center px-2.5 py-1 bg-orange-500/15 border border-orange-500/30 text-orange-300 text-xs font-medium">
                             {u.apexRank}
                           </span>
                         ) : (
@@ -249,7 +249,7 @@ export default function AdminStudentsPage() {
                       <td className="px-4 py-3 max-w-xs">
                         {u.bio ? (
                           <div className="flex items-start gap-2">
-                            <Quote size={12} className="text-purple-400 mt-0.5 shrink-0" />
+                            <Quote size={12} className="text-[#FF7582] mt-0.5 shrink-0" />
                             <span
                               className="text-xs text-gray-300 line-clamp-2"
                               title={u.bio}
@@ -264,7 +264,7 @@ export default function AdminStudentsPage() {
                       <td className="px-4 py-3 text-right">
                         <Link
                           href={`/admin/coaching/${u.id}`}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 text-sm font-medium transition-colors"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#FF7582]/10 hover:bg-[#FF7582]/20 text-[#FF7582] text-sm font-medium transition-colors"
                         >
                           <MessageSquare size={14} />
                           Chatter

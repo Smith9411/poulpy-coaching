@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
@@ -457,20 +457,20 @@ export default function AdminBookingsPage() {
 
   if (authLoading) {
     return (
-      <main className="min-h-screen page-bg py-24 flex items-center justify-center">
-        <Loader2 className="w-10 h-10 animate-spin text-purple-500" />
+      <main className="min-h-screen bg-[#07090D] py-24 flex items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-[#FF7582]" />
       </main>
     );
   }
 
   if (!user || !user.isAdmin) {
     return (
-      <main className="min-h-screen page-bg py-24 flex items-center justify-center">
-        <div className="card p-8 rounded-2xl text-center max-w-md">
+      <main className="min-h-screen bg-[#07090D] py-24 flex items-center justify-center">
+        <div className="bg-[#090c10] border border-white/8 p-8 text-center max-w-md">
           <Shield size={48} className="mx-auto text-red-400 mb-4" />
           <h2 className="text-xl font-bold text-white mb-2">Accès refusé</h2>
           <p className="text-sm text-gray-400 mb-4">Cette section est réservée à l'administrateur.</p>
-          <Link href="/" className="px-4 py-2 rounded-xl bg-purple-600 text-white text-sm font-bold">
+          <Link href="/" className="px-4 py-2 bg-[#FF7582] text-white text-sm font-bold">
             Retour à l'accueil
           </Link>
         </div>
@@ -479,21 +479,21 @@ export default function AdminBookingsPage() {
   }
 
   return (
-    <main className="min-h-screen page-bg py-20 px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-[#07090D] py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Top Header */}
         <div className="flex items-center justify-between flex-wrap gap-4 pt-4">
           <div className="flex items-center gap-3">
             <Link
               href="/admin"
-              className="p-2 rounded-xl glass hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
+              className="p-2 bg-black/40 border border-white/10 backdrop-blur-md hover:bg-white/10 text-gray-300 hover:text-white transition-colors"
               title="Retour au Panneau Admin"
             >
               <ArrowLeft size={20} />
             </Link>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300">
+                <span className="text-xs font-bold px-2.5 py-0.5 bg-[#8FAFD4]/20 text-[#8FAFD4]/80">
                   ADMIN COACHING
                 </span>
                 <span className="text-xs text-gray-400">• Sans paiement</span>
@@ -505,13 +505,13 @@ export default function AdminBookingsPage() {
           </div>
 
           {/* Tab Switcher */}
-          <div className="flex items-center p-1 rounded-2xl glass border border-white/10">
+          <div className="flex items-center p-1 bg-black/40 border border-white/10 backdrop-blur-md border border-white/10">
             <button
               type="button"
               onClick={() => setActiveTab('slots')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+              className={`flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-bold transition-all ${
                 activeTab === 'slots'
-                  ? 'bg-gradient-to-r from-purple-600 to-cyan-500 text-white shadow-md'
+                  ? 'bg-gradient-to-r from-[#FF7582] to-[#FF7582]/70 text-white shadow-md'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
@@ -521,16 +521,16 @@ export default function AdminBookingsPage() {
             <button
               type="button"
               onClick={() => setActiveTab('bookings')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all relative ${
+              className={`flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-bold transition-all relative ${
                 activeTab === 'bookings'
-                  ? 'bg-gradient-to-r from-purple-600 to-cyan-500 text-white shadow-md'
+                  ? 'bg-gradient-to-r from-[#FF7582] to-[#FF7582]/70 text-white shadow-md'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
               <Clock size={16} />
               <span>2. Réservations ({bookingsList.length})</span>
               {bookingsList.some((b) => !b.read_by_admin) && (
-                <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                <span className="w-2 h-2 bg-[#8FAFD4] animate-pulse" />
               )}
             </button>
           </div>
@@ -539,7 +539,7 @@ export default function AdminBookingsPage() {
         {/* Toast Alert */}
         {toast && (
           <div
-            className={`p-4 rounded-xl text-sm font-medium flex items-center gap-2 shadow-lg transition-all animate-in fade-in ${
+            className={`p-4 text-sm font-medium flex items-center gap-2 shadow-lg transition-all animate-in fade-in ${
               toast.type === 'success'
                 ? 'bg-green-500/20 border border-green-500/40 text-green-300'
                 : 'bg-red-500/20 border border-red-500/40 text-red-300'
@@ -556,7 +556,7 @@ export default function AdminBookingsPage() {
         {activeTab === 'slots' && (
           <div className="space-y-6">
             {/* Quick Actions & Navigation Bar */}
-            <div className="glass-dark p-4 sm:p-6 rounded-2xl border border-white/10 space-y-4">
+            <div className="bg-black/40 border border-white/10 backdrop-blur-md-dark p-4 sm:p-6 border border-white/10 space-y-4">
               <div className="flex items-center justify-between flex-wrap gap-4">
                 {/* Week selector */}
                 <div className="flex items-center gap-2">
@@ -564,7 +564,7 @@ export default function AdminBookingsPage() {
                     type="button"
                     onClick={() => setWeekOffset((prev) => Math.max(0, prev - 1))}
                     disabled={weekOffset === 0}
-                    className="p-2 rounded-xl glass hover:bg-white/10 text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="p-2 bg-black/40 border border-white/10 backdrop-blur-md hover:bg-white/10 text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
                     title="Semaine précédente"
                   >
                     <ChevronLeft size={20} />
@@ -581,7 +581,7 @@ export default function AdminBookingsPage() {
                     type="button"
                     onClick={() => setWeekOffset((prev) => prev + 1)}
                     disabled={weekOffset >= 3}
-                    className="p-2 rounded-xl glass hover:bg-white/10 text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="p-2 bg-black/40 border border-white/10 backdrop-blur-md hover:bg-white/10 text-gray-300 disabled:opacity-40 disabled:cursor-not-allowed"
                     title="Semaine suivante"
                   >
                     <ChevronRight size={20} />
@@ -591,7 +591,7 @@ export default function AdminBookingsPage() {
                     <button
                       type="button"
                       onClick={() => setWeekOffset(0)}
-                      className="px-2.5 py-1 text-xs rounded-lg glass text-purple-400 hover:text-white"
+                      className="px-2.5 py-1 text-xs bg-black/40 border border-white/10 backdrop-blur-md text-[#FF7582] hover:text-white"
                     >
                       Aujourd'hui
                     </button>
@@ -602,7 +602,7 @@ export default function AdminBookingsPage() {
                 <div className="flex items-center gap-3">
                   {hasUnsavedChanges && (
                     <span className="text-xs text-amber-400 font-semibold flex items-center gap-1.5 animate-pulse">
-                      <span className="w-2 h-2 rounded-full bg-amber-400" />
+                      <span className="w-2 h-2 bg-amber-400" />
                       Modifications non enregistrées
                     </span>
                   )}
@@ -610,7 +610,7 @@ export default function AdminBookingsPage() {
                     type="button"
                     onClick={handleSaveSlots}
                     disabled={isSavingSlots}
-                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-bold text-sm shadow-md hover:shadow-cyan-500/30 flex items-center gap-2 transition-all disabled:opacity-50"
+                    className="px-5 py-2.5 bg-gradient-to-r from-[#FF7582] to-[#FF7582]/70 text-white font-bold text-sm shadow-md hover:shadow-cyan-500/30 flex items-center gap-2 transition-all disabled:opacity-50"
                   >
                     {isSavingSlots ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
                     <span>Enregistrer les disponibilités</span>
@@ -625,28 +625,28 @@ export default function AdminBookingsPage() {
                   <button
                     type="button"
                     onClick={setAfternoonOnly}
-                    className="px-2.5 py-1.5 rounded-lg glass hover:bg-white/10 text-amber-300 font-medium transition-colors"
+                    className="px-2.5 py-1.5 bg-black/40 border border-white/10 backdrop-blur-md hover:bg-white/10 text-amber-300 font-medium transition-colors"
                   >
                     ☀️ Ouvrir 14h-18h
                   </button>
                   <button
                     type="button"
                     onClick={setEveningOnly}
-                    className="px-2.5 py-1.5 rounded-lg glass hover:bg-white/10 text-indigo-300 font-medium transition-colors"
+                    className="px-2.5 py-1.5 bg-black/40 border border-white/10 backdrop-blur-md hover:bg-white/10 text-indigo-300 font-medium transition-colors"
                   >
                     🌙 Ouvrir 18h-22h
                   </button>
                   <button
                     type="button"
                     onClick={() => setAllWeekSlots(true)}
-                    className="px-2.5 py-1.5 rounded-lg glass hover:bg-white/10 text-green-300 font-medium transition-colors"
+                    className="px-2.5 py-1.5 bg-black/40 border border-white/10 backdrop-blur-md hover:bg-white/10 text-green-300 font-medium transition-colors"
                   >
                     ✅ Tout ouvrir
                   </button>
                   <button
                     type="button"
                     onClick={() => setAllWeekSlots(false)}
-                    className="px-2.5 py-1.5 rounded-lg glass hover:bg-white/10 text-red-300 font-medium transition-colors"
+                    className="px-2.5 py-1.5 bg-black/40 border border-white/10 backdrop-blur-md hover:bg-white/10 text-red-300 font-medium transition-colors"
                   >
                     ❌ Tout fermer
                   </button>
@@ -661,12 +661,12 @@ export default function AdminBookingsPage() {
                   placeholder="Ex: 16:00"
                   value={customHourInput}
                   onChange={(e) => setCustomHourInput(e.target.value)}
-                  className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-white w-24 text-center focus:outline-none focus:border-purple-500"
+                  className="px-3 py-1 bg-white/5 border border-white/10 text-white w-24 text-center focus:outline-none focus:border-[#FF7582]"
                 />
                 <button
                   type="button"
                   onClick={handleAddCustomHour}
-                  className="px-3 py-1 rounded-lg bg-purple-600/30 border border-purple-500/40 text-purple-300 font-medium hover:bg-purple-600/50"
+                  className="px-3 py-1 bg-[#FF7582]/30 border border-[#FF7582]/40 text-[#FF7582]/80 font-medium hover:bg-[#FF7582]/50"
                 >
                   + Ajouter
                 </button>
@@ -682,16 +682,16 @@ export default function AdminBookingsPage() {
                 return (
                   <div
                     key={day.fullDate}
-                    className={`card rounded-2xl p-3.5 flex flex-col justify-between border transition-all ${
+                    className={`reticle-box p-3.5 flex flex-col justify-between border transition-all ${
                       day.isPast
                         ? 'opacity-40 bg-white/[0.02] border-white/5'
-                        : 'border-white/10 hover:border-purple-500/30'
+                        : 'border-white/10 hover:border-[#FF7582]/30'
                     }`}
                   >
                     {/* Day Column Header */}
                     <div className="border-b border-white/10 pb-2.5 mb-2.5">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold uppercase tracking-wider text-purple-400">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#FF7582]">
                           {day.dayName.slice(0, 3)}
                         </span>
                         <span className="text-xs text-gray-400 font-medium">{day.dateStr}</span>
@@ -699,7 +699,7 @@ export default function AdminBookingsPage() {
 
                       {/* Day count & Quick toggles */}
                       <div className="flex items-center justify-between mt-2 pt-1 text-[11px]">
-                        <span className={`font-semibold ${activeCount > 0 ? 'text-cyan-400' : 'text-gray-500'}`}>
+                        <span className={`font-semibold ${activeCount > 0 ? 'text-[#8FAFD4]' : 'text-gray-500'}`}>
                           {activeCount} ouvert{activeCount > 1 ? 's' : ''}
                         </span>
                         {!day.isPast && (
@@ -736,7 +736,7 @@ export default function AdminBookingsPage() {
                           return (
                             <div
                               key={key}
-                              className="p-2 rounded-xl bg-orange-500/15 border border-orange-500/40 text-orange-200 text-xs flex flex-col gap-0.5"
+                              className="p-2 bg-orange-500/15 border border-orange-500/40 text-orange-200 text-xs flex flex-col gap-0.5"
                               title={`Réservé par ${bookingOnSlot.student_name}`}
                             >
                               <div className="flex items-center justify-between font-bold">
@@ -758,9 +758,9 @@ export default function AdminBookingsPage() {
                         return (
                           <label
                             key={key}
-                            className={`flex items-center justify-between p-2 rounded-xl text-xs font-semibold cursor-pointer select-none transition-all border ${
+                            className={`flex items-center justify-between p-2 text-xs font-semibold cursor-pointer select-none transition-all border ${
                               isChecked
-                                ? 'bg-gradient-to-r from-purple-600/30 to-cyan-500/20 border-cyan-400/60 text-white shadow-sm'
+                                ? 'bg-gradient-to-r from-[#FF7582]/30 to-cyan-500/20 border-[#8FAFD4]/60 text-white shadow-sm'
                                 : 'bg-white/5 border-white/5 text-gray-400 hover:bg-white/10 hover:text-gray-200'
                             }`}
                           >
@@ -769,13 +769,13 @@ export default function AdminBookingsPage() {
                                 type="checkbox"
                                 checked={isChecked}
                                 onChange={() => toggleSlot(day.fullDate, time)}
-                                className="w-3.5 h-3.5 rounded border-gray-600 text-cyan-500 focus:ring-cyan-500 focus:ring-offset-0 bg-gray-800 cursor-pointer"
+                                className="w-3.5 h-3.5 rounded border-gray-600 text-[#8FAFD4] focus:ring-[#8FAFD4] focus:ring-offset-0 bg-gray-800 cursor-pointer"
                               />
                               <span>{time}</span>
                             </span>
                             <span
                               className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${
-                                isChecked ? 'text-cyan-300 bg-cyan-500/20' : 'text-gray-500'
+                                isChecked ? 'text-[#8FAFD4]/80 bg-[#8FAFD4]/20' : 'text-gray-500'
                               }`}
                             >
                               {isChecked ? 'Dispo' : 'Fermé'}
@@ -797,7 +797,7 @@ export default function AdminBookingsPage() {
         {activeTab === 'bookings' && (
           <div className="space-y-6">
             {/* Filters Bar */}
-            <div className="glass-dark p-4 sm:p-5 rounded-2xl border border-white/10 flex items-center justify-between flex-wrap gap-4">
+            <div className="bg-black/40 border border-white/10 backdrop-blur-md-dark p-4 sm:p-5 border border-white/10 flex items-center justify-between flex-wrap gap-4">
               {/* Search input */}
               <div className="relative flex-1 min-w-[240px]">
                 <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -806,7 +806,7 @@ export default function AdminBookingsPage() {
                   placeholder="Rechercher par nom, email, Discord ou jeu..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-xs sm:text-sm focus:outline-none focus:border-purple-500"
+                  className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 text-white placeholder-gray-500 text-xs sm:text-sm focus:outline-none focus:border-[#FF7582]"
                 />
               </div>
 
@@ -823,15 +823,15 @@ export default function AdminBookingsPage() {
                     key={tab.id}
                     type="button"
                     onClick={() => setStatusFilter(tab.id)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                    className={`px-3 py-1.5 text-xs font-bold transition-all flex items-center gap-1.5 ${
                       statusFilter === tab.id
-                        ? 'bg-gradient-to-r from-purple-600 to-cyan-500 text-white shadow-md'
+                        ? 'bg-gradient-to-r from-[#FF7582] to-[#FF7582]/70 text-white shadow-md'
                         : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10'
                     }`}
                   >
                     <span>{tab.label}</span>
                     <span
-                      className={`px-1.5 py-0.5 rounded-full text-[10px] leading-none ${
+                      className={`px-1.5 py-0.5 text-[10px] leading-none ${
                         statusFilter === tab.id
                           ? 'bg-white/25 text-white font-black'
                           : 'bg-white/5 text-gray-400'
@@ -845,7 +845,7 @@ export default function AdminBookingsPage() {
                 <button
                   type="button"
                   onClick={() => { fetchBookings(); fetchSlots(); }}
-                  className="p-2 rounded-xl bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+                  className="p-2 bg-white/5 border border-white/10 text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
                   title="Actualiser"
                 >
                   <RefreshCw size={16} className={bookingsLoading ? 'animate-spin' : ''} />
@@ -856,11 +856,11 @@ export default function AdminBookingsPage() {
             {/* Bookings List */}
             {bookingsLoading ? (
               <div className="py-20 text-center">
-                <Loader2 size={32} className="animate-spin text-purple-500 mx-auto mb-3" />
+                <Loader2 size={32} className="animate-spin text-[#FF7582] mx-auto mb-3" />
                 <p className="text-sm text-gray-400">Chargement des réservations...</p>
               </div>
             ) : filteredBookings.length === 0 ? (
-              <div className="card rounded-2xl p-12 text-center text-gray-400">
+              <div className="reticle-box p-12 text-center text-gray-400">
                 <Clock size={40} className="mx-auto mb-3 opacity-40" />
                 <h3 className="text-lg font-bold text-white mb-1">Aucune réservation trouvée</h3>
                 <p className="text-xs text-gray-400">
@@ -877,11 +877,11 @@ export default function AdminBookingsPage() {
                   return (
                     <div
                       key={b.id}
-                      className={`card rounded-2xl p-5 border flex flex-col justify-between space-y-4 transition-colors duration-200 ${
+                      className={`reticle-box p-5 border flex flex-col justify-between space-y-4 transition-colors duration-200 ${
                         b.status === 'confirmed'
-                          ? 'border-cyan-500/30 hover:border-cyan-400'
+                          ? 'border-[#8FAFD4]/30 hover:border-[#8FAFD4]'
                           : b.status === 'rescheduled'
-                          ? 'border-purple-500/40 hover:border-purple-400'
+                          ? 'border-[#FF7582]/40 hover:border-[#FF7582]'
                           : b.status === 'completed'
                           ? 'border-green-500/20 opacity-75'
                           : 'border-red-500/20 opacity-60'
@@ -890,17 +890,17 @@ export default function AdminBookingsPage() {
                       {/* Header with Plan and Status */}
                       <div>
                         <div className="flex items-center justify-between gap-2 mb-2">
-                          <span className="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300">
+                          <span className="text-xs font-extrabold px-2.5 py-0.5 bg-[#FF7582]/20 text-[#FF7582]/80">
                             {b.plan_name}
                           </span>
                           <span
-                            className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
+                            className={`text-[11px] font-bold px-2 py-0.5 ${
                               b.status === 'confirmed'
                                 ? 'bg-green-500/20 text-green-300'
                                 : b.status === 'rescheduled'
-                                ? 'bg-purple-500/20 text-purple-300'
+                                ? 'bg-[#FF7582]/20 text-[#FF7582]/80'
                                 : b.status === 'completed'
-                                ? 'bg-blue-500/20 text-blue-300'
+                                ? 'bg-[#8FAFD4]/20 text-[#8FAFD4]/80'
                                 : 'bg-red-500/20 text-red-400'
                             }`}
                           >
@@ -913,7 +913,7 @@ export default function AdminBookingsPage() {
 
                         {/* Date & Time Highlight */}
                         <div className="flex items-center gap-2 text-white font-extrabold text-base mb-1">
-                          <CalendarIcon size={16} className="text-cyan-400" />
+                          <CalendarIcon size={16} className="text-[#8FAFD4]" />
                           <span>
                             {new Date(b.booking_date).toLocaleDateString('fr-FR', {
                               weekday: 'short',
@@ -926,23 +926,23 @@ export default function AdminBookingsPage() {
                         <div className="text-xs text-gray-400 flex items-center gap-2">
                           <span>{b.plan_duration}</span>
                           <span>•</span>
-                          <span className="text-purple-300 font-bold">{b.plan_price}</span>
+                          <span className="text-[#FF7582]/80 font-bold">{b.plan_price}</span>
                         </div>
                       </div>
 
                       {/* Student Info */}
-                      <div className="p-3.5 rounded-xl bg-white/[0.04] border border-white/5 space-y-2 text-xs">
+                      <div className="p-3.5 bg-white/[0.04] border border-white/5 space-y-2 text-xs">
                         <div className="flex items-center justify-between">
                           <span className="text-gray-400">Élève :</span>
                           <span className="font-bold text-white flex items-center gap-1">
-                            <User size={12} className="text-purple-400" />
+                            <User size={12} className="text-[#FF7582]" />
                             {b.student_name}
                           </span>
                         </div>
 
                         <div className="flex items-center justify-between">
                           <span className="text-gray-400">Discord :</span>
-                          <div className="flex items-center gap-1 text-cyan-300 font-mono font-semibold">
+                          <div className="flex items-center gap-1 text-[#8FAFD4]/80 font-mono font-semibold">
                             <MessageSquare size={12} />
                             <span>{b.student_discord}</span>
                             <button
@@ -987,7 +987,7 @@ export default function AdminBookingsPage() {
                                 setRescheduleDate(b.booking_date);
                                 setRescheduleTime(b.booking_time);
                               }}
-                              className="flex-1 py-1.5 rounded-lg bg-purple-500/15 border border-purple-500/30 text-xs font-semibold text-purple-300 hover:bg-purple-500/30 hover:text-white transition-colors flex items-center justify-center gap-1 cursor-pointer"
+                              className="flex-1 py-1.5 bg-[#FF7582]/15 border border-[#FF7582]/30 text-xs font-semibold text-[#FF7582]/80 hover:bg-[#FF7582]/30 hover:text-white transition-colors flex items-center justify-center gap-1 cursor-pointer"
                             >
                               <Edit2 size={13} />
                               <span>Reporter</span>
@@ -997,7 +997,7 @@ export default function AdminBookingsPage() {
                               type="button"
                               disabled={isActionLoading}
                               onClick={() => handleCompleteBooking(b.id)}
-                              className="p-1.5 rounded-lg bg-green-500/15 border border-green-500/30 text-xs font-semibold text-green-400 hover:bg-green-500/30 transition-colors cursor-pointer"
+                              className="p-1.5 bg-green-500/15 border border-green-500/30 text-xs font-semibold text-green-400 hover:bg-green-500/30 transition-colors cursor-pointer"
                               title="Marquer comme terminée (libère le créneau du planning)"
                             >
                               <CheckCircle2 size={15} />
@@ -1010,7 +1010,7 @@ export default function AdminBookingsPage() {
                                 setCancelModalBooking(b);
                                 setCancelReasonInput('Annulée par le coach depuis le panneau admin.');
                               }}
-                              className="p-1.5 rounded-lg bg-red-500/15 border border-red-500/30 text-xs font-semibold text-red-400 hover:bg-red-500/30 transition-colors cursor-pointer"
+                              className="p-1.5 bg-red-500/15 border border-red-500/30 text-xs font-semibold text-red-400 hover:bg-red-500/30 transition-colors cursor-pointer"
                               title="Annuler la séance (libère le créneau et retire du profil élève)"
                             >
                               <Trash2 size={15} />
@@ -1037,16 +1037,16 @@ export default function AdminBookingsPage() {
         {/* ══════════════════════════════════════════════════════════════════════════ */}
         {rescheduleBooking && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-            <div className="glass-dark border border-purple-500/40 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl animate-in zoom-in-95">
+            <div className="bg-black/40 border border-white/10 backdrop-blur-md-dark border border-[#FF7582]/40 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl animate-in zoom-in-95">
               <div className="flex items-center justify-between border-b border-white/10 pb-3">
                 <div className="flex items-center gap-2">
-                  <Clock size={20} className="text-purple-400" />
+                  <Clock size={20} className="text-[#FF7582]" />
                   <h3 className="font-bold text-white text-lg">Reporter la session</h3>
                 </div>
                 <button
                   type="button"
                   onClick={() => setRescheduleBooking(null)}
-                  className="p-1.5 rounded-lg text-gray-400 hover:text-white"
+                  className="p-1.5 text-gray-400 hover:text-white"
                 >
                   <X size={18} />
                 </button>
@@ -1066,7 +1066,7 @@ export default function AdminBookingsPage() {
                   type="date"
                   value={rescheduleDate}
                   onChange={(e) => setRescheduleDate(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                  className="w-full px-3.5 py-2.5 bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-[#FF7582]"
                 />
               </div>
 
@@ -1078,7 +1078,7 @@ export default function AdminBookingsPage() {
                 <select
                   value={rescheduleTime}
                   onChange={(e) => setRescheduleTime(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-gray-900 border border-white/10 text-white text-sm focus:outline-none focus:border-purple-500"
+                  className="w-full px-3.5 py-2.5 bg-gray-900 border border-white/10 text-white text-sm focus:outline-none focus:border-[#FF7582]"
                 >
                   {availableHours.map((t) => (
                     <option key={t} value={t}>
@@ -1092,14 +1092,14 @@ export default function AdminBookingsPage() {
                 <button
                   type="button"
                   onClick={() => setRescheduleBooking(null)}
-                  className="px-4 py-2 rounded-xl glass text-xs text-gray-400 hover:text-white"
+                  className="px-4 py-2 bg-black/40 border border-white/10 backdrop-blur-md text-xs text-gray-400 hover:text-white"
                 >
                   Annuler
                 </button>
                 <button
                   type="button"
                   onClick={handleConfirmReschedule}
-                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-bold text-xs shadow-md"
+                  className="px-5 py-2 bg-gradient-to-r from-[#FF7582] to-[#FF7582]/70 text-white font-bold text-xs shadow-md"
                 >
                   Confirmer le report
                 </button>
@@ -1113,10 +1113,10 @@ export default function AdminBookingsPage() {
         {/* ══════════════════════════════════════════════════════════════════════════ */}
         {cancelModalBooking && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md">
-            <div className="glass-dark border border-red-500/40 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl shadow-red-500/10 animate-in zoom-in-95">
+            <div className="bg-black/40 border border-white/10 backdrop-blur-md-dark border border-red-500/40 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl shadow-red-500/10 animate-in zoom-in-95">
               <div className="flex items-center justify-between border-b border-white/10 pb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-red-500/20 border border-red-500/40 flex items-center justify-center text-red-400">
+                  <div className="w-9 h-9 bg-red-500/20 border border-red-500/40 flex items-center justify-center text-red-400">
                     <Trash2 size={18} />
                   </div>
                   <div>
@@ -1127,20 +1127,20 @@ export default function AdminBookingsPage() {
                 <button
                   type="button"
                   onClick={() => setCancelModalBooking(null)}
-                  className="p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
+                  className="p-1.5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors"
                 >
                   <X size={18} />
                 </button>
               </div>
 
-              <div className="p-4 rounded-2xl bg-white/5 border border-white/5 space-y-2">
+              <div className="p-4 bg-white/5 border border-white/5 space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-400">Élève :</span>
                   <span className="font-semibold text-white">{cancelModalBooking.student_name}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-400">Formule :</span>
-                  <span className="font-medium text-purple-300">{cancelModalBooking.plan_name}</span>
+                  <span className="font-medium text-[#FF7582]/80">{cancelModalBooking.plan_name}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-400">Date et heure :</span>
@@ -1159,11 +1159,11 @@ export default function AdminBookingsPage() {
                   value={cancelReasonInput}
                   onChange={(e) => setCancelReasonInput(e.target.value)}
                   placeholder="Ex: Imprévu, reprogrammation nécessaire..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-red-500 placeholder-gray-500"
+                  className="w-full px-3.5 py-2.5 bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-red-500 placeholder-gray-500"
                 />
               </div>
 
-              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-300 flex items-start gap-2">
+              <div className="p-3 bg-red-500/10 border border-red-500/20 text-xs text-red-300 flex items-start gap-2">
                 <span className="shrink-0 text-sm">⚠️</span>
                 <span>L'élève recevra une alerte sur son profil et le créneau sera de nouveau disponible à la réservation.</span>
               </div>
@@ -1173,7 +1173,7 @@ export default function AdminBookingsPage() {
                   type="button"
                   disabled={actionLoadingId === cancelModalBooking.id}
                   onClick={() => setCancelModalBooking(null)}
-                  className="px-4 py-2.5 rounded-xl glass text-xs font-semibold text-gray-400 hover:text-white transition-colors"
+                  className="px-4 py-2.5 bg-black/40 border border-white/10 backdrop-blur-md text-xs font-semibold text-gray-400 hover:text-white transition-colors"
                 >
                   Garder la séance
                 </button>
@@ -1181,7 +1181,7 @@ export default function AdminBookingsPage() {
                   type="button"
                   disabled={actionLoadingId === cancelModalBooking.id}
                   onClick={handleConfirmCancelBooking}
-                  className="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-lg shadow-red-500/20 transition-all flex items-center gap-2 cursor-pointer"
+                  className="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs shadow-lg shadow-red-500/20 transition-all flex items-center gap-2 cursor-pointer"
                 >
                   {actionLoadingId === cancelModalBooking.id ? (
                     <>

@@ -372,24 +372,24 @@ export default function AdminUsers() {
   };
 
   const SortIcon = ({ field }: { field: string }) =>
-    sortBy === field ? <span className="text-purple-400">{sortOrder === 'asc' ? '↑' : '↓'}</span> : <span className="text-gray-600">↕</span>;
+    sortBy === field ? <span className="text-[#FF7582]">{sortOrder === 'asc' ? '↑' : '↓'}</span> : <span className="text-gray-600">↕</span>;
 
   if (authLoading) {
     return (
-      <main className="min-h-screen page-bg py-24 flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      <main className="min-h-screen bg-[#07090D] py-24 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-[#FF7582] border-t-transparent animate-spin" />
       </main>
     );
   }
 
   if (!user || !user.isAdmin) {
     return (
-      <main className="min-h-screen page-bg py-24 flex items-center justify-center">
-        <div className="text-center card rounded-2xl p-12 max-w-md mx-auto px-4">
+      <main className="min-h-screen bg-[#07090D] py-24 flex items-center justify-center">
+        <div className="text-center reticle-box p-12 max-w-md mx-auto px-4">
           <Shield size={64} className="mx-auto mb-6 text-gray-500" />
           <h1 className="text-3xl font-bold mb-4">Accès refusé</h1>
           <p className="text-gray-400 mb-8">Tu n&apos;as pas les permissions d&apos;administrateur.</p>
-          <Link href="/admin" className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all">
+          <Link href="/admin" className="btn-cyber-primary">
             Retour à l&apos;admin
           </Link>
         </div>
@@ -398,7 +398,7 @@ export default function AdminUsers() {
   }
 
   return (
-    <main className="min-h-screen page-bg py-24">
+    <main className="min-h-screen bg-[#07090D] py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {/* Header */}
@@ -408,11 +408,11 @@ export default function AdminUsers() {
             Retour admin
           </Link>
           <div>
-            <div className="inline-block glass px-4 py-2 rounded-full mb-4">
-              <span className="text-sm text-purple-400 font-medium">UTILISATEURS</span>
+            <div className="inline-block data-badge data-badge-acid mb-4">
+              <span className="text-sm text-[#FF7582] font-medium">UTILISATEURS</span>
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-              Gestion des <span className="text-gradient">utilisateurs</span>
+              Gestion des <span className="text-[#FF7582]">utilisateurs</span>
             </h1>
             <p className="text-xl text-gray-300 max-w-2xl">
               Modifie les pseudos, retire les photos inappropriées, gère les rôles et administre les comptes en direct.
@@ -422,20 +422,20 @@ export default function AdminUsers() {
 
         {/* Alerts */}
         {loadError && (
-          <div className="mb-6 p-4 rounded-xl bg-red-500/20 border border-red-500/30 text-red-400 text-sm flex items-start gap-3">
+          <div className="mb-6 p-4 bg-red-500/20 border border-red-500/30 text-red-400 text-sm flex items-start gap-3">
             <AlertTriangle size={18} className="mt-0.5 flex-shrink-0" />
             <span>{loadError}</span>
           </div>
         )}
         {successMsg && (
-          <div className="mb-6 p-4 rounded-xl bg-green-500/20 border border-green-500/30 text-green-400 text-sm flex items-center gap-3">
+          <div className="mb-6 p-4 bg-[#A4DE87]/10 border border-[#A4DE87]/30 text-[#A4DE87] text-sm flex items-center gap-3">
             <Shield size={18} />
             <span>{successMsg}</span>
           </div>
         )}
 
         {/* Search & Stats */}
-        <div className="card rounded-2xl p-6 mb-6">
+        <div className="reticle-box p-6 mb-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="relative w-full sm:w-80">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 size-5" />
@@ -444,22 +444,22 @@ export default function AdminUsers() {
                 placeholder="Rechercher par pseudo ou email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all pl-12 pr-4 py-3"
+                className="w-full bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-[#FF7582]/50 focus:ring-1 focus:ring-[#FF7582]/50 transition-all pl-12 pr-4 py-3"
               />
             </div>
             <div className="flex items-center gap-4 text-sm flex-wrap">
               <span className="text-gray-400">{users.length} utilisateur{users.length > 1 ? 's' : ''}</span>
-              <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-medium flex items-center gap-1">
+              <span className="px-2.5 py-1 bg-[#A4DE87]/10 text-[#A4DE87] font-medium flex items-center gap-1">
                 <Sparkles size={13} />
                 {users.filter((u) => u.inCoaching).length} en coaching
               </span>
-              <span className="px-2.5 py-1 rounded-full bg-yellow-500/20 text-yellow-400 font-medium">
+              <span className="px-2.5 py-1 bg-[#FF7582]/10 text-[#FF7582] font-medium">
                 {users.filter((u) => u.isAdmin).length} admin{users.filter((u) => u.isAdmin).length > 1 ? 's' : ''}
               </span>
-              <span className="px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-400 font-medium">
+              <span className="px-2.5 py-1 bg-[#8FAFD4]/10 text-[#8FAFD4] font-medium">
                 {users.filter((u) => !u.isAdmin).length} membre{users.filter((u) => !u.isAdmin).length > 1 ? 's' : ''}
               </span>
-              <button onClick={fetchUsers} title="Actualiser" className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
+              <button onClick={fetchUsers} title="Actualiser" className="p-2 hover:bg-white/10 transition-colors text-gray-400 hover:text-white">
                 <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
               </button>
             </div>
@@ -467,10 +467,10 @@ export default function AdminUsers() {
         </div>
 
         {/* Users Table */}
-        <div className="card rounded-2xl overflow-hidden">
+        <div className="reticle-box overflow-hidden">
           {isLoading ? (
             <div className="p-12 text-center">
-              <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <div className="w-10 h-10 border-4 border-[#FF7582] border-t-transparent animate-spin mx-auto mb-4" />
               <p className="text-gray-400">Chargement des utilisateurs...</p>
             </div>
           ) : filteredUsers.length === 0 ? (
@@ -510,7 +510,7 @@ export default function AdminUsers() {
                           {/* Avatar + pseudo (avec édition inline) */}
                           <td className="px-6 py-4">
                             <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0 overflow-hidden">
+                              <div className="w-10 h-10 bg-[#FF7582] flex items-center justify-center text-black font-bold text-sm flex-shrink-0 overflow-hidden">
                                 {u.avatarUrl ? (
                                   <img src={u.avatarUrl} alt={u.username} className="w-full h-full object-cover" />
                                 ) : (
@@ -524,20 +524,20 @@ export default function AdminUsers() {
                                       type="text"
                                       value={editingUsername}
                                       onChange={(e) => setEditingUsername(e.target.value)}
-                                      className="px-2.5 py-1 text-sm rounded-lg bg-white/10 border border-white/20 text-inherit focus:outline-none focus:border-purple-500"
+                                      className="px-2.5 py-1 text-sm bg-white/10 border border-white/20 text-inherit focus:outline-none focus:border-[#FF7582]"
                                       autoFocus
                                     />
                                     <button
                                       onClick={() => handleSaveUsername(u)}
                                       disabled={isSavingEdit}
-                                      className="p-1 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30"
+                                      className="p-1 bg-[#A4DE87]/20 text-[#A4DE87] hover:bg-[#A4DE87]/30"
                                       title="Enregistrer"
                                     >
                                       {isSavingEdit ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                                     </button>
                                     <button
                                       onClick={() => setEditingUserId(null)}
-                                      className="p-1 rounded-lg bg-white/5 text-gray-400 hover:bg-white/10"
+                                      className="p-1 bg-white/5 text-gray-400 hover:bg-white/10"
                                       title="Annuler"
                                     >
                                       <X size={14} />
@@ -578,18 +578,18 @@ export default function AdminUsers() {
                               onClick={() => toggleCoaching(u)}
                               disabled={busyId === u.id}
                               title={u.inCoaching ? 'Retirer du coaching actuel' : 'Marquer en coaching actuel'}
-                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                              className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold transition-all ${
                                 u.inCoaching
-                                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-500/30 shadow-[0_0_12px_rgba(16,185,129,0.2)]'
+                                  ? 'bg-[#A4DE87]/20 text-[#A4DE87] border border-[#A4DE87]/40 hover:bg-[#A4DE87]/30 shadow-[0_0_12px_rgba(164,222,135,0.2)]'
                                   : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 hover:text-white'
                               } disabled:opacity-50`}
                             >
                               {busyId === u.id ? (
                                 <Loader2 size={12} className="animate-spin" />
                               ) : u.inCoaching ? (
-                                <Sparkles size={12} className="text-emerald-400" />
+                                <Sparkles size={12} className="text-[#A4DE87]" />
                               ) : (
-                                <span className="w-2 h-2 rounded-full bg-gray-500" />
+                                <span className="w-2 h-2 bg-gray-500" />
                               )}
                               {u.inCoaching ? 'En coaching' : 'Inactif'}
                             </button>
@@ -600,11 +600,11 @@ export default function AdminUsers() {
                             <button
                               type="button"
                               onClick={() => toggleSocials(u.id)}
-                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                              className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold transition-all ${
                                 socialCount > 0
                                   ? isExpanded
-                                    ? 'bg-purple-600 text-white shadow-[0_0_12px_rgba(147,51,234,0.35)]'
-                                    : 'bg-purple-500/15 text-purple-300 border border-purple-500/30 hover:bg-purple-500/25 hover:border-purple-500/50'
+                                    ? 'bg-[#FF7582] text-black shadow-[0_0_12px_rgba(255,117,130,0.35)]'
+                                    : 'bg-[#FF7582]/15 text-[#FF7582]/80 border border-[#FF7582]/30 hover:bg-[#FF7582]/25 hover:border-[#FF7582]/50'
                                   : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 hover:text-white'
                               }`}
                               title={
@@ -613,12 +613,12 @@ export default function AdminUsers() {
                                   : 'Aucun réseau - Cliquer pour voir'
                               }
                             >
-                              <Share2 size={12} className={socialCount > 0 ? 'text-purple-400' : 'text-gray-500'} />
+                              <Share2 size={12} className={socialCount > 0 ? 'text-[#FF7582]' : 'text-gray-500'} />
                               <span>Réseaux</span>
                               {socialCount > 0 ? (
                                 <span
-                                  className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-                                    isExpanded ? 'bg-white/20 text-white' : 'bg-purple-500/30 text-purple-200'
+                                  className={`px-1.5 py-0.2 text-[10px] font-bold ${
+                                    isExpanded ? 'bg-white/20 text-white' : 'bg-[#FF7582]/30 text-[#FF7582]/60'
                                   }`}
                                 >
                                   {socialCount}
@@ -636,11 +636,11 @@ export default function AdminUsers() {
                           {/* Badge rôle */}
                           <td className="px-6 py-4">
                             {u.isAdmin ? (
-                              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r from-yellow-500 to-orange-500 text-black">
+                              <span className="inline-flex items-center gap-1 px-3 py-1 text-xs font-bold bg-[#FF7582] text-black">
                                 <Shield size={10} />Admin
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-white/10 text-gray-300">
+                              <span className="inline-flex items-center gap-1 px-3 py-1 text-xs font-medium bg-white/10 text-gray-300">
                                 <User size={10} />Membre
                               </span>
                             )}
@@ -656,13 +656,13 @@ export default function AdminUsers() {
                                     <button
                                       onClick={() => handleRemoveAvatar(u)}
                                       disabled={busyId === u.id}
-                                      className="px-2 py-1 text-xs rounded-lg bg-orange-500/20 text-orange-400 hover:bg-orange-500/40 transition-colors disabled:opacity-40"
+                                      className="px-2 py-1 text-xs bg-orange-500/20 text-orange-400 hover:bg-orange-500/40 transition-colors disabled:opacity-40"
                                     >
                                       Retirer photo
                                     </button>
                                     <button
                                       onClick={() => setConfirmRemoveAvatar(null)}
-                                      className="px-2 py-1 text-xs rounded-lg bg-white/5 text-gray-400 hover:bg-white/10 transition-colors"
+                                      className="px-2 py-1 text-xs bg-white/5 text-gray-400 hover:bg-white/10 transition-colors"
                                     >
                                       ✕
                                     </button>
@@ -671,7 +671,7 @@ export default function AdminUsers() {
                                   <button
                                     onClick={() => setConfirmRemoveAvatar(u.id)}
                                     title="Retirer la photo de profil de cet utilisateur"
-                                    className="p-2 rounded-lg hover:bg-orange-500/10 transition-colors text-gray-400 hover:text-orange-400"
+                                    className="p-2 hover:bg-orange-500/10 transition-colors text-gray-400 hover:text-orange-400"
                                   >
                                     <ImageOff size={16} />
                                   </button>
@@ -684,10 +684,10 @@ export default function AdminUsers() {
                                   onClick={() => toggleAdmin(u)}
                                   disabled={busyId === u.id}
                                   title={u.isAdmin ? 'Retirer le rôle admin' : 'Promouvoir admin'}
-                                  className="p-2 rounded-lg hover:bg-white/10 transition-colors text-gray-400 hover:text-white disabled:opacity-40"
+                                  className="p-2 hover:bg-white/10 transition-colors text-gray-400 hover:text-white disabled:opacity-40"
                                 >
                                   {busyId === u.id
-                                    ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                    ? <div className="w-4 h-4 border-2 border-current border-t-transparent animate-spin" />
                                     : u.isAdmin ? <ShieldOff size={16} /> : <ShieldCheck size={16} />
                                   }
                                 </button>
@@ -700,13 +700,13 @@ export default function AdminUsers() {
                                     <button
                                       onClick={() => deleteUser(u)}
                                       disabled={busyId === u.id}
-                                      className="px-2 py-1 text-xs rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/40 transition-colors disabled:opacity-40"
+                                      className="px-2 py-1 text-xs bg-red-500/20 text-red-400 hover:bg-red-500/40 transition-colors disabled:opacity-40"
                                     >
                                       Confirmer
                                     </button>
                                     <button
                                       onClick={() => setConfirmDelete(null)}
-                                      className="px-2 py-1 text-xs rounded-lg bg-white/5 text-gray-400 hover:bg-white/10 transition-colors"
+                                      className="px-2 py-1 text-xs bg-white/5 text-gray-400 hover:bg-white/10 transition-colors"
                                     >
                                       Annuler
                                     </button>
@@ -715,7 +715,7 @@ export default function AdminUsers() {
                                   <button
                                     onClick={() => setConfirmDelete(u.id)}
                                     title="Supprimer le compte"
-                                    className="p-2 rounded-lg hover:bg-red-500/10 transition-colors text-gray-500 hover:text-red-400"
+                                    className="p-2 hover:bg-red-500/10 transition-colors text-gray-500 hover:text-red-400"
                                   >
                                     <Trash2 size={16} />
                                   </button>
@@ -727,12 +727,12 @@ export default function AdminUsers() {
 
                         {/* Rangée déroulante des réseaux sociaux en dessous */}
                         {isExpanded && (
-                          <tr className="bg-purple-950/20 border-b border-purple-500/20">
+                          <tr className="bg-[#FF7582]/5 border-b border-[#FF7582]/20">
                             <td colSpan={7} className="px-6 py-3.5">
-                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-black/40 border border-purple-500/20 rounded-xl p-3.5">
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-black/40 border border-[#FF7582]/20 p-3.5">
                                 <div className="flex flex-wrap items-center gap-2.5">
                                   <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide mr-1 flex items-center gap-1.5">
-                                    <Share2 size={12} className="text-purple-400" />
+                                    <Share2 size={12} className="text-[#FF7582]" />
                                     Réseaux de {u.username} :
                                   </span>
 
@@ -744,7 +744,7 @@ export default function AdminUsers() {
                                     <>
                                       {/* Discord */}
                                       {u.discord && (
-                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#5865F2]/15 border border-[#5865F2]/30 text-xs">
+                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#5865F2]/15 border border-[#5865F2]/30 text-xs">
                                           <span className="text-[#5865F2] flex items-center">
                                             <DiscordIcon className="w-3.5 h-3.5" />
                                           </span>
@@ -767,12 +767,12 @@ export default function AdminUsers() {
 
                                       {/* Twitch */}
                                       {u.twitch && (
-                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#9146FF]/15 border border-[#9146FF]/30 text-xs">
+                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#9146FF]/15 border border-[#9146FF]/30 text-xs">
                                           <a
                                             href={formatSocialUrl('twitch', u.twitch)}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-1.5 text-purple-300 hover:text-white transition-colors"
+                                            className="inline-flex items-center gap-1.5 text-[#FF7582]/80 hover:text-white transition-colors"
                                           >
                                             <span className="text-[#9146FF] flex items-center">
                                               <TwitchIcon className="w-3.5 h-3.5" />
@@ -798,7 +798,7 @@ export default function AdminUsers() {
 
                                       {/* YouTube */}
                                       {u.youtube && (
-                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#FF0000]/15 border border-[#FF0000]/30 text-xs">
+                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#FF0000]/15 border border-[#FF0000]/30 text-xs">
                                           <a
                                             href={formatSocialUrl('youtube', u.youtube)}
                                             target="_blank"
@@ -829,14 +829,14 @@ export default function AdminUsers() {
 
                                       {/* TikTok */}
                                       {u.tiktok && (
-                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#00f2fe]/15 border border-[#00f2fe]/30 text-xs">
+                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#00f2fe]/15 border border-[#00f2fe]/30 text-xs">
                                           <a
                                             href={formatSocialUrl('tiktok', u.tiktok)}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-1.5 text-cyan-300 hover:text-white transition-colors"
+                                            className="inline-flex items-center gap-1.5 text-[#8FAFD4]/80 hover:text-white transition-colors"
                                           >
-                                            <span className="text-cyan-400 flex items-center">
+                                            <span className="text-[#8FAFD4] flex items-center">
                                               <TiktokIcon className="w-3.5 h-3.5" />
                                             </span>
                                             <span className="font-medium">{formatSocialDisplay('tiktok', u.tiktok)}</span>
