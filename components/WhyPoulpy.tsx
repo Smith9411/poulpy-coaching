@@ -8,92 +8,110 @@ import { Target, Brain, Crosshair, TrendingUp, ShieldCheck, Flame, ArrowRight, P
 const PILLARS = [
   {
     num: "01",
-    icon: Target,
-    badge: "VOD CHIRURGIE",
-    title: "ANALYSE CHIRURGICALE",
-    subtitle: "Dissection millimétrique de tes parties",
+    icon: Crosshair,
+    badge: "AIM TRAINING",
+    title: "AIM TRAINING",
+    subtitle: "Playlist spéciale pour chaque jeu",
     description:
-      "Nous analysons tes replays en 4K image par image. Chaque élimination subie est décortiquée : micro-déficit d'angle, mauvais tempo de décalage ou exposition inutile.",
+      "Analyse des faiblesses biomécaniques et scénarios d'entraînement sur-mesure pour compenser tes lacunes. Progression assurée avec suivi régulier des scores.",
     specs: [
-      { label: "Précision d'analyse", val: "Sub-pixel & 60 FPS" },
-      { label: "Erreurs corrigées", val: "15 à 20 par session" },
-      { label: "Rapport", val: "Fiche Notion exportable" },
+      { label: "Playlists", val: "Spéciale par jeu" },
+      { label: "Analyse", val: "Scénarios ciblés" },
+      { label: "Progression", val: "Suivi des scores" },
     ],
+    hasClip: true,
+    clipTitle: "AIM TRAINING // VALORANT, APEX & KOVAAK",
+    clipSubtitle: "Clip Valo puis Apex puis Aim Training",
     color: "laser",
   },
   {
     num: "02",
-    icon: Brain,
-    badge: "VISION TACTIQUE",
-    title: "GAME SENSE & MACRO-GAME",
-    subtitle: "Anticiper au lieu de subir",
+    icon: Target,
+    badge: "ANALYSE STRATÉGIQUE",
+    title: "ANALYSE POUSSÉE & DÉTAILLÉE",
+    subtitle: "VOD review, stats et trackers en profondeur",
     description:
-      "Apprends à décoder les intentions ennemies 15 secondes avant qu'elles ne se produisent. Maîtrise des rotations, timing d'utilitaires et domination psychologique en clutch 1v2+.",
+      "Dissection millimétrique de tes parties et analyse poussée de tes statistiques. Méthodologie éprouvée basée sur la review de plus de 1000 games de pro.",
     specs: [
-      { label: "Survie en clutch", val: "+45% en 3 semaines" },
-      { label: "Lecture de carte", val: "Prédiction macro" },
-      { label: "Prise de décision", val: "Instantanée sous stress" },
+      { label: "VOD Review", val: "Image par image" },
+      { label: "Trackers", val: "Analyse de stats" },
+      { label: "Base Pro", val: "+1000 games revues" },
     ],
+    hasClip: false,
+    clipTitle: "",
+    clipSubtitle: "",
     color: "acid",
   },
   {
     num: "03",
-    icon: Crosshair,
-    badge: "MÉCANIQUE PURE",
-    title: "AIM & BIOMÉCANIQUE",
-    subtitle: "La visée au millimètre près",
+    icon: Brain,
+    badge: "VISION TACTIQUE",
+    title: "GAMESENSE & MACROGAME",
+    subtitle: "Gagnez tous vos clutchs",
     description:
-      "Programme sur-mesure axé sur la régularité pure : placement du viseur sub-pixel, tracking sans saccade, synchronisation mouvement/tir et posture physique adaptée.",
+      "Apprends à prédire les positions adverses et garde constamment une longueur d'avance. Domination tactique et lecture de jeu pro en situations critiques.",
     specs: [
-      { label: "Routine sur-mesure", val: "20 min KovaaK / Aimlabs" },
-      { label: "Sensibilité eDPI", val: "Calibration cm/360" },
-      { label: "Headshot %", val: "+18% en moyenne" },
+      { label: "Clutchs", val: "Gagnez tous vos duels" },
+      { label: "Lecture", val: "Prédiction positions" },
+      { label: "Macro", val: "+1 longueur d'avance" },
     ],
+    hasClip: true,
+    clipTitle: "CLUTCH GAME // VALORANT & 1V3 APEX",
+    clipSubtitle: "Clip de clutch Valo et 1v3 Apex Legends",
     color: "laser",
   },
   {
     num: "04",
-    icon: Flame,
-    badge: "PSYCHOLOGIE DU JOUEUR",
-    title: "ANTI-TILT & SANG-FROID",
-    subtitle: "Garder le contrôle absolu sous haute pression",
+    icon: TrendingUp,
+    badge: "SUIVI RIGOUREUX",
+    title: "PROGRESSION MESURABLE",
+    subtitle: "Fiche technique de suivi et objectifs",
     description:
-      "Le talent mécanique ne vaut rien si le mental flanche en prolongation. Travail sur la gestion émotionnelle, les routines respiratoires de match et l'élimination des spirales négatives.",
+      "Accompagnement méthodique structuré autour de ta fiche technique de suivi. Évaluation continue des aim scores et validation rigoureuse de tes compétences.",
     specs: [
-      { label: "Résistance au tilt", val: "Protocole anti-panique" },
-      { label: "Sang-froid mesuré", val: "BPM stabilisé en 1v1" },
-      { label: "Mentalité", val: "Posture de compétiteur pro" },
+      { label: "Fiche technique", val: "Suivi personnalisé" },
+      { label: "Aim Scores", val: "Métriques réelles" },
+      { label: "Compétences", val: "Objectifs validés" },
     ],
+    hasClip: false,
+    clipTitle: "",
+    clipSubtitle: "",
     color: "acid",
   },
   {
     num: "05",
-    icon: TrendingUp,
-    badge: "RÉSULTATS FORMELS",
-    title: "PROGRESSION MESURABLE",
-    subtitle: "Suivi continu et objectifs clairs",
+    icon: Flame,
+    badge: "PSYCHOLOGIE DU JOUEUR",
+    title: "ANTITILT & SANG-FROID",
+    subtitle: "Protocole de clutch et mindset de compétiteur",
     description:
-      "Un accompagnement rigoureux basé sur tes objectifs réels de compétition. Après chaque session, tes métriques sont mises à jour pour mesurer tes gains de performance tangibles.",
+      "Développe le mental des champions pour sécuriser tes situations de clutch 1v3 et 1v5. Routine anti-panique, maîtrise du stress et sang-froid absolu.",
     specs: [
-      { label: "Gain moyen", val: "+350 à +450 RR constatés" },
-      { label: "Liaison", val: "Canal privé Discord 7j/7" },
-      { label: "Debriefing", val: "Suivi continu après match" },
+      { label: "Protocole", val: "Gestion de clutch" },
+      { label: "Situations 1vX", val: "1v3 / 1v5 assurés" },
+      { label: "Mindset", val: "Posture compétiteur" },
     ],
+    hasClip: true,
+    clipTitle: "SANG-FROID EN CLUTCH // 1V3 & 1V5",
+    clipSubtitle: "Clip clutch et 1v3 Apex Legends",
     color: "laser",
   },
   {
     num: "06",
     icon: ShieldCheck,
     badge: "CONTRAT DE CONFIANCE",
-    title: "GARANTIE DE PALIER",
-    subtitle: "Montée en division garantie sous 14 jours",
+    title: "STEPUP GARANTIE",
+    subtitle: "Trackez vos progrès et gagnez des RR",
     description:
-      "Si après avoir suivi le protocole et appliqué les routines prescrites tu ne progresses pas en compétition, les séances de recalibrage sont offertes jusqu'à validation de ton objectif.",
+      "Un cadre d'entraînement strict pour acquérir l'ensemble des compétences requises. Progression tangible, gains de RR constants et métamorphose en joueur complet.",
     specs: [
-      { label: "Garantie", val: "+1 division minimum" },
-      { label: "Délai moyen", val: "9 à 14 jours" },
-      { label: "Engagement", val: "100% formalisé" },
+      { label: "Progrès", val: "Trackez vos gains" },
+      { label: "Gains RR", val: "Compétences acquises" },
+      { label: "Profil", val: "Joueur complet" },
     ],
+    hasClip: false,
+    clipTitle: "",
+    clipSubtitle: "",
     color: "acid",
   },
 ];
@@ -107,7 +125,7 @@ export default function WhyPoulpy() {
   const pillBtnsRef = useRef<HTMLButtonElement[]>([]);
   const cardFlippersRef = useRef<(HTMLDivElement | null)[]>([]);
   const activeIndexRef = useRef(0);
-  const scrollDistanceRef = useRef(3800);
+  const scrollDistanceRef = useRef(3200);
 
   const updatePills = (activeIdx: number) => {
     pillBtnsRef.current.forEach((btn, idx) => {
@@ -123,6 +141,9 @@ export default function WhyPoulpy() {
   const flippedStatesRef = useRef<boolean[]>([false, false, false, false, false, false]);
 
   const animateCardFlip = (idx: number, targetFlipped: boolean) => {
+    // Only animate flip on cards that actually have a clip
+    if (!pillars[idx]?.hasClip) return;
+
     const el = cardFlippersRef.current[idx];
     if (!el) return;
     flippedStatesRef.current[idx] = targetFlipped;
@@ -145,6 +166,7 @@ export default function WhyPoulpy() {
 
   const handleCardClick = (idx: number, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
+    if (!pillars[idx]?.hasClip) return;
     const isCurrentlyFlipped = flippedStatesRef.current[idx];
     animateCardFlip(idx, !isCurrentlyFlipped);
   };
@@ -166,8 +188,8 @@ export default function WhyPoulpy() {
       const firstItemLeft = items[0].offsetLeft;
       const cardPositions = items.map((el) => Math.min(maxScroll, Math.max(0, el.offsetLeft - firstItemLeft)));
 
-      // Calibrated scroll distance: spacious, comfortable pacing per vignette
-      const totalScrollDistance = Math.max(3400, maxScroll * 2.5);
+      // Pacing calibrated: clips cards have pauses, non-clip cards slide smoothly
+      const totalScrollDistance = Math.max(3000, maxScroll * 2.3);
       scrollDistanceRef.current = totalScrollDistance;
 
       ctx = gsap.context(() => {
@@ -179,14 +201,11 @@ export default function WhyPoulpy() {
           }
         });
 
-        // Thresholds calibrated: Card 0 flips around 9%, each card gets comfortable inspection time
+        // Thresholds only for cards with clips (01 -> idx 0, 03 -> idx 2, 05 -> idx 4)
         const thresholds = [
-          { forward: 0.09, backward: 0.06 },
-          { forward: 0.24, backward: 0.20 },
-          { forward: 0.40, backward: 0.36 },
-          { forward: 0.56, backward: 0.52 },
-          { forward: 0.72, backward: 0.68 },
-          { forward: 0.86, backward: 0.82 },
+          { idx: 0, forward: 0.09, backward: 0.06 }, // Case 01 (Clip Aim training)
+          { idx: 2, forward: 0.38, backward: 0.34 }, // Case 03 (Clip Gamesense & clutch)
+          { idx: 4, forward: 0.68, backward: 0.64 }, // Case 05 (Clip Antitilt & 1v3)
         ];
 
         const tl = gsap.timeline({
@@ -212,11 +231,11 @@ export default function WhyPoulpy() {
               // Active pill indicator
               const activeIdx = Math.min(
                 5,
-                progress < 0.17 ? 0
-                  : progress < 0.33 ? 1
-                  : progress < 0.49 ? 2
-                  : progress < 0.65 ? 3
-                  : progress < 0.81 ? 4
+                progress < 0.16 ? 0
+                  : progress < 0.32 ? 1
+                  : progress < 0.48 ? 2
+                  : progress < 0.64 ? 3
+                  : progress < 0.80 ? 4
                   : 5
               );
               if (activeIdx !== activeIndexRef.current) {
@@ -224,25 +243,44 @@ export default function WhyPoulpy() {
                 updatePills(activeIdx);
               }
 
-              // Trigger independent smooth flip/unflip animations based on scroll thresholds
-              thresholds.forEach((th, idx) => {
-                const isFlipped = flippedStatesRef.current[idx];
+              // Trigger smooth flip only on cards with clips
+              thresholds.forEach((th) => {
+                const isFlipped = flippedStatesRef.current[th.idx];
                 if (!isFlipped && progress >= th.forward) {
-                  animateCardFlip(idx, true);
+                  animateCardFlip(th.idx, true);
                 } else if (isFlipped && progress < th.backward) {
-                  animateCardFlip(idx, false);
+                  animateCardFlip(th.idx, false);
                 }
               });
             },
           },
         });
 
-        // Smooth horizontal track progression with generous holds per card
-        tl.to(track, { x: 0, duration: 0.4, ease: "none" });
-        for (let i = 1; i <= 5; i++) {
-          tl.to(track, { x: -cardPositions[i], duration: 0.85, ease: "power1.inOut" });
-          tl.to(track, { x: -cardPositions[i], duration: 0.45, ease: "none" });
-        }
+        // Choreographed Timeline:
+        // Card 0 (Clip): Hold front, user scrolls -> flips -> hold video
+        tl.to(track, { x: 0, duration: 0.45, ease: "none" });
+
+        // Card 1 (No clip): Smooth pass-through without long stall
+        tl.to(track, { x: -cardPositions[1], duration: 0.8, ease: "power1.inOut" });
+        tl.to(track, { x: -cardPositions[1], duration: 0.25, ease: "none" });
+
+        // Card 2 (Clip): Settle, flip & observe
+        tl.to(track, { x: -cardPositions[2], duration: 0.8, ease: "power1.inOut" });
+        tl.to(track, { x: -cardPositions[2], duration: 0.5, ease: "none" });
+
+        // Card 3 (No clip): Smooth pass-through
+        tl.to(track, { x: -cardPositions[3], duration: 0.8, ease: "power1.inOut" });
+        tl.to(track, { x: -cardPositions[3], duration: 0.25, ease: "none" });
+
+        // Card 4 (Clip): Settle, flip & observe
+        tl.to(track, { x: -cardPositions[4], duration: 0.8, ease: "power1.inOut" });
+        tl.to(track, { x: -cardPositions[4], duration: 0.5, ease: "none" });
+
+        // Card 5 (No clip): Smooth pass-through to CTA
+        tl.to(track, { x: -cardPositions[5], duration: 0.8, ease: "power1.inOut" });
+        tl.to(track, { x: -cardPositions[5], duration: 0.25, ease: "none" });
+
+        // Final CTA Callout Card
         tl.to(track, { x: -maxScroll, duration: 0.7, ease: "power1.inOut" });
       }, section);
     };
@@ -273,7 +311,7 @@ export default function WhyPoulpy() {
     const section = sectionRef.current;
     if (!section) return;
 
-    const cardTargetProgress = [0.09, 0.25, 0.41, 0.57, 0.73, 0.87];
+    const cardTargetProgress = [0.09, 0.23, 0.40, 0.56, 0.72, 0.86];
     const targetProgress = cardTargetProgress[index] ?? (index / 5) * 0.85;
     const sectionTop = section.getBoundingClientRect().top + window.scrollY;
     const targetY = sectionTop + targetProgress * scrollDistanceRef.current;
@@ -345,11 +383,14 @@ export default function WhyPoulpy() {
         {pillars.map((item, idx) => {
           const Icon = item.icon;
           const isAcid = item.color === "acid";
+          const hasClip = item.hasClip;
 
           return (
             <div
               key={item.num}
-              className="w-[85vw] sm:w-[500px] lg:w-[560px] h-[520px] shrink-0 relative cursor-pointer group/card"
+              className={`w-[85vw] sm:w-[500px] lg:w-[560px] h-[520px] shrink-0 relative ${
+                hasClip ? "cursor-pointer group/card" : ""
+              }`}
               onClick={(e) => handleCardClick(idx, e)}
               style={{
                 perspective: "1400px",
@@ -459,96 +500,105 @@ export default function WhyPoulpy() {
                     <div className="pt-4 mt-4 border-t border-white/5 flex items-center justify-between text-[10px] text-white/40 relative z-10">
                       <span>PILIER {item.num} // 06</span>
                       
-                      <div className="flex items-center gap-2 text-white/50 font-mono text-[10px] uppercase">
-                        <span className="relative flex h-2 w-2">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF7582] opacity-75" />
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF7582]" />
-                        </span>
-                        <span className="text-[#FF7582] font-bold">EXTRAIT VOD DISPONIBLE</span>
-                      </div>
+                      {hasClip ? (
+                        <div className="flex items-center gap-2 text-white/50 font-mono text-[10px] uppercase">
+                          <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF7582] opacity-75" />
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF7582]" />
+                          </span>
+                          <span className="text-[#FF7582] font-bold">EXTRAIT VOD DISPONIBLE</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5 text-white/40 font-mono text-[10px] uppercase">
+                          <span className="w-1.5 h-1.5 bg-white/30 rounded-full" />
+                          <span>MÉTHODE THÉORIQUE & DATA</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
 
                 {/* ======================================================== */}
-                {/* FACE ARRIÈRE (BACK - LECTEUR CLIP VIDÉO) */}
+                {/* FACE ARRIÈRE (BACK - LECTEUR CLIP VIDÉO pour cartes avec clip) */}
                 {/* ======================================================== */}
-                <div
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    width: "100%",
-                    height: "100%",
-                    backfaceVisibility: "hidden",
-                    WebkitBackfaceVisibility: "hidden",
-                    transform: "rotateY(180deg) translateZ(1px)",
-                    willChange: "transform",
-                    transformStyle: "preserve-3d",
-                    WebkitTransformStyle: "preserve-3d",
-                  }}
-                  className="reticle-box p-6 sm:p-8 bg-[#090C12] border-2 border-[#FF7582] shadow-[0_0_35px_rgba(255,117,130,0.3)] flex flex-col justify-between"
-                >
-                  <CornerBrackets color="coral" />
+                {hasClip && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      width: "100%",
+                      height: "100%",
+                      backfaceVisibility: "hidden",
+                      WebkitBackfaceVisibility: "hidden",
+                      transform: "rotateY(180deg) translateZ(1px)",
+                      willChange: "transform",
+                      transformStyle: "preserve-3d",
+                      WebkitTransformStyle: "preserve-3d",
+                    }}
+                    className="reticle-box p-6 sm:p-8 bg-[#090C12] border-2 border-[#FF7582] shadow-[0_0_35px_rgba(255,117,130,0.3)] flex flex-col justify-between"
+                  >
+                    <CornerBrackets color="coral" />
 
-                  {/* Back Header */}
-                  <div className="flex items-center justify-between border-b border-white/10 pb-3 relative z-10">
-                    <div className="flex items-center gap-2">
-                      <span className="bg-[#FF7582] text-black text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
-                        EXTRAIT VOD // PILIER {item.num}
-                      </span>
-                      <span className="text-xs text-white/70 font-display hidden sm:inline">
-                        {item.title}
-                      </span>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={(e) => handleCardClick(idx, e)}
-                      className="btn-cyber-ghost text-[10px] py-1.5 px-3 flex items-center gap-1.5 hover:border-[#FF7582] hover:text-[#FF7582] cursor-pointer"
-                    >
-                      <RotateCcw className="w-3 h-3" />
-                      <span>RETOUR [✕]</span>
-                    </button>
-                  </div>
-
-                  {/* Video Mockup Container */}
-                  <div className="relative my-auto aspect-video w-full bg-black/90 border border-white/20 flex flex-col items-center justify-center overflow-hidden group/player shadow-inner z-10">
-                    {/* Scanlines / Grid effect */}
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#FF7582]/10 via-transparent to-black pointer-events-none" />
-                    <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
-
-                    {/* Play Button with breathing rings */}
-                    <div className="relative z-10 flex flex-col items-center gap-3">
-                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#FF7582]/20 border-2 border-[#FF7582] flex items-center justify-center text-[#FF7582] shadow-[0_0_25px_rgba(255,117,130,0.5)] group-hover/player:scale-110 transition-transform cursor-pointer">
-                        <Play className="w-6 h-6 fill-current ml-1" />
-                      </div>
-                      <div className="text-center space-y-0.5">
-                        <span className="text-xs font-bold font-display tracking-wider text-white block">
-                          CLIP VOD DISPONIBLE TRÈS BIENTÔT
+                    {/* Back Header */}
+                    <div className="flex items-center justify-between border-b border-white/10 pb-3 relative z-10">
+                      <div className="flex items-center gap-2">
+                        <span className="bg-[#FF7582] text-black text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
+                          EXTRAIT VOD // PILIER {item.num}
                         </span>
-                        <span className="text-[10px] text-white/50 font-mono block">
-                          Format vidéo YouTube // 1080p 60 FPS
+                        <span className="text-xs text-white/70 font-display hidden sm:inline">
+                          {item.title}
                         </span>
                       </div>
+
+                      <button
+                        type="button"
+                        onClick={(e) => handleCardClick(idx, e)}
+                        className="btn-cyber-ghost text-[10px] py-1.5 px-3 flex items-center gap-1.5 hover:border-[#FF7582] hover:text-[#FF7582] cursor-pointer"
+                      >
+                        <RotateCcw className="w-3 h-3" />
+                        <span>RETOUR [✕]</span>
+                      </button>
                     </div>
 
-                    {/* Bottom bar overlay */}
-                    <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-[9px] font-mono text-white/60 z-10">
-                      <span className="bg-black/80 px-2 py-0.5 border border-white/10">00:45 / 01:30</span>
-                      <span className="text-[#FF7582] font-bold">COACH POULPY REPLAY ARCHIVE</span>
+                    {/* Video Mockup Container */}
+                    <div className="relative my-auto aspect-video w-full bg-black/90 border border-white/20 flex flex-col items-center justify-center overflow-hidden group/player shadow-inner z-10">
+                      {/* Scanlines / Grid effect */}
+                      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#FF7582]/10 via-transparent to-black pointer-events-none" />
+                      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
+
+                      {/* Play Button with breathing rings */}
+                      <div className="relative z-10 flex flex-col items-center gap-3">
+                        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#FF7582]/20 border-2 border-[#FF7582] flex items-center justify-center text-[#FF7582] shadow-[0_0_25px_rgba(255,117,130,0.5)] group-hover/player:scale-110 transition-transform cursor-pointer">
+                          <Play className="w-6 h-6 fill-current ml-1" />
+                        </div>
+                        <div className="text-center space-y-0.5">
+                          <span className="text-xs font-bold font-display tracking-wider text-white block">
+                            {item.clipTitle}
+                          </span>
+                          <span className="text-[10px] text-white/50 font-mono block">
+                            CLIP DISPONIBLE TRÈS BIENTÔT // 1080P 60FPS
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Bottom bar overlay */}
+                      <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-[9px] font-mono text-white/60 z-10">
+                        <span className="bg-black/80 px-2 py-0.5 border border-white/10">00:45 / 01:30</span>
+                        <span className="text-[#FF7582] font-bold">COACH POULPY REPLAY ARCHIVE</span>
+                      </div>
+                    </div>
+
+                    {/* Back Footer */}
+                    <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs relative z-10">
+                      <span className="text-[10px] text-white/60 truncate">
+                        Démonstration : <strong className="text-white">{item.clipSubtitle}</strong>
+                      </span>
+                      <span className="text-[9px] font-mono text-[#FF7582] uppercase tracking-wider">
+                        [LECTEUR ACTIF]
+                      </span>
                     </div>
                   </div>
-
-                  {/* Back Footer (Clean Single-Line Note) */}
-                  <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs relative z-10">
-                    <span className="text-[10px] text-white/60 truncate">
-                      Démonstration : <strong className="text-white">{item.subtitle}</strong>
-                    </span>
-                    <span className="text-[9px] font-mono text-[#FF7582] uppercase tracking-wider">
-                      [LECTEUR ACTIF]
-                    </span>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           );
@@ -588,4 +638,5 @@ export default function WhyPoulpy() {
     </section>
   );
 }
+
 
