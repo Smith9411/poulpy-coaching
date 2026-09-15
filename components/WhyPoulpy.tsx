@@ -7,108 +7,120 @@ import DecryptedText from "./DecryptedText";
 import CornerBrackets from "./CornerBrackets";
 import { Target, Brain, Crosshair, TrendingUp, ShieldCheck, Flame, ChevronRight, ArrowRight } from "lucide-react";
 
-gsap.registerPlugin(ScrollTrigger);
+const PILLARS = [
+  {
+    num: "01",
+    icon: Target,
+    badge: "VOD CHIRURGIE",
+    title: "ANALYSE CHIRURGICALE",
+    subtitle: "Dissection millimétrique de tes parties",
+    description:
+      "Nous analysons tes replays en 4K image par image. Chaque élimination subie est décortiquée : micro-déficit d'angle, mauvais tempo de décalage ou exposition inutile.",
+    specs: [
+      { label: "Précision d'analyse", val: "Sub-pixel & 60 FPS" },
+      { label: "Erreurs corrigées", val: "15 à 20 par session" },
+      { label: "Rapport", val: "Fiche Notion exportable" },
+    ],
+    color: "laser",
+  },
+  {
+    num: "02",
+    icon: Brain,
+    badge: "VISION TACTIQUE",
+    title: "GAME SENSE & MACRO-GAME",
+    subtitle: "Anticiper au lieu de subir",
+    description:
+      "Apprends à décoder les intentions ennemies 15 secondes avant qu'elles ne se produisent. Maîtrise des rotations, timing d'utilitaires et domination psychologique en clutch 1v2+.",
+    specs: [
+      { label: "Survie en clutch", val: "+45% en 3 semaines" },
+      { label: "Lecture de carte", val: "Prédiction macro" },
+      { label: "Prise de décision", val: "Instantanée sous stress" },
+    ],
+    color: "acid",
+  },
+  {
+    num: "03",
+    icon: Crosshair,
+    badge: "MÉCANIQUE PURE",
+    title: "AIM & BIOMÉCANIQUE",
+    subtitle: "La visée au millimètre près",
+    description:
+      "Programme sur-mesure axé sur la régularité pure : placement du viseur sub-pixel, tracking sans saccade, synchronisation mouvement/tir et posture physique adaptée.",
+    specs: [
+      { label: "Routine sur-mesure", val: "20 min KovaaK / Aimlabs" },
+      { label: "Sensibilité eDPI", val: "Calibration cm/360" },
+      { label: "Headshot %", val: "+18% en moyenne" },
+    ],
+    color: "laser",
+  },
+  {
+    num: "04",
+    icon: Flame,
+    badge: "PSYCHOLOGIE DU JOUEUR",
+    title: "ANTI-TILT & SANG-FROID",
+    subtitle: "Garder le contrôle absolu sous haute pression",
+    description:
+      "Le talent mécanique ne vaut rien si le mental flanche en prolongation. Travail sur la gestion émotionnelle, les routines respiratoires de match et l'élimination des spirales négatives.",
+    specs: [
+      { label: "Résistance au tilt", val: "Protocole anti-panique" },
+      { label: "Sang-froid mesuré", val: "BPM stabilisé en 1v1" },
+      { label: "Mentalité", val: "Posture de compétiteur pro" },
+    ],
+    color: "acid",
+  },
+  {
+    num: "05",
+    icon: TrendingUp,
+    badge: "RÉSULTATS FORMELS",
+    title: "PROGRESSION MESURABLE",
+    subtitle: "Suivi continu et objectifs clairs",
+    description:
+      "Un accompagnement rigoureux basé sur tes objectifs réels de compétition. Après chaque session, tes métriques sont mises à jour pour mesurer tes gains de performance tangibles.",
+    specs: [
+      { label: "Gain moyen", val: "+350 à +450 RR constatés" },
+      { label: "Liaison", val: "Canal privé Discord 7j/7" },
+      { label: "Debriefing", val: "Suivi continu après match" },
+    ],
+    color: "laser",
+  },
+  {
+    num: "06",
+    icon: ShieldCheck,
+    badge: "CONTRAT DE CONFIANCE",
+    title: "GARANTIE DE PALIER",
+    subtitle: "Montée en division garantie sous 14 jours",
+    description:
+      "Si après avoir suivi le protocole et appliqué les routines prescrites tu ne progresses pas en compétition, les séances de recalibrage sont offertes jusqu'à validation de ton objectif.",
+    specs: [
+      { label: "Garantie", val: "+1 division minimum" },
+      { label: "Délai moyen", val: "9 à 14 jours" },
+      { label: "Engagement", val: "100% formalisé" },
+    ],
+    color: "acid",
+  },
+];
 
 export default function WhyPoulpy() {
+  const pillars = PILLARS;
   const sectionRef = useRef<HTMLElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
-  const [scrollPct, setScrollPct] = useState(0);
-
-  const pillars = [
-    {
-      num: "01",
-      icon: Target,
-      badge: "VOD CHIRURGIE",
-      title: "ANALYSE CHIRURGICALE",
-      subtitle: "Dissection millimétrique de tes parties",
-      description:
-        "Nous analysons tes replays en 4K image par image. Chaque élimination subie est décortiquée : micro-déficit d'angle, mauvais tempo de décalage ou exposition inutile.",
-      specs: [
-        { label: "Précision d'analyse", val: "Sub-pixel & 60 FPS" },
-        { label: "Erreurs corrigées", val: "15 à 20 par session" },
-        { label: "Rapport", val: "Fiche Notion exportable" },
-      ],
-      color: "laser",
-    },
-    {
-      num: "02",
-      icon: Brain,
-      badge: "VISION TACTIQUE",
-      title: "GAME SENSE & MACRO-GAME",
-      subtitle: "Anticiper au lieu de subir",
-      description:
-        "Apprends à décoder les intentions ennemies 15 secondes avant qu'elles ne se produisent. Maîtrise des rotations, timing d'utilitaires et domination psychologique en clutch 1v2+.",
-      specs: [
-        { label: "Survie en clutch", val: "+45% en 3 semaines" },
-        { label: "Lecture de carte", val: "Prédiction macro" },
-        { label: "Prise de décision", val: "Instantanée sous stress" },
-      ],
-      color: "acid",
-    },
-    {
-      num: "03",
-      icon: Crosshair,
-      badge: "MÉCANIQUE PURE",
-      title: "AIM & BIOMÉCANIQUE",
-      subtitle: "La visée au millimètre près",
-      description:
-        "Programme sur-mesure axé sur la régularité pure : placement du viseur sub-pixel, tracking sans saccade, synchronisation mouvement/tir et posture physique adaptée.",
-      specs: [
-        { label: "Routine sur-mesure", val: "20 min KovaaK / Aimlabs" },
-        { label: "Sensibilité eDPI", val: "Calibration cm/360" },
-        { label: "Headshot %", val: "+18% en moyenne" },
-      ],
-      color: "laser",
-    },
-    {
-      num: "04",
-      icon: Flame,
-      badge: "PSYCHOLOGIE DU JOUEUR",
-      title: "ANTI-TILT & SANG-FROID",
-      subtitle: "Garder le contrôle absolu sous haute pression",
-      description:
-        "Le talent mécanique ne vaut rien si le mental flanche en prolongation. Travail sur la gestion émotionnelle, les routines respiratoires de match et l'élimination des spirales négatives.",
-      specs: [
-        { label: "Résistance au tilt", val: "Protocole anti-panique" },
-        { label: "Sang-froid mesuré", val: "BPM stabilisé en 1v1" },
-        { label: "Mentalité", val: "Posture de compétiteur pro" },
-      ],
-      color: "acid",
-    },
-    {
-      num: "05",
-      icon: TrendingUp,
-      badge: "RÉSULTATS FORMELS",
-      title: "PROGRESSION MESURABLE",
-      subtitle: "Suivi continu et objectifs clairs",
-      description:
-        "Un accompagnement rigoureux basé sur tes objectifs réels de compétition. Après chaque session, tes métriques sont mises à jour pour mesurer tes gains de performance tangibles.",
-      specs: [
-        { label: "Gain moyen", val: "+350 à +450 RR constatés" },
-        { label: "Liaison", val: "Canal privé Discord 7j/7" },
-        { label: "Debriefing", val: "Suivi continu après match" },
-      ],
-      color: "laser",
-    },
-    {
-      num: "06",
-      icon: ShieldCheck,
-      badge: "CONTRAT DE CONFIANCE",
-      title: "GARANTIE DE PALIER",
-      subtitle: "Montée en division garantie sous 14 jours",
-      description:
-        "Si après avoir suivi le protocole et appliqué les routines prescrites tu ne progresses pas en compétition, les séances de recalibrage sont offertes jusqu'à validation de ton objectif.",
-      specs: [
-        { label: "Garantie", val: "+1 division minimum" },
-        { label: "Délai moyen", val: "9 à 14 jours" },
-        { label: "Engagement", val: "100% formalisé" },
-      ],
-      color: "acid",
-    },
-  ];
-
-  const [activeIndex, setActiveIndex] = useState(0);
+  const progressBarRef = useRef<HTMLDivElement | null>(null);
+  const scrollPctRef = useRef<HTMLSpanElement | null>(null);
+  const pillsRef = useRef<HTMLDivElement | null>(null);
+  const activeIndexRef = useRef(0);
   const trackDistanceRef = useRef(3000);
+
+  const updatePills = (activeIdx: number) => {
+    if (!pillsRef.current) return;
+    const buttons = pillsRef.current.querySelectorAll("button");
+    buttons.forEach((btn, idx) => {
+      if (idx === activeIdx) {
+        btn.className = "px-2 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer border-[#FF7582] bg-[#FF7582] text-black shadow-[0_0_10px_rgba(255,117,130,0.4)]";
+      } else {
+        btn.className = "px-2 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer border-white/15 text-white/50 hover:border-white/40 hover:text-white bg-black/40";
+      }
+    });
+  };
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -137,20 +149,38 @@ export default function WhyPoulpy() {
             trigger: section,
             start: "top top",
             end: "bottom bottom",
-            scrub: 0.5,
+            scrub: 0.35,
+            fastScrollEnd: true,
+            preventOverlaps: true,
             invalidateOnRefresh: true,
-            onUpdate: (self) => {
-              const pct = Math.round(self.progress * 100);
-              const idx = Math.min(5, Math.floor(self.progress * 6));
-              setScrollPct(pct);
-              setActiveIndex(idx);
+            onUpdate: (self: { progress: number }) => {
+              const progress = self.progress;
+              const pct = Math.round(progress * 100);
+              if (scrollPctRef.current) {
+                scrollPctRef.current.textContent = `${pct}%`;
+              }
+              if (progressBarRef.current) {
+                progressBarRef.current.style.transform = `scaleX(${progress})`;
+              }
+              const idx = Math.min(5, Math.floor(progress * 6));
+              if (idx !== activeIndexRef.current) {
+                activeIndexRef.current = idx;
+                updatePills(idx);
+              }
             },
           },
         });
       }, section);
     };
 
-    bindScroll();
+    if (typeof document !== "undefined" && document.fonts) {
+      document.fonts.ready.then(() => {
+        bindScroll();
+        ScrollTrigger.refresh();
+      });
+    } else {
+      bindScroll();
+    }
 
     const handleResize = () => {
       bindScroll();
@@ -212,13 +242,13 @@ export default function WhyPoulpy() {
           {/* Pill Navigation & Live Progress */}
           <div className="flex items-center gap-4 text-xs">
             {/* Direct Card Jump Pills */}
-            <div className="flex items-center gap-1.5">
+            <div ref={pillsRef} className="flex items-center gap-1.5">
               {pillars.map((p, idx) => (
                 <button
                   key={p.num}
                   onClick={() => goToCard(idx)}
-                  className={`px-2 py-0.5 text-[10px] font-bold border transition-all cursor-pointer ${
-                    activeIndex === idx
+                  className={`px-2 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer ${
+                    idx === 0
                       ? "border-[#FF7582] bg-[#FF7582] text-black shadow-[0_0_10px_rgba(255,117,130,0.4)]"
                       : "border-white/15 text-white/50 hover:border-white/40 hover:text-white bg-black/40"
                   }`}
@@ -229,11 +259,12 @@ export default function WhyPoulpy() {
             </div>
 
             <span className="text-white/40 hidden sm:inline">AVANCEMENT :</span>
-            <span className="text-[#FF7582] font-bold">{scrollPct}%</span>
+            <span ref={scrollPctRef} className="text-[#FF7582] font-bold">0%</span>
             <div className="w-24 sm:w-32 h-1.5 bg-white/10 border border-white/15 relative overflow-hidden">
               <div
-                className="h-full bg-[#FF7582] shadow-[0_0_10px_#FF7582] transition-all duration-75"
-                style={{ width: `${scrollPct}%` }}
+                ref={progressBarRef}
+                className="h-full w-full bg-[#FF7582] shadow-[0_0_10px_#FF7582] origin-left will-change-transform"
+                style={{ transform: "scaleX(0)" }}
               />
             </div>
           </div>
@@ -250,9 +281,10 @@ export default function WhyPoulpy() {
             return (
               <div
                 key={item.num}
+                style={{ contain: "layout style paint" }}
                 className={`group w-[85vw] sm:w-[500px] lg:w-[560px] shrink-0 reticle-box ${
                   isAcid ? "" : "reticle-laser"
-                } p-8 sm:p-10 space-y-6 bg-[#090c10] border border-white/10 relative overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.9)] transition-colors duration-300 ${
+                } p-8 sm:p-10 space-y-6 bg-[#090c10] border border-white/10 relative overflow-hidden shadow-[0_4px_30px_rgba(0,0,0,0.8)] transition-colors duration-300 ${
                   isAcid ? "hover:border-[#FF7582]/50" : "hover:border-[#8FAFD4]/50"
                 }`}
               >
@@ -328,7 +360,10 @@ export default function WhyPoulpy() {
           })}
 
           {/* Final Callout Card at End of Scroll */}
-          <div className="w-[85vw] sm:w-[480px] shrink-0 reticle-box p-8 sm:p-10 flex flex-col justify-between space-y-6 bg-black border border-[#FF7582]/50 relative overflow-hidden shadow-[0_0_40px_rgba(255,117,130,0.2)]">
+          <div
+            style={{ contain: "layout style paint" }}
+            className="w-[85vw] sm:w-[480px] shrink-0 reticle-box p-8 sm:p-10 flex flex-col justify-between space-y-6 bg-black border border-[#FF7582]/50 relative overflow-hidden shadow-[0_4px_30px_rgba(255,117,130,0.2)]"
+          >
             <div className="radar-sweep-line" />
             <div className="space-y-3 relative z-10">
               <span className="data-badge data-badge-acid">PRÊT POUR L&apos;ASCENSION ?</span>

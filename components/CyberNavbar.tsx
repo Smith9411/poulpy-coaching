@@ -232,9 +232,20 @@ export default function CyberNavbar({
       }
     };
 
+    let ticking = false;
+    const onScrollThrottled = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
     handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll, { passive: true });
+    window.addEventListener("scroll", onScrollThrottled, { passive: true });
+    window.addEventListener("resize", onScrollThrottled, { passive: true });
 
     const handleClickOutside = (e: MouseEvent) => {
       if (notifsRef.current && !notifsRef.current.contains(e.target as Node)) {
@@ -247,8 +258,8 @@ export default function CyberNavbar({
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
+      window.removeEventListener("scroll", onScrollThrottled);
+      window.removeEventListener("resize", onScrollThrottled);
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isHomePage]);

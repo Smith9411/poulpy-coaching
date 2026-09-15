@@ -30,7 +30,7 @@ export default function Scene3D() {
         antialias: false,
         powerPreference: "default",
       });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
       renderer.setSize(width, height);
       renderer.setClearColor(0x000000, 0);
       mount.appendChild(renderer.domElement);
@@ -177,11 +177,16 @@ export default function Scene3D() {
       const animate = () => {
         animId = requestAnimationFrame(animate);
 
+        const currentScroll = typeof window !== "undefined" ? window.scrollY : 0;
+
+        // When user scrolls past hero section, pause rendering to free 100% CPU/GPU for smooth scrolling
+        if (currentScroll > window.innerHeight * 1.05) {
+          return;
+        }
+
         const now = performance.now();
         const delta = Math.min((now - lastTime) * 0.001, 0.05);
         lastTime = now;
-
-        const currentScroll = typeof window !== "undefined" ? window.scrollY : 0;
 
         // Smooth mouse follow
         mouseX += (targetX - mouseX) * 0.045;
