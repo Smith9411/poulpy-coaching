@@ -99,40 +99,74 @@ const PILLARS = [
   },
 ];
 
-function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
-  const [isFlipped, setIsFlipped] = useState(false);
+function PillarFlipCard({
+  item,
+  isFlipped,
+}: {
+  item: typeof PILLARS[0];
+  isFlipped: boolean;
+}) {
+  const [manualOverride, setManualOverride] = useState<boolean | null>(null);
   const controls = useAnimationControls();
-  const isAnimatingRef = useRef(false);
+  const prevFlippedRef = useRef(false);
+  const isFirstRenderRef = useRef(true);
   const Icon = item.icon;
   const isAcid = item.color === "acid";
 
-  const handleFlip = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (isAnimatingRef.current) return;
-    isAnimatingRef.current = true;
+  const effectiveFlipped = manualOverride !== null ? manualOverride : isFlipped;
 
-    const nextFlipped = !isFlipped;
-    setIsFlipped(nextFlipped);
+  // Trigger smooth jump-and-flip animation whenever effective flipped state changes
+  useEffect(() => {
+    if (isFirstRenderRef.current) {
+      isFirstRenderRef.current = false;
+      if (effectiveFlipped) {
+        const timer = setTimeout(() => {
+          controls.start({
+            y: [0, -48, 0],
+            scale: [1, 1.035, 1],
+            rotateY: 180,
+            transition: {
+              rotateY: { duration: 0.75, ease: [0.25, 1, 0.5, 1] },
+              y: { duration: 0.75, times: [0, 0.48, 1], ease: "easeInOut" },
+              scale: { duration: 0.75, times: [0, 0.48, 1], ease: "easeInOut" },
+            },
+          });
+          prevFlippedRef.current = true;
+        }, 500);
+        return () => clearTimeout(timer);
+      }
+      return;
+    }
 
-    controls
-      .start({
+    if (prevFlippedRef.current !== effectiveFlipped) {
+      prevFlippedRef.current = effectiveFlipped;
+      controls.start({
         y: [0, -48, 0],
         scale: [1, 1.035, 1],
-        rotateY: nextFlipped ? 180 : 0,
+        rotateY: effectiveFlipped ? 180 : 0,
         transition: {
-          rotateY: { duration: 0.7, ease: [0.25, 1, 0.5, 1] },
-          y: { duration: 0.7, times: [0, 0.48, 1], ease: "easeInOut" },
-          scale: { duration: 0.7, times: [0, 0.48, 1], ease: "easeInOut" },
+          rotateY: { duration: 0.75, ease: [0.25, 1, 0.5, 1] },
+          y: { duration: 0.75, times: [0, 0.48, 1], ease: "easeInOut" },
+          scale: { duration: 0.75, times: [0, 0.48, 1], ease: "easeInOut" },
         },
-      })
-      .then(() => {
-        isAnimatingRef.current = false;
       });
+    }
+  }, [effectiveFlipped, controls]);
+
+  // Reset manual override if scroll drives a new card
+  useEffect(() => {
+    setManualOverride(null);
+  }, [isFlipped]);
+
+  const handleManualToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setManualOverride((prev) => (prev !== null ? !prev : !isFlipped));
   };
 
   return (
     <div
-      className="w-[85vw] sm:w-[500px] lg:w-[560px] h-[520px] shrink-0 relative"
+      className="w-[85vw] sm:w-[500px] lg:w-[560px] h-[520px] shrink-0 relative cursor-pointer group/card"
+      onClick={handleManualToggle}
       style={{
         perspective: "1400px",
         transform: "translateZ(0)",
@@ -235,26 +269,17 @@ function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
               ))}
             </div>
 
-            {/* Footer Indicator with Prominent Breathing CLIP Button */}
+            {/* Footer Indicator (CLIP button temporarily replaced by clean indicator) */}
             <div className="pt-4 mt-4 border-t border-white/5 flex items-center justify-between text-[10px] text-white/40 relative z-10">
               <span>PILIER {item.num} // 06</span>
               
-              {/* Breathing CLIP Button */}
-              <button
-                type="button"
-                onClick={handleFlip}
-                className="relative group/clip px-4 py-2 bg-[#FF7582]/15 border border-[#FF7582] text-[#FF7582] hover:bg-[#FF7582] hover:text-black transition-all duration-200 font-mono text-[11px] font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer shadow-[0_0_18px_rgba(255,117,130,0.35)] animate-pulse"
-                title="Voir l'extrait vidéo de coaching"
-              >
-                {/* Glowing ping dot */}
+              <div className="flex items-center gap-2 text-white/50 font-mono text-[10px] uppercase">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF7582] opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF7582] group-hover/clip:bg-black" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF7582]" />
                 </span>
-
-                <Play className="w-3.5 h-3.5 fill-current" />
-                <span>CLIP</span>
-              </button>
+                <span className="text-[#FF7582] font-bold">EXTRAIT VOD DISPONIBLE</span>
+              </div>
             </div>
           </div>
         </div>
@@ -292,7 +317,7 @@ function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
 
             <button
               type="button"
-              onClick={handleFlip}
+              onClick={handleManualToggle}
               className="btn-cyber-ghost text-[10px] py-1.5 px-3 flex items-center gap-1.5 hover:border-[#FF7582] hover:text-[#FF7582] cursor-pointer"
             >
               <RotateCcw className="w-3 h-3" />
@@ -346,6 +371,7 @@ function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
 
 export default function WhyPoulpy() {
   const pillars = PILLARS;
+  const [activeCardIndex, setActiveCardIndex] = useState(0);
   const sectionRef = useRef<HTMLElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const progressBarRef = useRef<HTMLDivElement | null>(null);
@@ -404,6 +430,7 @@ export default function WhyPoulpy() {
               if (idx !== activeIndexRef.current) {
                 activeIndexRef.current = idx;
                 updatePills(idx);
+                setActiveCardIndex(idx);
               }
             },
           },
@@ -506,8 +533,12 @@ export default function WhyPoulpy() {
           backfaceVisibility: "hidden",
         }}
       >
-        {pillars.map((item) => (
-          <PillarFlipCard key={item.num} item={item} />
+        {pillars.map((item, idx) => (
+          <PillarFlipCard
+            key={item.num}
+            item={item}
+            isFlipped={activeCardIndex === idx}
+          />
         ))}
 
         {/* Final Callout Card at End of Scroll */}
