@@ -343,16 +343,9 @@ export default function WhyPoulpy() {
 
     gsap.to(el, {
       rotateY: targetFlipped ? 180 : 0,
+      y: 0,
       duration: 0.75,
       ease: "power2.out",
-      overwrite: "auto",
-    });
-    gsap.to(el, {
-      y: -26,
-      duration: 0.375,
-      yoyo: true,
-      repeat: 1,
-      ease: "power1.inOut",
       overwrite: "auto",
     });
   };
