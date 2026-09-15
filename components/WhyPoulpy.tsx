@@ -235,7 +235,7 @@ const PILLARS = [
       { label: "Macro", val: "+1 longueur d'avance" },
     ],
     hasClip: true,
-    videoSrc: "",
+    videoSrc: "/videos/why-poulpy/clutch.mp4",
     clipTitle: "CLUTCH GAME // VALORANT & 1V3 APEX",
     clipSubtitle: "Clip de clutch Valo et 1v3 Apex Legends",
     color: "laser",
