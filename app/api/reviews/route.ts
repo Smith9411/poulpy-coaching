@@ -28,6 +28,37 @@ interface ReviewItem {
   admin_response?: string;
   admin_response_at?: string;
   updated_at?: string;
+  featured?: boolean;
+}
+
+async function getFeaturedIds(): Promise<string[]> {
+  try {
+    const { data } = await supabase
+      .from('settings')
+      .select('value')
+      .eq('key', 'featured_review_ids')
+      .maybeSingle();
+
+    if (data?.value) {
+      const parsed = JSON.parse(data.value);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch (e) {
+    console.error('Erreur lecture featured_review_ids:', e);
+  }
+  return [];
+}
+
+async function saveFeaturedIds(ids: string[]): Promise<void> {
+  try {
+    await supabase.from('settings').upsert({
+      key: 'featured_review_ids',
+      value: JSON.stringify(ids),
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'key' });
+  } catch (e) {
+    console.error('Erreur sauvegarde featured_review_ids:', e);
+  }
 }
 
 async function getAuthUser(req: NextRequest) {
@@ -61,6 +92,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const sortBy = searchParams.get('sortBy') || 'date';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
+    const onlyFeatured = searchParams.get('featured') === 'true';
 
     let orderByColumn: string = 'created_at';
     let ascending: boolean = false;
@@ -81,14 +113,31 @@ export async function GET(req: NextRequest) {
         break;
     }
 
-    const { data: reviews, error } = await supabase
+    const { data: dbReviews, error } = await supabase
       .from('reviews')
       .select('*')
       .order(orderByColumn, { ascending });
 
     if (error) throw error;
 
-    return NextResponse.json({ reviews: reviews || [] });
+    const featuredIds = await getFeaturedIds();
+
+    let reviews = (dbReviews || []).map((r: any) => ({
+      ...r,
+      featured: featuredIds.includes(r.id) || r.featured === true,
+    }));
+
+    if (onlyFeatured) {
+      const featuredOnly = reviews.filter((r: any) => r.featured);
+      // If none explicitly marked as featured, fallback to all reviews so homepage is never empty
+      reviews = featuredOnly.length > 0 ? featuredOnly : reviews;
+    }
+
+    return NextResponse.json({
+      reviews,
+      totalCount: (dbReviews || []).length,
+      featuredCount: featuredIds.length,
+    });
   } catch (error) {
     console.error('Erreur récupération avis:', error);
     return NextResponse.json({ reviews: [] });
@@ -187,6 +236,38 @@ export async function PATCH(req: NextRequest) {
         { error: "Vous n'avez pas la permission de modifier cet avis." },
         { status: 403 }
       );
+    }
+
+    // Gestion du toggle "Épingler sur l'accueil" réservé aux admins
+    if (body.featured !== undefined) {
+      if (!isAdmin) {
+        return NextResponse.json(
+          { error: "Seul un administrateur peut décider des avis affichés sur l'accueil." },
+          { status: 403 }
+        );
+      }
+      const isFeatured = Boolean(body.featured);
+      let featuredIds = await getFeaturedIds();
+      if (isFeatured) {
+        if (!featuredIds.includes(id)) {
+          featuredIds.push(id);
+        }
+      } else {
+        featuredIds = featuredIds.filter((fid) => fid !== id);
+      }
+      await saveFeaturedIds(featuredIds);
+
+      try {
+        await supabase.from('reviews').update({ featured: isFeatured }).eq('id', id);
+      } catch {}
+
+      return NextResponse.json({
+        success: true,
+        featured: isFeatured,
+        featuredIds,
+        review: { ...existing, featured: isFeatured },
+        message: isFeatured ? "Avis affiché sur l'accueil avec succès" : "Avis retiré de l'accueil",
+      });
     }
 
     // Fenêtre d'édition de 5 min pour le propriétaire (admin peut toujours éditer)

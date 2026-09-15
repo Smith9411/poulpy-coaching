@@ -21,6 +21,7 @@ interface Review {
   updated_at?: string;
   admin_response?: string;
   admin_response_at?: string;
+  featured?: boolean;
 }
 
 const EDIT_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
@@ -488,6 +489,48 @@ export default function Avis() {
     }
   };
 
+  const [togglingFeaturedId, setTogglingFeaturedId] = useState<string | null>(null);
+
+  const handleToggleFeatured = async (reviewId: string, nextFeatured: boolean) => {
+    if (!user?.isAdmin) return;
+    setTogglingFeaturedId(reviewId);
+    try {
+      let { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        const { data: r } = await supabase.auth.refreshSession();
+        session = r.session;
+      }
+      if (!session?.access_token) throw new Error("Session expirée. Veuillez vous reconnecter.");
+
+      const res = await fetch('/api/reviews', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ id: reviewId, featured: nextFeatured }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || "Erreur lors de la mise à jour");
+
+      setReviews((prev) =>
+        prev.map((r) => (r.id === reviewId ? { ...r, featured: nextFeatured } : r))
+      );
+
+      showStatus(
+        'success',
+        nextFeatured
+          ? "★ Avis ajouté sur la page d'accueil !"
+          : "Avis retiré de la page d'accueil."
+      );
+    } catch (err: any) {
+      showStatus('error', err.message || "Erreur lors de la mise à jour");
+    } finally {
+      setTogglingFeaturedId(null);
+    }
+  };
+
   const avgRating =
     reviews.length > 0
       ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
@@ -888,51 +931,76 @@ export default function Avis() {
                 <div>
                   {/* Top: Stars + Owner/Admin Actions */}
                   <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/5">
-                    <div className="flex items-center gap-1">
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} size={15} className="fill-[#FF7582] text-[#FF7582]" />
-                      ))}
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1">
+                        {[...Array(testimonial.rating)].map((_, i) => (
+                          <Star key={i} size={15} className="fill-[#FF7582] text-[#FF7582]" />
+                        ))}
+                      </div>
+                      {testimonial.featured && (
+                        <span className="data-badge data-badge-acid text-[9px]">
+                          ★ SUR L&apos;ACCUEIL
+                        </span>
+                      )}
                     </div>
 
                     {/* Actions */}
-                    {user && (user.id === testimonial.user_id || user.isAdmin) && (
-                      <div className="flex items-center gap-1">
-                        {editingId !== testimonial.id && canEdit(testimonial) && (
-                          <button
-                            onClick={() => handleStartEdit(testimonial)}
-                            title={user.isAdmin && testimonial.user_id !== user.id ? 'Modifier (Admin)' : 'Modifier (5 min)'}
-                            className="p-1 text-white/40 hover:text-[#8FAFD4] transition-colors cursor-pointer"
-                          >
-                            <Edit3 size={14} />
-                          </button>
-                        )}
+                    <div className="flex items-center gap-1.5">
+                      {/* Admin Toggle Featured Button */}
+                      {user?.isAdmin && (
+                        <button
+                          onClick={() => handleToggleFeatured(testimonial.id, !testimonial.featured)}
+                          disabled={togglingFeaturedId === testimonial.id}
+                          title={testimonial.featured ? "Retirer de la page d'accueil" : "Afficher sur la page d'accueil (défilement en direct)"}
+                          className={`px-2 py-0.5 text-[10px] font-bold font-mono border transition-all cursor-pointer ${
+                            testimonial.featured
+                              ? "bg-[#FF7582] text-black border-[#FF7582] shadow-[0_0_10px_rgba(255,117,130,0.4)]"
+                              : "bg-black/80 text-white/60 hover:text-white border-white/20 hover:border-[#FF7582]/60 hover:bg-[#FF7582]/10"
+                          }`}
+                        >
+                          <span>{testimonial.featured ? "★ SUR L'ACCUEIL" : "+ ACCUEIL"}</span>
+                        </button>
+                      )}
 
-                        {confirmDeleteId === testimonial.id ? (
-                          <div className="flex items-center gap-1">
+                      {user && (user.id === testimonial.user_id || user.isAdmin) && (
+                        <>
+                          {editingId !== testimonial.id && canEdit(testimonial) && (
                             <button
-                              onClick={() => handleDeleteReview(testimonial.id)}
-                              className="px-2 py-0.5 text-[10px] bg-red-500/20 text-red-400 border border-red-500/40 hover:bg-red-500/40 font-bold"
+                              onClick={() => handleStartEdit(testimonial)}
+                              title={user.isAdmin && testimonial.user_id !== user.id ? 'Modifier (Admin)' : 'Modifier (5 min)'}
+                              className="p-1 text-white/40 hover:text-[#8FAFD4] transition-colors cursor-pointer"
                             >
-                              SUPPRIMER
+                              <Edit3 size={14} />
                             </button>
+                          )}
+
+                          {confirmDeleteId === testimonial.id ? (
+                            <div className="flex items-center gap-1">
+                              <button
+                                onClick={() => handleDeleteReview(testimonial.id)}
+                                className="px-2 py-0.5 text-[10px] bg-red-500/20 text-red-400 border border-red-500/40 hover:bg-red-500/40 font-bold"
+                              >
+                                SUPPRIMER
+                              </button>
+                              <button
+                                onClick={() => setConfirmDeleteId(null)}
+                                className="px-1.5 py-0.5 text-[10px] bg-white/5 text-white/50 hover:text-white"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ) : (
                             <button
-                              onClick={() => setConfirmDeleteId(null)}
-                              className="px-1.5 py-0.5 text-[10px] bg-white/5 text-white/50 hover:text-white"
+                              onClick={() => setConfirmDeleteId(testimonial.id)}
+                              title={user.isAdmin && testimonial.user_id !== user.id ? 'Supprimer (Admin)' : 'Supprimer votre avis'}
+                              className="p-1 text-white/40 hover:text-red-400 transition-colors cursor-pointer"
                             >
-                              ✕
+                              <Trash2 size={14} />
                             </button>
-                          </div>
-                        ) : (
-                          <button
-                            onClick={() => setConfirmDeleteId(testimonial.id)}
-                            title={user.isAdmin && testimonial.user_id !== user.id ? 'Supprimer (Admin)' : 'Supprimer votre avis'}
-                            className="p-1 text-white/40 hover:text-red-400 transition-colors cursor-pointer"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        )}
-                      </div>
-                    )}
+                          )}
+                        </>
+                      )}
+                    </div>
                   </div>
 
                   {/* Owner badge + countdown */}
