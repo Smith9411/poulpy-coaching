@@ -8,7 +8,6 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import Select from '@/components/Select';
 import CyberNavbar from '@/components/CyberNavbar';
-import ThemeToggle from '@/components/ThemeToggle';
 
 interface Review {
   id: string;
@@ -499,7 +498,6 @@ export default function Avis() {
   return (
     <main className="min-h-screen bg-[#07090D] text-white selection:bg-[#FF7582] selection:text-black pt-28 pb-20 font-mono relative z-10">
       <CyberNavbar />
-      <ThemeToggle />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 

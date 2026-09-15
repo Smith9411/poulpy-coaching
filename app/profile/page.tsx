@@ -10,7 +10,6 @@ import FavoriteGames from '@/components/FavoriteGames';
 import SocialLinks from '@/components/SocialLinks';
 import { CoachingBooking } from '@/components/booking/types';
 import CyberNavbar from '@/components/CyberNavbar';
-import ThemeToggle from '@/components/ThemeToggle';
 
 const MAGIC_BYTES: Record<string, number[]> = {
   'image/png': [0x89, 0x50, 0x4e, 0x47],
@@ -129,7 +128,6 @@ export default function Profile() {
     return (
       <main className="min-h-screen bg-[#07090D] text-white flex items-center justify-center font-mono px-4">
         <CyberNavbar />
-        <ThemeToggle />
         <div className="text-center reticle-box bg-[#090c10] border border-white/10 p-12 max-w-md mx-auto">
           <User size={48} className="mx-auto mb-4 text-white/30" />
           <h1 className="text-2xl font-display uppercase tracking-wider mb-2">ACCÈS NON AUTHENTIFIÉ</h1>
@@ -265,7 +263,6 @@ export default function Profile() {
   return (
     <main className="min-h-screen bg-[#07090D] text-white selection:bg-[#FF7582] selection:text-black pt-28 pb-20 font-mono relative z-10">
       <CyberNavbar />
-      <ThemeToggle />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
 
