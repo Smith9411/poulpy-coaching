@@ -120,19 +120,33 @@ export default function WhyPoulpy() {
     });
   };
 
-  const handleCardClick = (idx: number, e?: React.MouseEvent) => {
-    if (e) e.stopPropagation();
+  const flippedStatesRef = useRef<boolean[]>([false, false, false, false, false, false]);
+
+  const animateCardFlip = (idx: number, targetFlipped: boolean) => {
     const el = cardFlippersRef.current[idx];
     if (!el) return;
-    const currentRot = (gsap.getProperty(el, "rotateY") as number) || 0;
-    const normalized = ((currentRot % 360) + 360) % 360;
-    const isFlipped = normalized > 90 && normalized < 270;
+    flippedStatesRef.current[idx] = targetFlipped;
+
     gsap.to(el, {
-      rotateY: isFlipped ? 0 : 180,
-      duration: 0.6,
+      rotateY: targetFlipped ? 180 : 0,
+      duration: 0.75,
       ease: "power2.out",
       overwrite: "auto",
     });
+    gsap.to(el, {
+      y: -26,
+      duration: 0.375,
+      yoyo: true,
+      repeat: 1,
+      ease: "power1.inOut",
+      overwrite: "auto",
+    });
+  };
+
+  const handleCardClick = (idx: number, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    const isCurrentlyFlipped = flippedStatesRef.current[idx];
+    animateCardFlip(idx, !isCurrentlyFlipped);
   };
 
   useEffect(() => {
@@ -152,15 +166,27 @@ export default function WhyPoulpy() {
       const firstItemLeft = items[0].offsetLeft;
       const cardPositions = items.map((el) => Math.min(maxScroll, Math.max(0, el.offsetLeft - firstItemLeft)));
 
-      // Calibrated scroll distance: snappy pacing without trailing dead zone
-      const totalScrollDistance = Math.max(2800, maxScroll * 2.2);
+      // Calibrated scroll distance
+      const totalScrollDistance = Math.max(2600, maxScroll * 2.0);
       scrollDistanceRef.current = totalScrollDistance;
 
       ctx = gsap.context(() => {
-        // Reset all card flippers to 0 on context mount
-        cardFlippersRef.current.forEach((el) => {
-          if (el) gsap.set(el, { rotateY: 0, y: 0 });
+        // Reset all card flippers
+        cardFlippersRef.current.forEach((el, idx) => {
+          if (el) {
+            gsap.set(el, { rotateY: 0, y: 0 });
+            flippedStatesRef.current[idx] = false;
+          }
         });
+
+        const thresholds = [
+          { forward: 0.04, backward: 0.02 },
+          { forward: 0.19, backward: 0.15 },
+          { forward: 0.35, backward: 0.31 },
+          { forward: 0.51, backward: 0.47 },
+          { forward: 0.67, backward: 0.63 },
+          { forward: 0.83, backward: 0.79 },
+        ];
 
         const tl = gsap.timeline({
           scrollTrigger: {
@@ -182,7 +208,7 @@ export default function WhyPoulpy() {
                 progressBarRef.current.style.transform = `scaleX(${progress})`;
               }
 
-              // Active pill navigation indicator
+              // Active pill indicator
               const activeIdx = Math.min(
                 5,
                 progress < 0.16 ? 0
@@ -196,61 +222,26 @@ export default function WhyPoulpy() {
                 activeIndexRef.current = activeIdx;
                 updatePills(activeIdx);
               }
+
+              // Trigger independent smooth flip/unflip animations based on scroll thresholds
+              thresholds.forEach((th, idx) => {
+                const isFlipped = flippedStatesRef.current[idx];
+                if (!isFlipped && progress >= th.forward) {
+                  animateCardFlip(idx, true);
+                } else if (isFlipped && progress < th.backward) {
+                  animateCardFlip(idx, false);
+                }
+              });
             },
           },
         });
 
-        // 1. Initial Rest Window on Section Arrival (Card 0 is 100% resting on front face)
-        tl.to(track, { x: 0, duration: 0.3, ease: "none" });
-
-        // 2. Card 0: Progressive Flip & Observation Window
-        if (cardFlippersRef.current[0]) {
-          tl.to(cardFlippersRef.current[0], { rotateY: 180, duration: 0.5, ease: "power2.inOut" });
-          tl.to(cardFlippersRef.current[0], { y: -22, duration: 0.25, yoyo: true, repeat: 1, ease: "power1.inOut" }, "<");
+        // Smooth horizontal track progression with gentle stepped pacing
+        tl.to(track, { x: 0, duration: 0.2, ease: "none" });
+        for (let i = 1; i <= 5; i++) {
+          tl.to(track, { x: -cardPositions[i], duration: 0.8, ease: "power1.inOut" });
+          tl.to(track, { x: -cardPositions[i], duration: 0.3, ease: "none" });
         }
-        tl.to(track, { x: 0, duration: 0.3, ease: "none" });
-
-        // 3. Move to Card 1 -> Flip & Observe
-        tl.to(track, { x: -cardPositions[1], duration: 0.6, ease: "power1.inOut" });
-        if (cardFlippersRef.current[1]) {
-          tl.to(cardFlippersRef.current[1], { rotateY: 180, duration: 0.5, ease: "power2.inOut" });
-          tl.to(cardFlippersRef.current[1], { y: -22, duration: 0.25, yoyo: true, repeat: 1, ease: "power1.inOut" }, "<");
-        }
-        tl.to(track, { x: -cardPositions[1], duration: 0.3, ease: "none" });
-
-        // 4. Move to Card 2 -> Flip & Observe
-        tl.to(track, { x: -cardPositions[2], duration: 0.6, ease: "power1.inOut" });
-        if (cardFlippersRef.current[2]) {
-          tl.to(cardFlippersRef.current[2], { rotateY: 180, duration: 0.5, ease: "power2.inOut" });
-          tl.to(cardFlippersRef.current[2], { y: -22, duration: 0.25, yoyo: true, repeat: 1, ease: "power1.inOut" }, "<");
-        }
-        tl.to(track, { x: -cardPositions[2], duration: 0.3, ease: "none" });
-
-        // 5. Move to Card 3 -> Flip & Observe
-        tl.to(track, { x: -cardPositions[3], duration: 0.6, ease: "power1.inOut" });
-        if (cardFlippersRef.current[3]) {
-          tl.to(cardFlippersRef.current[3], { rotateY: 180, duration: 0.5, ease: "power2.inOut" });
-          tl.to(cardFlippersRef.current[3], { y: -22, duration: 0.25, yoyo: true, repeat: 1, ease: "power1.inOut" }, "<");
-        }
-        tl.to(track, { x: -cardPositions[3], duration: 0.3, ease: "none" });
-
-        // 6. Move to Card 4 -> Flip & Observe
-        tl.to(track, { x: -cardPositions[4], duration: 0.6, ease: "power1.inOut" });
-        if (cardFlippersRef.current[4]) {
-          tl.to(cardFlippersRef.current[4], { rotateY: 180, duration: 0.5, ease: "power2.inOut" });
-          tl.to(cardFlippersRef.current[4], { y: -22, duration: 0.25, yoyo: true, repeat: 1, ease: "power1.inOut" }, "<");
-        }
-        tl.to(track, { x: -cardPositions[4], duration: 0.3, ease: "none" });
-
-        // 7. Move to Card 5 -> Flip & Observe
-        tl.to(track, { x: -cardPositions[5], duration: 0.6, ease: "power1.inOut" });
-        if (cardFlippersRef.current[5]) {
-          tl.to(cardFlippersRef.current[5], { rotateY: 180, duration: 0.5, ease: "power2.inOut" });
-          tl.to(cardFlippersRef.current[5], { y: -22, duration: 0.25, yoyo: true, repeat: 1, ease: "power1.inOut" }, "<");
-        }
-        tl.to(track, { x: -cardPositions[5], duration: 0.3, ease: "none" });
-
-        // 8. Move to Final CTA Callout Card (Immediately releases pin at end of motion)
         tl.to(track, { x: -maxScroll, duration: 0.6, ease: "power1.inOut" });
       }, section);
     };
