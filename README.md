@@ -269,6 +269,10 @@ Fonctionnement côté app : après le retour Google, `/auth/callback` vérifie l
   - **Token expiré géré côté client** : ajout `supabase.auth.refreshSession()` automatique dans `handleAdminResponse` quand le token est expiré, avec message clair "Session expirée, reconnectez-vous"
   - **UI mode déroulant améliorée** : bouton "Réponse de l'équipe Poulpy" avec gradient purple→cyan bien visible, **chevron rotatif** (ChevronDown + rotate-180 quand déployé), animation framer-motion easeInOut, **avatar "Équipe Poulpy" + date de réponse** dans le panneau déplié
   - **Fix build** : `discordUrl` manquant dans `setSettings` de `components/About.tsx` (erreur TS2345)
+- 2026-09-15 (fix glitch chiffres, suppression trait blanc et fluidité fast-scroll WhyPoulpy) :
+  - **Suppression du trait blanc parasite** : suppression du `border-b` de la barre de télémétrie qui entrait en collision visuelle au-dessus des cartes sur écran PC portable / hauteur réduite
+  - **Suppression du glitch sur les chiffres** : suppression de `glitch-text` sur les numéros de cartes (`item.num`) pour une typographie fixe, nette et immédiatement lisible
+  - **Élimination des freeze au scroll rapide** : suppression de `fastScrollEnd` et `preventOverlaps` de ScrollTrigger (qui interrompaient brusquement le tween d'animation en cas de vitesse élevée) et ajustement du scrub à `0.6` pour une inertie fluide
 - 2026-09-15 (optimisation performance scroll horizontal et animations) :
   - **Scroll horizontal fluide (`WhyPoulpy`)** : élimination des re-renders React continus pendant le scrub GSAP en utilisant des refs DOM directes (`progressBarRef`, `scrollPctRef`, `pillsRef`) et `transform: scaleX()` accéléré GPU au lieu de transitions CSS sur la largeur
   - **Mesures stables sur refresh** : synchronisation de l'initialisation de ScrollTrigger avec `document.fonts.ready` et activation de `fastScrollEnd` + `preventOverlaps`

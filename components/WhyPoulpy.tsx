@@ -149,9 +149,7 @@ export default function WhyPoulpy() {
             trigger: section,
             start: "top top",
             end: "bottom bottom",
-            scrub: 0.35,
-            fastScrollEnd: true,
-            preventOverlaps: true,
+            scrub: 0.6,
             invalidateOnRefresh: true,
             onUpdate: (self: { progress: number }) => {
               const progress = self.progress;
@@ -227,9 +225,9 @@ export default function WhyPoulpy() {
       ref={sectionRef}
       className="relative w-full bg-[#07090D] border-t border-[rgba(255,255,255,0.08)] font-mono min-h-[4200px] overflow-x-clip"
     >
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-24 sm:pt-28 pb-8 sm:pb-10 z-20 bg-[#07090D]">
+      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-16 sm:pt-20 pb-6 sm:pb-8 z-20 bg-[#07090D]">
         {/* Top Telemetry Bar */}
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-12 flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4 z-20">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-12 flex flex-wrap items-center justify-between gap-4 pb-2 z-20">
           <div className="flex items-center gap-3">
             <span className="data-badge data-badge-acid">
               <DecryptedText text="POURQUOI CHOISIR POULPY ? // 06 PILIERS" />
@@ -273,7 +271,7 @@ export default function WhyPoulpy() {
         {/* Horizontal Sliding Track */}
         <div
           ref={trackRef}
-          className="flex items-center w-max pl-6 sm:pl-12 pr-32 space-x-8 sm:space-x-12 my-auto will-change-transform transform-gpu select-none"
+          className="flex items-center w-max pl-6 sm:pl-12 pr-32 space-x-8 sm:space-x-12 my-auto select-none"
         >
           {pillars.map((item) => {
             const Icon = item.icon;
@@ -281,7 +279,6 @@ export default function WhyPoulpy() {
             return (
               <div
                 key={item.num}
-                style={{ contain: "layout style paint" }}
                 className={`group w-[85vw] sm:w-[500px] lg:w-[560px] shrink-0 reticle-box ${
                   isAcid ? "" : "reticle-laser"
                 } p-8 sm:p-10 space-y-6 bg-[#090c10] border border-white/10 relative overflow-hidden shadow-[0_4px_30px_rgba(0,0,0,0.8)] transition-colors duration-300 ${
@@ -301,7 +298,7 @@ export default function WhyPoulpy() {
                     >
                       {item.badge}
                     </span>
-                    <div className="glitch-text text-4xl sm:text-6xl font-display text-white tracking-wider">
+                    <div className="text-4xl sm:text-6xl font-display text-white tracking-wider">
                       {item.num}
                     </div>
                   </div>
@@ -360,10 +357,7 @@ export default function WhyPoulpy() {
           })}
 
           {/* Final Callout Card at End of Scroll */}
-          <div
-            style={{ contain: "layout style paint" }}
-            className="w-[85vw] sm:w-[480px] shrink-0 reticle-box p-8 sm:p-10 flex flex-col justify-between space-y-6 bg-black border border-[#FF7582]/50 relative overflow-hidden shadow-[0_4px_30px_rgba(255,117,130,0.2)]"
-          >
+          <div className="w-[85vw] sm:w-[480px] shrink-0 reticle-box p-8 sm:p-10 flex flex-col justify-between space-y-6 bg-black border border-[#FF7582]/50 relative overflow-hidden shadow-[0_4px_30px_rgba(255,117,130,0.2)]">
             <div className="radar-sweep-line" />
             <div className="space-y-3 relative z-10">
               <span className="data-badge data-badge-acid">PRÊT POUR L&apos;ASCENSION ?</span>
