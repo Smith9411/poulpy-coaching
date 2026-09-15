@@ -152,8 +152,8 @@ export default function WhyPoulpy() {
       const firstItemLeft = items[0].offsetLeft;
       const cardPositions = items.map((el) => Math.min(maxScroll, Math.max(0, el.offsetLeft - firstItemLeft)));
 
-      // Generous scroll room for smooth, spaced-out pacing
-      const totalScrollDistance = Math.max(3800, maxScroll * 2.8 + 1000);
+      // Calibrated scroll distance: snappy pacing without trailing dead zone
+      const totalScrollDistance = Math.max(2800, maxScroll * 2.2);
       scrollDistanceRef.current = totalScrollDistance;
 
       ctx = gsap.context(() => {
@@ -170,7 +170,7 @@ export default function WhyPoulpy() {
             end: () => `+=${totalScrollDistance}`,
             pin: true,
             pinSpacing: true,
-            scrub: 0.6,
+            scrub: 0.5,
             anticipatePin: 0,
             invalidateOnRefresh: true,
             onUpdate: (self: { progress: number }) => {
@@ -201,58 +201,57 @@ export default function WhyPoulpy() {
         });
 
         // 1. Initial Rest Window on Section Arrival (Card 0 is 100% resting on front face)
-        tl.to(track, { x: 0, duration: 0.4, ease: "none" });
+        tl.to(track, { x: 0, duration: 0.3, ease: "none" });
 
         // 2. Card 0: Progressive Flip & Observation Window
         if (cardFlippersRef.current[0]) {
-          tl.to(cardFlippersRef.current[0], { rotateY: 180, duration: 0.6, ease: "power2.inOut" });
-          tl.to(cardFlippersRef.current[0], { y: -22, duration: 0.3, yoyo: true, repeat: 1, ease: "power1.inOut" }, "<");
+          tl.to(cardFlippersRef.current[0], { rotateY: 180, duration: 0.5, ease: "power2.inOut" });
+          tl.to(cardFlippersRef.current[0], { y: -22, duration: 0.25, yoyo: true, repeat: 1, ease: "power1.inOut" }, "<");
         }
-        tl.to(track, { x: 0, duration: 0.4, ease: "none" });
+        tl.to(track, { x: 0, duration: 0.3, ease: "none" });
 
         // 3. Move to Card 1 -> Flip & Observe
-        tl.to(track, { x: -cardPositions[1], duration: 0.7, ease: "power1.inOut" });
+        tl.to(track, { x: -cardPositions[1], duration: 0.6, ease: "power1.inOut" });
         if (cardFlippersRef.current[1]) {
-          tl.to(cardFlippersRef.current[1], { rotateY: 180, duration: 0.6, ease: "power2.inOut" });
-          tl.to(cardFlippersRef.current[1], { y: -22, duration: 0.3, yoyo: true, repeat: 1, ease: "power1.inOut" }, "<");
+          tl.to(cardFlippersRef.current[1], { rotateY: 180, duration: 0.5, ease: "power2.inOut" });
+          tl.to(cardFlippersRef.current[1], { y: -22, duration: 0.25, yoyo: true, repeat: 1, ease: "power1.inOut" }, "<");
         }
-        tl.to(track, { x: -cardPositions[1], duration: 0.4, ease: "none" });
+        tl.to(track, { x: -cardPositions[1], duration: 0.3, ease: "none" });
 
         // 4. Move to Card 2 -> Flip & Observe
-        tl.to(track, { x: -cardPositions[2], duration: 0.7, ease: "power1.inOut" });
+        tl.to(track, { x: -cardPositions[2], duration: 0.6, ease: "power1.inOut" });
         if (cardFlippersRef.current[2]) {
-          tl.to(cardFlippersRef.current[2], { rotateY: 180, duration: 0.6, ease: "power2.inOut" });
-          tl.to(cardFlippersRef.current[2], { y: -22, duration: 0.3, yoyo: true, repeat: 1, ease: "power1.inOut" }, "<");
+          tl.to(cardFlippersRef.current[2], { rotateY: 180, duration: 0.5, ease: "power2.inOut" });
+          tl.to(cardFlippersRef.current[2], { y: -22, duration: 0.25, yoyo: true, repeat: 1, ease: "power1.inOut" }, "<");
         }
-        tl.to(track, { x: -cardPositions[2], duration: 0.4, ease: "none" });
+        tl.to(track, { x: -cardPositions[2], duration: 0.3, ease: "none" });
 
         // 5. Move to Card 3 -> Flip & Observe
-        tl.to(track, { x: -cardPositions[3], duration: 0.7, ease: "power1.inOut" });
+        tl.to(track, { x: -cardPositions[3], duration: 0.6, ease: "power1.inOut" });
         if (cardFlippersRef.current[3]) {
-          tl.to(cardFlippersRef.current[3], { rotateY: 180, duration: 0.6, ease: "power2.inOut" });
-          tl.to(cardFlippersRef.current[3], { y: -22, duration: 0.3, yoyo: true, repeat: 1, ease: "power1.inOut" }, "<");
+          tl.to(cardFlippersRef.current[3], { rotateY: 180, duration: 0.5, ease: "power2.inOut" });
+          tl.to(cardFlippersRef.current[3], { y: -22, duration: 0.25, yoyo: true, repeat: 1, ease: "power1.inOut" }, "<");
         }
-        tl.to(track, { x: -cardPositions[3], duration: 0.4, ease: "none" });
+        tl.to(track, { x: -cardPositions[3], duration: 0.3, ease: "none" });
 
         // 6. Move to Card 4 -> Flip & Observe
-        tl.to(track, { x: -cardPositions[4], duration: 0.7, ease: "power1.inOut" });
+        tl.to(track, { x: -cardPositions[4], duration: 0.6, ease: "power1.inOut" });
         if (cardFlippersRef.current[4]) {
-          tl.to(cardFlippersRef.current[4], { rotateY: 180, duration: 0.6, ease: "power2.inOut" });
-          tl.to(cardFlippersRef.current[4], { y: -22, duration: 0.3, yoyo: true, repeat: 1, ease: "power1.inOut" }, "<");
+          tl.to(cardFlippersRef.current[4], { rotateY: 180, duration: 0.5, ease: "power2.inOut" });
+          tl.to(cardFlippersRef.current[4], { y: -22, duration: 0.25, yoyo: true, repeat: 1, ease: "power1.inOut" }, "<");
         }
-        tl.to(track, { x: -cardPositions[4], duration: 0.4, ease: "none" });
+        tl.to(track, { x: -cardPositions[4], duration: 0.3, ease: "none" });
 
         // 7. Move to Card 5 -> Flip & Observe
-        tl.to(track, { x: -cardPositions[5], duration: 0.7, ease: "power1.inOut" });
+        tl.to(track, { x: -cardPositions[5], duration: 0.6, ease: "power1.inOut" });
         if (cardFlippersRef.current[5]) {
-          tl.to(cardFlippersRef.current[5], { rotateY: 180, duration: 0.6, ease: "power2.inOut" });
-          tl.to(cardFlippersRef.current[5], { y: -22, duration: 0.3, yoyo: true, repeat: 1, ease: "power1.inOut" }, "<");
+          tl.to(cardFlippersRef.current[5], { rotateY: 180, duration: 0.5, ease: "power2.inOut" });
+          tl.to(cardFlippersRef.current[5], { y: -22, duration: 0.25, yoyo: true, repeat: 1, ease: "power1.inOut" }, "<");
         }
-        tl.to(track, { x: -cardPositions[5], duration: 0.4, ease: "none" });
+        tl.to(track, { x: -cardPositions[5], duration: 0.3, ease: "none" });
 
-        // 8. Move to Final CTA Callout Card
-        tl.to(track, { x: -maxScroll, duration: 0.8, ease: "power1.inOut" });
-        tl.to(track, { x: -maxScroll, duration: 0.5, ease: "none" });
+        // 8. Move to Final CTA Callout Card (Immediately releases pin at end of motion)
+        tl.to(track, { x: -maxScroll, duration: 0.6, ease: "power1.inOut" });
       }, section);
     };
 
