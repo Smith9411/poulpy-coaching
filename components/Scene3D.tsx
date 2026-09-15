@@ -87,8 +87,8 @@ export default function Scene3D() {
 
           radii[i] = r;
           angles[i] = theta;
-          // Calibrated slow, serene fluid vortex rotation
-          speeds[i] = (0.0008 + 0.0016 / (r * 0.018 + 1)) * (0.8 + Math.random() * 0.4);
+          // Calibrated harmonic rotation: closer layer speeds so the spiral arms stay defined much longer
+          speeds[i] = (0.00085 + 0.00028 / (r * 0.008 + 1)) * (0.97 + Math.random() * 0.06);
           zOffsets[i] = z;
           verticalWaves[i] = Math.random() * Math.PI * 2;
 
