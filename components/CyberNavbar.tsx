@@ -324,7 +324,7 @@ export default function CyberNavbar({
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
-            ? "py-3 bg-black/95 backdrop-blur-md border-b border-[rgba(255,117,130,0.2)] shadow-[0_4px_30px_rgba(0,0,0,0.8)]"
+            ? "py-3 bg-black/95 backdrop-blur-md border-b border-transparent shadow-[0_4px_30px_rgba(0,0,0,0.8)]"
             : "py-6 bg-transparent border-b border-transparent shadow-none"
         }`}
       >
