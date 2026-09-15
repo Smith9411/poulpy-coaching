@@ -48,7 +48,7 @@ export default function CyberNavbar({
   const isHomePage = pathname === "/";
 
   const { user, logout } = useAuth();
-  const [scrolled, setScrolled] = useState(false);
+  const [scrolled, setScrolled] = useState(!isHomePage);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -179,26 +179,12 @@ export default function CyberNavbar({
     }
 
     const handleScroll = () => {
-      if (window.scrollY < 200) {
-        setScrolled(false);
+      // Solid/blur background active as soon as scrolling starts (> 30px), or always solid on subpages
+      const isScrolled = isHomePage ? window.scrollY > 30 : true;
+      setScrolled(isScrolled);
+
+      if (!isHomePage || window.scrollY < 120) {
         setActiveSection("");
-        return;
-      }
-
-      const coachingEl = document.getElementById("coaching");
-      if (coachingEl) {
-        const rect = coachingEl.getBoundingClientRect();
-        setScrolled(rect.top <= 80);
-      } else {
-        setScrolled(window.scrollY > 400);
-      }
-
-      const isAtBottom =
-        window.innerHeight + window.scrollY >=
-        document.documentElement.scrollHeight - 80;
-
-      if (isAtBottom) {
-        setActiveSection("faq");
         return;
       }
 
@@ -213,7 +199,7 @@ export default function CyberNavbar({
         { id: "faq", linkId: "faq" },
       ];
 
-      const detectionLine = 140;
+      const detectionLine = 160;
       let detected = "";
 
       for (const s of sections) {
@@ -227,9 +213,7 @@ export default function CyberNavbar({
         }
       }
 
-      if (detected) {
-        setActiveSection(detected);
-      }
+      setActiveSection(detected);
     };
 
     let ticking = false;
