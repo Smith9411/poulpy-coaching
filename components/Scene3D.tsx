@@ -87,8 +87,8 @@ export default function Scene3D() {
 
           radii[i] = r;
           angles[i] = theta;
-          // Calibrated harmonic rotation: unified base speed with very gentle radial differential
-          speeds[i] = (0.0013 + 0.0002 / (r * 0.008 + 1)) * (0.99 + Math.random() * 0.02);
+          // Calibrated harmonic rotation: slightly faster base speed
+          speeds[i] = (0.00175 + 0.00025 / (r * 0.008 + 1)) * (0.99 + Math.random() * 0.02);
           zOffsets[i] = z;
           verticalWaves[i] = Math.random() * Math.PI * 2;
 
