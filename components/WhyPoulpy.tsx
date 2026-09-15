@@ -13,8 +13,6 @@ import {
   ArrowRight,
   Play,
   RotateCcw,
-  Volume2,
-  VolumeX,
   Pause,
 } from "lucide-react";
 
@@ -35,7 +33,6 @@ function PillarVideoPlayer({
 }: PillarVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
@@ -45,15 +42,13 @@ function PillarVideoPlayer({
     if (!video || !videoSrc) return;
 
     if (isFlipped && isSectionInView) {
-      video.muted = isMuted;
+      video.muted = true;
       const playPromise = video.play();
       if (playPromise !== undefined) {
         playPromise
           .then(() => setIsPlaying(true))
           .catch(() => {
-            // Autoplay policy fallback: force mute and retry
             video.muted = true;
-            setIsMuted(true);
             video.play()
               .then(() => setIsPlaying(true))
               .catch(() => setIsPlaying(false));
@@ -63,7 +58,7 @@ function PillarVideoPlayer({
       video.pause();
       setIsPlaying(false);
     }
-  }, [isFlipped, isSectionInView, videoSrc, isMuted]);
+  }, [isFlipped, isSectionInView, videoSrc]);
 
   const togglePlay = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -75,14 +70,6 @@ function PillarVideoPlayer({
       video.pause();
       setIsPlaying(false);
     }
-  };
-
-  const toggleMute = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const video = videoRef.current;
-    if (!video) return;
-    video.muted = !video.muted;
-    setIsMuted(video.muted);
   };
 
   const handleTimeUpdate = () => {
@@ -144,7 +131,7 @@ function PillarVideoPlayer({
         ref={videoRef}
         src={videoSrc}
         loop
-        muted={isMuted}
+        muted
         playsInline
         preload="auto"
         onTimeUpdate={handleTimeUpdate}
@@ -155,21 +142,12 @@ function PillarVideoPlayer({
       {/* Subtle Scanline Overlay */}
       <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0)_50%,rgba(0,0,0,0.2)_50%)] bg-[size:100%_4px] pointer-events-none opacity-40" />
 
-      {/* Top Bar Controls */}
-      <div className="absolute top-2 left-2.5 right-2.5 flex items-center justify-between pointer-events-auto z-20">
+      {/* Top Bar Badge (Shown strictly on hover) */}
+      <div className="absolute top-2 left-2.5 flex items-center pointer-events-none z-20 opacity-0 group-hover/video:opacity-100 transition-opacity duration-300">
         <div className="flex items-center gap-1.5 bg-black/75 backdrop-blur-md px-2 py-0.5 border border-white/10 rounded text-[9px] font-mono">
           <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
           <span className="text-white/80 font-bold uppercase tracking-wider">LIVE FEED // AUTO-LOOP</span>
         </div>
-
-        <button
-          type="button"
-          onClick={toggleMute}
-          title={isMuted ? "Activer le son" : "Couper le son"}
-          className="p-1.5 bg-black/80 backdrop-blur-md border border-white/20 hover:border-[#FF7582] text-white hover:text-[#FF7582] rounded transition-colors cursor-pointer"
-        >
-          {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5 text-[#FF7582]" />}
-        </button>
       </div>
 
       {/* Center Play/Pause Indicator if manually paused */}
@@ -181,8 +159,8 @@ function PillarVideoPlayer({
         </div>
       )}
 
-      {/* Bottom Cyber Progress & Status Bar */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/80 to-transparent p-2.5 pt-4 space-y-1.5 z-20 pointer-events-auto">
+      {/* Bottom Cyber Progress & Status Bar (Shown strictly on hover) */}
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/80 to-transparent p-2.5 pt-4 space-y-1.5 z-20 pointer-events-auto opacity-0 group-hover/video:opacity-100 transition-opacity duration-300">
         {/* Progress scrub bar */}
         <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden">
           <div
