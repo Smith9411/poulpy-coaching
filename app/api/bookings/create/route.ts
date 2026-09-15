@@ -135,6 +135,29 @@ export async function POST(req: NextRequest) {
         .from('coaching_slots')
         .update({ is_booked: true, updated_at: new Date().toISOString() })
         .eq('id', targetSlotId);
+    } else {
+      try {
+        const { data: createdSlot } = await supabase
+          .from('coaching_slots')
+          .insert({
+            date: bookingDate,
+            start_time: bookingTime,
+            is_active: true,
+            is_booked: true,
+            created_by: userId,
+          })
+          .select('id')
+          .maybeSingle();
+
+        if (createdSlot?.id) {
+          await supabase
+            .from('coaching_bookings')
+            .update({ slot_id: createdSlot.id })
+            .eq('id', newBooking.id);
+        }
+      } catch (slotErr) {
+        console.warn('Création auto slot ignorée:', slotErr);
+      }
     }
 
     // 5. Synchronisation automatique avec Notion Calendar

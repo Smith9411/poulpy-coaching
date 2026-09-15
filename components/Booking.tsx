@@ -214,6 +214,12 @@ export default function Booking() {
   };
 
   const handleNextStep = async () => {
+    if (step === 1) {
+      setSubmitError(null);
+      setStep(2);
+      return;
+    }
+
     if (step === 2) {
       if (!selectedTime) {
         setSubmitError("Veuillez sélectionner un créneau horaire disponible.");
@@ -221,8 +227,13 @@ export default function Booking() {
       }
       setSubmitError(null);
       setStep(3);
+      return;
+    }
+
+    if (step === 3) {
       if (!user) {
         setSubmitError("Vous devez être connecté avec votre compte pour réserver une session de coaching.");
+        setAuthModalOpen(true);
         return;
       }
       if (!studentDiscord.trim()) {
@@ -294,8 +305,6 @@ export default function Booking() {
       } finally {
         setIsSubmitting(false);
       }
-    } else {
-      setStep((prev) => prev + 1);
     }
   };
 
