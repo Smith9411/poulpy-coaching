@@ -111,21 +111,17 @@ function ScrollStackCard({ step, index, total }: { step: StepData; index: number
 
   return (
     <div
-      className="sticky mb-12 w-full will-change-transform"
+      className="sticky mb-10 w-full will-change-transform"
       style={{
         top: stickyTop,
         zIndex: 10 + index,
       }}
     >
-      <motion.div
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.3 }}
+      <div
         onMouseMove={handleMouseMove}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className={`relative max-w-4xl mx-auto p-6 sm:p-9 reticle-box bg-[#090C12] border transition-[border-color,background-color,box-shadow] duration-200 shadow-[0_20px_60px_rgba(0,0,0,0.95)] overflow-hidden select-none ${
+        className={`relative max-w-4xl mx-auto p-6 sm:p-9 reticle-box bg-[#090C12]/95 backdrop-blur-md border transition-[border-color,background-color,box-shadow,transform] duration-200 shadow-[0_20px_60px_rgba(0,0,0,0.95)] overflow-hidden select-none ${
           isHovered
             ? isAcid
               ? "border-[#FF7582] shadow-[0_0_35px_rgba(255,117,130,0.25)] bg-[#0d1017]"
@@ -228,7 +224,7 @@ function ScrollStackCard({ step, index, total }: { step: StepData; index: number
             </div>
           )}
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
