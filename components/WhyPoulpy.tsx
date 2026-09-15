@@ -142,7 +142,7 @@ export default function WhyPoulpy() {
             start: "top top",
             end: () => `+=${Math.max(0, track.scrollWidth - window.innerWidth + 120)}`,
             pin: true,
-            scrub: 0.8,
+            scrub: 0.3,
             anticipatePin: 1,
             invalidateOnRefresh: true,
             fastScrollEnd: false,
