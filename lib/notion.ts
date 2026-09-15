@@ -3,7 +3,7 @@
  * Synchronise les réservations de coaching avec une base de données Notion / Notion Calendar.
  *
  * Variables d'environnement requises (dans .env.local et Vercel) :
- * - NOTION_API_KEY : Clé secrète de l'intégration Notion (ex: secret_xxx)
+ * - NOTION_API_KEY : Clé secrète de l'intégration Notion (ex: secret_xxx ou ntn_xxx)
  * - NOTION_BOOKINGS_DATABASE_ID : ID de la base de données Notion (32 caractères hex)
  */
 
@@ -23,9 +23,39 @@ export interface NotionBookingPayload {
 const NOTION_API_URL = 'https://api.notion.com/v1';
 const NOTION_VERSION = '2022-06-28';
 
+/**
+ * Nettoie l'ID de base de données (si l'utilisateur a collé une URL ou des tirets)
+ */
+export function cleanNotionId(rawId?: string): string | null {
+  if (!rawId) return null;
+  let id = rawId.trim();
+
+  // Si c'est une URL Notion complète
+  if (id.includes('notion.so') || id.includes('notion.com')) {
+    const match = id.match(/([a-f0-9]{32})/i);
+    if (match) {
+      id = match[1];
+    } else {
+      const parts = id.split('?')[0].split('/');
+      id = parts[parts.length - 1].replace(/-/g, '');
+    }
+  }
+
+  // Nettoyage des tirets
+  id = id.replace(/-/g, '');
+
+  if (id.length === 32) {
+    // Format UUID avec tirets (ex: 3dca31f0-5765-8084-b92b-f97fe8d36dd2)
+    return `${id.slice(0, 8)}-${id.slice(8, 12)}-${id.slice(12, 16)}-${id.slice(16, 20)}-${id.slice(20)}`;
+  }
+
+  return id;
+}
+
 function getNotionConfig() {
-  const apiKey = process.env.NOTION_API_KEY;
-  const databaseId = process.env.NOTION_BOOKINGS_DATABASE_ID;
+  const apiKey = process.env.NOTION_API_KEY?.trim();
+  const rawDatabaseId = process.env.NOTION_BOOKINGS_DATABASE_ID?.trim();
+  const databaseId = cleanNotionId(rawDatabaseId);
 
   if (!apiKey || !databaseId) {
     return null;
@@ -65,77 +95,152 @@ function buildNotionDateRange(dateStr: string, timeStr: string, durationStr?: st
 }
 
 /**
+ * Tente de résoudre le vrai ID de la base de données (si un ID de page parente a été fourni)
+ */
+async function resolveDatabaseId(config: { apiKey: string; databaseId: string }): Promise<string> {
+  try {
+    // 1. Essayer d'interroger directement la base de données
+    const checkRes = await fetch(`${NOTION_API_URL}/databases/${config.databaseId}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${config.apiKey}`,
+        'Notion-Version': NOTION_VERSION,
+      },
+    });
+
+    if (checkRes.ok) {
+      return config.databaseId;
+    }
+
+    // 2. Si 404/400, il est possible que databaseId soit l'ID d'une page contenant une base inline
+    const pageBlocksRes = await fetch(`${NOTION_API_URL}/blocks/${config.databaseId}/children`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${config.apiKey}`,
+        'Notion-Version': NOTION_VERSION,
+      },
+    });
+
+    if (pageBlocksRes.ok) {
+      const blocksData = await pageBlocksRes.json();
+      const childDb = (blocksData.results || []).find((b: any) => b.type === 'child_database');
+      if (childDb && childDb.id) {
+        console.info(`[Notion Sync] Base de données inline détectée automatiquement : ${childDb.id}`);
+        return childDb.id;
+      }
+    }
+  } catch (err) {
+    console.warn('[Notion Sync] Erreur lors de la résolution de la base:', err);
+  }
+
+  return config.databaseId;
+}
+
+/**
+ * Récupère le schéma des propriétés de la base Notion pour adapter dynamiquement l'envoi
+ */
+async function getDatabaseProperties(config: { apiKey: string; databaseId: string }): Promise<Record<string, any> | null> {
+  try {
+    const res = await fetch(`${NOTION_API_URL}/databases/${config.databaseId}`, {
+      headers: {
+        Authorization: `Bearer ${config.apiKey}`,
+        'Notion-Version': NOTION_VERSION,
+      },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      return data.properties || null;
+    }
+  } catch {
+    // Silently continue
+  }
+  return null;
+}
+
+/**
  * Crée une page de réservation dans la base de données Notion
- * Retourne l'ID de la page Notion créée ou null en cas d'erreur / configuration manquante
  */
 export async function createNotionBooking(payload: NotionBookingPayload): Promise<string | null> {
   const config = getNotionConfig();
   if (!config) {
-    console.info('[Notion Sync] Clés Notion non configurées, synchronisation ignorée.');
+    console.info('[Notion Sync] Clés Notion non configurées (NOTION_API_KEY ou NOTION_BOOKINGS_DATABASE_ID manquant).');
     return null;
   }
 
   try {
+    const realDbId = await resolveDatabaseId(config);
+    const schemaProps = await getDatabaseProperties({ apiKey: config.apiKey, databaseId: realDbId });
+
     const { start, end } = buildNotionDateRange(payload.bookingDate, payload.bookingTime, payload.planDuration);
     const title = `[${payload.game.toUpperCase()}] Coaching - ${payload.studentName}`;
 
-    const dateProperty: Record<string, any> = {
-      start,
+    // Trouver le nom de la propriété titre (par défaut 'Name' ou première propriété de type 'title')
+    let titleKey = 'Name';
+    if (schemaProps) {
+      const foundTitle = Object.entries(schemaProps).find(([, val]: [string, any]) => val.type === 'title');
+      if (foundTitle) titleKey = foundTitle[0];
+    }
+
+    const properties: Record<string, any> = {
+      [titleKey]: {
+        title: [{ type: 'text', text: { content: title } }],
+      },
     };
-    if (end) {
-      dateProperty.end = end;
+
+    // Propriété Date
+    const dateProperty: Record<string, any> = { start };
+    if (end) dateProperty.end = end;
+    properties['Date'] = { date: dateProperty };
+
+    // Propriété Statut (gère à la fois les types 'select' et 'status')
+    const statutType = schemaProps?.['Statut']?.type || 'select';
+    if (statutType === 'status') {
+      properties['Statut'] = { status: { name: 'Confirmé' } };
+    } else {
+      properties['Statut'] = { select: { name: 'Confirmé' } };
+    }
+
+    // Propriété Jeu
+    const jeuType = schemaProps?.['Jeu']?.type || 'select';
+    const jeuName = payload.game.toLowerCase().includes('val') ? 'Valorant' : 'Apex Legends';
+    if (jeuType === 'select') {
+      properties['Jeu'] = { select: { name: jeuName } };
+    } else {
+      properties['Jeu'] = { rich_text: [{ type: 'text', text: { content: jeuName } }] };
+    }
+
+    // Propriété Formule
+    properties['Formule'] = {
+      rich_text: [{ type: 'text', text: { content: payload.planName } }],
+    };
+
+    // Propriété Discord
+    properties['Discord'] = {
+      rich_text: [{ type: 'text', text: { content: payload.studentDiscord } }],
+    };
+
+    // Propriété Email
+    properties['Email'] = {
+      email: payload.studentEmail,
+    };
+
+    // Propriété Notes
+    properties['Notes'] = {
+      rich_text: [{ type: 'text', text: { content: (payload.notes || 'Aucune note spécifique').slice(0, 1900) } }],
+    };
+
+    // Si certaines propriétés n'existent pas dans la base de l'utilisateur, ne pas faire planter la requête
+    if (schemaProps) {
+      for (const key of Object.keys(properties)) {
+        if (!schemaProps[key] && key !== titleKey) {
+          delete properties[key];
+        }
+      }
     }
 
     const body = {
-      parent: { database_id: config.databaseId },
-      properties: {
-        Name: {
-          title: [
-            {
-              type: 'text',
-              text: { content: title },
-            },
-          ],
-        },
-        Date: {
-          date: dateProperty,
-        },
-        Statut: {
-          select: { name: 'Confirmé' },
-        },
-        Jeu: {
-          select: {
-            name: payload.game.toLowerCase().includes('val') ? 'Valorant' : 'Apex Legends',
-          },
-        },
-        Formule: {
-          rich_text: [
-            {
-              type: 'text',
-              text: { content: payload.planName },
-            },
-          ],
-        },
-        Discord: {
-          rich_text: [
-            {
-              type: 'text',
-              text: { content: payload.studentDiscord },
-            },
-          ],
-        },
-        Email: {
-          email: payload.studentEmail,
-        },
-        Notes: {
-          rich_text: [
-            {
-              type: 'text',
-              text: { content: (payload.notes || 'Aucune note spécifique').slice(0, 1900) },
-            },
-          ],
-        },
-      },
+      parent: { database_id: realDbId },
+      properties,
     };
 
     const res = await fetch(`${NOTION_API_URL}/pages`, {
@@ -150,7 +255,7 @@ export async function createNotionBooking(payload: NotionBookingPayload): Promis
 
     if (!res.ok) {
       const errText = await res.text();
-      console.error('[Notion Sync] Erreur lors de la création de la page Notion:', res.status, errText);
+      console.error('[Notion Sync Error]', res.status, errText);
       return null;
     }
 
@@ -158,7 +263,7 @@ export async function createNotionBooking(payload: NotionBookingPayload): Promis
     console.info(`[Notion Sync] Réservation créée avec succès dans Notion (Page ID: ${data.id})`);
     return data.id as string;
   } catch (err) {
-    console.error('[Notion Sync] Erreur inattendue:', err);
+    console.error('[Notion Sync Exception]', err);
     return null;
   }
 }
@@ -184,12 +289,8 @@ export async function updateNotionBookingDate(
 
     const body = {
       properties: {
-        Date: {
-          date: dateProperty,
-        },
-        Statut: {
-          select: { name: statusLabel },
-        },
+        Date: { date: dateProperty },
+        Statut: { select: { name: statusLabel } },
       },
     };
 
@@ -203,14 +304,7 @@ export async function updateNotionBookingDate(
       body: JSON.stringify(body),
     });
 
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error('[Notion Sync] Erreur lors de la mise à jour de la date Notion:', res.status, errText);
-      return false;
-    }
-
-    console.info(`[Notion Sync] Date mise à jour dans Notion pour la page ${notionPageId}`);
-    return true;
+    return res.ok;
   } catch (err) {
     console.error('[Notion Sync] Erreur mise à jour date:', err);
     return false;
@@ -227,9 +321,7 @@ export async function cancelNotionBooking(notionPageId: string, archivePage: boo
   try {
     const body: Record<string, any> = {
       properties: {
-        Statut: {
-          select: { name: 'Annulé' },
-        },
+        Statut: { select: { name: 'Annulé' } },
       },
     };
 
@@ -247,14 +339,7 @@ export async function cancelNotionBooking(notionPageId: string, archivePage: boo
       body: JSON.stringify(body),
     });
 
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error('[Notion Sync] Erreur lors de l\'annulation Notion:', res.status, errText);
-      return false;
-    }
-
-    console.info(`[Notion Sync] Réservation annulée dans Notion (Page ID: ${notionPageId})`);
-    return true;
+    return res.ok;
   } catch (err) {
     console.error('[Notion Sync] Erreur annulation Notion:', err);
     return false;
@@ -271,9 +356,7 @@ export async function completeNotionBooking(notionPageId: string): Promise<boole
   try {
     const body = {
       properties: {
-        Statut: {
-          select: { name: 'Terminé' },
-        },
+        Statut: { select: { name: 'Terminé' } },
       },
     };
 
@@ -291,5 +374,70 @@ export async function completeNotionBooking(notionPageId: string): Promise<boole
   } catch (err) {
     console.error('[Notion Sync] Erreur complétion Notion:', err);
     return false;
+  }
+}
+
+/**
+ * Teste la connexion à Notion et renvoie un diagnostic complet
+ */
+export async function testNotionConnection(): Promise<{
+  success: boolean;
+  message: string;
+  details?: any;
+}> {
+  const config = getNotionConfig();
+  if (!config) {
+    return {
+      success: false,
+      message: 'Variables d\'environnement NOTION_API_KEY ou NOTION_BOOKINGS_DATABASE_ID manquantes dans votre configuration.',
+    };
+  }
+
+  try {
+    const realDbId = await resolveDatabaseId(config);
+    const res = await fetch(`${NOTION_API_URL}/databases/${realDbId}`, {
+      headers: {
+        Authorization: `Bearer ${config.apiKey}`,
+        'Notion-Version': NOTION_VERSION,
+      },
+    });
+
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => ({}));
+      if (res.status === 404) {
+        return {
+          success: false,
+          message: 'Base de données introuvable (Erreur 404). Avez-vous bien cliqué sur les "•••" > "Connexions" > "Poulpy Coaching" sur votre page Notion ?',
+          details: errJson,
+        };
+      }
+      if (res.status === 401) {
+        return {
+          success: false,
+          message: 'Clé secrète NOTION_API_KEY invalide (Erreur 401).',
+          details: errJson,
+        };
+      }
+      return {
+        success: false,
+        message: `Erreur API Notion (${res.status}) : ${errJson.message || 'Erreur inconnue'}`,
+        details: errJson,
+      };
+    }
+
+    const dbData = await res.json();
+    return {
+      success: true,
+      message: `Connexion Notion réussie ! Base connectée : "${dbData.title?.[0]?.plain_text || 'Planning Coaching'}"`,
+      details: {
+        databaseId: realDbId,
+        properties: Object.keys(dbData.properties || {}),
+      },
+    };
+  } catch (err: any) {
+    return {
+      success: false,
+      message: `Exception réseau : ${err.message || err}`,
+    };
   }
 }
