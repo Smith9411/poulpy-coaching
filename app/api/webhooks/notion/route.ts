@@ -11,29 +11,41 @@ export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/webhooks/notion
- * Affiche l'état du webhook et le dernier jeton de vérification reçu depuis Supabase
+ * Affiche l'état du webhook, le jeton et le dernier événement reçu pour diagnostiquer en 1 seconde
  */
 export async function GET() {
   let tokenFromDb: string | null = null;
+  let lastEventLog: any = null;
+
   try {
-    const { data } = await supabase
+    const { data: tokenData } = await supabase
       .from('settings')
       .select('value')
       .eq('key', 'notion_webhook_token')
       .maybeSingle();
-    if (data?.value) {
-      tokenFromDb = data.value;
+    if (tokenData?.value) tokenFromDb = tokenData.value;
+
+    const { data: eventData } = await supabase
+      .from('settings')
+      .select('value, updated_at')
+      .eq('key', 'last_notion_webhook_event')
+      .maybeSingle();
+    if (eventData?.value) {
+      try {
+        lastEventLog = JSON.parse(eventData.value);
+      } catch {
+        lastEventLog = eventData.value;
+      }
     }
   } catch (e) {
-    console.warn('Erreur lecture token DB:', e);
+    console.warn('Erreur lecture logs DB:', e);
   }
 
   return NextResponse.json({
     status: 'ok',
     service: 'Poulpy Coaching Notion Webhook',
-    jeton_de_verification:
-      tokenFromDb ||
-      "En attente du jeton... Cliquez sur 'Renvoyer le jeton' dans Notion, puis rafraîchissez cette page.",
+    dernier_evenement_recu: lastEventLog || "Aucun événement reçu depuis Notion pour l'instant. Déplacez une séance dans Notion Calendar.",
+    jeton_de_verification: tokenFromDb || "Non requis si déjà vérifié",
   });
 }
 
@@ -44,6 +56,23 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   try {
     const rawBody = await req.json().catch(() => ({}));
+    const nowIso = new Date().toISOString();
+
+    // Log diagnostic de chaque payload reçu pour vérification
+    try {
+      await supabase
+        .from('settings')
+        .upsert(
+          {
+            key: 'last_notion_webhook_event',
+            value: JSON.stringify({
+              received_at: nowIso,
+              body: rawBody,
+            }),
+          },
+          { onConflict: 'key' }
+        );
+    } catch {}
 
     // 1. Handshake de vérification initial de Notion
     const isVerification =
