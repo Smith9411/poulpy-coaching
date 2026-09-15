@@ -106,14 +106,12 @@ export default function WhyPoulpy() {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const progressBarRef = useRef<HTMLDivElement | null>(null);
   const scrollPctRef = useRef<HTMLSpanElement | null>(null);
-  const pillsRef = useRef<HTMLDivElement | null>(null);
+  const pillBtnsRef = useRef<HTMLButtonElement[]>([]);
   const activeIndexRef = useRef(0);
-  const trackDistanceRef = useRef(3000);
 
   const updatePills = (activeIdx: number) => {
-    if (!pillsRef.current) return;
-    const buttons = pillsRef.current.querySelectorAll("button");
-    buttons.forEach((btn, idx) => {
+    pillBtnsRef.current.forEach((btn, idx) => {
+      if (!btn) return;
       if (idx === activeIdx) {
         btn.className = "px-2 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer border-[#FF7582] bg-[#FF7582] text-black shadow-[0_0_10px_rgba(255,117,130,0.4)]";
       } else {
@@ -129,33 +127,28 @@ export default function WhyPoulpy() {
 
     let ctx: gsap.Context | null = null;
 
-    const bindScroll = () => {
+    const setupScroll = () => {
       if (ctx) ctx.revert();
 
-      // Measure precise scroll width
-      const maxScroll = Math.max(0, track.scrollWidth - window.innerWidth + 140);
-      const totalH = maxScroll + window.innerHeight;
-
-      // Apply height directly to DOM element without triggering React re-renders
-      section.style.height = `${totalH}px`;
-      trackDistanceRef.current = maxScroll;
+      const scrollDistance = Math.max(0, track.scrollWidth - window.innerWidth + 120);
 
       ctx = gsap.context(() => {
         gsap.to(track, {
-          x: () => -maxScroll,
+          x: -scrollDistance,
           ease: "none",
           scrollTrigger: {
             id: "whypoulpy-scroll",
             trigger: section,
             start: "top top",
-            end: "bottom bottom",
-            scrub: 0.6,
+            end: () => `+=${scrollDistance}`,
+            pin: true,
+            scrub: 0.8,
+            anticipatePin: 1,
             invalidateOnRefresh: true,
             onUpdate: (self: { progress: number }) => {
               const progress = self.progress;
-              const pct = Math.round(progress * 100);
               if (scrollPctRef.current) {
-                scrollPctRef.current.textContent = `${pct}%`;
+                scrollPctRef.current.textContent = `${Math.round(progress * 100)}%`;
               }
               if (progressBarRef.current) {
                 progressBarRef.current.style.transform = `scaleX(${progress})`;
@@ -173,15 +166,15 @@ export default function WhyPoulpy() {
 
     if (typeof document !== "undefined" && document.fonts) {
       document.fonts.ready.then(() => {
-        bindScroll();
+        setupScroll();
         ScrollTrigger.refresh();
       });
     } else {
-      bindScroll();
+      setupScroll();
     }
 
     const handleResize = () => {
-      bindScroll();
+      setupScroll();
       ScrollTrigger.refresh();
     };
 
@@ -198,193 +191,179 @@ export default function WhyPoulpy() {
     const track = trackRef.current;
     if (!section || !track) return;
 
-    const cards = track.children;
-    const targetCard = cards[index] as HTMLElement;
+    const scrollDistance = Math.max(0, track.scrollWidth - window.innerWidth + 120);
     const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+    const targetY = sectionTop + (index / (pillars.length - 1)) * scrollDistance;
 
-    let targetY = sectionTop;
-    if (targetCard) {
-      const cardOffset = targetCard.offsetLeft - 48;
-      const maxScroll = Math.max(0, track.scrollWidth - window.innerWidth + 140);
-      const clampedOffset = Math.min(maxScroll, Math.max(0, cardOffset));
-      targetY = sectionTop + clampedOffset;
-    } else {
-      targetY = sectionTop + (index / (pillars.length - 1)) * trackDistanceRef.current;
-    }
-
-    gsap.to(window, {
-      scrollTo: { y: targetY, autoKill: false },
-      duration: 0.8,
-      ease: "power2.inOut",
-    });
+    window.scrollTo({ top: targetY, behavior: "smooth" });
   };
 
   return (
     <section
       id="coaching"
       ref={sectionRef}
-      className="relative w-full bg-[#07090D] border-t border-[rgba(255,255,255,0.08)] font-mono min-h-[4200px] overflow-x-clip"
+      className="relative w-full h-screen bg-[#07090D] border-t border-[rgba(255,255,255,0.08)] font-mono overflow-hidden flex flex-col justify-between pt-16 sm:pt-20 pb-6 sm:pb-8 z-20"
     >
-      <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between pt-16 sm:pt-20 pb-6 sm:pb-8 z-20 bg-[#07090D]">
-        {/* Top Telemetry Bar */}
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-12 flex flex-wrap items-center justify-between gap-4 pb-2 z-20">
-          <div className="flex items-center gap-3">
-            <span className="data-badge data-badge-acid">
-              <DecryptedText text="POURQUOI CHOISIR POULPY ? // 06 PILIERS" />
-            </span>
-            <span className="text-white/40 text-xs hidden md:inline-flex items-center">
-              <span className="w-1.5 h-1.5 bg-[#FF7582] animate-ping" />
-            </span>
-          </div>
-
-          {/* Pill Navigation & Live Progress */}
-          <div className="flex items-center gap-4 text-xs">
-            {/* Direct Card Jump Pills */}
-            <div ref={pillsRef} className="flex items-center gap-1.5">
-              {pillars.map((p, idx) => (
-                <button
-                  key={p.num}
-                  onClick={() => goToCard(idx)}
-                  className={`px-2 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer ${
-                    idx === 0
-                      ? "border-[#FF7582] bg-[#FF7582] text-black shadow-[0_0_10px_rgba(255,117,130,0.4)]"
-                      : "border-white/15 text-white/50 hover:border-white/40 hover:text-white bg-black/40"
-                  }`}
-                >
-                  {p.num}
-                </button>
-              ))}
-            </div>
-
-            <span className="text-white/40 hidden sm:inline">AVANCEMENT :</span>
-            <span ref={scrollPctRef} className="text-[#FF7582] font-bold">0%</span>
-            <div className="w-24 sm:w-32 h-1.5 bg-white/10 border border-white/15 relative overflow-hidden">
-              <div
-                ref={progressBarRef}
-                className="h-full w-full bg-[#FF7582] shadow-[0_0_10px_#FF7582] origin-left will-change-transform"
-                style={{ transform: "scaleX(0)" }}
-              />
-            </div>
-          </div>
+      {/* Top Telemetry Bar */}
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-12 flex flex-wrap items-center justify-between gap-4 pb-2 z-20">
+        <div className="flex items-center gap-3">
+          <span className="data-badge data-badge-acid">
+            <DecryptedText text="POURQUOI CHOISIR POULPY ? // 06 PILIERS" />
+          </span>
+          <span className="text-white/40 text-xs hidden md:inline-flex items-center">
+            <span className="w-1.5 h-1.5 bg-[#FF7582] animate-ping" />
+          </span>
         </div>
 
-        {/* Horizontal Sliding Track */}
-        <div
-          ref={trackRef}
-          className="flex items-center w-max pl-6 sm:pl-12 pr-32 space-x-8 sm:space-x-12 my-auto select-none"
-        >
-          {pillars.map((item) => {
-            const Icon = item.icon;
-            const isAcid = item.color === "acid";
-            return (
-              <div
-                key={item.num}
-                className={`group w-[85vw] sm:w-[500px] lg:w-[560px] shrink-0 reticle-box ${
-                  isAcid ? "" : "reticle-laser"
-                } p-8 sm:p-10 space-y-6 bg-[#090c10] border border-white/10 relative overflow-hidden shadow-[0_4px_30px_rgba(0,0,0,0.8)] transition-colors duration-300 ${
-                  isAcid ? "hover:border-[#FF7582]/50" : "hover:border-[#8FAFD4]/50"
+        {/* Pill Navigation & Live Progress */}
+        <div className="flex items-center gap-4 text-xs">
+          {/* Direct Card Jump Pills */}
+          <div className="flex items-center gap-1.5">
+            {pillars.map((p, idx) => (
+              <button
+                key={p.num}
+                ref={(el) => {
+                  if (el) pillBtnsRef.current[idx] = el;
+                }}
+                onClick={() => goToCard(idx)}
+                className={`px-2 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer ${
+                  idx === 0
+                    ? "border-[#FF7582] bg-[#FF7582] text-black shadow-[0_0_10px_rgba(255,117,130,0.4)]"
+                    : "border-white/15 text-white/50 hover:border-white/40 hover:text-white bg-black/40"
                 }`}
               >
-                <CornerBrackets color={isAcid ? "coral" : "slate"} />
-                {/* Card Header */}
-                <div className="flex items-start justify-between border-b border-white/10 pb-4 relative z-10">
-                  <div className="space-y-1">
-                    <span
-                      className={`text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider ${
-                        isAcid
-                          ? "bg-[#FF7582]/10 text-[#FF7582] border border-[#FF7582]/30"
-                          : "bg-[#8FAFD4]/10 text-[#8FAFD4] border border-[#8FAFD4]/30"
-                      }`}
-                    >
-                      {item.badge}
-                    </span>
-                    <div className="text-4xl sm:text-6xl font-display text-white tracking-wider">
-                      {item.num}
-                    </div>
-                  </div>
+                {p.num}
+              </button>
+            ))}
+          </div>
 
-                  <div
-                    className={`w-12 h-12 border flex items-center justify-center ${
-                      isAcid
-                        ? "border-[#FF7582]/40 text-[#FF7582] bg-[#FF7582]/5"
-                        : "border-[#8FAFD4]/40 text-[#8FAFD4] bg-[#8FAFD4]/5"
-                    }`}
-                  >
-                    <Icon className="w-6 h-6" />
-                  </div>
-                </div>
-
-                {/* Card Body */}
-                <div className="space-y-2 relative z-10">
-                  <h3 className="text-2xl font-display text-white tracking-wider">
-                    {item.title}
-                  </h3>
-                  <div className="text-xs text-[#FF7582] font-medium">
-                    {item.subtitle}
-                  </div>
-                  <p className="text-xs text-white/60 leading-relaxed pt-2">
-                    {item.description}
-                  </p>
-                </div>
-
-                {/* Specs & Metrics */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-4 border-t border-white/10 relative z-10">
-                  {item.specs.map((s, sIdx) => (
-                    <div key={sIdx} className="p-2.5 bg-black/80 border border-white/5 space-y-1">
-                      <span className="text-[9px] text-white/40 uppercase block truncate">
-                        {s.label}
-                      </span>
-                      <strong
-                        className={`text-xs font-mono font-bold block ${
-                          isAcid ? "text-[#FF7582]" : "text-[#8FAFD4]"
-                        }`}
-                      >
-                        {s.val}
-                      </strong>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Footer Indicator */}
-                <div className="pt-4 border-t border-white/5 flex items-center justify-between text-[10px] text-white/40 relative z-10">
-                  <span>PILIER {item.num} // 06</span>
-                  <span className="flex items-center gap-1 text-[#FF7582]">
-                    CONTINUER LE SCROLL <ChevronRight className="w-3.5 h-3.5" />
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-
-          {/* Final Callout Card at End of Scroll */}
-          <div className="w-[85vw] sm:w-[480px] shrink-0 reticle-box p-8 sm:p-10 flex flex-col justify-between space-y-6 bg-black border border-[#FF7582]/50 relative overflow-hidden shadow-[0_4px_30px_rgba(255,117,130,0.2)]">
-            <div className="radar-sweep-line" />
-            <div className="space-y-3 relative z-10">
-              <span className="data-badge data-badge-acid">PRÊT POUR L&apos;ASCENSION ?</span>
-              <h3 className="text-3xl sm:text-4xl font-display text-white tracking-wider">
-                LE PROCHAIN PALIER C&apos;EST MAINTENANT.
-              </h3>
-              <p className="text-xs text-white/60 leading-relaxed">
-                Ne perds plus des mois à tourner en rond en ranked. Réserve ton premier audit dès aujourd&apos;hui.
-              </p>
-            </div>
-
-            <div className="pt-6 border-t border-white/10 relative z-10">
-              <a
-                href="#tarifs"
-                className="btn-cyber-primary w-full justify-center text-xs py-3"
-              >
-                <span>DÉCOUVRIR LES TARIFS</span>
-                <ArrowRight className="w-4 h-4" />
-              </a>
-            </div>
+          <span className="text-white/40 hidden sm:inline">AVANCEMENT :</span>
+          <span ref={scrollPctRef} className="text-[#FF7582] font-bold">0%</span>
+          <div className="w-24 sm:w-32 h-1.5 bg-white/10 border border-white/15 relative overflow-hidden">
+            <div
+              ref={progressBarRef}
+              className="h-full w-full bg-[#FF7582] shadow-[0_0_10px_#FF7582] origin-left will-change-transform"
+              style={{ transform: "scaleX(0)" }}
+            />
           </div>
         </div>
+      </div>
 
-        {/* Bottom Hint */}
-        <div className="w-full max-w-7xl mx-auto px-6 sm:px-12 flex items-center justify-end text-[10px] text-white/30 z-20">
-          <span className="text-[#FF3E4D] font-mono">DÉROULEZ LA PAGE VERS LE BAS ↓</span>
+      {/* Horizontal Sliding Track */}
+      <div
+        ref={trackRef}
+        className="flex items-center w-max pl-6 sm:pl-12 pr-32 space-x-8 sm:space-x-12 my-auto select-none"
+      >
+        {pillars.map((item) => {
+          const Icon = item.icon;
+          const isAcid = item.color === "acid";
+          return (
+            <div
+              key={item.num}
+              className={`group w-[85vw] sm:w-[500px] lg:w-[560px] shrink-0 reticle-box ${
+                isAcid ? "" : "reticle-laser"
+              } p-8 sm:p-10 space-y-6 bg-[#090c10] border border-white/10 relative overflow-hidden shadow-[0_4px_30px_rgba(0,0,0,0.8)] transition-colors duration-300 ${
+                isAcid ? "hover:border-[#FF7582]/50" : "hover:border-[#8FAFD4]/50"
+              }`}
+            >
+              <CornerBrackets color={isAcid ? "coral" : "slate"} />
+              {/* Card Header */}
+              <div className="flex items-start justify-between border-b border-white/10 pb-4 relative z-10">
+                <div className="space-y-1">
+                  <span
+                    className={`text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider ${
+                      isAcid
+                        ? "bg-[#FF7582]/10 text-[#FF7582] border border-[#FF7582]/30"
+                        : "bg-[#8FAFD4]/10 text-[#8FAFD4] border border-[#8FAFD4]/30"
+                    }`}
+                  >
+                    {item.badge}
+                  </span>
+                  <div className="text-4xl sm:text-6xl font-display text-white tracking-wider">
+                    {item.num}
+                  </div>
+                </div>
+
+                <div
+                  className={`w-12 h-12 border flex items-center justify-center ${
+                    isAcid
+                      ? "border-[#FF7582]/40 text-[#FF7582] bg-[#FF7582]/5"
+                      : "border-[#8FAFD4]/40 text-[#8FAFD4] bg-[#8FAFD4]/5"
+                  }`}
+                >
+                  <Icon className="w-6 h-6" />
+                </div>
+              </div>
+
+              {/* Card Body */}
+              <div className="space-y-2 relative z-10">
+                <h3 className="text-2xl font-display text-white tracking-wider">
+                  {item.title}
+                </h3>
+                <div className="text-xs text-[#FF7582] font-medium">
+                  {item.subtitle}
+                </div>
+                <p className="text-xs text-white/60 leading-relaxed pt-2">
+                  {item.description}
+                </p>
+              </div>
+
+              {/* Specs & Metrics */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-4 border-t border-white/10 relative z-10">
+                {item.specs.map((s, sIdx) => (
+                  <div key={sIdx} className="p-2.5 bg-black/80 border border-white/5 space-y-1">
+                    <span className="text-[9px] text-white/40 uppercase block truncate">
+                      {s.label}
+                    </span>
+                    <strong
+                      className={`text-xs font-mono font-bold block ${
+                        isAcid ? "text-[#FF7582]" : "text-[#8FAFD4]"
+                      }`}
+                    >
+                      {s.val}
+                    </strong>
+                  </div>
+                ))}
+              </div>
+
+              {/* Footer Indicator */}
+              <div className="pt-4 border-t border-white/5 flex items-center justify-between text-[10px] text-white/40 relative z-10">
+                <span>PILIER {item.num} // 06</span>
+                <span className="flex items-center gap-1 text-[#FF7582]">
+                  CONTINUER LE SCROLL <ChevronRight className="w-3.5 h-3.5" />
+                </span>
+              </div>
+            </div>
+          );
+        })}
+
+        {/* Final Callout Card at End of Scroll */}
+        <div className="w-[85vw] sm:w-[480px] shrink-0 reticle-box p-8 sm:p-10 flex flex-col justify-between space-y-6 bg-black border border-[#FF7582]/50 relative overflow-hidden shadow-[0_4px_30px_rgba(255,117,130,0.2)]">
+          <div className="space-y-3 relative z-10">
+            <span className="data-badge data-badge-acid">PRÊT POUR L&apos;ASCENSION ?</span>
+            <h3 className="text-3xl sm:text-4xl font-display text-white tracking-wider">
+              LE PROCHAIN PALIER C&apos;EST MAINTENANT.
+            </h3>
+            <p className="text-xs text-white/60 leading-relaxed">
+              Ne perds plus des mois à tourner en rond en ranked. Réserve ton premier audit dès aujourd&apos;hui.
+            </p>
+          </div>
+
+          <div className="pt-6 border-t border-white/10 relative z-10">
+            <a
+              href="#tarifs"
+              className="btn-cyber-primary w-full justify-center text-xs py-3"
+            >
+              <span>DÉCOUVRIR LES TARIFS</span>
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
         </div>
+      </div>
+
+      {/* Bottom Hint */}
+      <div className="w-full max-w-7xl mx-auto px-6 sm:px-12 flex items-center justify-end text-[10px] text-white/30 z-20">
+        <span className="text-[#FF3E4D] font-mono">DÉROULEZ LA PAGE VERS LE BAS ↓</span>
       </div>
     </section>
   );

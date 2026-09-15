@@ -269,6 +269,9 @@ Fonctionnement côté app : après le retour Google, `/auth/callback` vérifie l
   - **Token expiré géré côté client** : ajout `supabase.auth.refreshSession()` automatique dans `handleAdminResponse` quand le token est expiré, avec message clair "Session expirée, reconnectez-vous"
   - **UI mode déroulant améliorée** : bouton "Réponse de l'équipe Poulpy" avec gradient purple→cyan bien visible, **chevron rotatif** (ChevronDown + rotate-180 quand déployé), animation framer-motion easeInOut, **avatar "Équipe Poulpy" + date de réponse** dans le panneau déplié
   - **Fix build** : `discordUrl` manquant dans `setSettings` de `components/About.tsx` (erreur TS2345)
+- 2026-09-15 (refonte architecture scroll horizontal GSAP pin: true à 120 FPS) :
+  - **Passage à GSAP `pin: true` & `anticipatePin: 1`** : remplacement du conteneur CSS `sticky` (qui causait une désynchronisation entre le thread de scroll natif du navigateur et le thread de rendu GSAP) par le système de pinning natif matériel de ScrollTrigger
+  - **Fluidité 120 FPS constante** : scrubbing calé à `0.8`, calcul de distance exact `+=${scrollDistance}`, mise en cache directe des boutons de pills dans `pillBtnsRef`, et suppression de toutes les animations laser concurrentes sur la dernière carte
 - 2026-09-15 (fix glitch chiffres, suppression trait blanc et fluidité fast-scroll WhyPoulpy) :
   - **Suppression du trait blanc parasite** : suppression du `border-b` de la barre de télémétrie qui entrait en collision visuelle au-dessus des cartes sur écran PC portable / hauteur réduite
   - **Suppression du glitch sur les chiffres** : suppression de `glitch-text` sur les numéros de cartes (`item.num`) pour une typographie fixe, nette et immédiatement lisible
