@@ -272,7 +272,7 @@ const PILLARS = [
       { label: "Mindset", val: "Posture compétiteur" },
     ],
     hasClip: true,
-    videoSrc: "",
+    videoSrc: "/videos/why-poulpy/sang-froid.mp4",
     clipTitle: "SANG-FROID EN CLUTCH // 1V3 & 1V5",
     clipSubtitle: "Clip clutch et 1v3 Apex Legends",
     color: "laser",
