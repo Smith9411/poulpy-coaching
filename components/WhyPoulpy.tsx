@@ -3,7 +3,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import DecryptedText from "./DecryptedText";
 import CornerBrackets from "./CornerBrackets";
-import { Target, Brain, Crosshair, TrendingUp, ShieldCheck, Flame, ArrowRight, Play } from "lucide-react";
+import { Target, Brain, Crosshair, TrendingUp, ShieldCheck, Flame, ArrowRight, Play, RotateCcw } from "lucide-react";
 
 const PILLARS = [
   {
@@ -19,7 +19,6 @@ const PILLARS = [
       { label: "Erreurs corrigées", val: "15 à 20 par session" },
       { label: "Rapport", val: "Fiche Notion exportable" },
     ],
-    videoDuration: "00:45 • 1080p",
     color: "laser",
   },
   {
@@ -35,7 +34,6 @@ const PILLARS = [
       { label: "Lecture de carte", val: "Prédiction macro" },
       { label: "Prise de décision", val: "Instantanée sous stress" },
     ],
-    videoDuration: "00:52 • 1080p",
     color: "acid",
   },
   {
@@ -51,7 +49,6 @@ const PILLARS = [
       { label: "Sensibilité eDPI", val: "Calibration cm/360" },
       { label: "Headshot %", val: "+18% en moyenne" },
     ],
-    videoDuration: "00:38 • 1080p",
     color: "laser",
   },
   {
@@ -67,7 +64,6 @@ const PILLARS = [
       { label: "Sang-froid mesuré", val: "BPM stabilisé en 1v1" },
       { label: "Mentalité", val: "Posture de compétiteur pro" },
     ],
-    videoDuration: "00:40 • 1080p",
     color: "acid",
   },
   {
@@ -83,7 +79,6 @@ const PILLARS = [
       { label: "Liaison", val: "Canal privé Discord 7j/7" },
       { label: "Debriefing", val: "Suivi continu après match" },
     ],
-    videoDuration: "00:55 • 1080p",
     color: "laser",
   },
   {
@@ -99,7 +94,6 @@ const PILLARS = [
       { label: "Délai moyen", val: "9 à 14 jours" },
       { label: "Engagement", val: "100% formalisé" },
     ],
-    videoDuration: "00:30 • 1080p",
     color: "acid",
   },
 ];
@@ -111,8 +105,9 @@ export default function WhyPoulpy() {
   const progressBarRef = useRef<HTMLDivElement | null>(null);
   const scrollPctRef = useRef<HTMLSpanElement | null>(null);
   const pillBtnsRef = useRef<HTMLButtonElement[]>([]);
+  const cardFlippersRef = useRef<(HTMLDivElement | null)[]>([]);
   const activeIndexRef = useRef(0);
-  const scrollDistanceRef = useRef(2000);
+  const scrollDistanceRef = useRef(3800);
 
   const updatePills = (activeIdx: number) => {
     pillBtnsRef.current.forEach((btn, idx) => {
@@ -123,6 +118,35 @@ export default function WhyPoulpy() {
         btn.className = "px-2 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer border-white/15 text-white/50 hover:border-white/40 hover:text-white bg-black/40";
       }
     });
+  };
+
+  const flippedStatesRef = useRef<boolean[]>([false, false, false, false, false, false]);
+
+  const animateCardFlip = (idx: number, targetFlipped: boolean) => {
+    const el = cardFlippersRef.current[idx];
+    if (!el) return;
+    flippedStatesRef.current[idx] = targetFlipped;
+
+    gsap.to(el, {
+      rotateY: targetFlipped ? 180 : 0,
+      duration: 0.75,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+    gsap.to(el, {
+      y: -26,
+      duration: 0.375,
+      yoyo: true,
+      repeat: 1,
+      ease: "power1.inOut",
+      overwrite: "auto",
+    });
+  };
+
+  const handleCardClick = (idx: number, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    const isCurrentlyFlipped = flippedStatesRef.current[idx];
+    animateCardFlip(idx, !isCurrentlyFlipped);
   };
 
   useEffect(() => {
@@ -136,13 +160,35 @@ export default function WhyPoulpy() {
       if (ctx) ctx.revert();
 
       const maxScroll = Math.max(0, track.scrollWidth - window.innerWidth + 120);
-      const totalScrollDistance = Math.max(2000, maxScroll * 1.5);
+      const items = Array.from(track.children) as HTMLElement[];
+      if (items.length === 0) return;
+
+      const firstItemLeft = items[0].offsetLeft;
+      const cardPositions = items.map((el) => Math.min(maxScroll, Math.max(0, el.offsetLeft - firstItemLeft)));
+
+      // Calibrated scroll distance
+      const totalScrollDistance = Math.max(2600, maxScroll * 2.0);
       scrollDistanceRef.current = totalScrollDistance;
 
       ctx = gsap.context(() => {
-        gsap.to(track, {
-          x: () => -maxScroll,
-          ease: "none",
+        // Reset all card flippers
+        cardFlippersRef.current.forEach((el, idx) => {
+          if (el) {
+            gsap.set(el, { rotateY: 0, y: 0 });
+            flippedStatesRef.current[idx] = false;
+          }
+        });
+
+        const thresholds = [
+          { forward: 0.04, backward: 0.02 },
+          { forward: 0.19, backward: 0.15 },
+          { forward: 0.35, backward: 0.31 },
+          { forward: 0.51, backward: 0.47 },
+          { forward: 0.67, backward: 0.63 },
+          { forward: 0.83, backward: 0.79 },
+        ];
+
+        const tl = gsap.timeline({
           scrollTrigger: {
             id: "whypoulpy-scroll",
             trigger: section,
@@ -162,14 +208,41 @@ export default function WhyPoulpy() {
                 progressBarRef.current.style.transform = `scaleX(${progress})`;
               }
 
-              const idx = Math.min(5, Math.floor(progress * 6));
-              if (idx !== activeIndexRef.current) {
-                activeIndexRef.current = idx;
-                updatePills(idx);
+              // Active pill indicator
+              const activeIdx = Math.min(
+                5,
+                progress < 0.16 ? 0
+                  : progress < 0.32 ? 1
+                  : progress < 0.48 ? 2
+                  : progress < 0.64 ? 3
+                  : progress < 0.80 ? 4
+                  : 5
+              );
+              if (activeIdx !== activeIndexRef.current) {
+                activeIndexRef.current = activeIdx;
+                updatePills(activeIdx);
               }
+
+              // Trigger independent smooth flip/unflip animations based on scroll thresholds
+              thresholds.forEach((th, idx) => {
+                const isFlipped = flippedStatesRef.current[idx];
+                if (!isFlipped && progress >= th.forward) {
+                  animateCardFlip(idx, true);
+                } else if (isFlipped && progress < th.backward) {
+                  animateCardFlip(idx, false);
+                }
+              });
             },
           },
         });
+
+        // Smooth horizontal track progression with gentle stepped pacing
+        tl.to(track, { x: 0, duration: 0.2, ease: "none" });
+        for (let i = 1; i <= 5; i++) {
+          tl.to(track, { x: -cardPositions[i], duration: 0.8, ease: "power1.inOut" });
+          tl.to(track, { x: -cardPositions[i], duration: 0.3, ease: "none" });
+        }
+        tl.to(track, { x: -maxScroll, duration: 0.6, ease: "power1.inOut" });
       }, section);
     };
 
@@ -199,7 +272,8 @@ export default function WhyPoulpy() {
     const section = sectionRef.current;
     if (!section) return;
 
-    const targetProgress = index / (pillars.length - 1);
+    const cardTargetProgress = [0.07, 0.23, 0.39, 0.55, 0.71, 0.87];
+    const targetProgress = cardTargetProgress[index] ?? (index / 5) * 0.85;
     const sectionTop = section.getBoundingClientRect().top + window.scrollY;
     const targetY = sectionTop + targetProgress * scrollDistanceRef.current;
 
@@ -267,113 +341,211 @@ export default function WhyPoulpy() {
           backfaceVisibility: "hidden",
         }}
       >
-        {pillars.map((item) => {
+        {pillars.map((item, idx) => {
           const Icon = item.icon;
           const isAcid = item.color === "acid";
 
           return (
             <div
               key={item.num}
-              className={`w-[85vw] sm:w-[500px] lg:w-[560px] h-[520px] shrink-0 reticle-box ${
-                isAcid ? "" : "reticle-laser"
-              } p-8 sm:p-10 space-y-6 bg-[#090c10] border border-white/10 shadow-2xl shadow-black/80 transition-colors duration-150 flex flex-col justify-between ${
-                isAcid ? "hover:border-[#FF7582]/50" : "hover:border-[#8FAFD4]/50"
-              }`}
+              className="w-[85vw] sm:w-[500px] lg:w-[560px] h-[520px] shrink-0 relative cursor-pointer group/card"
+              onClick={(e) => handleCardClick(idx, e)}
               style={{
+                perspective: "1400px",
                 transform: "translateZ(0)",
               }}
             >
-              <CornerBrackets color={isAcid ? "coral" : "slate"} />
+              <div
+                ref={(el) => {
+                  if (el) cardFlippersRef.current[idx] = el;
+                }}
+                style={{
+                  transformStyle: "preserve-3d",
+                  WebkitTransformStyle: "preserve-3d",
+                  transformOrigin: "50% 50%",
+                  willChange: "transform",
+                  transform: "rotateY(0deg) translateZ(0px)",
+                }}
+                className="w-full h-full relative"
+              >
+                {/* ======================================================== */}
+                {/* FACE AVANT (FRONT) */}
+                {/* ======================================================== */}
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    width: "100%",
+                    height: "100%",
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    transform: "rotateY(0deg) translateZ(1px)",
+                    willChange: "transform",
+                    transformStyle: "preserve-3d",
+                    WebkitTransformStyle: "preserve-3d",
+                  }}
+                  className={`reticle-box ${
+                    isAcid ? "" : "reticle-laser"
+                  } p-8 sm:p-10 space-y-6 bg-[#090c10] border border-white/10 shadow-2xl shadow-black/80 transition-colors duration-150 flex flex-col justify-between ${
+                    isAcid ? "hover:border-[#FF7582]/50" : "hover:border-[#8FAFD4]/50"
+                  }`}
+                >
+                  <CornerBrackets color={isAcid ? "coral" : "slate"} />
 
-              <div>
-                {/* Card Header with Mini Player in upper-middle */}
-                <div className="flex items-start justify-between border-b border-white/10 pb-4 relative z-10 gap-2">
-                  <div className="space-y-1">
-                    <span
-                      className={`text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider ${
-                        isAcid
-                          ? "bg-[#FF7582]/10 text-[#FF7582] border border-[#FF7582]/30"
-                          : "bg-[#8FAFD4]/10 text-[#8FAFD4] border border-[#8FAFD4]/30"
-                      }`}
-                    >
-                      {item.badge}
-                    </span>
-                    <div className="text-4xl sm:text-6xl font-display text-white tracking-wider">
-                      {item.num}
-                    </div>
-                  </div>
-
-                  {/* Mini Player au milieu en haut dans l'espace disponible */}
-                  <div className="flex items-center gap-2.5 p-1.5 sm:p-2 bg-black/90 border border-white/15 hover:border-[#FF7582]/60 transition-colors group/mini cursor-pointer self-center shadow-lg">
-                    <div className="relative w-14 sm:w-16 h-9 sm:h-10 bg-[#07090D] border border-white/20 flex items-center justify-center overflow-hidden shrink-0">
-                      <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:6px_6px] pointer-events-none" />
-                      <div className="w-5 h-5 rounded-full bg-[#FF7582]/20 border border-[#FF7582] flex items-center justify-center text-[#FF7582] group-hover/mini:scale-110 transition-transform shadow-[0_0_8px_rgba(255,117,130,0.5)]">
-                        <Play className="w-2.5 h-2.5 fill-current ml-0.5" />
+                  <div>
+                    {/* Card Header */}
+                    <div className="flex items-start justify-between border-b border-white/10 pb-4 relative z-10">
+                      <div className="space-y-1">
+                        <span
+                          className={`text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider ${
+                            isAcid
+                              ? "bg-[#FF7582]/10 text-[#FF7582] border border-[#FF7582]/30"
+                              : "bg-[#8FAFD4]/10 text-[#8FAFD4] border border-[#8FAFD4]/30"
+                          }`}
+                        >
+                          {item.badge}
+                        </span>
+                        <div className="text-4xl sm:text-6xl font-display text-white tracking-wider">
+                          {item.num}
+                        </div>
                       </div>
-                    </div>
-                    <div className="space-y-0.5 text-left pr-1">
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#FF7582] animate-pulse" />
-                        <span className="text-[9px] font-bold text-white tracking-wider font-mono uppercase">VOD CLIP</span>
-                      </div>
-                      <span className="text-[8px] text-white/50 font-mono block">{item.videoDuration}</span>
-                    </div>
-                  </div>
 
-                  <div
-                    className={`w-12 h-12 border flex items-center justify-center shrink-0 ${
-                      isAcid
-                        ? "border-[#FF7582]/40 text-[#FF7582] bg-[#FF7582]/5"
-                        : "border-[#8FAFD4]/40 text-[#8FAFD4] bg-[#8FAFD4]/5"
-                    }`}
-                  >
-                    <Icon className="w-6 h-6" />
-                  </div>
-                </div>
-
-                {/* Card Body */}
-                <div className="space-y-2 pt-4 relative z-10">
-                  <h3 className="text-2xl font-display text-white tracking-wider">
-                    {item.title}
-                  </h3>
-                  <div className="text-xs text-[#FF7582] font-medium">
-                    {item.subtitle}
-                  </div>
-                  <p className="text-xs text-white/60 leading-relaxed pt-2">
-                    {item.description}
-                  </p>
-                </div>
-              </div>
-
-              <div>
-                {/* Specs & Metrics */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-4 border-t border-white/10 relative z-10">
-                  {item.specs.map((s, sIdx) => (
-                    <div key={sIdx} className="p-2.5 bg-black/80 border border-white/5 space-y-1">
-                      <span className="text-[9px] text-white/40 uppercase block truncate">
-                        {s.label}
-                      </span>
-                      <strong
-                        className={`text-xs font-mono font-bold block ${
-                          isAcid ? "text-[#FF7582]" : "text-[#8FAFD4]"
+                      <div
+                        className={`w-12 h-12 border flex items-center justify-center ${
+                          isAcid
+                            ? "border-[#FF7582]/40 text-[#FF7582] bg-[#FF7582]/5"
+                            : "border-[#8FAFD4]/40 text-[#8FAFD4] bg-[#8FAFD4]/5"
                         }`}
                       >
-                        {s.val}
-                      </strong>
+                        <Icon className="w-6 h-6" />
+                      </div>
                     </div>
-                  ))}
+
+                    {/* Card Body */}
+                    <div className="space-y-2 pt-4 relative z-10">
+                      <h3 className="text-2xl font-display text-white tracking-wider">
+                        {item.title}
+                      </h3>
+                      <div className="text-xs text-[#FF7582] font-medium">
+                        {item.subtitle}
+                      </div>
+                      <p className="text-xs text-white/60 leading-relaxed pt-2">
+                        {item.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    {/* Specs & Metrics */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-4 border-t border-white/10 relative z-10">
+                      {item.specs.map((s, sIdx) => (
+                        <div key={sIdx} className="p-2.5 bg-black/80 border border-white/5 space-y-1">
+                          <span className="text-[9px] text-white/40 uppercase block truncate">
+                            {s.label}
+                          </span>
+                          <strong
+                            className={`text-xs font-mono font-bold block ${
+                              isAcid ? "text-[#FF7582]" : "text-[#8FAFD4]"
+                            }`}
+                          >
+                            {s.val}
+                          </strong>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Footer Indicator */}
+                    <div className="pt-4 mt-4 border-t border-white/5 flex items-center justify-between text-[10px] text-white/40 relative z-10">
+                      <span>PILIER {item.num} // 06</span>
+                      
+                      <div className="flex items-center gap-2 text-white/50 font-mono text-[10px] uppercase">
+                        <span className="relative flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF7582] opacity-75" />
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF7582]" />
+                        </span>
+                        <span className="text-[#FF7582] font-bold">EXTRAIT VOD DISPONIBLE</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Footer Indicator */}
-                <div className="pt-4 mt-4 border-t border-white/5 flex items-center justify-between text-[10px] text-white/40 relative z-10">
-                  <span>PILIER {item.num} // 06</span>
-                  
-                  <div className="flex items-center gap-2 text-white/50 font-mono text-[10px] uppercase">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF7582] opacity-75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF7582]" />
+                {/* ======================================================== */}
+                {/* FACE ARRIÈRE (BACK - LECTEUR CLIP VIDÉO) */}
+                {/* ======================================================== */}
+                <div
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    width: "100%",
+                    height: "100%",
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    transform: "rotateY(180deg) translateZ(1px)",
+                    willChange: "transform",
+                    transformStyle: "preserve-3d",
+                    WebkitTransformStyle: "preserve-3d",
+                  }}
+                  className="reticle-box p-6 sm:p-8 bg-[#090C12] border-2 border-[#FF7582] shadow-[0_0_35px_rgba(255,117,130,0.3)] flex flex-col justify-between"
+                >
+                  <CornerBrackets color="coral" />
+
+                  {/* Back Header */}
+                  <div className="flex items-center justify-between border-b border-white/10 pb-3 relative z-10">
+                    <div className="flex items-center gap-2">
+                      <span className="bg-[#FF7582] text-black text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
+                        EXTRAIT VOD // PILIER {item.num}
+                      </span>
+                      <span className="text-xs text-white/70 font-display hidden sm:inline">
+                        {item.title}
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={(e) => handleCardClick(idx, e)}
+                      className="btn-cyber-ghost text-[10px] py-1.5 px-3 flex items-center gap-1.5 hover:border-[#FF7582] hover:text-[#FF7582] cursor-pointer"
+                    >
+                      <RotateCcw className="w-3 h-3" />
+                      <span>RETOUR [✕]</span>
+                    </button>
+                  </div>
+
+                  {/* Video Mockup Container */}
+                  <div className="relative my-auto aspect-video w-full bg-black/90 border border-white/20 flex flex-col items-center justify-center overflow-hidden group/player shadow-inner z-10">
+                    {/* Scanlines / Grid effect */}
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#FF7582]/10 via-transparent to-black pointer-events-none" />
+                    <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
+
+                    {/* Play Button with breathing rings */}
+                    <div className="relative z-10 flex flex-col items-center gap-3">
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#FF7582]/20 border-2 border-[#FF7582] flex items-center justify-center text-[#FF7582] shadow-[0_0_25px_rgba(255,117,130,0.5)] group-hover/player:scale-110 transition-transform cursor-pointer">
+                        <Play className="w-6 h-6 fill-current ml-1" />
+                      </div>
+                      <div className="text-center space-y-0.5">
+                        <span className="text-xs font-bold font-display tracking-wider text-white block">
+                          CLIP VOD DISPONIBLE TRÈS BIENTÔT
+                        </span>
+                        <span className="text-[10px] text-white/50 font-mono block">
+                          Format vidéo YouTube // 1080p 60 FPS
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Bottom bar overlay */}
+                    <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-[9px] font-mono text-white/60 z-10">
+                      <span className="bg-black/80 px-2 py-0.5 border border-white/10">00:45 / 01:30</span>
+                      <span className="text-[#FF7582] font-bold">COACH POULPY REPLAY ARCHIVE</span>
+                    </div>
+                  </div>
+
+                  {/* Back Footer (Clean Single-Line Note) */}
+                  <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs relative z-10">
+                    <span className="text-[10px] text-white/60 truncate">
+                      Démonstration : <strong className="text-white">{item.subtitle}</strong>
                     </span>
-                    <span className="text-[#FF7582] font-bold">EXTRAIT DISPONIBLE</span>
+                    <span className="text-[9px] font-mono text-[#FF7582] uppercase tracking-wider">
+                      [LECTEUR ACTIF]
+                    </span>
                   </div>
                 </div>
               </div>
@@ -415,5 +587,4 @@ export default function WhyPoulpy() {
     </section>
   );
 }
-
 
