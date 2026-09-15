@@ -109,35 +109,13 @@ function PillarFlipCard({
   const [manualOverride, setManualOverride] = useState<boolean | null>(null);
   const controls = useAnimationControls();
   const prevFlippedRef = useRef(false);
-  const isFirstRenderRef = useRef(true);
   const Icon = item.icon;
   const isAcid = item.color === "acid";
 
   const effectiveFlipped = manualOverride !== null ? manualOverride : isFlipped;
 
-  // Trigger smooth jump-and-flip animation whenever effective flipped state changes
+  // Trigger smooth continuous jump-and-flip animation whenever effective flipped state changes
   useEffect(() => {
-    if (isFirstRenderRef.current) {
-      isFirstRenderRef.current = false;
-      if (effectiveFlipped) {
-        const timer = setTimeout(() => {
-          controls.start({
-            y: [0, -48, 0],
-            scale: [1, 1.035, 1],
-            rotateY: 180,
-            transition: {
-              rotateY: { duration: 0.75, ease: [0.25, 1, 0.5, 1] },
-              y: { duration: 0.75, times: [0, 0.48, 1], ease: "easeInOut" },
-              scale: { duration: 0.75, times: [0, 0.48, 1], ease: "easeInOut" },
-            },
-          });
-          prevFlippedRef.current = true;
-        }, 500);
-        return () => clearTimeout(timer);
-      }
-      return;
-    }
-
     if (prevFlippedRef.current !== effectiveFlipped) {
       prevFlippedRef.current = effectiveFlipped;
       controls.start({
@@ -153,7 +131,7 @@ function PillarFlipCard({
     }
   }, [effectiveFlipped, controls]);
 
-  // Reset manual override if scroll drives a new card
+  // Reset manual override if scroll drives a new card state
   useEffect(() => {
     setManualOverride(null);
   }, [isFlipped]);
@@ -269,7 +247,7 @@ function PillarFlipCard({
               ))}
             </div>
 
-            {/* Footer Indicator (CLIP button temporarily replaced by clean indicator) */}
+            {/* Footer Indicator */}
             <div className="pt-4 mt-4 border-t border-white/5 flex items-center justify-between text-[10px] text-white/40 relative z-10">
               <span>PILIER {item.num} // 06</span>
               
@@ -371,13 +349,15 @@ function PillarFlipCard({
 
 export default function WhyPoulpy() {
   const pillars = PILLARS;
-  const [activeCardIndex, setActiveCardIndex] = useState(0);
+  const [flippedCards, setFlippedCards] = useState<boolean[]>([false, false, false, false, false, false]);
   const sectionRef = useRef<HTMLElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
   const progressBarRef = useRef<HTMLDivElement | null>(null);
   const scrollPctRef = useRef<HTMLSpanElement | null>(null);
   const pillBtnsRef = useRef<HTMLButtonElement[]>([]);
   const activeIndexRef = useRef(0);
+  const prevMaskRef = useRef(0);
+  const scrollDistanceRef = useRef(3600);
 
   const updatePills = (activeIdx: number) => {
     pillBtnsRef.current.forEach((btn, idx) => {
@@ -400,24 +380,29 @@ export default function WhyPoulpy() {
     const setupScroll = () => {
       if (ctx) ctx.revert();
 
-      const scrollDistance = Math.max(0, track.scrollWidth - window.innerWidth + 120);
+      const maxScroll = Math.max(0, track.scrollWidth - window.innerWidth + 120);
+      const items = Array.from(track.children) as HTMLElement[];
+      if (items.length === 0) return;
+
+      const firstItemLeft = items[0].offsetLeft;
+      const cardPositions = items.map((el) => Math.min(maxScroll, Math.max(0, el.offsetLeft - firstItemLeft)));
+
+      // Substantially lengthened scroll room for spacious, deliberate pacing
+      const totalScrollDistance = Math.max(3800, maxScroll * 2.6 + 1000);
+      scrollDistanceRef.current = totalScrollDistance;
 
       ctx = gsap.context(() => {
-        gsap.to(track, {
-          x: () => -Math.max(0, track.scrollWidth - window.innerWidth + 120),
-          ease: "none",
+        const tl = gsap.timeline({
           scrollTrigger: {
             id: "whypoulpy-scroll",
             trigger: section,
             start: "top top",
-            end: () => `+=${Math.max(0, track.scrollWidth - window.innerWidth + 120)}`,
+            end: () => `+=${totalScrollDistance}`,
             pin: true,
             pinSpacing: true,
-            scrub: 0.6,
-            anticipatePin: 0,
+            scrub: 0.7,
+            anticipatePin: 1,
             invalidateOnRefresh: true,
-            fastScrollEnd: false,
-            preventOverlaps: false,
             onUpdate: (self: { progress: number }) => {
               const progress = self.progress;
               if (scrollPctRef.current) {
@@ -426,15 +411,73 @@ export default function WhyPoulpy() {
               if (progressBarRef.current) {
                 progressBarRef.current.style.transform = `scaleX(${progress})`;
               }
-              const idx = Math.min(5, Math.floor(progress * 6));
-              if (idx !== activeIndexRef.current) {
-                activeIndexRef.current = idx;
-                updatePills(idx);
-                setActiveCardIndex(idx);
+
+              // Active pill navigation indicator
+              const activeIdx = Math.min(
+                5,
+                progress < 0.15 ? 0
+                  : progress < 0.30 ? 1
+                  : progress < 0.45 ? 2
+                  : progress < 0.60 ? 3
+                  : progress < 0.75 ? 4
+                  : 5
+              );
+              if (activeIdx !== activeIndexRef.current) {
+                activeIndexRef.current = activeIdx;
+                updatePills(activeIdx);
+              }
+
+              // Progressive flip mask (starts false, flips during hold windows)
+              const mask =
+                (progress >= 0.03 ? 1 : 0) |
+                (progress >= 0.18 ? 2 : 0) |
+                (progress >= 0.33 ? 4 : 0) |
+                (progress >= 0.48 ? 8 : 0) |
+                (progress >= 0.63 ? 16 : 0) |
+                (progress >= 0.78 ? 32 : 0);
+
+              if (mask !== prevMaskRef.current) {
+                prevMaskRef.current = mask;
+                setFlippedCards([
+                  (mask & 1) !== 0,
+                  (mask & 2) !== 0,
+                  (mask & 4) !== 0,
+                  (mask & 8) !== 0,
+                  (mask & 16) !== 0,
+                  (mask & 32) !== 0,
+                ]);
               }
             },
           },
         });
+
+        // Stepped timeline: alternating deliberate holds & smooth transitions
+        // Card 0 hold (flips at progress 0.03)
+        tl.to(track, { x: 0, duration: 0.5, ease: "none" });
+
+        // Transition 0 -> 1 & hold 1 (flips at 0.18)
+        tl.to(track, { x: -cardPositions[1], duration: 0.5, ease: "power1.inOut" });
+        tl.to(track, { x: -cardPositions[1], duration: 0.5, ease: "none" });
+
+        // Transition 1 -> 2 & hold 2 (flips at 0.33)
+        tl.to(track, { x: -cardPositions[2], duration: 0.5, ease: "power1.inOut" });
+        tl.to(track, { x: -cardPositions[2], duration: 0.5, ease: "none" });
+
+        // Transition 2 -> 3 & hold 3 (flips at 0.48)
+        tl.to(track, { x: -cardPositions[3], duration: 0.5, ease: "power1.inOut" });
+        tl.to(track, { x: -cardPositions[3], duration: 0.5, ease: "none" });
+
+        // Transition 3 -> 4 & hold 4 (flips at 0.63)
+        tl.to(track, { x: -cardPositions[4], duration: 0.5, ease: "power1.inOut" });
+        tl.to(track, { x: -cardPositions[4], duration: 0.5, ease: "none" });
+
+        // Transition 4 -> 5 & hold 5 (flips at 0.78)
+        tl.to(track, { x: -cardPositions[5], duration: 0.5, ease: "power1.inOut" });
+        tl.to(track, { x: -cardPositions[5], duration: 0.5, ease: "none" });
+
+        // Transition 5 -> CTA callout card
+        tl.to(track, { x: -maxScroll, duration: 0.6, ease: "power1.inOut" });
+        tl.to(track, { x: -maxScroll, duration: 0.4, ease: "none" });
       }, section);
     };
 
@@ -462,12 +505,12 @@ export default function WhyPoulpy() {
 
   const goToCard = (index: number) => {
     const section = sectionRef.current;
-    const track = trackRef.current;
-    if (!section || !track) return;
+    if (!section) return;
 
-    const scrollDistance = Math.max(0, track.scrollWidth - window.innerWidth + 120);
+    const cardTargetProgress = [0.038, 0.192, 0.346, 0.5, 0.654, 0.808];
+    const targetProgress = cardTargetProgress[index] ?? (index / 5) * 0.8;
     const sectionTop = section.getBoundingClientRect().top + window.scrollY;
-    const targetY = sectionTop + (index / (pillars.length - 1)) * scrollDistance;
+    const targetY = sectionTop + targetProgress * scrollDistanceRef.current;
 
     window.scrollTo({ top: targetY, behavior: "smooth" });
   };
@@ -537,7 +580,7 @@ export default function WhyPoulpy() {
           <PillarFlipCard
             key={item.num}
             item={item}
-            isFlipped={activeCardIndex === idx}
+            isFlipped={Boolean(flippedCards[idx])}
           />
         ))}
 
