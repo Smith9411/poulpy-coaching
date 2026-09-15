@@ -227,18 +227,32 @@ export default function Avis() {
 
     setIsSubmitting(true);
     try {
+      let { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        const { data: refreshData, error: refreshErr } = await supabase.auth.refreshSession();
+        if (refreshErr || !refreshData.session) {
+          throw new Error('Session expirée. Veuillez vous reconnecter.');
+        }
+        session = refreshData.session;
+      }
+
+      const token = session?.access_token;
+      if (!token) throw new Error('Vous devez être connecté pour publier un avis.');
+
       const gameNormalized = game === 'Valorant' ? 'valorant' : game === 'Apex Legends' ? 'apex' : 'aim';
 
       const res = await fetch('/api/reviews', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           name: user.username,
           game: gameNormalized,
           rank: finalRank,
           rating,
           text: text.trim(),
-          userId: user.id,
         }),
       });
 

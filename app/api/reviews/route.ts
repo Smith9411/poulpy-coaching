@@ -146,22 +146,46 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { name, game, rank, text, rating, userId } = body;
-
-    if (!name || !text || !game) {
+    const auth = await getAuthUser(req);
+    if ('error' in auth) {
       return NextResponse.json(
-        { error: 'Champs obligatoires manquants (nom, jeu, avis)' },
+        { error: 'Vous devez être connecté avec votre compte pour publier un avis.' },
+        { status: 401 }
+      );
+    }
+    const authUser = auth.user;
+
+    const body = await req.json();
+    const { name, game, rank, text, rating } = body;
+
+    if (!text || !game) {
+      return NextResponse.json(
+        { error: 'Champs obligatoires manquants (jeu, avis)' },
         { status: 400 }
       );
     }
 
-    const nameTrimmed = String(name).trim();
+    // Récupération du pseudo officiel du profil
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('id', authUser.id)
+      .maybeSingle();
+
+    const authorName = (
+      profile?.username ||
+      authUser.user_metadata?.username ||
+      authUser.user_metadata?.full_name ||
+      name ||
+      'Élève Poulpy'
+    ).trim();
+
+    const nameTrimmed = authorName.slice(0, MAX_NAME_LENGTH);
     const textTrimmed = String(text).trim();
     const gameTrimmed = String(game).trim().toLowerCase();
     const rankTrimmed = String(rank || 'Membre Poulpy').trim();
 
-    if (nameTrimmed.length < 1 || nameTrimmed.length > MAX_NAME_LENGTH) {
+    if (nameTrimmed.length < 1) {
       return NextResponse.json({ error: `Le nom doit faire entre 1 et ${MAX_NAME_LENGTH} caractères` }, { status: 400 });
     }
     if (textTrimmed.length < 1 || textTrimmed.length > MAX_TEXT_LENGTH) {
@@ -181,7 +205,7 @@ export async function POST(req: NextRequest) {
       rank: rankTrimmed,
       text: textTrimmed,
       rating: Math.min(5, Math.max(1, Number(rating) || 5)),
-      user_id: typeof userId === 'string' && userId.length > 0 ? userId : undefined,
+      user_id: authUser.id,
       created_at: new Date().toISOString(),
     };
 

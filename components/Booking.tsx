@@ -213,7 +213,10 @@ export default function Booking() {
       }
       setSubmitError(null);
       setStep(3);
-    } else if (step === 3) {
+      if (!user) {
+        setSubmitError("Vous devez être connecté avec votre compte pour réserver une session de coaching.");
+        return;
+      }
       if (!studentDiscord.trim()) {
         setSubmitError("L'identifiant Discord est requis pour initier le salon vocal.");
         return;
@@ -230,14 +233,24 @@ export default function Booking() {
         const randomCode = Math.floor(1000 + Math.random() * 9000);
         const missionId = `PLP-${randomCode}-OP`;
 
-        let token: string | undefined;
-        try {
-          const { data: { session } } = await supabase.auth.getSession();
-          token = session?.access_token;
-        } catch {}
+        let { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) {
+          const { data: refreshData, error: refreshErr } = await supabase.auth.refreshSession();
+          if (refreshErr || !refreshData.session) {
+            throw new Error("Session expirée. Veuillez vous reconnecter.");
+          }
+          session = refreshData.session;
+        }
 
-        const headers: Record<string, string> = { "Content-Type": "application/json" };
-        if (token) headers["Authorization"] = `Bearer ${token}`;
+        const token = session?.access_token;
+        if (!token) {
+          throw new Error("Vous devez être connecté pour réserver une session.");
+        }
+
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        };
 
         const res = await fetch("/api/bookings/create", {
           method: "POST",
@@ -250,8 +263,8 @@ export default function Booking() {
             planName: activePlan.name,
             planPrice: activePlan.price,
             planDuration: activePlan.duration,
-            studentName: studentName.trim() || studentDiscord.trim(),
-            studentEmail: studentEmail.trim(),
+            studentName: (studentName.trim() || user.username || studentDiscord.trim()),
+            studentEmail: (studentEmail.trim() || user.email || ""),
             studentDiscord: studentDiscord.trim(),
             game: `${game} (${currentRank})`,
             notes: objective.trim(),
@@ -872,6 +885,28 @@ export default function Booking() {
                   </span>
                 </div>
 
+                {!user && (
+                  <div className="p-4 bg-[#FF7582]/10 border border-[#FF7582]/40 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <Shield className="w-5 h-5 text-[#FF7582] shrink-0" />
+                      <div>
+                        <div className="text-xs font-bold text-white uppercase tracking-wider">
+                          COMPTE ÉLÈVE REQUIS POUR RÉSERVER
+                        </div>
+                        <p className="text-[11px] text-white/70 mt-0.5">
+                          Vous devez être connecté pour bloquer votre créneau et accéder à votre suivi personnalisé.
+                        </p>
+                      </div>
+                    </div>
+                    <a
+                      href="/auth"
+                      className="btn-cyber-primary py-2 px-5 text-xs font-bold shrink-0 text-center"
+                    >
+                      <span>SE CONNECTER / S'INSCRIRE</span>
+                    </a>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-4">
                     <div>
@@ -978,23 +1013,33 @@ export default function Booking() {
                     <ChevronLeft className="w-4 h-4" />
                     <span>RETOUR CRÉNEAU</span>
                   </button>
-                  <button
-                    disabled={isSubmitting}
-                    onClick={handleNextStep}
-                    className="btn-cyber-primary flex items-center gap-2 py-2.5 px-7 text-xs font-bold uppercase disabled:opacity-50 cursor-pointer"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>VERROUILLAGE EN COURS...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>CONFIRMER LA SESSION</span>
-                        <Send className="w-4 h-4" />
-                      </>
-                    )}
-                  </button>
+                  {user ? (
+                    <button
+                      disabled={isSubmitting}
+                      onClick={handleNextStep}
+                      className="btn-cyber-primary flex items-center gap-2 py-2.5 px-7 text-xs font-bold uppercase disabled:opacity-50 cursor-pointer"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>VERROUILLAGE EN COURS...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>CONFIRMER LA SESSION</span>
+                          <Send className="w-4 h-4" />
+                        </>
+                      )}
+                    </button>
+                  ) : (
+                    <a
+                      href="/auth"
+                      className="btn-cyber-primary flex items-center gap-2 py-2.5 px-7 text-xs font-bold uppercase cursor-pointer"
+                    >
+                      <User className="w-4 h-4" />
+                      <span>SE CONNECTER POUR CONFIRMER</span>
+                    </a>
+                  )}
                 </div>
               </motion.div>
             )}
