@@ -101,11 +101,13 @@ const PILLARS = [
 
 function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
   const [isFlipped, setIsFlipped] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
   const Icon = item.icon;
   const isAcid = item.color === "acid";
 
   const handleFlip = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setHasInteracted(true);
     setIsFlipped((prev) => !prev);
   };
 
@@ -115,12 +117,23 @@ function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
       style={{ perspective: "1400px" }}
     >
       <motion.div
-        animate={{
-          rotateY: isFlipped ? 180 : 0,
-        }}
+        animate={
+          hasInteracted
+            ? {
+                y: [0, -48, -48, 0],
+                scale: [1, 1.05, 1.05, 1],
+                rotateY: isFlipped ? [0, 0, 180, 180] : [180, 180, 0, 0],
+              }
+            : {
+                y: 0,
+                scale: 1,
+                rotateY: 0,
+              }
+        }
         transition={{
-          duration: 0.65,
-          ease: [0.23, 1, 0.32, 1],
+          duration: 0.82,
+          times: [0, 0.26, 0.74, 1],
+          ease: "easeInOut",
         }}
         style={{
           transformStyle: "preserve-3d",
