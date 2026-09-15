@@ -113,23 +113,17 @@ function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
 
   return (
     <div
-      className="w-[85vw] sm:w-[500px] lg:w-[560px] shrink-0"
+      className="w-[85vw] sm:w-[500px] lg:w-[560px] h-[520px] shrink-0"
       style={{ perspective: "1400px" }}
     >
       <motion.div
         animate={
           hasInteracted
-            ? isFlipped
-              ? {
-                  rotateY: 180,
-                  y: [0, -36, 0],
-                  scale: [1, 1.04, 1],
-                }
-              : {
-                  rotateY: 0,
-                  y: [0, -36, 0],
-                  scale: [1, 1.04, 1],
-                }
+            ? {
+                rotateY: isFlipped ? 180 : 0,
+                y: [0, -32, 0],
+                scale: [1, 1.03, 1],
+              }
             : {
                 rotateY: 0,
                 y: 0,
@@ -137,12 +131,15 @@ function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
               }
         }
         transition={{
-          rotateY: { duration: 0.7, ease: [0.22, 1.2, 0.36, 1] },
-          y: { duration: 0.7, times: [0, 0.45, 1], ease: "easeInOut" },
-          scale: { duration: 0.7, times: [0, 0.45, 1], ease: "easeInOut" },
+          rotateY: { duration: 0.65, ease: [0.22, 1.2, 0.36, 1] },
+          y: { duration: 0.65, times: [0, 0.45, 1], ease: "easeInOut" },
+          scale: { duration: 0.65, times: [0, 0.45, 1], ease: "easeInOut" },
         }}
-        style={{ transformStyle: "preserve-3d" }}
-        className="relative w-full h-full min-h-[490px]"
+        style={{
+          transformStyle: "preserve-3d",
+          transformOrigin: "center center",
+        }}
+        className="relative w-full h-full"
       >
         {/* ======================================================== */}
         {/* FACE AVANT (FRONT) */}
@@ -152,9 +149,9 @@ function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
             backfaceVisibility: "hidden",
             transform: "rotateY(0deg)",
           }}
-          className={`reticle-box ${
+          className={`absolute inset-0 w-full h-full reticle-box ${
             isAcid ? "" : "reticle-laser"
-          } p-8 sm:p-10 space-y-6 bg-[#090c10] border border-white/10 relative overflow-hidden shadow-2xl shadow-black/80 transition-colors duration-150 h-full flex flex-col justify-between ${
+          } p-8 sm:p-10 space-y-6 bg-[#090c10] border border-white/10 overflow-hidden shadow-2xl shadow-black/80 transition-colors duration-150 flex flex-col justify-between ${
             isAcid ? "hover:border-[#FF7582]/50" : "hover:border-[#8FAFD4]/50"
           }`}
         >
@@ -264,7 +261,7 @@ function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
             backfaceVisibility: "hidden",
             transform: "rotateY(180deg)",
           }}
-          className="absolute inset-0 reticle-box p-6 sm:p-8 bg-[#090C12] border-2 border-[#FF7582] shadow-[0_0_35px_rgba(255,117,130,0.3)] flex flex-col justify-between overflow-hidden"
+          className="absolute inset-0 w-full h-full reticle-box p-6 sm:p-8 bg-[#090C12] border-2 border-[#FF7582] shadow-[0_0_35px_rgba(255,117,130,0.3)] flex flex-col justify-between overflow-hidden"
         >
           <CornerBrackets color="coral" />
 
@@ -336,6 +333,7 @@ function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
     </div>
   );
 }
+
 
 export default function WhyPoulpy() {
   const pillars = PILLARS;
@@ -506,7 +504,7 @@ export default function WhyPoulpy() {
         {/* Final Callout Card at End of Scroll */}
         <div
           style={{ transform: "translateZ(0)", contain: "layout style paint" }}
-          className="w-[85vw] sm:w-[480px] shrink-0 reticle-box p-8 sm:p-10 flex flex-col justify-between space-y-6 bg-black border border-[#FF7582]/50 relative overflow-hidden shadow-2xl shadow-black/80"
+          className="w-[85vw] sm:w-[480px] h-[520px] shrink-0 reticle-box p-8 sm:p-10 flex flex-col justify-between space-y-6 bg-black border border-[#FF7582]/50 relative overflow-hidden shadow-2xl shadow-black/80"
         >
           <div className="space-y-3 relative z-10">
             <span className="data-badge data-badge-acid">PRÊT POUR L&apos;ASCENSION ?</span>
