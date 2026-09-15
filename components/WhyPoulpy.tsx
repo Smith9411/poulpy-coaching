@@ -188,8 +188,8 @@ export default function WhyPoulpy() {
       const firstItemLeft = items[0].offsetLeft;
       const cardPositions = items.map((el) => Math.min(maxScroll, Math.max(0, el.offsetLeft - firstItemLeft)));
 
-      // Pacing calibrated: clips cards have pauses, non-clip cards slide smoothly
-      const totalScrollDistance = Math.max(3000, maxScroll * 2.3);
+      // Pacing calibrated: continuous scrolling with brief holds strictly on flipped clip cards
+      const totalScrollDistance = Math.max(2600, maxScroll * 2.0);
       scrollDistanceRef.current = totalScrollDistance;
 
       ctx = gsap.context(() => {
@@ -201,10 +201,10 @@ export default function WhyPoulpy() {
           }
         });
 
-        // Thresholds only for cards with clips (01 -> idx 0, 03 -> idx 2, 05 -> idx 4)
+        // Thresholds strictly for clip cards (01 -> idx 0, 03 -> idx 2, 05 -> idx 4)
         const thresholds = [
-          { idx: 0, forward: 0.09, backward: 0.06 }, // Case 01 (Clip Aim training)
-          { idx: 2, forward: 0.38, backward: 0.34 }, // Case 03 (Clip Gamesense & clutch)
+          { idx: 0, forward: 0.04, backward: 0.02 }, // Case 01 (Clip Aim training)
+          { idx: 2, forward: 0.35, backward: 0.31 }, // Case 03 (Clip Gamesense & clutch)
           { idx: 4, forward: 0.68, backward: 0.64 }, // Case 05 (Clip Antitilt & 1v3)
         ];
 
@@ -231,11 +231,11 @@ export default function WhyPoulpy() {
               // Active pill indicator
               const activeIdx = Math.min(
                 5,
-                progress < 0.16 ? 0
-                  : progress < 0.32 ? 1
-                  : progress < 0.48 ? 2
-                  : progress < 0.64 ? 3
-                  : progress < 0.80 ? 4
+                progress < 0.22 ? 0
+                  : progress < 0.38 ? 1
+                  : progress < 0.56 ? 2
+                  : progress < 0.72 ? 3
+                  : progress < 0.88 ? 4
                   : 5
               );
               if (activeIdx !== activeIndexRef.current) {
@@ -257,31 +257,23 @@ export default function WhyPoulpy() {
         });
 
         // Choreographed Timeline:
-        // Card 0 (Clip): Hold front, user scrolls -> flips -> hold video
-        tl.to(track, { x: 0, duration: 0.45, ease: "none" });
+        // 1. Card 0 (Clip): flips immediately -> brief hold to view video
+        tl.to(track, { x: 0, duration: 0.5, ease: "none" });
 
-        // Card 1 (No clip): Smooth pass-through without long stall
-        tl.to(track, { x: -cardPositions[1], duration: 0.8, ease: "power1.inOut" });
-        tl.to(track, { x: -cardPositions[1], duration: 0.25, ease: "none" });
+        // 2. Smooth continuous scroll past Card 1 (no pause) all the way to Card 2
+        tl.to(track, { x: -cardPositions[2], duration: 1.0, ease: "power1.inOut" });
 
-        // Card 2 (Clip): Settle, flip & observe
-        tl.to(track, { x: -cardPositions[2], duration: 0.8, ease: "power1.inOut" });
+        // 3. Card 2 (Clip): brief hold on flipped video card
         tl.to(track, { x: -cardPositions[2], duration: 0.5, ease: "none" });
 
-        // Card 3 (No clip): Smooth pass-through
-        tl.to(track, { x: -cardPositions[3], duration: 0.8, ease: "power1.inOut" });
-        tl.to(track, { x: -cardPositions[3], duration: 0.25, ease: "none" });
+        // 4. Smooth continuous scroll past Card 3 (no pause) all the way to Card 4
+        tl.to(track, { x: -cardPositions[4], duration: 1.0, ease: "power1.inOut" });
 
-        // Card 4 (Clip): Settle, flip & observe
-        tl.to(track, { x: -cardPositions[4], duration: 0.8, ease: "power1.inOut" });
+        // 5. Card 4 (Clip): brief hold on flipped video card
         tl.to(track, { x: -cardPositions[4], duration: 0.5, ease: "none" });
 
-        // Card 5 (No clip): Smooth pass-through to CTA
-        tl.to(track, { x: -cardPositions[5], duration: 0.8, ease: "power1.inOut" });
-        tl.to(track, { x: -cardPositions[5], duration: 0.25, ease: "none" });
-
-        // Final CTA Callout Card
-        tl.to(track, { x: -maxScroll, duration: 0.7, ease: "power1.inOut" });
+        // 6. Smooth continuous scroll past Card 5 (no pause) to CTA callout
+        tl.to(track, { x: -maxScroll, duration: 1.0, ease: "power1.inOut" });
       }, section);
     };
 
@@ -311,7 +303,7 @@ export default function WhyPoulpy() {
     const section = sectionRef.current;
     if (!section) return;
 
-    const cardTargetProgress = [0.09, 0.23, 0.40, 0.56, 0.72, 0.86];
+    const cardTargetProgress = [0.05, 0.22, 0.39, 0.56, 0.72, 0.88];
     const targetProgress = cardTargetProgress[index] ?? (index / 5) * 0.85;
     const sectionTop = section.getBoundingClientRect().top + window.scrollY;
     const targetY = sectionTop + targetProgress * scrollDistanceRef.current;
