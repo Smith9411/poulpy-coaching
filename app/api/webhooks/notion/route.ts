@@ -9,19 +9,31 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export const dynamic = 'force-dynamic';
 
-let lastVerificationToken: string | null = null;
-
 /**
  * GET /api/webhooks/notion
- * Affiche l'état du webhook et le dernier jeton de vérification reçu pour l'activation Notion
+ * Affiche l'état du webhook et le dernier jeton de vérification reçu depuis Supabase
  */
 export async function GET() {
+  let tokenFromDb: string | null = null;
+  try {
+    const { data } = await supabase
+      .from('settings')
+      .select('value')
+      .eq('key', 'notion_webhook_token')
+      .maybeSingle();
+    if (data?.value) {
+      tokenFromDb = data.value;
+    }
+  } catch (e) {
+    console.warn('Erreur lecture token DB:', e);
+  }
+
   return NextResponse.json({
     status: 'ok',
     service: 'Poulpy Coaching Notion Webhook',
-    last_verification_token:
-      lastVerificationToken ||
-      "En attente du jeton... Cliquez sur 'Renvoyer le jeton' dans Notion pour le voir s'afficher ici.",
+    jeton_de_verification:
+      tokenFromDb ||
+      "En attente du jeton... Cliquez sur 'Renvoyer le jeton' dans Notion, puis rafraîchissez cette page.",
   });
 }
 
@@ -33,26 +45,33 @@ export async function POST(req: NextRequest) {
   try {
     const rawBody = await req.json().catch(() => ({}));
 
-    // 1. Handshake de vérification initial de Notion (Capture du jeton de vérification)
+    // 1. Handshake de vérification initial de Notion (Capture et persistance du jeton)
     const token =
       rawBody.verification_token ||
       rawBody.verificationToken ||
       rawBody.token ||
-      rawBody.secret;
+      rawBody.secret ||
+      rawBody.challenge;
 
     if (token) {
-      lastVerificationToken = token;
       console.info(`[Notion Webhook] Jeton de vérification reçu : ${token}`);
+
+      try {
+        await supabase
+          .from('settings')
+          .upsert(
+            { key: 'notion_webhook_token', value: String(token) },
+            { onConflict: 'key' }
+          );
+      } catch (dbErr) {
+        console.warn('Erreur sauvegarde token dans DB:', dbErr);
+      }
+
       return NextResponse.json({
-        challenge: rawBody.challenge || token,
+        challenge: token,
         status: 'verified',
         verification_token: token,
       });
-    }
-
-    if (rawBody.challenge) {
-      console.info('[Notion Webhook] Challenge de vérification reçu');
-      return NextResponse.json({ challenge: rawBody.challenge });
     }
 
     // 2. Extraction de l'ID de la page modifiée
