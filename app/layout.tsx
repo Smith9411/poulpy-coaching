@@ -71,15 +71,15 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "32x32" },
-      { url: "/icon.png", sizes: "192x192", type: "image/png" },
-      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+      { url: "/poulpy-favicon.png?v=4", type: "image/png" },
+      { url: "/icons/icon-192x192.png?v=4", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512x512.png?v=4", sizes: "512x512", type: "image/png" },
+      { url: "/favicon.ico?v=4", sizes: "any" },
     ],
     apple: [
-      { url: "/apple-icon.png", sizes: "180x180", type: "image/png" },
+      { url: "/poulpy-favicon.png?v=4", sizes: "180x180", type: "image/png" },
     ],
-    shortcut: "/favicon.ico",
+    shortcut: "/poulpy-favicon.png?v=4",
   },
 };
 
@@ -132,9 +132,9 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning className={`${bebasNeue.variable} ${jetbrainsMono.variable}`}>
       <head>
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="icon" type="image/png" sizes="192x192" href="/icon.png" />
-        <link rel="apple-touch-icon" href="/apple-icon.png" />
+        <link rel="icon" type="image/png" href="/poulpy-favicon.png?v=4" />
+        <link rel="shortcut icon" type="image/png" href="/poulpy-favicon.png?v=4" />
+        <link rel="apple-touch-icon" href="/poulpy-favicon.png?v=4" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
