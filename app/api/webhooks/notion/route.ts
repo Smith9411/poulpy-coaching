@@ -9,12 +9,20 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export const dynamic = 'force-dynamic';
 
+let lastVerificationToken: string | null = null;
+
 /**
  * GET /api/webhooks/notion
- * Endpoint de vérification de santé pour le Webhook Notion
+ * Affiche l'état du webhook et le dernier jeton de vérification reçu pour l'activation Notion
  */
 export async function GET() {
-  return NextResponse.json({ status: 'ok', service: 'Poulpy Coaching Notion Webhook' });
+  return NextResponse.json({
+    status: 'ok',
+    service: 'Poulpy Coaching Notion Webhook',
+    last_verification_token:
+      lastVerificationToken ||
+      "En attente du jeton... Cliquez sur 'Renvoyer le jeton' dans Notion pour le voir s'afficher ici.",
+  });
 }
 
 /**
@@ -25,14 +33,26 @@ export async function POST(req: NextRequest) {
   try {
     const rawBody = await req.json().catch(() => ({}));
 
-    // 1. Handshake de vérification initial de Notion
+    // 1. Handshake de vérification initial de Notion (Capture du jeton de vérification)
+    const token =
+      rawBody.verification_token ||
+      rawBody.verificationToken ||
+      rawBody.token ||
+      rawBody.secret;
+
+    if (token) {
+      lastVerificationToken = token;
+      console.info(`[Notion Webhook] Jeton de vérification reçu : ${token}`);
+      return NextResponse.json({
+        challenge: rawBody.challenge || token,
+        status: 'verified',
+        verification_token: token,
+      });
+    }
+
     if (rawBody.challenge) {
       console.info('[Notion Webhook] Challenge de vérification reçu');
       return NextResponse.json({ challenge: rawBody.challenge });
-    }
-    if (rawBody.verification_token) {
-      console.info('[Notion Webhook] Token de vérification reçu');
-      return NextResponse.json({ status: 'verified' });
     }
 
     // 2. Extraction de l'ID de la page modifiée
