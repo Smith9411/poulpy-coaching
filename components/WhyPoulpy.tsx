@@ -395,9 +395,9 @@ export default function WhyPoulpy() {
 
         // Thresholds strictly for clip cards (01 -> idx 0, 03 -> idx 2, 05 -> idx 4)
         const thresholds = [
-          { idx: 0, forward: 0.04, backward: 0.02 }, // Case 01 (Clip Aim training)
-          { idx: 2, forward: 0.35, backward: 0.31 }, // Case 03 (Clip Gamesense & clutch)
-          { idx: 4, forward: 0.68, backward: 0.64 }, // Case 05 (Clip Antitilt & 1v3)
+          { idx: 0, forward: 0.10, backward: 0.07 }, // Case 01 (Clip Aim training - flips at 10%)
+          { idx: 2, forward: 0.38, backward: 0.34 }, // Case 03 (Clip Gamesense & clutch)
+          { idx: 4, forward: 0.70, backward: 0.66 }, // Case 05 (Clip Antitilt & 1v3)
         ];
 
         const tl = gsap.timeline({
@@ -450,8 +450,8 @@ export default function WhyPoulpy() {
         });
 
         // Choreographed Timeline:
-        // 1. Card 0 (Clip): flips immediately -> brief hold to view video
-        tl.to(track, { x: 0, duration: 0.5, ease: "none" });
+        // 1. Card 0 (Clip): holds front until 10% scroll, flips to video, then holds flipped
+        tl.to(track, { x: 0, duration: 0.8, ease: "none" });
 
         // 2. Smooth continuous scroll past Card 1 (no pause) all the way to Card 2
         tl.to(track, { x: -cardPositions[2], duration: 1.0, ease: "power1.inOut" });
@@ -505,7 +505,7 @@ export default function WhyPoulpy() {
     const section = sectionRef.current;
     if (!section) return;
 
-    const cardTargetProgress = [0.05, 0.22, 0.39, 0.56, 0.72, 0.88];
+    const cardTargetProgress = [0.10, 0.25, 0.42, 0.58, 0.74, 0.88];
     const targetProgress = cardTargetProgress[index] ?? (index / 5) * 0.85;
     const sectionTop = section.getBoundingClientRect().top + window.scrollY;
     const targetY = sectionTop + targetProgress * scrollDistanceRef.current;
