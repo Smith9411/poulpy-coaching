@@ -22,6 +22,7 @@ interface PillarVideoPlayerProps {
   clipSubtitle: string;
   isFlipped: boolean;
   isSectionInView: boolean;
+  isCardInView: boolean;
 }
 
 function PillarVideoPlayer({
@@ -30,18 +31,22 @@ function PillarVideoPlayer({
   clipSubtitle,
   isFlipped,
   isSectionInView,
+  isCardInView,
 }: PillarVideoPlayerProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
-  // Play automatically without sound in a loop ONLY when card is flipped and section is in view
+  // Play automatically without sound in a loop ONLY when:
+  // 1. Card is flipped
+  // 2. Section is in view
+  // 3. THIS card is currently on screen
   useEffect(() => {
     const video = videoRef.current;
     if (!video || !videoSrc) return;
 
-    if (isFlipped && isSectionInView) {
+    if (isFlipped && isSectionInView && isCardInView) {
       video.muted = true;
       const playPromise = video.play();
       if (playPromise !== undefined) {
@@ -58,7 +63,7 @@ function PillarVideoPlayer({
       video.pause();
       setIsPlaying(false);
     }
-  }, [isFlipped, isSectionInView, videoSrc]);
+  }, [isFlipped, isSectionInView, isCardInView, videoSrc]);
 
   const togglePlay = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -313,6 +318,7 @@ export default function WhyPoulpy() {
 
   const [flippedArray, setFlippedArray] = useState<boolean[]>([false, false, false, false, false, false]);
   const [isSectionInView, setIsSectionInView] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   const updatePills = (activeIdx: number) => {
     pillBtnsRef.current.forEach((btn, idx) => {
@@ -407,6 +413,7 @@ export default function WhyPoulpy() {
             invalidateOnRefresh: true,
             onUpdate: (self: { progress: number }) => {
               const progress = self.progress;
+              setScrollProgress(progress);
               if (scrollPctRef.current) {
                 scrollPctRef.current.textContent = `${Math.round(progress * 100)}%`;
               }
@@ -754,6 +761,13 @@ export default function WhyPoulpy() {
                       clipSubtitle={item.clipSubtitle}
                       isFlipped={flippedArray[idx]}
                       isSectionInView={isSectionInView}
+                      isCardInView={
+                        idx === 0
+                          ? scrollProgress < 0.25
+                          : idx === 2
+                          ? scrollProgress >= 0.18 && scrollProgress <= 0.60
+                          : scrollProgress >= 0.52
+                      }
                     />
 
                     {/* Back Footer */}
