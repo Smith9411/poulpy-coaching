@@ -116,13 +116,13 @@ function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
 
     controls
       .start({
-        y: [0, -52, 0],
-        scale: [1, 1.04, 1],
-        rotateY: nextFlipped ? [0, 90, 180] : [180, 90, 0],
+        y: [0, -48, 0],
+        scale: [1, 1.035, 1],
+        rotateY: nextFlipped ? 180 : 0,
         transition: {
-          duration: 0.72,
-          times: [0, 0.5, 1],
-          ease: "easeInOut",
+          rotateY: { duration: 0.7, ease: [0.25, 1, 0.5, 1] },
+          y: { duration: 0.7, times: [0, 0.48, 1], ease: "easeInOut" },
+          scale: { duration: 0.7, times: [0, 0.48, 1], ease: "easeInOut" },
         },
       })
       .then(() => {
@@ -141,6 +141,7 @@ function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
         style={{
           transformStyle: "preserve-3d",
           transformOrigin: "50% 50%",
+          willChange: "transform",
         }}
         className="w-full h-full relative"
       >
@@ -155,7 +156,7 @@ function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
             height: "100%",
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",
-            transform: "rotateY(0deg) translateZ(1px)",
+            transform: "rotateY(0deg) translateZ(2px)",
           }}
           className={`reticle-box ${
             isAcid ? "" : "reticle-laser"
@@ -262,7 +263,7 @@ function PillarFlipCard({ item }: { item: typeof PILLARS[0] }) {
             height: "100%",
             backfaceVisibility: "hidden",
             WebkitBackfaceVisibility: "hidden",
-            transform: "rotateY(180deg) translateZ(1px)",
+            transform: "rotateY(180deg) translateZ(2px)",
           }}
           className="reticle-box p-6 sm:p-8 bg-[#090C12] border-2 border-[#FF7582] shadow-[0_0_35px_rgba(255,117,130,0.3)] flex flex-col justify-between overflow-hidden"
         >
