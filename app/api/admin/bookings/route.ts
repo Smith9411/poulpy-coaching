@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import {
+  cancelNotionBooking,
+  updateNotionBookingDate,
+  completeNotionBooking,
+} from '@/lib/notion';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -215,6 +220,13 @@ export async function PATCH(req: NextRequest) {
           .eq('start_time', currentBooking.booking_time);
       }
 
+      // 3. Synchronisation Notion : archiver/annuler la page du calendrier
+      if (currentBooking.notion_page_id) {
+        cancelNotionBooking(currentBooking.notion_page_id, true).catch((e) =>
+          console.error('[Notion Sync Error on Cancel]', e)
+        );
+      }
+
       return NextResponse.json({ success: true, booking: updated });
     }
 
@@ -292,6 +304,13 @@ export async function PATCH(req: NextRequest) {
         return NextResponse.json({ error: updateErr.message }, { status: 500 });
       }
 
+      // 4. Synchronisation Notion : mettre à jour la date et le statut dans le calendrier Notion
+      if (currentBooking.notion_page_id) {
+        updateNotionBookingDate(currentBooking.notion_page_id, newDate, newTime, 'rescheduled').catch((e) =>
+          console.error('[Notion Sync Error on Reschedule]', e)
+        );
+      }
+
       return NextResponse.json({ success: true, booking: updated });
     }
 
@@ -323,6 +342,13 @@ export async function PATCH(req: NextRequest) {
           .update({ is_booked: false, updated_at: new Date().toISOString() })
           .eq('date', currentBooking.booking_date)
           .eq('start_time', currentBooking.booking_time);
+      }
+
+      // Synchronisation Notion : passer le statut à 'Terminé'
+      if (currentBooking.notion_page_id) {
+        completeNotionBooking(currentBooking.notion_page_id).catch((e) =>
+          console.error('[Notion Sync Error on Complete]', e)
+        );
       }
 
       return NextResponse.json({ success: true, booking: updated });

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { createNotionBooking } from '@/lib/notion';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -140,7 +141,32 @@ export async function POST(req: NextRequest) {
         .eq('id', targetSlotId);
     }
 
-    // 5. Attribuer le rôle 'in_coaching = true' au profil pour qu'il apparaisse immédiatement dans Gérer le coaching
+    // 5. Synchronisation automatique avec Notion Calendar
+    try {
+      const notionPageId = await createNotionBooking({
+        bookingId: newBooking.id,
+        studentName: studentName.trim(),
+        studentEmail: studentEmail.trim().toLowerCase(),
+        studentDiscord: studentDiscord.trim(),
+        game: game || 'Valorant',
+        planName,
+        planDuration,
+        bookingDate,
+        bookingTime,
+        notes,
+      });
+
+      if (notionPageId) {
+        await supabase
+          .from('coaching_bookings')
+          .update({ notion_page_id: notionPageId })
+          .eq('id', newBooking.id);
+      }
+    } catch (notionErr) {
+      console.error('[Notion Sync Error]', notionErr);
+    }
+
+    // 6. Attribuer le rôle 'in_coaching = true' au profil pour qu'il apparaisse immédiatement dans Gérer le coaching
     try {
       if (userId) {
         await supabase

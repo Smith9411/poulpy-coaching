@@ -37,6 +37,8 @@ Fichier `.env.local` (jamais commit) :
 - `NEXT_PUBLIC_SUPABASE_URL` — URL du projet Supabase
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — clé anon (publique)
 - `SUPABASE_SERVICE_ROLE_KEY` — clé service_role (privée, **ne JAMAIS exposer au client**)
+- `NOTION_API_KEY` — Clé secrète d'intégration Notion (`secret_...`)
+- `NOTION_BOOKINGS_DATABASE_ID` — ID de la base de données Notion Calendar (32 caractères)
 
 ## Architecture
 
@@ -269,6 +271,15 @@ Fonctionnement côté app : après le retour Google, `/auth/callback` vérifie l
   - **Token expiré géré côté client** : ajout `supabase.auth.refreshSession()` automatique dans `handleAdminResponse` quand le token est expiré, avec message clair "Session expirée, reconnectez-vous"
   - **UI mode déroulant améliorée** : bouton "Réponse de l'équipe Poulpy" avec gradient purple→cyan bien visible, **chevron rotatif** (ChevronDown + rotate-180 quand déployé), animation framer-motion easeInOut, **avatar "Équipe Poulpy" + date de réponse** dans le panneau déplié
   - **Fix build** : `discordUrl` manquant dans `setSettings` de `components/About.tsx` (erreur TS2345)
+- 2026-09-15 (intégration Notion Calendar & synchronisation automatique des réservations) :
+  - **Module d'intégration résilient (`lib/notion.ts`)** : création des méthodes `createNotionBooking`, `updateNotionBookingDate`, `cancelNotionBooking` et `completeNotionBooking` via l'API REST officielle Notion v1 (`Notion-Version: 2022-06-28`). En cas d'absence de configuration, le flux de réservation reste 100% fonctionnel sans blocage.
+  - **Synchronisation à la création (`POST /api/bookings/create`)** : création instantanée de la page RDV dans Notion avec titre structuré, date/heure, statut `Confirmé`, jeu (`Valorant`/`Apex Legends`), formule, Discord, email et notes, puis enregistrement du `notion_page_id` dans Supabase.
+  - **Synchronisation en direct des actions admin (`PATCH /api/admin/bookings`)** :
+    - *Annulation* : archivage / suppression immédiate de la séance dans le calendrier Notion.
+    - *Report* : mise à jour instantanée de la date/heure et du statut `Reporté` dans Notion.
+    - *Complétion* : bascule du statut en `Terminé` dans Notion.
+  - **Script de migration SQL (`add-notion-columns.sql`)** : ajout idempotent de la colonne `notion_page_id` et index de recherche.
+  - **Guide de mise en route (`NOTION_SETUP.md`)** : documentation complète pas-à-pas pour configurer l'intégration Notion et Notion Calendar.
 - 2026-09-15 (optimisation ultra-haute performance scroll horizontal WhyPoulpy & 0-overhead Three.js) :
   - **Calibrage scrub réactif (`scrub: 0.3`)** : remplacement du scrub lourd 0.8s (qui créait une sensation de traînée/lag après le refresh et sur trackpad de PC portable) par un scrub vif et fluide 0.3s
   - **Isolation GPU & Composition matérielle** : application de `transform: translate3d(0,0,0)`, `will-change: transform`, `backface-visibility: hidden` sur la piste de défilement (`trackRef`) et `contain: layout style paint` sur chaque carte individuelle pour éliminer les recalculs de rasterisation CPU
