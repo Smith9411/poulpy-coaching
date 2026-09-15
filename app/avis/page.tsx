@@ -8,6 +8,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import Select from '@/components/Select';
 import CyberNavbar from '@/components/CyberNavbar';
+import AuthModal from '@/components/AuthModal';
 
 interface Review {
   id: string;
@@ -67,6 +68,7 @@ const APEX_RANKS = [
 
 export default function Avis() {
   const { user } = useAuth();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [userAvatars, setUserAvatars] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(true);
@@ -593,13 +595,13 @@ export default function Avis() {
                   <span>{isFormOpen ? 'FERMER LE FORMULAIRE' : 'RÉDIGER UN AVIS'}</span>
                 </button>
               ) : (
-                <Link
-                  href="/auth"
-                  className="btn-cyber-ghost text-xs"
+                <button
+                  onClick={() => setAuthModalOpen(true)}
+                  className="btn-cyber-primary text-xs cursor-pointer"
                 >
                   <UserIcon size={16} />
                   <span>SE CONNECTER POUR LAISSER UN AVIS</span>
-                </Link>
+                </button>
               )}
             </div>
           </div>
@@ -1276,6 +1278,8 @@ export default function Avis() {
           </p>
         </div>
       </div>
+
+      <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
     </main>
   );
 }

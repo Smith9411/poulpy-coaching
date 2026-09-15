@@ -7,6 +7,7 @@ import DecryptedText from "./DecryptedText";
 import CornerBrackets from "./CornerBrackets";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
+import AuthModal from "./AuthModal";
 
 interface RawSlot {
   id: string;
@@ -70,6 +71,7 @@ function useCardTilt() {
 
 export default function Booking() {
   const { user } = useAuth();
+  const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
   const [step, setStep] = useState<number>(1);
   const [selectedPlan, setSelectedPlan] = useState<string>("pro");
 
@@ -898,12 +900,13 @@ export default function Booking() {
                         </p>
                       </div>
                     </div>
-                    <a
-                      href="/auth"
-                      className="btn-cyber-primary py-2 px-5 text-xs font-bold shrink-0 text-center"
+                    <button
+                      type="button"
+                      onClick={() => setAuthModalOpen(true)}
+                      className="btn-cyber-primary py-2 px-5 text-xs font-bold shrink-0 text-center cursor-pointer"
                     >
                       <span>SE CONNECTER / S'INSCRIRE</span>
-                    </a>
+                    </button>
                   </div>
                 )}
 
@@ -1032,13 +1035,14 @@ export default function Booking() {
                       )}
                     </button>
                   ) : (
-                    <a
-                      href="/auth"
+                    <button
+                      type="button"
+                      onClick={() => setAuthModalOpen(true)}
                       className="btn-cyber-primary flex items-center gap-2 py-2.5 px-7 text-xs font-bold uppercase cursor-pointer"
                     >
                       <User className="w-4 h-4" />
                       <span>SE CONNECTER POUR CONFIRMER</span>
-                    </a>
+                    </button>
                   )}
                 </div>
               </motion.div>
@@ -1097,6 +1101,8 @@ export default function Booking() {
           </AnimatePresence>
         </div>
       </div>
+
+      <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
     </section>
   );
 }
