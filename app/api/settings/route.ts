@@ -36,7 +36,8 @@ export async function GET() {
   try {
     const { data: settings, error } = await supabase
       .from('settings')
-      .select('key, value');
+      .select('key, value')
+      .in('key', ALLOWED_KEYS);
 
     if (error) {
       if (error.message?.includes('does not exist') || error.message?.includes('schema cache')) {

@@ -28,8 +28,8 @@ export default function CyberMedia() {
   const twitchUrl = "https://www.twitch.tv/poulpy_coaching";
 
   return (
-    <section id="media" className="py-28 px-6 sm:px-12 lg:px-16 bg-[#06080b] border-t border-[rgba(255,255,255,0.08)] font-mono">
-      <div className="max-w-7xl mx-auto space-y-10">
+    <section id="media" className="py-14 sm:py-16 px-6 sm:px-12 lg:px-16 bg-[#06080b] border-t border-[rgba(255,255,255,0.08)] font-mono">
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-6">
           <div className="space-y-2">

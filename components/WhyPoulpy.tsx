@@ -1,8 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import DecryptedText from "./DecryptedText";
 import CornerBrackets from "./CornerBrackets";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+}
 import {
   Target,
   Brain,
@@ -507,10 +512,43 @@ export default function WhyPoulpy() {
 
     const cardTargetProgress = [0.10, 0.25, 0.42, 0.58, 0.74, 0.88];
     const targetProgress = cardTargetProgress[index] ?? (index / 5) * 0.85;
-    const sectionTop = section.getBoundingClientRect().top + window.scrollY;
-    const targetY = sectionTop + targetProgress * scrollDistanceRef.current;
 
-    window.scrollTo({ top: targetY, behavior: "smooth" });
+    const st = ScrollTrigger.getById("whypoulpy-scroll");
+    let targetY: number;
+
+    if (st) {
+      targetY = st.start + targetProgress * (st.end - st.start);
+    } else {
+      const pinSpacer = section.closest(".pin-spacer") as HTMLElement | null;
+      const baseTop = pinSpacer
+        ? pinSpacer.getBoundingClientRect().top + window.scrollY
+        : section.getBoundingClientRect().top + window.scrollY;
+      targetY = baseTop + targetProgress * (scrollDistanceRef.current || 2600);
+    }
+
+    gsap.to(window, {
+      scrollTo: { y: targetY, autoKill: false },
+      duration: 0.8,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+  };
+
+  const handleGoToTarifs = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const el = document.getElementById("booking") || document.getElementById("tarifs");
+    if (el) {
+      const navOffset = 70;
+      const targetTop = el.getBoundingClientRect().top + window.scrollY - navOffset;
+      gsap.to(window, {
+        scrollTo: { y: targetTop, autoKill: false },
+        duration: 1.2,
+        ease: "power3.inOut",
+        overwrite: "auto",
+      });
+    } else {
+      window.location.hash = "booking";
+    }
   };
 
   return (
@@ -582,7 +620,7 @@ export default function WhyPoulpy() {
           return (
             <div
               key={item.num}
-              className={`w-[85vw] sm:w-[500px] lg:w-[560px] h-[520px] shrink-0 relative ${
+              className={`w-[85vw] sm:w-[500px] lg:w-[560px] h-[480px] sm:h-[500px] shrink-0 relative ${
                 hasClip ? "cursor-pointer group/card" : ""
               }`}
               onClick={(e) => handleCardClick(idx, e)}
@@ -789,7 +827,7 @@ export default function WhyPoulpy() {
         {/* Final Callout Card at End of Scroll */}
         <div
           style={{ transform: "translateZ(0)", contain: "layout style paint" }}
-          className="w-[85vw] sm:w-[480px] h-[520px] shrink-0 reticle-box p-8 sm:p-10 flex flex-col justify-between space-y-6 bg-black border border-[#FF7582]/50 relative overflow-hidden shadow-2xl shadow-black/80"
+          className="w-[85vw] sm:w-[480px] h-[480px] sm:h-[500px] shrink-0 reticle-box p-8 sm:p-10 flex flex-col justify-between space-y-6 bg-black border border-[#FF7582]/50 relative overflow-hidden shadow-2xl shadow-black/80"
         >
           <div className="space-y-3 relative z-10">
             <span className="data-badge data-badge-acid">PRÊT POUR L&apos;ASCENSION ?</span>
@@ -803,8 +841,9 @@ export default function WhyPoulpy() {
 
           <div className="pt-6 border-t border-white/10 relative z-10">
             <a
-              href="#tarifs"
-              className="btn-cyber-primary w-full justify-center text-xs py-3"
+              href="#booking"
+              onClick={handleGoToTarifs}
+              className="btn-cyber-primary w-full justify-center text-xs py-3 cursor-pointer"
             >
               <span>DÉCOUVRIR LES TARIFS</span>
               <ArrowRight className="w-4 h-4" />
@@ -814,8 +853,8 @@ export default function WhyPoulpy() {
       </div>
 
       {/* Bottom Hint */}
-      <div className="w-full max-w-7xl mx-auto px-6 sm:px-12 flex items-center justify-end text-[10px] text-white/30 z-20">
-        <span className="text-[#FF3E4D] font-mono">DÉROULEZ LA PAGE VERS LE BAS ↓</span>
+      <div className="w-full max-w-7xl mx-auto px-6 sm:px-12 flex items-center justify-end text-[10px] text-white/40 z-20 pt-4 pb-2">
+        <span className="text-[#FF3E4D] font-mono tracking-wider">DÉROULEZ LA PAGE VERS LE BAS ↓</span>
       </div>
     </section>
   );

@@ -271,6 +271,10 @@ Fonctionnement côté app : après le retour Google, `/auth/callback` vérifie l
   - **Token expiré géré côté client** : ajout `supabase.auth.refreshSession()` automatique dans `handleAdminResponse` quand le token est expiré, avec message clair "Session expirée, reconnectez-vous"
   - **UI mode déroulant améliorée** : bouton "Réponse de l'équipe Poulpy" avec gradient purple→cyan bien visible, **chevron rotatif** (ChevronDown + rotate-180 quand déployé), animation framer-motion easeInOut, **avatar "Équipe Poulpy" + date de réponse** dans le panneau déplié
   - **Fix build** : `discordUrl` manquant dans `setSettings` de `components/About.tsx` (erreur TS2345)
+- 2026-09-16 (restauration complète & correction navigation Pourquoi Poulpy) :
+  - **Restauration intégrale des 51 commits distants** : réintégration de l'ensemble des fonctionnalités créées sur la machine distante (vidéos de clips Aim/Clutch/Sang-Froid, pack sessions, avis mis en avant, robots/sitemap SEO, profil et booking).
+  - **Calibrage exact du saut par pilier (`goToCard`)** : utilisation de `st.start` et `st.end` de ScrollTrigger combinés à `ScrollToPlugin` pour scroller au pixel près vers chaque carte (01 à 06) sans décalage de pin.
+  - **Redirection fluide CTA Tarifs** : connexion du bouton « Découvrir les tarifs » vers la section de réservation/tarifs (`#booking` et ancre `#tarifs`) avec défilement fluide GSAP.
 - 2026-09-15 (simplification header Méthodologie) :
   - **Nettoyage UI Méthodologie (`components/Methodology.tsx`)** : suppression de la pastille et mention « Défile vers le bas » au profit d'une présentation épurée et directe des 4 phases chirurgicales.
 - 2026-09-15 (nettoyage UI boutons de thème dupliqués) :
@@ -296,6 +300,14 @@ Fonctionnement côté app : après le retour Google, `/auth/callback` vérifie l
     - *Complétion* : bascule du statut en `Terminé` dans Notion.
   - **Script de migration SQL (`add-notion-columns.sql`)** : ajout idempotent de la colonne `notion_page_id` et index de recherche.
   - **Guide de mise en route (`NOTION_SETUP.md`)** : documentation complète pas-à-pas pour configurer l'intégration Notion et Notion Calendar.
+- 2026-09-16 (animation 3D Depth Shift & Directional Slide sur CyberGames) :
+  - **Transition multidimensionnelle Valorant ↔ Apex** : bascule directionnelle avec inertie spring (`stiffness: 320, damping: 30`), profondeur 3D (`scale: 0.95`, `rotateY: ±5deg`), défilement spatial horizontal et cascade échelonnée (*stagger*) sur les modules de protocole
+  - **Dynamisme visuel & Réticules adaptatifs** : synchronisation des accents de bordure et des `CornerBrackets` (`coral` / `slate`) selon la couleur signature du jeu actif
+- 2026-09-16 (calibrage des espacements verticaux entre les sections de la page d'accueil) :
+  - **Aération de l'indicateur "Déroulez la page vers le bas" (`WhyPoulpy`)** : calibrage de la hauteur des cartes (`h-[480px] sm:h-[500px]`) et ajout de marges dédiées (`pt-4 pb-2`) sur l'indicateur textuel inférieur pour éviter tout écrasement contre le bas des cartes ou la bordure de section
+  - **Réduction des gaps inter-sections** : standardisation du padding vertical (`py-14 sm:py-16`) sur `CyberGames`, `Methodology`, `Booking`, `CyberTestimonials`, `CyberAbout`, `CyberMedia` et `CyberFAQ`
+  - **Ajustement de la densité interne** : réduction des `space-y-16` et `space-y-14` vers `space-y-8 sm:space-y-10` pour supprimer les vides excessifs tout en préservant l'impact visuel Cybercore
+  - **Intégrité de la navigation garantie** : préservation totale des ancrages DOM (`#games`, `#methodology`, `#booking`, `#avis`, `#apropos`, `#media`, `#faq`) et du calcul dynamique de positionnement de la `CyberNavbar`
 - 2026-09-15 (optimisation ultra-haute performance scroll horizontal WhyPoulpy & 0-overhead Three.js) :
   - **Calibrage scrub réactif (`scrub: 0.3`)** : remplacement du scrub lourd 0.8s (qui créait une sensation de traînée/lag après le refresh et sur trackpad de PC portable) par un scrub vif et fluide 0.3s
   - **Isolation GPU & Composition matérielle** : application de `transform: translate3d(0,0,0)`, `will-change: transform`, `backface-visibility: hidden` sur la piste de défilement (`trackRef`) et `contain: layout style paint` sur chaque carte individuelle pour éliminer les recalculs de rasterisation CPU

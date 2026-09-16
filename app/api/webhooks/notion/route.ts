@@ -45,7 +45,7 @@ export async function GET() {
     status: 'ok',
     service: 'Poulpy Coaching Notion Webhook',
     dernier_evenement_recu: lastEventLog || "Aucun événement reçu depuis Notion pour l'instant. Déplacez une séance dans Notion Calendar.",
-    jeton_de_verification: tokenFromDb || "Non requis si déjà vérifié",
+    verification_configuree: Boolean(tokenFromDb),
   });
 }
 
