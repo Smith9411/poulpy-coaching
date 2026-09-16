@@ -31,18 +31,18 @@ CREATE POLICY "Users can update own profile or admin" ON public.profiles
   FOR UPDATE
   TO authenticated
   USING (
-    auth.uid() = id
-    OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    auth.uid()::text = id::text
+    OR EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   )
   WITH CHECK (
-    auth.uid() = id
-    OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    auth.uid()::text = id::text
+    OR EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   );
 
 CREATE POLICY "Users can insert own profile" ON public.profiles
   FOR INSERT
   TO authenticated
-  WITH CHECK (auth.uid() = id);
+  WITH CHECK (auth.uid()::text = id::text);
 
 
 -- 3. POLITIQUES DE SÉCURITÉ : COACHING_SLOTS
@@ -59,10 +59,10 @@ CREATE POLICY "Admins can manage slots" ON public.coaching_slots
   FOR ALL
   TO authenticated
   USING (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   )
   WITH CHECK (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   );
 
 
@@ -76,18 +76,18 @@ CREATE POLICY "Students view own bookings or admin" ON public.coaching_bookings
   FOR SELECT
   TO authenticated
   USING (
-    auth.uid() = user_id
-    OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    auth.uid()::text = user_id::text
+    OR EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   );
 
 CREATE POLICY "Admins can manage all bookings" ON public.coaching_bookings
   FOR ALL
   TO authenticated
   USING (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   )
   WITH CHECK (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   );
 
 
@@ -101,18 +101,18 @@ CREATE POLICY "Students view own messages or admin" ON public.coaching_messages
   FOR SELECT
   TO authenticated
   USING (
-    auth.uid() = student_id
-    OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    auth.uid()::text = student_id::text
+    OR EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   );
 
 CREATE POLICY "Admins have full access on messages" ON public.coaching_messages
   FOR ALL
   TO authenticated
   USING (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   )
   WITH CHECK (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   );
 
 
@@ -124,16 +124,16 @@ DROP POLICY IF EXISTS "Students can view their own sheet" ON public.student_shee
 CREATE POLICY "Students can view their own sheet" ON public.student_sheets
   FOR SELECT
   TO authenticated
-  USING (student_id = auth.uid());
+  USING (student_id::text = auth.uid()::text);
 
 CREATE POLICY "Admins have full access on student_sheets" ON public.student_sheets
   FOR ALL
   TO authenticated
   USING (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   )
   WITH CHECK (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   );
 
 
@@ -147,18 +147,18 @@ CREATE POLICY "Students view own clips or admin" ON public.vod_clips
   FOR SELECT
   TO authenticated
   USING (
-    student_id = auth.uid()
-    OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    student_id::text = auth.uid()::text
+    OR EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   );
 
 CREATE POLICY "Admins manage vod_clips" ON public.vod_clips
   FOR ALL
   TO authenticated
   USING (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   )
   WITH CHECK (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   );
 
 DROP POLICY IF EXISTS "View annotations for accessible clips" ON public.vod_annotations;
@@ -170,10 +170,10 @@ CREATE POLICY "View annotations for accessible clips" ON public.vod_annotations
   USING (
     EXISTS (
       SELECT 1 FROM public.vod_clips
-      WHERE public.vod_clips.id = public.vod_annotations.clip_id
+      WHERE public.vod_clips.id::text = public.vod_annotations.clip_id::text
         AND (
-          public.vod_clips.student_id = auth.uid()
-          OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+          public.vod_clips.student_id::text = auth.uid()::text
+          OR EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
         )
     )
   );
@@ -182,10 +182,10 @@ CREATE POLICY "Admins manage vod_annotations" ON public.vod_annotations
   FOR ALL
   TO authenticated
   USING (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   )
   WITH CHECK (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   );
 
 
@@ -203,26 +203,26 @@ CREATE POLICY "Anyone can read reviews" ON public.reviews
 CREATE POLICY "Authenticated users can create reviews" ON public.reviews
   FOR INSERT
   TO authenticated
-  WITH CHECK (auth.uid() = user_id);
+  WITH CHECK (auth.uid()::text = user_id::text);
 
 CREATE POLICY "Owners or admins can update reviews" ON public.reviews
   FOR UPDATE
   TO authenticated
   USING (
-    auth.uid() = user_id
-    OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    auth.uid()::text = user_id::text
+    OR EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   )
   WITH CHECK (
-    auth.uid() = user_id
-    OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    auth.uid()::text = user_id::text
+    OR EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   );
 
 CREATE POLICY "Owners or admins can delete reviews" ON public.reviews
   FOR DELETE
   TO authenticated
   USING (
-    auth.uid() = user_id
-    OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    auth.uid()::text = user_id::text
+    OR EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   );
 
 
@@ -241,24 +241,24 @@ CREATE POLICY "Only admins can update settings" ON public.settings
   FOR UPDATE
   TO authenticated
   USING (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   )
   WITH CHECK (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   );
 
 CREATE POLICY "Only admins can insert settings" ON public.settings
   FOR INSERT
   TO authenticated
   WITH CHECK (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   );
 
 CREATE POLICY "Only admins can delete settings" ON public.settings
   FOR DELETE
   TO authenticated
   USING (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND is_admin = true)
+    EXISTS (SELECT 1 FROM public.profiles WHERE id::text = auth.uid()::text AND is_admin = true)
   );
 
 
