@@ -622,7 +622,7 @@ export default function WhyPoulpy() {
           return (
             <div
               key={item.num}
-              className={`w-[85vw] sm:w-[500px] lg:w-[560px] h-[520px] shrink-0 relative ${
+              className={`w-[85vw] sm:w-[500px] lg:w-[560px] h-[480px] sm:h-[500px] shrink-0 relative ${
                 hasClip ? "cursor-pointer group/card" : ""
               }`}
               onClick={(e) => handleCardClick(idx, e)}
@@ -829,7 +829,7 @@ export default function WhyPoulpy() {
         {/* Final Callout Card at End of Scroll */}
         <div
           style={{ transform: "translateZ(0)", contain: "layout style paint" }}
-          className="w-[85vw] sm:w-[480px] h-[520px] shrink-0 reticle-box p-8 sm:p-10 flex flex-col justify-between space-y-6 bg-black border border-[#FF7582]/50 relative overflow-hidden shadow-2xl shadow-black/80"
+          className="w-[85vw] sm:w-[480px] h-[480px] sm:h-[500px] shrink-0 reticle-box p-8 sm:p-10 flex flex-col justify-between space-y-6 bg-black border border-[#FF7582]/50 relative overflow-hidden shadow-2xl shadow-black/80"
         >
           <div className="space-y-3 relative z-10">
             <span className="data-badge data-badge-acid">PRÊT POUR L&apos;ASCENSION ?</span>
@@ -855,8 +855,8 @@ export default function WhyPoulpy() {
       </div>
 
       {/* Bottom Hint */}
-      <div className="w-full max-w-7xl mx-auto px-6 sm:px-12 flex items-center justify-end text-[10px] text-white/30 z-20">
-        <span className="text-[#FF3E4D] font-mono">DÉROULEZ LA PAGE VERS LE BAS ↓</span>
+      <div className="w-full max-w-7xl mx-auto px-6 sm:px-12 flex items-center justify-end text-[10px] text-white/40 z-20 pt-4 pb-2">
+        <span className="text-[#FF3E4D] font-mono tracking-wider">DÉROULEZ LA PAGE VERS LE BAS ↓</span>
       </div>
     </section>
   );
