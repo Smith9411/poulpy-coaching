@@ -317,7 +317,7 @@ export default function Booking() {
   };
 
   return (
-    <section id="booking" className="py-20 px-6 sm:px-12 lg:px-16 bg-[#07090D] border-t border-[rgba(255,255,255,0.08)] font-mono relative z-20">
+    <section id="booking" className="py-14 sm:py-16 px-6 sm:px-12 lg:px-16 bg-[#07090D] border-t border-[rgba(255,255,255,0.08)] font-mono relative z-20">
       {/* Anchor target for #tarifs */}
       <div id="tarifs" className="absolute -top-20 pointer-events-none" />
       <div className="max-w-6xl mx-auto space-y-8">

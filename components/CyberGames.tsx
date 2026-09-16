@@ -49,8 +49,8 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
   const current = games.find((g) => g.id === activeGame) || games[0];
 
   return (
-    <section id="games" className="py-32 px-6 sm:px-12 lg:px-16 bg-[#07090D] border-t border-[rgba(255,255,255,0.08)]">
-      <div className="max-w-7xl mx-auto space-y-12 font-mono">
+    <section id="games" className="py-14 sm:py-16 px-6 sm:px-12 lg:px-16 bg-[#07090D] border-t border-[rgba(255,255,255,0.08)]">
+      <div className="max-w-7xl mx-auto space-y-8 sm:space-y-10 font-mono">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-6">
           <div className="space-y-2">
             <span className="data-badge data-badge-laser">

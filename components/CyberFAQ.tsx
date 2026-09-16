@@ -47,8 +47,8 @@ export default function CyberFAQ() {
   };
 
   return (
-    <section id="faq" className="py-32 px-6 sm:px-12 lg:px-16 bg-[#07090D] border-t border-white/10 font-mono">
-      <div className="max-w-4xl mx-auto space-y-16">
+    <section id="faq" className="py-14 sm:py-16 px-6 sm:px-12 lg:px-16 bg-[#07090D] border-t border-white/10 font-mono">
+      <div className="max-w-4xl mx-auto space-y-8 sm:space-y-10">
         <div className="space-y-3 text-center">
           <span className="data-badge data-badge-laser inline-flex">
             <DecryptedText text="INFORMATIONS PRATIQUES &amp; FAQ" />

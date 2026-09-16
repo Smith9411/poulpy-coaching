@@ -300,6 +300,10 @@ Fonctionnement côté app : après le retour Google, `/auth/callback` vérifie l
     - *Complétion* : bascule du statut en `Terminé` dans Notion.
   - **Script de migration SQL (`add-notion-columns.sql`)** : ajout idempotent de la colonne `notion_page_id` et index de recherche.
   - **Guide de mise en route (`NOTION_SETUP.md`)** : documentation complète pas-à-pas pour configurer l'intégration Notion et Notion Calendar.
+- 2026-09-16 (calibrage des espacements verticaux entre les sections de la page d'accueil) :
+  - **Réduction des gaps inter-sections** : standardisation du padding vertical (`py-14 sm:py-16` au lieu de `py-32` / `py-24` / `py-28`) sur `CyberGames`, `Methodology`, `Booking`, `CyberTestimonials`, `CyberAbout`, `CyberMedia` et `CyberFAQ`
+  - **Ajustement de la densité interne** : réduction des `space-y-16` et `space-y-14` vers `space-y-8 sm:space-y-10` pour supprimer les vides excessifs tout en préservant l'impact visuel Cybercore
+  - **Intégrité de la navigation garantie** : préservation totale des ancrages DOM (`#games`, `#methodology`, `#booking`, `#avis`, `#apropos`, `#media`, `#faq`) et du calcul dynamique de positionnement de la `CyberNavbar`
 - 2026-09-15 (optimisation ultra-haute performance scroll horizontal WhyPoulpy & 0-overhead Three.js) :
   - **Calibrage scrub réactif (`scrub: 0.3`)** : remplacement du scrub lourd 0.8s (qui créait une sensation de traînée/lag après le refresh et sur trackpad de PC portable) par un scrub vif et fluide 0.3s
   - **Isolation GPU & Composition matérielle** : application de `transform: translate3d(0,0,0)`, `will-change: transform`, `backface-visibility: hidden` sur la piste de défilement (`trackRef`) et `contain: layout style paint` sur chaque carte individuelle pour éliminer les recalculs de rasterisation CPU
