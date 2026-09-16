@@ -385,10 +385,11 @@ button, a {
   display: flex;
   width: max-content;
   animation: marquee-scroll 25s linear infinite;
+  animation-play-state: running !important;
 }
 
 .animate-marquee:hover {
-  animation-play-state: paused;
+  animation-play-state: running !important;
 }
 
 @keyframes border-glow-pulse {

@@ -45,29 +45,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Formule de coaching requise.' }, { status: 400 });
     }
 
-    // 1. Détection de l'utilisateur connecté s'il y a un token
-    let userId: string | null = null;
+    // 1. Détection et vérification obligatoire de l'utilisateur connecté
     const authHeader = req.headers.get('authorization');
-    if (authHeader?.startsWith('Bearer ')) {
-      const token = authHeader.replace('Bearer ', '').trim();
-      const { data: authData } = await supabase.auth.getUser(token);
-      if (authData?.user) {
-        userId = authData.user.id;
-      }
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Vous devez être connecté avec votre compte pour réserver une session de coaching.' },
+        { status: 401 }
+      );
     }
 
-    // Si pas de token, recherche si un compte existe avec cet email
-    if (!userId) {
-      const { data: existingProfile } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('username', studentName.trim())
-        .maybeSingle();
-
-      if (existingProfile) {
-        userId = existingProfile.id;
-      }
+    const token = authHeader.replace('Bearer ', '').trim();
+    const { data: authData, error: authErr } = await supabase.auth.getUser(token);
+    if (authErr || !authData?.user) {
+      return NextResponse.json(
+        { error: 'Session invalide ou expirée. Veuillez vous reconnecter.' },
+        { status: 401 }
+      );
     }
+
+    const userId = authData.user.id;
 
     // 2. Vérification et réservation du créneau dans coaching_slots
     let targetSlotId = slotId;
@@ -139,6 +135,29 @@ export async function POST(req: NextRequest) {
         .from('coaching_slots')
         .update({ is_booked: true, updated_at: new Date().toISOString() })
         .eq('id', targetSlotId);
+    } else {
+      try {
+        const { data: createdSlot } = await supabase
+          .from('coaching_slots')
+          .insert({
+            date: bookingDate,
+            start_time: bookingTime,
+            is_active: true,
+            is_booked: true,
+            created_by: userId,
+          })
+          .select('id')
+          .maybeSingle();
+
+        if (createdSlot?.id) {
+          await supabase
+            .from('coaching_bookings')
+            .update({ slot_id: createdSlot.id })
+            .eq('id', newBooking.id);
+        }
+      } catch (slotErr) {
+        console.warn('Création auto slot ignorée:', slotErr);
+      }
     }
 
     // 5. Synchronisation automatique avec Notion Calendar

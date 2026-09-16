@@ -6,101 +6,308 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import DecryptedText from "./DecryptedText";
 import CornerBrackets from "./CornerBrackets";
-import { Target, Brain, Crosshair, TrendingUp, ShieldCheck, Flame, ChevronRight, ArrowRight } from "lucide-react";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+}
+import {
+  Target,
+  Brain,
+  Crosshair,
+  TrendingUp,
+  ShieldCheck,
+  Flame,
+  ArrowRight,
+  Play,
+  RotateCcw,
+  Pause,
+} from "lucide-react";
+
+interface PillarVideoPlayerProps {
+  videoSrc?: string;
+  clipTitle: string;
+  clipSubtitle: string;
+  isFlipped: boolean;
+  isSectionInView: boolean;
+  isCardInView: boolean;
+}
+
+function PillarVideoPlayer({
+  videoSrc,
+  clipTitle,
+  clipSubtitle,
+  isFlipped,
+  isSectionInView,
+  isCardInView,
+}: PillarVideoPlayerProps) {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  // Play automatically without sound in a loop ONLY when:
+  // 1. Card is flipped
+  // 2. Section is in view
+  // 3. THIS card is currently on screen
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !videoSrc) return;
+
+    if (isFlipped && isSectionInView && isCardInView) {
+      video.muted = true;
+      const playPromise = video.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => setIsPlaying(true))
+          .catch(() => {
+            video.muted = true;
+            video.play()
+              .then(() => setIsPlaying(true))
+              .catch(() => setIsPlaying(false));
+          });
+      }
+    } else {
+      video.pause();
+      setIsPlaying(false);
+    }
+  }, [isFlipped, isSectionInView, isCardInView, videoSrc]);
+
+  const togglePlay = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) {
+      video.play().then(() => setIsPlaying(true)).catch(() => {});
+    } else {
+      video.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      setCurrentTime(videoRef.current.currentTime);
+    }
+  };
+
+  const handleLoadedMetadata = () => {
+    if (videoRef.current) {
+      setDuration(videoRef.current.duration);
+    }
+  };
+
+  const formatTime = (secs: number) => {
+    if (isNaN(secs)) return "00:00";
+    const m = Math.floor(secs / 60);
+    const s = Math.floor(secs % 60);
+    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  };
+
+  const progressPct = duration > 0 ? (currentTime / duration) * 100 : 0;
+
+  if (!videoSrc) {
+    return (
+      <div className="relative my-auto aspect-video w-full bg-black/90 border border-white/20 flex flex-col items-center justify-center overflow-hidden group/player shadow-inner z-10">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#FF7582]/10 via-transparent to-black pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col items-center gap-3">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#FF7582]/20 border-2 border-[#FF7582] flex items-center justify-center text-[#FF7582] shadow-[0_0_25px_rgba(255,117,130,0.5)] group-hover/player:scale-110 transition-transform cursor-pointer">
+            <Play className="w-6 h-6 fill-current ml-1" />
+          </div>
+          <div className="text-center space-y-0.5">
+            <span className="text-xs font-bold font-display tracking-wider text-white block">
+              {clipTitle}
+            </span>
+            <span className="text-[10px] text-white/50 font-mono block">
+              CLIP DISPONIBLE TRÈS BIENTÔT // 1080P 60FPS
+            </span>
+          </div>
+        </div>
+
+        <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-[9px] font-mono text-white/60 z-10">
+          <span className="bg-black/80 px-2 py-0.5 border border-white/10">00:45 / 01:30</span>
+          <span className="text-[#FF7582] font-bold">COACH POULPY REPLAY ARCHIVE</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      onClick={togglePlay}
+      className="relative my-auto aspect-video w-full bg-black border border-[#FF7582]/40 flex flex-col items-center justify-center overflow-hidden group/video shadow-[0_0_25px_rgba(255,117,130,0.2)] z-10 cursor-pointer select-none"
+    >
+      {/* Real Video Element */}
+      <video
+        ref={videoRef}
+        src={videoSrc}
+        loop
+        muted
+        playsInline
+        preload="metadata"
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        onPlaying={() => setIsPlaying(true)}
+        onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoadedMetadata}
+        className="w-full h-full object-cover"
+      />
+
+      {/* Subtle Scanline Overlay */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0)_50%,rgba(0,0,0,0.2)_50%)] bg-[size:100%_4px] pointer-events-none opacity-40" />
+
+      {/* Top Bar Badge (Shown strictly on hover) */}
+      <div className="absolute top-2 left-2.5 flex items-center pointer-events-none z-20 opacity-0 group-hover/video:opacity-100 transition-opacity duration-300">
+        <div className="flex items-center gap-1.5 bg-black/75 backdrop-blur-md px-2 py-0.5 border border-white/10 rounded text-[9px] font-mono">
+          <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+          <span className="text-white/80 font-bold uppercase tracking-wider">LIVE FEED // AUTO-LOOP</span>
+        </div>
+      </div>
+
+      {/* Center Play/Pause Indicator if manually paused */}
+      {!isPlaying && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/45 backdrop-blur-[2px] z-10 transition-opacity">
+          <div className="w-12 h-12 rounded-full bg-[#FF7582] text-black flex items-center justify-center shadow-[0_0_20px_rgba(255,117,130,0.6)]">
+            <Play className="w-5 h-5 fill-current ml-0.5" />
+          </div>
+        </div>
+      )}
+
+      {/* Bottom Cyber Progress & Status Bar (Shown strictly on hover) */}
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black via-black/80 to-transparent p-2.5 pt-4 space-y-1.5 z-20 pointer-events-auto opacity-0 group-hover/video:opacity-100 transition-opacity duration-300">
+        {/* Progress scrub bar */}
+        <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-[#FF7582] transition-all duration-100 ease-linear shadow-[0_0_8px_#FF7582]"
+            style={{ width: `${progressPct}%` }}
+          />
+        </div>
+
+        <div className="flex items-center justify-between text-[9px] font-mono text-white/70">
+          <span className="font-bold text-white tracking-wider">
+            {formatTime(currentTime)} / {formatTime(duration)}
+          </span>
+          <span className="text-[#FF7582] font-bold uppercase flex items-center gap-1">
+            <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#FF7582]" />
+            {isPlaying ? "EN LECTURE" : "PAUSE"}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 const PILLARS = [
   {
     num: "01",
-    icon: Target,
-    badge: "VOD CHIRURGIE",
-    title: "ANALYSE CHIRURGICALE",
-    subtitle: "Dissection millimétrique de tes parties",
+    icon: Crosshair,
+    badge: "AIM TRAINING",
+    title: "AIM TRAINING",
+    subtitle: "Playlist spéciale pour chaque jeu",
     description:
-      "Nous analysons tes replays en 4K image par image. Chaque élimination subie est décortiquée : micro-déficit d'angle, mauvais tempo de décalage ou exposition inutile.",
+      "Analyse des faiblesses biomécaniques et scénarios d'entraînement sur-mesure pour compenser tes lacunes. Progression assurée avec suivi régulier des scores.",
     specs: [
-      { label: "Précision d'analyse", val: "Sub-pixel & 60 FPS" },
-      { label: "Erreurs corrigées", val: "15 à 20 par session" },
-      { label: "Rapport", val: "Fiche Notion exportable" },
+      { label: "Playlists", val: "Spéciale par jeu" },
+      { label: "Analyse", val: "Scénarios ciblés" },
+      { label: "Progression", val: "Suivi des scores" },
     ],
+    hasClip: true,
+    videoSrc: "/videos/why-poulpy/aim.mp4",
+    clipTitle: "AIM TRAINING // VALORANT, APEX & KOVAAK",
+    clipSubtitle: "Clip Valo puis Apex puis Aim Training",
     color: "laser",
   },
   {
     num: "02",
-    icon: Brain,
-    badge: "VISION TACTIQUE",
-    title: "GAME SENSE & MACRO-GAME",
-    subtitle: "Anticiper au lieu de subir",
+    icon: Target,
+    badge: "ANALYSE STRATÉGIQUE",
+    title: "ANALYSE POUSSÉE & DÉTAILLÉE",
+    subtitle: "VOD review, stats et trackers en profondeur",
     description:
-      "Apprends à décoder les intentions ennemies 15 secondes avant qu'elles ne se produisent. Maîtrise des rotations, timing d'utilitaires et domination psychologique en clutch 1v2+.",
+      "Dissection millimétrique de tes parties et analyse poussée de tes statistiques. Méthodologie éprouvée basée sur la review de plus de 1000 games de pro.",
     specs: [
-      { label: "Survie en clutch", val: "+45% en 3 semaines" },
-      { label: "Lecture de carte", val: "Prédiction macro" },
-      { label: "Prise de décision", val: "Instantanée sous stress" },
+      { label: "VOD Review", val: "Image par image" },
+      { label: "Trackers", val: "Analyse de stats" },
+      { label: "Base Pro", val: "+1000 games revues" },
     ],
+    hasClip: false,
+    clipTitle: "",
+    clipSubtitle: "",
     color: "acid",
   },
   {
     num: "03",
-    icon: Crosshair,
-    badge: "MÉCANIQUE PURE",
-    title: "AIM & BIOMÉCANIQUE",
-    subtitle: "La visée au millimètre près",
+    icon: Brain,
+    badge: "VISION TACTIQUE",
+    title: "GAMESENSE & MACROGAME",
+    subtitle: "Gagnez tous vos clutchs",
     description:
-      "Programme sur-mesure axé sur la régularité pure : placement du viseur sub-pixel, tracking sans saccade, synchronisation mouvement/tir et posture physique adaptée.",
+      "Apprends à prédire les positions adverses et garde constamment une longueur d'avance. Domination tactique et lecture de jeu pro en situations critiques.",
     specs: [
-      { label: "Routine sur-mesure", val: "20 min KovaaK / Aimlabs" },
-      { label: "Sensibilité eDPI", val: "Calibration cm/360" },
-      { label: "Headshot %", val: "+18% en moyenne" },
+      { label: "Clutchs", val: "Gagnez tous vos duels" },
+      { label: "Lecture", val: "Prédiction positions" },
+      { label: "Macro", val: "+1 longueur d'avance" },
     ],
+    hasClip: true,
+    videoSrc: "/videos/why-poulpy/clutch.mp4",
+    clipTitle: "CLUTCH GAME // VALORANT & 1V3 APEX",
+    clipSubtitle: "Clip de clutch Valo et 1v3 Apex Legends",
     color: "laser",
   },
   {
     num: "04",
-    icon: Flame,
-    badge: "PSYCHOLOGIE DU JOUEUR",
-    title: "ANTI-TILT & SANG-FROID",
-    subtitle: "Garder le contrôle absolu sous haute pression",
+    icon: TrendingUp,
+    badge: "SUIVI RIGOUREUX",
+    title: "PROGRESSION MESURABLE",
+    subtitle: "Fiche technique de suivi et objectifs",
     description:
-      "Le talent mécanique ne vaut rien si le mental flanche en prolongation. Travail sur la gestion émotionnelle, les routines respiratoires de match et l'élimination des spirales négatives.",
+      "Accompagnement méthodique structuré autour de ta fiche technique de suivi. Évaluation continue des aim scores et validation rigoureuse de tes compétences.",
     specs: [
-      { label: "Résistance au tilt", val: "Protocole anti-panique" },
-      { label: "Sang-froid mesuré", val: "BPM stabilisé en 1v1" },
-      { label: "Mentalité", val: "Posture de compétiteur pro" },
+      { label: "Fiche technique", val: "Suivi personnalisé" },
+      { label: "Aim Scores", val: "Métriques réelles" },
+      { label: "Compétences", val: "Objectifs validés" },
     ],
+    hasClip: false,
+    clipTitle: "",
+    clipSubtitle: "",
     color: "acid",
   },
   {
     num: "05",
-    icon: TrendingUp,
-    badge: "RÉSULTATS FORMELS",
-    title: "PROGRESSION MESURABLE",
-    subtitle: "Suivi continu et objectifs clairs",
+    icon: Flame,
+    badge: "PSYCHOLOGIE DU JOUEUR",
+    title: "ANTITILT & SANG-FROID",
+    subtitle: "Protocole de clutch et mindset de compétiteur",
     description:
-      "Un accompagnement rigoureux basé sur tes objectifs réels de compétition. Après chaque session, tes métriques sont mises à jour pour mesurer tes gains de performance tangibles.",
+      "Développe le mental des champions pour sécuriser tes situations de clutch 1v3 et 1v5. Routine anti-panique, maîtrise du stress et sang-froid absolu.",
     specs: [
-      { label: "Gain moyen", val: "+350 à +450 RR constatés" },
-      { label: "Liaison", val: "Canal privé Discord 7j/7" },
-      { label: "Debriefing", val: "Suivi continu après match" },
+      { label: "Protocole", val: "Gestion de clutch" },
+      { label: "Situations 1vX", val: "1v3 / 1v5 assurés" },
+      { label: "Mindset", val: "Posture compétiteur" },
     ],
+    hasClip: true,
+    videoSrc: "/videos/why-poulpy/sang-froid.mp4",
+    clipTitle: "SANG-FROID EN CLUTCH // 1V3 & 1V5",
+    clipSubtitle: "Clip clutch et 1v3 Apex Legends",
     color: "laser",
   },
   {
     num: "06",
     icon: ShieldCheck,
     badge: "CONTRAT DE CONFIANCE",
-    title: "GARANTIE DE PALIER",
-    subtitle: "Montée en division garantie sous 14 jours",
+    title: "STEPUP GARANTIE",
+    subtitle: "Trackez vos progrès et gagnez des RR",
     description:
-      "Si après avoir suivi le protocole et appliqué les routines prescrites tu ne progresses pas en compétition, les séances de recalibrage sont offertes jusqu'à validation de ton objectif.",
+      "Un cadre d'entraînement strict pour acquérir l'ensemble des compétences requises. Progression tangible, gains de RR constants et métamorphose en joueur complet.",
     specs: [
-      { label: "Garantie", val: "+1 division minimum" },
-      { label: "Délai moyen", val: "9 à 14 jours" },
-      { label: "Engagement", val: "100% formalisé" },
+      { label: "Progrès", val: "Trackez vos gains" },
+      { label: "Gains RR", val: "Compétences acquises" },
+      { label: "Profil", val: "Joueur complet" },
     ],
+    hasClip: false,
+    clipTitle: "",
+    clipSubtitle: "",
     color: "acid",
   },
 ];
@@ -112,7 +319,13 @@ export default function WhyPoulpy() {
   const progressBarRef = useRef<HTMLDivElement | null>(null);
   const scrollPctRef = useRef<HTMLSpanElement | null>(null);
   const pillBtnsRef = useRef<HTMLButtonElement[]>([]);
+  const cardFlippersRef = useRef<(HTMLDivElement | null)[]>([]);
   const activeIndexRef = useRef(0);
+  const scrollDistanceRef = useRef(3200);
+
+  const [flippedArray, setFlippedArray] = useState<boolean[]>([false, false, false, false, false, false]);
+  const [isSectionInView, setIsSectionInView] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
 
   const updatePills = (activeIdx: number) => {
     pillBtnsRef.current.forEach((btn, idx) => {
@@ -125,6 +338,38 @@ export default function WhyPoulpy() {
     });
   };
 
+  const flippedStatesRef = useRef<boolean[]>([false, false, false, false, false, false]);
+
+  const animateCardFlip = (idx: number, targetFlipped: boolean) => {
+    // Only animate flip on cards that actually have a clip
+    if (!pillars[idx]?.hasClip) return;
+
+    const el = cardFlippersRef.current[idx];
+    if (!el) return;
+    flippedStatesRef.current[idx] = targetFlipped;
+    setFlippedArray((prev) => {
+      if (prev[idx] === targetFlipped) return prev;
+      const next = [...prev];
+      next[idx] = targetFlipped;
+      return next;
+    });
+
+    gsap.to(el, {
+      rotateY: targetFlipped ? 180 : 0,
+      y: 0,
+      duration: 0.75,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+  };
+
+  const handleCardClick = (idx: number, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (!pillars[idx]?.hasClip) return;
+    const isCurrentlyFlipped = flippedStatesRef.current[idx];
+    animateCardFlip(idx, !isCurrentlyFlipped);
+  };
+
   useEffect(() => {
     const section = sectionRef.current;
     const track = trackRef.current;
@@ -135,55 +380,100 @@ export default function WhyPoulpy() {
     const setupScroll = () => {
       if (ctx) ctx.revert();
 
-      const scrollDistance = Math.max(0, track.scrollWidth - window.innerWidth + 120);
+      const maxScroll = Math.max(0, track.scrollWidth - window.innerWidth + 120);
+      const items = Array.from(track.children) as HTMLElement[];
+      if (items.length === 0) return;
+
+      const firstItemLeft = items[0].offsetLeft;
+      const cardPositions = items.map((el) => Math.min(maxScroll, Math.max(0, el.offsetLeft - firstItemLeft)));
+
+      // Pacing calibrated: continuous scrolling with brief holds strictly on flipped clip cards
+      const totalScrollDistance = Math.max(2600, maxScroll * 2.0);
+      scrollDistanceRef.current = totalScrollDistance;
 
       ctx = gsap.context(() => {
-        gsap.to(track, {
-          x: () => -Math.max(0, track.scrollWidth - window.innerWidth + 120),
-          ease: "none",
+        // Reset all card flippers
+        cardFlippersRef.current.forEach((el, idx) => {
+          if (el) {
+            gsap.set(el, { rotateY: 0, y: 0 });
+            flippedStatesRef.current[idx] = false;
+          }
+        });
+
+        // Thresholds strictly for clip cards (01 -> idx 0, 03 -> idx 2, 05 -> idx 4)
+        const thresholds = [
+          { idx: 0, forward: 0.10, backward: 0.07 }, // Case 01 (Clip Aim training - flips at 10%)
+          { idx: 2, forward: 0.38, backward: 0.34 }, // Case 03 (Clip Gamesense & clutch)
+          { idx: 4, forward: 0.70, backward: 0.66 }, // Case 05 (Clip Antitilt & 1v3)
+        ];
+
+        const tl = gsap.timeline({
           scrollTrigger: {
             id: "whypoulpy-scroll",
             trigger: section,
             start: "top top",
-            end: () => `+=${Math.max(0, track.scrollWidth - window.innerWidth + 120)}`,
+            end: () => `+=${totalScrollDistance}`,
             pin: true,
-            scrub: 0.3,
-            anticipatePin: 1,
+            pinSpacing: true,
+            scrub: 0.5,
+            anticipatePin: 0,
             invalidateOnRefresh: true,
-            fastScrollEnd: false,
-            preventOverlaps: false,
             onUpdate: (self: { progress: number }) => {
               const progress = self.progress;
+              setScrollProgress(progress);
               if (scrollPctRef.current) {
                 scrollPctRef.current.textContent = `${Math.round(progress * 100)}%`;
               }
               if (progressBarRef.current) {
                 progressBarRef.current.style.transform = `scaleX(${progress})`;
               }
-              if (trackRef.current) {
-                const scrollDist = Math.max(0, trackRef.current.scrollWidth - window.innerWidth + 120);
-                const currentX = progress * scrollDist;
-                const cards = trackRef.current.children;
-                let closestIdx = 0;
-                let minDiff = Infinity;
-                for (let i = 0; i < pillars.length; i++) {
-                  const card = cards[i] as HTMLElement;
-                  if (card) {
-                    const diff = Math.abs(card.offsetLeft - currentX);
-                    if (diff < minDiff) {
-                      minDiff = diff;
-                      closestIdx = i;
-                    }
-                  }
-                }
-                if (closestIdx !== activeIndexRef.current) {
-                  activeIndexRef.current = closestIdx;
-                  updatePills(closestIdx);
-                }
+
+              // Active pill indicator
+              const activeIdx = Math.min(
+                5,
+                progress < 0.22 ? 0
+                  : progress < 0.38 ? 1
+                  : progress < 0.56 ? 2
+                  : progress < 0.72 ? 3
+                  : progress < 0.88 ? 4
+                  : 5
+              );
+              if (activeIdx !== activeIndexRef.current) {
+                activeIndexRef.current = activeIdx;
+                updatePills(activeIdx);
               }
+
+              // Trigger smooth flip only on cards with clips
+              thresholds.forEach((th) => {
+                const isFlipped = flippedStatesRef.current[th.idx];
+                if (!isFlipped && progress >= th.forward) {
+                  animateCardFlip(th.idx, true);
+                } else if (isFlipped && progress < th.backward) {
+                  animateCardFlip(th.idx, false);
+                }
+              });
             },
           },
         });
+
+        // Choreographed Timeline:
+        // 1. Card 0 (Clip): holds front until 10% scroll, flips to video, then holds flipped
+        tl.to(track, { x: 0, duration: 0.8, ease: "none" });
+
+        // 2. Smooth continuous scroll past Card 1 (no pause) all the way to Card 2
+        tl.to(track, { x: -cardPositions[2], duration: 1.0, ease: "power1.inOut" });
+
+        // 3. Card 2 (Clip): brief hold on flipped video card
+        tl.to(track, { x: -cardPositions[2], duration: 0.5, ease: "none" });
+
+        // 4. Smooth continuous scroll past Card 3 (no pause) all the way to Card 4
+        tl.to(track, { x: -cardPositions[4], duration: 1.0, ease: "power1.inOut" });
+
+        // 5. Card 4 (Clip): brief hold on flipped video card
+        tl.to(track, { x: -cardPositions[4], duration: 0.5, ease: "none" });
+
+        // 6. Smooth continuous scroll past Card 5 (no pause) to CTA callout
+        tl.to(track, { x: -maxScroll, duration: 1.0, ease: "power1.inOut" });
       }, section);
     };
 
@@ -201,9 +491,18 @@ export default function WhyPoulpy() {
       ScrollTrigger.refresh();
     };
 
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsSectionInView(entry.isIntersecting);
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(section);
+
     window.addEventListener("resize", handleResize, { passive: true });
 
     return () => {
+      observer.disconnect();
       window.removeEventListener("resize", handleResize);
       if (ctx) ctx.revert();
     };
@@ -211,20 +510,14 @@ export default function WhyPoulpy() {
 
   const goToCard = (index: number) => {
     const section = sectionRef.current;
-    const track = trackRef.current;
-    if (!section || !track) return;
+    if (!section) return;
 
-    const cards = track.children;
-    const targetCard = cards[index] as HTMLElement;
-    if (!targetCard) return;
+    const cardTargetProgress = [0.10, 0.25, 0.42, 0.58, 0.74, 0.88];
+    const targetProgress = cardTargetProgress[index] ?? (index / 5) * 0.85;
 
-    const scrollDistance = Math.max(0, track.scrollWidth - window.innerWidth + 120);
-    if (scrollDistance <= 0) return;
-
-    const targetProgress = Math.min(1, Math.max(0, targetCard.offsetLeft / scrollDistance));
     const st = ScrollTrigger.getById("whypoulpy-scroll");
-
     let targetY: number;
+
     if (st) {
       targetY = st.start + targetProgress * (st.end - st.start);
     } else {
@@ -232,7 +525,7 @@ export default function WhyPoulpy() {
       const baseTop = pinSpacer
         ? pinSpacer.getBoundingClientRect().top + window.scrollY
         : section.getBoundingClientRect().top + window.scrollY;
-      targetY = baseTop + targetProgress * scrollDistance;
+      targetY = baseTop + targetProgress * (scrollDistanceRef.current || 2600);
     }
 
     gsap.to(window, {
@@ -311,7 +604,7 @@ export default function WhyPoulpy() {
         </div>
       </div>
 
-      {/* Horizontal Sliding Track (Hardware Accelerated GPU Layer) */}
+      {/* Horizontal Sliding Track */}
       <div
         ref={trackRef}
         className="flex items-center w-max pl-6 sm:pl-12 pr-32 space-x-8 sm:space-x-12 my-auto select-none will-change-transform transform-gpu"
@@ -321,85 +614,213 @@ export default function WhyPoulpy() {
           backfaceVisibility: "hidden",
         }}
       >
-        {pillars.map((item) => {
+        {pillars.map((item, idx) => {
           const Icon = item.icon;
           const isAcid = item.color === "acid";
+          const hasClip = item.hasClip;
+
           return (
             <div
               key={item.num}
-              style={{ transform: "translateZ(0)", contain: "layout style paint" }}
-              className={`group w-[85vw] sm:w-[500px] lg:w-[560px] shrink-0 reticle-box ${
-                isAcid ? "" : "reticle-laser"
-              } p-8 sm:p-10 space-y-6 bg-[#090c10] border border-white/10 relative overflow-hidden shadow-2xl shadow-black/80 transition-colors duration-150 ${
-                isAcid ? "hover:border-[#FF7582]/50" : "hover:border-[#8FAFD4]/50"
+              className={`w-[85vw] sm:w-[500px] lg:w-[560px] h-[520px] shrink-0 relative ${
+                hasClip ? "cursor-pointer group/card" : ""
               }`}
+              onClick={(e) => handleCardClick(idx, e)}
+              style={{
+                perspective: "1400px",
+                transform: "translateZ(0)",
+              }}
             >
-              <CornerBrackets color={isAcid ? "coral" : "slate"} />
-              {/* Card Header */}
-              <div className="flex items-start justify-between border-b border-white/10 pb-4 relative z-10">
-                <div className="space-y-1">
-                  <span
-                    className={`text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider ${
-                      isAcid
-                        ? "bg-[#FF7582]/10 text-[#FF7582] border border-[#FF7582]/30"
-                        : "bg-[#8FAFD4]/10 text-[#8FAFD4] border border-[#8FAFD4]/30"
-                    }`}
-                  >
-                    {item.badge}
-                  </span>
-                  <div className="text-4xl sm:text-6xl font-display text-white tracking-wider">
-                    {item.num}
-                  </div>
-                </div>
-
+              <div
+                ref={(el) => {
+                  if (el) cardFlippersRef.current[idx] = el;
+                }}
+                style={{
+                  transformStyle: "preserve-3d",
+                  WebkitTransformStyle: "preserve-3d",
+                  transformOrigin: "50% 50%",
+                  willChange: "transform",
+                  transform: "rotateY(0deg) translateZ(0px)",
+                }}
+                className="w-full h-full relative"
+              >
+                {/* ======================================================== */}
+                {/* FACE AVANT (FRONT) */}
+                {/* ======================================================== */}
                 <div
-                  className={`w-12 h-12 border flex items-center justify-center ${
-                    isAcid
-                      ? "border-[#FF7582]/40 text-[#FF7582] bg-[#FF7582]/5"
-                      : "border-[#8FAFD4]/40 text-[#8FAFD4] bg-[#8FAFD4]/5"
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    width: "100%",
+                    height: "100%",
+                    backfaceVisibility: "hidden",
+                    WebkitBackfaceVisibility: "hidden",
+                    transform: "rotateY(0deg) translateZ(1px)",
+                    willChange: "transform",
+                    transformStyle: "preserve-3d",
+                    WebkitTransformStyle: "preserve-3d",
+                  }}
+                  className={`reticle-box ${
+                    isAcid ? "" : "reticle-laser"
+                  } p-8 sm:p-10 space-y-6 bg-[#090c10] border border-white/10 shadow-2xl shadow-black/80 transition-colors duration-150 flex flex-col justify-between ${
+                    isAcid ? "hover:border-[#FF7582]/50" : "hover:border-[#8FAFD4]/50"
                   }`}
                 >
-                  <Icon className="w-6 h-6" />
-                </div>
-              </div>
+                  <CornerBrackets color={isAcid ? "coral" : "slate"} />
 
-              {/* Card Body */}
-              <div className="space-y-2 relative z-10">
-                <h3 className="text-2xl font-display text-white tracking-wider">
-                  {item.title}
-                </h3>
-                <div className="text-xs text-[#FF7582] font-medium">
-                  {item.subtitle}
-                </div>
-                <p className="text-xs text-white/60 leading-relaxed pt-2">
-                  {item.description}
-                </p>
-              </div>
+                  <div>
+                    {/* Card Header */}
+                    <div className="flex items-start justify-between border-b border-white/10 pb-4 relative z-10">
+                      <div className="space-y-1">
+                        <span
+                          className={`text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider ${
+                            isAcid
+                              ? "bg-[#FF7582]/10 text-[#FF7582] border border-[#FF7582]/30"
+                              : "bg-[#8FAFD4]/10 text-[#8FAFD4] border border-[#8FAFD4]/30"
+                          }`}
+                        >
+                          {item.badge}
+                        </span>
+                        <div className="text-4xl sm:text-6xl font-display text-white tracking-wider">
+                          {item.num}
+                        </div>
+                      </div>
 
-              {/* Specs & Metrics */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-4 border-t border-white/10 relative z-10">
-                {item.specs.map((s, sIdx) => (
-                  <div key={sIdx} className="p-2.5 bg-black/80 border border-white/5 space-y-1">
-                    <span className="text-[9px] text-white/40 uppercase block truncate">
-                      {s.label}
-                    </span>
-                    <strong
-                      className={`text-xs font-mono font-bold block ${
-                        isAcid ? "text-[#FF7582]" : "text-[#8FAFD4]"
-                      }`}
-                    >
-                      {s.val}
-                    </strong>
+                      <div
+                        className={`w-12 h-12 border flex items-center justify-center ${
+                          isAcid
+                            ? "border-[#FF7582]/40 text-[#FF7582] bg-[#FF7582]/5"
+                            : "border-[#8FAFD4]/40 text-[#8FAFD4] bg-[#8FAFD4]/5"
+                        }`}
+                      >
+                        <Icon className="w-6 h-6" />
+                      </div>
+                    </div>
+
+                    {/* Card Body */}
+                    <div className="space-y-2 pt-4 relative z-10">
+                      <h3 className="text-2xl font-display text-white tracking-wider">
+                        {item.title}
+                      </h3>
+                      <div className="text-xs text-[#FF7582] font-medium">
+                        {item.subtitle}
+                      </div>
+                      <p className="text-xs text-white/60 leading-relaxed pt-2">
+                        {item.description}
+                      </p>
+                    </div>
                   </div>
-                ))}
-              </div>
 
-              {/* Footer Indicator */}
-              <div className="pt-4 border-t border-white/5 flex items-center justify-between text-[10px] text-white/40 relative z-10">
-                <span>PILIER {item.num} // 06</span>
-                <span className="flex items-center gap-1 text-[#FF7582]">
-                  CONTINUER LE SCROLL <ChevronRight className="w-3.5 h-3.5" />
-                </span>
+                  <div>
+                    {/* Specs & Metrics */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-4 border-t border-white/10 relative z-10">
+                      {item.specs.map((s, sIdx) => (
+                        <div key={sIdx} className="p-2.5 bg-black/80 border border-white/5 space-y-1">
+                          <span className="text-[9px] text-white/40 uppercase block truncate">
+                            {s.label}
+                          </span>
+                          <strong
+                            className={`text-xs font-mono font-bold block ${
+                              isAcid ? "text-[#FF7582]" : "text-[#8FAFD4]"
+                            }`}
+                          >
+                            {s.val}
+                          </strong>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Footer Indicator */}
+                    <div className="pt-4 mt-4 border-t border-white/5 flex items-center justify-between text-[10px] text-white/40 relative z-10">
+                      <span>PILIER {item.num} // 06</span>
+                      
+                      {hasClip ? (
+                        <div className="flex items-center gap-2 text-white/50 font-mono text-[10px] uppercase">
+                          <span className="relative flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF7582] opacity-75" />
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF7582]" />
+                          </span>
+                          <span className="text-[#FF7582] font-bold">EXTRAIT VOD DISPONIBLE</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5 text-white/40 font-mono text-[10px] uppercase">
+                          <span className="w-1.5 h-1.5 bg-white/30 rounded-full" />
+                          <span>MÉTHODE THÉORIQUE & DATA</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* ======================================================== */}
+                {/* FACE ARRIÈRE (BACK - LECTEUR CLIP VIDÉO pour cartes avec clip) */}
+                {/* ======================================================== */}
+                {hasClip && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      width: "100%",
+                      height: "100%",
+                      backfaceVisibility: "hidden",
+                      WebkitBackfaceVisibility: "hidden",
+                      transform: "rotateY(180deg) translateZ(1px)",
+                      willChange: "transform",
+                      transformStyle: "preserve-3d",
+                      WebkitTransformStyle: "preserve-3d",
+                    }}
+                    className="reticle-box p-6 sm:p-8 bg-[#090C12] border-2 border-[#FF7582] shadow-[0_0_35px_rgba(255,117,130,0.3)] flex flex-col justify-between"
+                  >
+                    <CornerBrackets color="coral" />
+
+                    {/* Back Header */}
+                    <div className="flex items-center justify-between border-b border-white/10 pb-3 relative z-10">
+                      <div className="flex items-center gap-2">
+                        <span className="bg-[#FF7582] text-black text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
+                          EXTRAIT VOD // PILIER {item.num}
+                        </span>
+                        <span className="text-xs text-white/70 font-display hidden sm:inline">
+                          {item.title}
+                        </span>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={(e) => handleCardClick(idx, e)}
+                        className="btn-cyber-ghost text-[10px] py-1.5 px-3 flex items-center gap-1.5 hover:border-[#FF7582] hover:text-[#FF7582] cursor-pointer"
+                      >
+                        <RotateCcw className="w-3 h-3" />
+                        <span>RETOUR [✕]</span>
+                      </button>
+                    </div>
+
+                    {/* Video Player Component */}
+                    <PillarVideoPlayer
+                      videoSrc={item.videoSrc}
+                      clipTitle={item.clipTitle}
+                      clipSubtitle={item.clipSubtitle}
+                      isFlipped={flippedArray[idx]}
+                      isSectionInView={isSectionInView}
+                      isCardInView={
+                        idx === 0
+                          ? scrollProgress < 0.25
+                          : idx === 2
+                          ? scrollProgress >= 0.18 && scrollProgress <= 0.60
+                          : scrollProgress >= 0.52
+                      }
+                    />
+
+                    {/* Back Footer */}
+                    <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs relative z-10">
+                      <span className="text-[10px] text-white/60 truncate">
+                        Démonstration : <strong className="text-white">{item.clipSubtitle}</strong>
+                      </span>
+                      <span className="text-[9px] font-mono text-[#FF7582] uppercase tracking-wider">
+                        [LECTEUR ACTIF]
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           );
@@ -408,7 +829,7 @@ export default function WhyPoulpy() {
         {/* Final Callout Card at End of Scroll */}
         <div
           style={{ transform: "translateZ(0)", contain: "layout style paint" }}
-          className="w-[85vw] sm:w-[480px] shrink-0 reticle-box p-8 sm:p-10 flex flex-col justify-between space-y-6 bg-black border border-[#FF7582]/50 relative overflow-hidden shadow-2xl shadow-black/80"
+          className="w-[85vw] sm:w-[480px] h-[520px] shrink-0 reticle-box p-8 sm:p-10 flex flex-col justify-between space-y-6 bg-black border border-[#FF7582]/50 relative overflow-hidden shadow-2xl shadow-black/80"
         >
           <div className="space-y-3 relative z-10">
             <span className="data-badge data-badge-acid">PRÊT POUR L&apos;ASCENSION ?</span>
@@ -440,3 +861,5 @@ export default function WhyPoulpy() {
     </section>
   );
 }
+
+

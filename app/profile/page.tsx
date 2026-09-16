@@ -1,15 +1,65 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
-import { User, Mail, Settings, LogOut, Shield, Clock, Award, Camera, Trash2, Edit2, Check, X, Loader2, MessageSquare, Quote, Film, Calendar, Gamepad2, AlertCircle, FileText, ArrowLeft } from 'lucide-react';
+import { User, Mail, Settings, LogOut, Shield, Clock, Award, Camera, Trash2, Edit2, Check, X, Loader2, MessageSquare, Quote, Film, Calendar, Gamepad2, AlertCircle, FileText, ArrowLeft, ArrowRight, Layers, Sparkles, Send } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import FavoriteGames from '@/components/FavoriteGames';
 import SocialLinks from '@/components/SocialLinks';
 import { CoachingBooking } from '@/components/booking/types';
 import CyberNavbar from '@/components/CyberNavbar';
+
+interface RawSlot {
+  id: string;
+  date: string;
+  start_time: string;
+  is_active: boolean;
+  is_booked: boolean;
+}
+
+interface DayOption {
+  dayName: string;
+  dayNumber: number;
+  monthName: string;
+  dateIso: string;
+  fullDateLabel: string;
+  slots: Array<{
+    id?: string;
+    time: string;
+    available: boolean;
+  }>;
+  availableCount: number;
+}
+
+interface PackSessionItem {
+  number: number;
+  title: string;
+  isBooked: boolean;
+  bookingId?: string;
+  bookingDate?: string;
+  bookingTime?: string;
+  status?: string;
+  game?: string;
+}
+
+interface PackSummary {
+  hasActivePack: boolean;
+  packType: 'pro' | 'performance';
+  packName: string;
+  totalSessions: number;
+  bookedSessions: number;
+  remainingSessions: number;
+  nextSessionNumber: number;
+  sessions: PackSessionItem[];
+}
+
+const DAYS_SHORT = ["DIM", "LUN", "MAR", "MER", "JEU", "VEN", "SAM"];
+const DAYS_FULL = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"];
+const MONTHS_SHORT = ["JANV", "FÉVR", "MARS", "AVR", "MAI", "JUIN", "JUIL", "AOÛT", "SEPT", "OCT", "NOV", "DÉC"];
+const MONTHS_FULL = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+const STANDARD_HOURS = ["10:00", "11:30", "14:00", "15:30", "17:00", "18:30", "20:00", "21:30"];
 
 const MAGIC_BYTES: Record<string, number[]> = {
   'image/png': [0x89, 0x50, 0x4e, 0x47],
@@ -50,13 +100,27 @@ export default function Profile() {
     updated_at: string;
   }>>([]);
   const [bookingsLoading, setBookingsLoading] = useState(false);
+  const [packSummary, setPackSummary] = useState<PackSummary | null>(null);
+
+  // Pack Slot Booking States
+  const [showPackBooking, setShowPackBooking] = useState(false);
+  const [packSlots, setPackSlots] = useState<RawSlot[]>([]);
+  const [loadingPackSlots, setLoadingPackSlots] = useState(false);
+  const [selectedPackDayIndex, setSelectedPackDayIndex] = useState(0);
+  const [selectedPackSlotId, setSelectedPackSlotId] = useState<string | null>(null);
+  const [selectedPackTime, setSelectedPackTime] = useState<string>('');
+  const [packGame, setPackGame] = useState<string>('Valorant');
+  const [packNotes, setPackNotes] = useState<string>('');
+  const [isBookingPackSession, setIsBookingPackSession] = useState(false);
+  const [packBookingError, setPackBookingError] = useState<string | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const showStatus = (type: 'success' | 'error', text: string) => {
     setStatusMsg({ type, text });
     if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
-    statusTimerRef.current = setTimeout(() => setStatusMsg(null), 3500);
+    statusTimerRef.current = setTimeout(() => setStatusMsg(null), 4000);
   };
 
   const dismissAlert = async (bookingId: string) => {
@@ -76,6 +140,142 @@ export default function Profile() {
     } catch {}
   };
 
+  // Charger les créneaux disponibles pour le pack
+  const fetchPackSlots = async () => {
+    setLoadingPackSlots(true);
+    try {
+      const res = await fetch('/api/bookings/slots', { cache: 'no-store' });
+      if (res.ok) {
+        const data = await res.json();
+        setPackSlots(data.slots || []);
+      }
+    } catch (err) {
+      console.warn('Erreur chargement slots pack:', err);
+    } finally {
+      setLoadingPackSlots(false);
+    }
+  };
+
+  useEffect(() => {
+    if (showPackBooking && packSlots.length === 0) {
+      fetchPackSlots();
+    }
+  }, [showPackBooking, packSlots.length]);
+
+  // Compute 14 upcoming days for Pack booking
+  const packDaysList: DayOption[] = useMemo(() => {
+    const list: DayOption[] = [];
+    const baseDate = new Date();
+
+    const slotsByDate = new Map<string, RawSlot[]>();
+    packSlots.forEach((s) => {
+      const arr = slotsByDate.get(s.date) || [];
+      arr.push(s);
+      slotsByDate.set(s.date, arr);
+    });
+
+    for (let i = 1; i <= 14; i++) {
+      const d = new Date(baseDate);
+      d.setDate(baseDate.getDate() + i);
+
+      const dateIso = d.toISOString().split("T")[0];
+      const dayOfWeek = d.getDay();
+      const dayName = DAYS_SHORT[dayOfWeek];
+      const dayFull = DAYS_FULL[dayOfWeek];
+      const dayNum = d.getDate();
+      const monthShort = MONTHS_SHORT[d.getMonth()];
+      const monthFull = MONTHS_FULL[d.getMonth()];
+      const fullDateLabel = `${dayFull} ${dayNum} ${monthFull}`;
+
+      const dayDbSlots = slotsByDate.get(dateIso) || [];
+
+      let slotItems: Array<{ id?: string; time: string; available: boolean }> = [];
+
+      if (dayDbSlots.length > 0) {
+        slotItems = dayDbSlots
+          .filter((s) => s.is_active && !s.is_booked)
+          .map((s) => ({
+            id: s.id,
+            time: s.start_time,
+            available: true,
+          }));
+        slotItems.sort((a, b) => a.time.localeCompare(b.time));
+      } else {
+        slotItems = STANDARD_HOURS.map((h) => ({
+          time: h,
+          available: false,
+        }));
+      }
+
+      const availableCount = slotItems.filter((s) => s.available).length;
+
+      list.push({
+        dayName,
+        dayNumber: dayNum,
+        monthName: monthShort,
+        dateIso,
+        fullDateLabel,
+        slots: slotItems,
+        availableCount,
+      });
+    }
+
+    return list;
+  }, [packSlots]);
+
+  // Confirmer la réservation gratuite de la séance du pack
+  const handleConfirmPackSession = async () => {
+    if (!selectedPackTime) {
+      setPackBookingError('Veuillez sélectionner un créneau horaire disponible.');
+      return;
+    }
+    const currentDay = packDaysList[selectedPackDayIndex];
+    if (!currentDay) return;
+
+    setIsBookingPackSession(true);
+    setPackBookingError(null);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('Session expirée. Veuillez vous reconnecter.');
+      }
+
+      const res = await fetch('/api/bookings/pack-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          slotId: selectedPackSlotId,
+          bookingDate: currentDay.dateIso,
+          bookingTime: selectedPackTime,
+          game: packGame,
+          notes: packNotes,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        throw new Error(data.error || 'Erreur lors de la réservation de votre séance de pack.');
+      }
+
+      showStatus('success', `Séance ${data.sessionNumber}/${data.totalSessions} réservée avec succès pour le ${currentDay.fullDateLabel} à ${selectedPackTime} !`);
+      setShowPackBooking(false);
+      setSelectedPackTime('');
+      setSelectedPackSlotId(null);
+      setPackNotes('');
+      fetchPackSlots();
+      loadBookings();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erreur lors de la réservation';
+      setPackBookingError(msg);
+    } finally {
+      setIsBookingPackSession(false);
+    }
+  };
+
   useEffect(() => {
     return () => {
       if (statusTimerRef.current) clearTimeout(statusTimerRef.current);
@@ -83,37 +283,33 @@ export default function Profile() {
   }, []);
 
   // Charger les réservations de l'élève
+  const loadBookings = async () => {
+    setBookingsLoading(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) return;
+
+      const res = await fetch('/api/bookings/student', {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+        cache: 'no-store',
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      setStudentBookings(data.bookings || []);
+      setStudentAlerts(data.alerts || []);
+      if (data.packSummary) {
+        setPackSummary(data.packSummary);
+      }
+    } catch (err) {
+      console.error('Erreur chargement bookings profil:', err);
+    } finally {
+      setBookingsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!user) return;
-    let cancelled = false;
-
-    const loadBookings = async () => {
-      setBookingsLoading(true);
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session?.access_token) return;
-
-        const res = await fetch('/api/bookings/student', {
-          headers: { Authorization: `Bearer ${session.access_token}` },
-          cache: 'no-store',
-        });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (!cancelled) {
-          setStudentBookings(data.bookings || []);
-          setStudentAlerts(data.alerts || []);
-        }
-      } catch (err) {
-        console.error('Erreur chargement bookings profil:', err);
-      } finally {
-        if (!cancelled) setBookingsLoading(false);
-      }
-    };
-
     loadBookings();
-    return () => {
-      cancelled = true;
-    };
   }, [user]);
 
   if (authLoading) {
@@ -547,6 +743,261 @@ export default function Profile() {
         {!user.isAdmin && (
           <div className="mb-8">
             <FavoriteGames />
+          </div>
+        )}
+
+        {/* ======================================================== */}
+        {/* PACK SÉANCES ACTIF // GESTION & RÉSERVATION DES CRÉNEAUX */}
+        {/* Disparaît automatiquement dès que toutes les séances sont réservées */}
+        {/* ======================================================== */}
+        {packSummary && packSummary.hasActivePack && packSummary.remainingSessions > 0 && (
+          <div className="reticle-box bg-[#090C12] border-2 border-[#FF7582] shadow-[0_0_35px_rgba(255,117,130,0.2)] p-6 sm:p-8 mb-8 relative overflow-hidden">
+            {/* Top Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5 mb-6">
+              <div>
+                <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                  <span className="bg-[#FF7582] text-black text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
+                    PACK SÉANCES ACTIF
+                  </span>
+                  <span className="text-[10px] text-[#A4DE87] font-bold tracking-wider font-mono border border-[#A4DE87]/30 bg-[#A4DE87]/10 px-2 py-0.5">
+                    {packSummary.remainingSessions} SÉANCE(S) RESTANTE(S) À PLANIFIER
+                  </span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-display text-white tracking-wider">
+                  {packSummary.packName.toUpperCase()}
+                </h2>
+                <p className="text-xs text-white/60 mt-0.5 font-mono">
+                  Sélectionne un créneau horaire pour bloquer gratuitement ta prochaine séance (Séance {packSummary.nextSessionNumber}/{packSummary.totalSessions}).
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowPackBooking(!showPackBooking)}
+                className="btn-cyber-primary text-xs py-2.5 px-5 shrink-0 flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(255,117,130,0.3)]"
+              >
+                <Calendar size={14} />
+                <span>{showPackBooking ? 'MASQUER LE CALENDRIER' : `RÉSERVER SÉANCE ${packSummary.nextSessionNumber}/${packSummary.totalSessions}`}</span>
+              </button>
+            </div>
+
+            {/* Progress Grid of Pack Sessions */}
+            <div className="space-y-2 mb-6">
+              <div className="text-[10px] text-white/40 uppercase tracking-widest font-mono">
+                AVANCEMENT DU PROTOCOLE DU PACK ({packSummary.bookedSessions} / {packSummary.totalSessions} SÉANCES RÉSERVÉES) :
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+                {packSummary.sessions.map((s) => (
+                  <div
+                    key={s.number}
+                    className={`p-3 border text-center font-mono transition-all flex flex-col justify-between ${
+                      s.isBooked
+                        ? 'border-[#A4DE87]/40 bg-[#A4DE87]/10 text-white shadow-[0_0_10px_rgba(164,222,135,0.1)]'
+                        : s.number === packSummary.nextSessionNumber
+                        ? 'border-[#FF7582] bg-[#FF7582]/15 text-white ring-1 ring-[#FF7582] shadow-[0_0_15px_rgba(255,117,130,0.25)]'
+                        : 'border-white/10 bg-black/40 text-white/40'
+                    }`}
+                  >
+                    <div className="text-[10px] uppercase font-bold tracking-wider">
+                      SÉANCE {s.number}
+                    </div>
+
+                    {s.isBooked ? (
+                      <div className="mt-1 space-y-0.5">
+                        <span className="text-[8px] text-[#A4DE87] font-bold block">[ RÉSERVÉE ]</span>
+                        <span className="text-[10px] text-white/80 block font-bold truncate">
+                          {new Date(s.bookingDate!).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} à {s.bookingTime}
+                        </span>
+                      </div>
+                    ) : s.number === packSummary.nextSessionNumber ? (
+                      <div className="mt-1">
+                        <span className="text-[8px] text-[#FF7582] font-bold block animate-pulse">À RÉSERVER</span>
+                        <span className="text-[10px] text-white font-bold block">0 € INCLUS</span>
+                      </div>
+                    ) : (
+                      <div className="mt-1">
+                        <span className="text-[8px] text-white/30 block">EN ATTENTE</span>
+                        <span className="text-[10px] text-white/30 block">Inclus</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Embedded Slot Selector for Next Session */}
+            {showPackBooking && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="pt-6 border-t border-white/10 space-y-5"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="text-xs text-white/80 uppercase font-bold tracking-wider flex items-center gap-2">
+                    <span className="w-2 h-2 bg-[#FF7582]" />
+                    <span>PLANIFICATION DE LA SÉANCE {packSummary.nextSessionNumber} / {packSummary.totalSessions}</span>
+                  </div>
+                  {loadingPackSlots && (
+                    <div className="flex items-center gap-1.5 text-xs text-[#8FAFD4]">
+                      <Loader2 size={13} className="animate-spin" />
+                      <span>Actualisation des créneaux...</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Days Selector */}
+                <div className="space-y-2">
+                  <label className="text-[11px] text-white/70 block uppercase font-bold tracking-wider">
+                    1. CHOISIR LE JOUR :
+                  </label>
+                  <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
+                    {packDaysList.map((d, index) => {
+                      const isSelected = selectedPackDayIndex === index;
+                      return (
+                        <div
+                          key={d.dateIso}
+                          onClick={() => {
+                            setSelectedPackDayIndex(index);
+                            setSelectedPackTime('');
+                            setSelectedPackSlotId(null);
+                          }}
+                          className={`flex-shrink-0 w-24 p-2.5 border text-center cursor-pointer transition-all ${
+                            isSelected
+                              ? 'border-[#FF7582] bg-[#FF7582]/20 text-white shadow-[0_0_12px_rgba(255,117,130,0.3)] ring-1 ring-[#FF7582]'
+                              : 'border-white/10 bg-black/60 hover:border-white/30 text-white/70'
+                          }`}
+                        >
+                          <div className="text-[9px] uppercase font-bold text-white/50">{d.dayName}</div>
+                          <div className="text-base font-display">{d.dayNumber} {d.monthName}</div>
+                          <div className="mt-1">
+                            {d.availableCount > 0 ? (
+                              <span className="text-[8px] font-bold px-1 py-0.2 bg-[#A4DE87]/15 border border-[#A4DE87]/30 text-[#A4DE87] uppercase block">
+                                {d.availableCount} dispo
+                              </span>
+                            ) : (
+                              <span className="text-[8px] font-medium px-1 py-0.2 bg-white/5 text-white/30 uppercase block">
+                                Complet
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Slots Grid */}
+                <div className="space-y-2">
+                  <label className="text-[11px] text-white/70 block uppercase font-bold tracking-wider">
+                    2. SÉLECTIONNER L'HEURE (CRÉNEAU) :
+                  </label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2">
+                    {packDaysList[selectedPackDayIndex]?.slots.map((slot) => {
+                      const isSelected = selectedPackTime === slot.time;
+                      return (
+                        <button
+                          key={slot.time}
+                          type="button"
+                          disabled={!slot.available}
+                          onClick={() => {
+                            if (slot.available) {
+                              setSelectedPackTime(slot.time);
+                              setSelectedPackSlotId(slot.id || null);
+                            }
+                          }}
+                          className={`p-2.5 border text-center font-mono transition-all text-xs ${
+                            isSelected
+                              ? 'border-[#FF7582] bg-[#FF7582] text-black font-bold shadow-[0_0_15px_rgba(255,117,130,0.4)] cursor-pointer'
+                              : slot.available
+                              ? 'border-[#A4DE87]/40 bg-black/60 hover:border-[#A4DE87] text-white cursor-pointer'
+                              : 'border-white/5 bg-black/20 text-white/20 cursor-not-allowed opacity-40'
+                          }`}
+                        >
+                          <div className="font-bold">{slot.time}</div>
+                          <div className={`text-[8px] font-bold uppercase mt-0.5 ${isSelected ? 'text-black' : slot.available ? 'text-[#A4DE87]' : 'text-white/20'}`}>
+                            {isSelected ? 'CHOISI' : slot.available ? 'LIBRE' : 'OCCUPÉ'}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Game & Notes Options */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                  <div>
+                    <label className="text-[10px] text-white/70 block uppercase font-bold tracking-wider mb-1">
+                      JEU DE LA SÉANCE :
+                    </label>
+                    <select
+                      value={packGame}
+                      onChange={(e) => setPackGame(e.target.value)}
+                      className="w-full bg-black border border-white/20 p-2.5 text-xs text-white focus:border-[#FF7582] focus:outline-none"
+                    >
+                      <option value="Valorant">Valorant</option>
+                      <option value="CS2">Counter-Strike 2</option>
+                      <option value="Overwatch 2">Overwatch 2</option>
+                      <option value="Apex Legends">Apex Legends</option>
+                      <option value="Fortnite">Fortnite</option>
+                      <option value="Autre">Autre FPS</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] text-white/70 block uppercase font-bold tracking-wider mb-1">
+                      NOTES / OBJECTIFS SPÉCIFIQUES :
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Ex: Analyse VOD sur Bind, travail de l'aim..."
+                      value={packNotes}
+                      onChange={(e) => setPackNotes(e.target.value)}
+                      className="w-full bg-black border border-white/20 p-2.5 text-xs text-white placeholder-white/30 focus:border-[#FF7582] focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                {packBookingError && (
+                  <div className="p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-2">
+                    <AlertCircle size={15} className="shrink-0" />
+                    <span>{packBookingError}</span>
+                  </div>
+                )}
+
+                {/* Confirm Action Button */}
+                <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="text-xs text-white/70 font-mono">
+                    {selectedPackTime ? (
+                      <span>
+                        Créneau sélectionné : <strong className="text-white">{packDaysList[selectedPackDayIndex]?.fullDateLabel} à {selectedPackTime}</strong> (0 € - Inclus Pack)
+                      </span>
+                    ) : (
+                      <span className="text-white/40">Veuillez choisir un créneau ci-dessus</span>
+                    )}
+                  </div>
+
+                  <button
+                    type="button"
+                    disabled={!selectedPackTime || isBookingPackSession}
+                    onClick={handleConfirmPackSession}
+                    className="btn-cyber-primary py-3 px-7 text-xs font-bold uppercase disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer w-full sm:w-auto justify-center"
+                  >
+                    {isBookingPackSession ? (
+                      <>
+                        <Loader2 size={14} className="animate-spin" />
+                        <span>VERROUILLAGE EN COURS...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send size={14} />
+                        <span>VALIDER LA SÉANCE {packSummary.nextSessionNumber}/{packSummary.totalSessions} (0 €)</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </motion.div>
+            )}
           </div>
         )}
 

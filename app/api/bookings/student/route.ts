@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getStudentPackSummary } from '../pack-session/route';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -107,9 +108,15 @@ export async function GET(req: NextRequest) {
       ).catch((e) => console.error('Error auto-completing student bookings:', e));
     }
 
-    return NextResponse.json({ bookings: sanitizedBookings, alerts });
+    const packSummary = getStudentPackSummary(sanitizedBookings);
+
+    return NextResponse.json({
+      bookings: sanitizedBookings,
+      alerts,
+      packSummary,
+    });
   } catch (err: unknown) {
     console.error('Erreur GET /api/bookings/student:', err);
-    return NextResponse.json({ error: 'Erreur interne', bookings: [], alerts: [] }, { status: 500 });
+    return NextResponse.json({ error: 'Erreur interne', bookings: [], alerts: [], packSummary: null }, { status: 500 });
   }
 }

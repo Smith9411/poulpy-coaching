@@ -271,10 +271,10 @@ Fonctionnement côté app : après le retour Google, `/auth/callback` vérifie l
   - **Token expiré géré côté client** : ajout `supabase.auth.refreshSession()` automatique dans `handleAdminResponse` quand le token est expiré, avec message clair "Session expirée, reconnectez-vous"
   - **UI mode déroulant améliorée** : bouton "Réponse de l'équipe Poulpy" avec gradient purple→cyan bien visible, **chevron rotatif** (ChevronDown + rotate-180 quand déployé), animation framer-motion easeInOut, **avatar "Équipe Poulpy" + date de réponse** dans le panneau déplié
   - **Fix build** : `discordUrl` manquant dans `setSettings` de `components/About.tsx` (erreur TS2345)
-- 2026-09-16 (correction navigation Pourquoi Poulpy : pills 01-06 & redirection tarifs) :
-  - **Calibrage exact du saut par pilier (`goToCard`)** : calcul de la translation réelle de chaque carte dans la piste GPU (`offsetLeft`) et scroll précis via `ScrollToPlugin` au lieu d'une division arbitraire.
-  - **Détection dynamique de la pilule active** : détection de la carte la plus proche du viewport en direct selon le défilement horizontal.
-  - **Redirection fluide CTA Tarifs** : correction du bouton « Découvrir les tarifs » vers la section de réservation/tarifs (`#booking` et alias `#tarifs`) avec scroll fluide GSAP.
+- 2026-09-16 (restauration complète & correction navigation Pourquoi Poulpy) :
+  - **Restauration intégrale des 51 commits distants** : réintégration de l'ensemble des fonctionnalités créées sur la machine distante (vidéos de clips Aim/Clutch/Sang-Froid, pack sessions, avis mis en avant, robots/sitemap SEO, profil et booking).
+  - **Calibrage exact du saut par pilier (`goToCard`)** : utilisation de `st.start` et `st.end` de ScrollTrigger combinés à `ScrollToPlugin` pour scroller au pixel près vers chaque carte (01 à 06) sans décalage de pin.
+  - **Redirection fluide CTA Tarifs** : connexion du bouton « Découvrir les tarifs » vers la section de réservation/tarifs (`#booking` et ancre `#tarifs`) avec défilement fluide GSAP.
 - 2026-09-15 (simplification header Méthodologie) :
   - **Nettoyage UI Méthodologie (`components/Methodology.tsx`)** : suppression de la pastille et mention « Défile vers le bas » au profit d'une présentation épurée et directe des 4 phases chirurgicales.
 - 2026-09-15 (nettoyage UI boutons de thème dupliqués) :

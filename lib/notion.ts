@@ -66,22 +66,56 @@ function getNotionConfig() {
 
 /**
  * Détermine la durée en minutes selon la formule de coaching ou la chaîne de durée
+ * - Coaching Compétition (1h30 - 2h) -> 120 minutes
+ * - Coaching Pro (1h - 1h30) -> 90 minutes
+ * - Session Diagnostic Stream (45 min - 1h) -> 60 minutes
  */
 export function getDurationMinutes(durationStr?: string, planName?: string): number {
-  const combined = `${durationStr || ''} ${planName || ''}`.toLowerCase();
-  if (combined.includes('30') || combined.includes('diag') || combined.includes('session')) {
-    return 30;
-  }
-  if (combined.includes('1h30') || combined.includes('90') || combined.includes('perf')) {
-    return 90;
-  }
-  if (combined.includes('2h') || combined.includes('120')) {
+  const name = (planName || '').toLowerCase();
+  const dur = (durationStr || '').toLowerCase();
+
+  // 1. Coaching Compétition (1h30 - 2h -> 120 minutes)
+  if (
+    name.includes('compétition') ||
+    name.includes('competition') ||
+    name.includes('performance') ||
+    dur.includes('2h') ||
+    dur.includes('120')
+  ) {
     return 120;
   }
-  if (combined.includes('45')) {
-    return 45;
+
+  // 2. Coaching Pro (1h - 1h30 -> 90 minutes)
+  if (
+    name.includes('pro') ||
+    dur.includes('1h30') ||
+    dur.includes('90') ||
+    dur.includes('1h-1h30') ||
+    dur.includes('1h - 1h30')
+  ) {
+    return 90;
   }
-  return 60;
+
+  // 3. Diagnostic / VOD Stream (45 min - 1h -> 60 minutes)
+  if (
+    name.includes('diag') ||
+    name.includes('stream') ||
+    name.includes('session') ||
+    dur.includes('45') ||
+    dur.includes('1h') ||
+    dur.includes('60')
+  ) {
+    return 60;
+  }
+
+  // Détection numérique générique
+  if (dur.includes('120') || dur.includes('2h')) return 120;
+  if (dur.includes('90') || dur.includes('1h30')) return 90;
+  if (dur.includes('60') || dur.includes('1h')) return 60;
+  if (dur.includes('45')) return 45;
+  if (dur.includes('30') && !dur.includes('1h30')) return 30;
+
+  return 90;
 }
 
 /**

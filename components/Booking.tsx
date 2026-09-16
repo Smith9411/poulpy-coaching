@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Calendar, Clock, User, Shield, ChevronRight, ChevronLeft, ArrowRight, Send, Loader2, AlertCircle, Crosshair } from "lucide-react";
+import { Check, Calendar, Clock, User, Shield, ChevronRight, ChevronLeft, ArrowRight, Send, Loader2, AlertCircle, Crosshair, MessageCircle, ExternalLink } from "lucide-react";
 import DecryptedText from "./DecryptedText";
 import CornerBrackets from "./CornerBrackets";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
+import AuthModal from "./AuthModal";
 
 interface RawSlot {
   id: string;
@@ -70,8 +71,11 @@ function useCardTilt() {
 
 export default function Booking() {
   const { user } = useAuth();
+  const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
   const [step, setStep] = useState<number>(1);
   const [selectedPlan, setSelectedPlan] = useState<string>("pro");
+  const [proIsPack, setProIsPack] = useState<boolean>(false);
+  const [perfIsPack, setPerfIsPack] = useState<boolean>(false);
 
   // Tilt controls for each card
   const proTilt = useCardTilt();
@@ -192,9 +196,13 @@ export default function Booking() {
   const currentDay = daysList[selectedDayIndex] || daysList[0];
 
   const planDetails: Record<string, { name: string; price: string; duration: string }> = {
-    pro: { name: "COACHING PRO", price: "49 €", duration: "60 MINUTES" },
-    session: { name: "SESSION DIAGNOSTIC", price: "29 €", duration: "30 MINUTES" },
-    performance: { name: "PERFORMANCE", price: "89 €", duration: "90 MINUTES" },
+    pro: proIsPack
+      ? { name: "COACHING PRO (PACK 5 SÉANCES + 2 OFFERTES)", price: "50 €", duration: "7 SÉANCES (1H-1H30 / SÉANCE)" }
+      : { name: "COACHING PRO (RÉFÉRENCE)", price: "10 €", duration: "1H - 1H30" },
+    session: { name: "SESSION DIAGNOSTIC (VOD STREAM)", price: "0 € (GRATUIT)", duration: "45 MIN - 1H" },
+    performance: perfIsPack
+      ? { name: "COACHING COMPÉTITION (PACK 3 SÉANCES + 1 OFFERTE)", price: "60 €", duration: "4 SÉANCES (1H30-2H / SÉANCE)" }
+      : { name: "COACHING COMPÉTITION & TEAM", price: "20 €", duration: "1H30 - 2H" },
   };
 
   const activePlan = planDetails[selectedPlan] || planDetails["pro"];
@@ -206,6 +214,12 @@ export default function Booking() {
   };
 
   const handleNextStep = async () => {
+    if (step === 1) {
+      setSubmitError(null);
+      setStep(2);
+      return;
+    }
+
     if (step === 2) {
       if (!selectedTime) {
         setSubmitError("Veuillez sélectionner un créneau horaire disponible.");
@@ -213,7 +227,15 @@ export default function Booking() {
       }
       setSubmitError(null);
       setStep(3);
-    } else if (step === 3) {
+      return;
+    }
+
+    if (step === 3) {
+      if (!user) {
+        setSubmitError("Vous devez être connecté avec votre compte pour réserver une session de coaching.");
+        setAuthModalOpen(true);
+        return;
+      }
       if (!studentDiscord.trim()) {
         setSubmitError("L'identifiant Discord est requis pour initier le salon vocal.");
         return;
@@ -230,14 +252,24 @@ export default function Booking() {
         const randomCode = Math.floor(1000 + Math.random() * 9000);
         const missionId = `PLP-${randomCode}-OP`;
 
-        let token: string | undefined;
-        try {
-          const { data: { session } } = await supabase.auth.getSession();
-          token = session?.access_token;
-        } catch {}
+        let { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) {
+          const { data: refreshData, error: refreshErr } = await supabase.auth.refreshSession();
+          if (refreshErr || !refreshData.session) {
+            throw new Error("Session expirée. Veuillez vous reconnecter.");
+          }
+          session = refreshData.session;
+        }
 
-        const headers: Record<string, string> = { "Content-Type": "application/json" };
-        if (token) headers["Authorization"] = `Bearer ${token}`;
+        const token = session?.access_token;
+        if (!token) {
+          throw new Error("Vous devez être connecté pour réserver une session.");
+        }
+
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        };
 
         const res = await fetch("/api/bookings/create", {
           method: "POST",
@@ -250,8 +282,8 @@ export default function Booking() {
             planName: activePlan.name,
             planPrice: activePlan.price,
             planDuration: activePlan.duration,
-            studentName: studentName.trim() || studentDiscord.trim(),
-            studentEmail: studentEmail.trim(),
+            studentName: (studentName.trim() || user.username || studentDiscord.trim()),
+            studentEmail: (studentEmail.trim() || user.email || ""),
             studentDiscord: studentDiscord.trim(),
             game: `${game} (${currentRank})`,
             notes: objective.trim(),
@@ -273,8 +305,6 @@ export default function Booking() {
       } finally {
         setIsSubmitting(false);
       }
-    } else {
-      setStep((prev) => prev + 1);
     }
   };
 
@@ -405,18 +435,18 @@ export default function Booking() {
                         />
                       )}
 
-                      <div className="space-y-6 relative z-10" style={{ transform: "translateZ(8px)" }}>
+                      <div className="space-y-5 relative z-10" style={{ transform: "translateZ(8px)" }}>
                         {/* Top Badges */}
                         <div className="flex items-center justify-between border-b border-white/10 pb-4">
                           <span className="bg-[#FF7582] text-black text-[10px] font-bold px-3 py-1 uppercase tracking-widest">
                             FORMULE DE RÉFÉRENCE
                           </span>
                           <span className="text-xs text-white/70 tracking-widest font-mono">
-                            DURÉE : 60 MINUTES
+                            {proIsPack ? "PACK 5 SÉANCES + 2 OFFERTES" : "DURÉE : 1H - 1H30"}
                           </span>
                         </div>
 
-                        {/* Title & Price */}
+                        {/* Title & Interactive Price Selector */}
                         <div>
                           <span className="text-[10px] text-white/40 uppercase tracking-widest block font-mono">
                             COACHING INDIVIDUEL COMPLET
@@ -424,31 +454,93 @@ export default function Booking() {
                           <h3 className="text-3xl sm:text-4xl font-display text-white tracking-wider mt-1">
                             COACHING PRO
                           </h3>
-                          <div className="flex items-baseline gap-2 mt-2">
-                            <span className="text-4xl sm:text-5xl font-display text-[#FF7582]">
-                              49 €
-                            </span>
-                            <span className="text-xs text-white/40 font-mono">/ SÉANCE INTENSIVE</span>
+
+                          {/* Single vs Pack interactive selector */}
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-3.5">
+                            {/* Option 1: Single Session 10€ */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedPlan("pro");
+                                setProIsPack(false);
+                              }}
+                              className={`p-3 border text-left transition-all relative ${
+                                !proIsPack && selectedPlan === "pro"
+                                  ? "border-[#FF7582] bg-[#FF7582]/15 text-white shadow-[0_0_15px_rgba(255,117,130,0.25)] ring-1 ring-[#FF7582]"
+                                  : "border-white/10 bg-black/40 text-white/50 hover:border-white/30 hover:text-white/80"
+                              }`}
+                            >
+                              <div className="flex items-baseline justify-between">
+                                <span className={`text-2xl sm:text-3xl font-display ${!proIsPack && selectedPlan === "pro" ? "text-[#FF7582]" : "text-white"}`}>
+                                  10 €
+                                </span>
+                                <span className={`text-[9px] font-mono uppercase font-bold tracking-wider px-1.5 py-0.5 border ${
+                                  !proIsPack && selectedPlan === "pro"
+                                    ? "border-[#FF7582]/40 bg-[#FF7582]/20 text-[#FF7582]"
+                                    : "border-white/10 text-white/40"
+                                }`}>
+                                  À L'UNITÉ
+                                </span>
+                              </div>
+                              <div className="text-[11px] font-mono text-white/70 mt-1">
+                                1 séance complète (1h - 1h30)
+                              </div>
+                            </button>
+
+                            {/* Option 2: Pack 50€ */}
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setSelectedPlan("pro");
+                                setProIsPack(true);
+                              }}
+                              className={`p-3 border text-left transition-all relative overflow-hidden ${
+                                proIsPack && selectedPlan === "pro"
+                                  ? "border-[#FF7582] bg-[#FF7582]/15 text-white shadow-[0_0_15px_rgba(255,117,130,0.25)] ring-1 ring-[#FF7582]"
+                                  : "border-white/10 bg-black/40 text-white/50 hover:border-white/30 hover:text-white/80"
+                              }`}
+                            >
+                              <div className="absolute top-1.5 right-1.5 px-1.5 py-0.5 text-[8px] font-bold bg-[#FF7582] text-black uppercase tracking-wider">
+                                +2 GRATUITES
+                              </div>
+                              <div className="flex items-baseline justify-between">
+                                <span className={`text-2xl sm:text-3xl font-display ${proIsPack && selectedPlan === "pro" ? "text-[#FF7582]" : "text-white"}`}>
+                                  50 €
+                                </span>
+                                <span className={`text-[9px] font-mono uppercase font-bold tracking-wider mr-16 px-1.5 py-0.5 border ${
+                                  proIsPack && selectedPlan === "pro"
+                                    ? "border-[#FF7582]/40 bg-[#FF7582]/20 text-[#FF7582]"
+                                    : "border-white/10 text-white/40"
+                                }`}>
+                                  PACK BUNDLE
+                                </span>
+                              </div>
+                              <div className="text-[11px] font-mono text-white/70 mt-1">
+                                5 séances + 2 offertes (7 au total)
+                              </div>
+                            </button>
                           </div>
                         </div>
 
                         {/* Description */}
                         <p className="text-xs text-white/70 leading-relaxed max-w-xl">
-                          L&apos;expérience centrale de l&apos;Atelier Poulpy : diagnostic en direct, recalibrage biomécanique du viseur et correction chirurgicale de vos prises d&apos;information.
+                          Analyse tracker, diagnostic mécanique puis VOD review avec protocoles à mettre en place pour progresser (fiche technique de suivi Notion).
                         </p>
 
                         {/* Features Matrix (2 columns of dark boxes) */}
-                        <div className="space-y-2.5 pt-2">
+                        <div className="space-y-2 pt-1">
                           <span className="text-[10px] text-white/40 uppercase tracking-widest block font-mono">
                             CONTENU DU PROTOCOLE :
                           </span>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                             {[
-                              "Analyse complète de gameplay",
-                              "Coaching personnalisé en vocal",
-                              "Travail d'aim & placement du viseur",
-                              "Feuille de route Notion 4 semaines",
-                              "Suivi Discord VIP 7j/7",
+                              "Analyse tracker & statistiques",
+                              "Diagnostic mécanique & viseur",
+                              "VOD review & correction en vocal",
+                              "Protocoles & fiches techniques Notion",
+                              "Suivi Discord & progression continue",
                             ].map((feat, i) => (
                               <div key={i} className="p-2.5 bg-black/70 border border-white/5 flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 bg-[#FF7582] shrink-0" />
@@ -460,7 +552,7 @@ export default function Booking() {
                       </div>
 
                       {/* Footer note */}
-                      <div className="pt-5 mt-6 border-t border-white/10 text-[10px] text-white/40 font-mono flex items-center justify-between relative z-10">
+                      <div className="pt-4 mt-5 border-t border-white/10 text-[10px] text-white/40 font-mono flex items-center justify-between relative z-10">
                         <span>Idéal pour débloquer un palier de ranked tenace</span>
                         <span className={`font-bold uppercase tracking-wider text-[11px] ${
                           selectedPlan === "pro" ? "text-[#FF7582]" : "text-white/30"
@@ -498,9 +590,9 @@ export default function Booking() {
                         style={{ transformStyle: "preserve-3d" }}
                         className={`relative h-full p-5 flex flex-col justify-between transition-colors duration-200 border overflow-hidden select-none ${
                           selectedPlan === "session"
-                            ? "bg-[#0c0f15] border-white shadow-[0_0_25px_rgba(255,255,255,0.2)] ring-1 ring-white"
+                            ? "bg-[#0c0f15] border-[#A4DE87] shadow-[0_0_25px_rgba(164,222,135,0.2)] ring-1 ring-[#A4DE87]"
                             : sessionTilt.isHovered
-                            ? "bg-[#0c0f15] border-white/50 shadow-[0_0_20px_rgba(255,255,255,0.1)]"
+                            ? "bg-[#0c0f15] border-[#A4DE87]/50 shadow-[0_0_20px_rgba(164,222,135,0.1)]"
                             : "bg-[#090C12] border-white/15 hover:border-white/30"
                         }`}
                       >
@@ -508,18 +600,18 @@ export default function Booking() {
                           <div
                             className="absolute inset-0 pointer-events-none transition-opacity duration-200"
                             style={{
-                              background: `radial-gradient(circle 200px at ${sessionTilt.mousePos.x}% ${sessionTilt.mousePos.y}%, rgba(255, 255, 255, 0.1), transparent 80%)`,
+                              background: `radial-gradient(circle 200px at ${sessionTilt.mousePos.x}% ${sessionTilt.mousePos.y}%, rgba(164, 222, 135, 0.1), transparent 80%)`,
                             }}
                           />
                         )}
 
                         <div className="space-y-3 relative z-10" style={{ transform: "translateZ(6px)" }}>
                           <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                            <span className="bg-white/10 text-white/70 text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
-                              DIAGNOSTIC FLASH
+                            <span className="bg-[#A4DE87]/15 text-[#A4DE87] text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest border border-[#A4DE87]/30">
+                              OFFRE UNIQUE (1X)
                             </span>
                             <span className="text-[11px] text-white/50 tracking-wider font-mono">
-                              30 MINUTES
+                              45 MIN - 1H
                             </span>
                           </div>
 
@@ -527,34 +619,43 @@ export default function Booking() {
                             <h4 className="text-xl font-display text-white tracking-wider">
                               SESSION DIAGNOSTIC
                             </h4>
-                            <div className="text-2xl font-display text-white mt-0.5">
-                              29 €
+                            <div className="flex items-baseline gap-2 mt-0.5">
+                              <span className="text-2xl font-display text-[#A4DE87]">
+                                0 €
+                              </span>
+                              <span className="text-[10px] font-mono text-[#A4DE87] font-bold tracking-wider">
+                                GRATUIT // EN STREAM
+                              </span>
                             </div>
                           </div>
 
                           <p className="text-[11px] text-white/60 leading-snug">
-                            Audit ciblé pour isoler rapidement les défauts majeurs de viseur ou de crosshair placement.
+                            VOD review avec analyse des erreurs, review réalisée en Stream. Pas de méthode d'entraînement ni diagnostic long terme. Analyse d'une game sur un personnage.
                           </p>
 
                           <div className="space-y-1 pt-1 text-[11px] text-white/70">
                             <div className="flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 bg-white/40 shrink-0" />
-                              <span>Analyse rapide de gameplay</span>
+                              <span className="w-1.5 h-1.5 bg-[#A4DE87] shrink-0" />
+                              <span>VOD review d'une game (1 personnage)</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 bg-white/40 shrink-0" />
-                              <span>Conseils personnalisés immédiats</span>
+                              <span className="w-1.5 h-1.5 bg-[#A4DE87] shrink-0" />
+                              <span>Analyse chirurgicale des erreurs</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 bg-white/40 shrink-0" />
-                              <span>Compte-rendu écrit</span>
+                              <span className="w-1.5 h-1.5 bg-[#A4DE87] shrink-0" />
+                              <span>Review réalisée en direct en Stream</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 bg-[#A4DE87] shrink-0" />
+                              <span>Disponible 1 seule fois par élève</span>
                             </div>
                           </div>
                         </div>
 
                         <div className="pt-2 text-right relative z-10">
                           <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                            selectedPlan === "session" ? "text-white" : "text-white/30"
+                            selectedPlan === "session" ? "text-[#A4DE87]" : "text-white/30"
                           }`}>
                             {selectedPlan === "session" ? "SÉLECTIONNÉ" : "SÉLECTIONNER"}
                           </span>
@@ -562,7 +663,7 @@ export default function Booking() {
                       </motion.div>
                     </div>
 
-                    {/* Bottom Right: PERFORMANCE */}
+                    {/* Bottom Right: PERFORMANCE / COMPÉTITION */}
                     <div
                       className="flex-1 cursor-pointer"
                       style={{ perspective: "1000px" }}
@@ -603,38 +704,87 @@ export default function Booking() {
                         <div className="space-y-3 relative z-10" style={{ transform: "translateZ(6px)" }}>
                           <div className="flex items-center justify-between border-b border-white/10 pb-2">
                             <span className="bg-[#8FAFD4]/20 text-[#8FAFD4] text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
-                              COMPÉTITION & TEAM
+                              AXE COMPÉTITION & TEAM
                             </span>
                             <span className="text-[11px] text-[#8FAFD4] tracking-wider font-mono">
-                              90 MINUTES
+                              {perfIsPack ? "PACK 3 + 1 OFFERTE" : "1H30 - 2H"}
                             </span>
                           </div>
 
                           <div>
                             <h4 className="text-xl font-display text-white tracking-wider">
-                              PERFORMANCE
+                              COACHING COMPÉTITION
                             </h4>
-                            <div className="text-2xl font-display text-[#8FAFD4] mt-0.5">
-                              89 €
+
+                            {/* Single vs Pack interactive selector */}
+                            <div className="grid grid-cols-2 gap-2 mt-2">
+                              {/* Option 1: Single Session 20€ */}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedPlan("performance");
+                                  setPerfIsPack(false);
+                                }}
+                                className={`p-2 border text-left transition-all ${
+                                  !perfIsPack && selectedPlan === "performance"
+                                    ? "border-[#8FAFD4] bg-[#8FAFD4]/15 text-white shadow-[0_0_12px_rgba(143,175,212,0.25)] ring-1 ring-[#8FAFD4]"
+                                    : "border-white/10 bg-black/40 text-white/50 hover:border-white/30 hover:text-white/80"
+                                }`}
+                              >
+                                <div className="flex items-baseline justify-between">
+                                  <span className={`text-xl font-display ${!perfIsPack && selectedPlan === "performance" ? "text-[#8FAFD4]" : "text-white"}`}>
+                                    20 €
+                                  </span>
+                                  <span className="text-[8px] font-mono uppercase tracking-wider text-white/40">À L'UNITÉ</span>
+                                </div>
+                                <div className="text-[10px] font-mono text-white/70">1 séance (1h30-2h)</div>
+                              </button>
+
+                              {/* Option 2: Pack 60€ */}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setSelectedPlan("performance");
+                                  setPerfIsPack(true);
+                                }}
+                                className={`p-2 border text-left transition-all relative overflow-hidden ${
+                                  perfIsPack && selectedPlan === "performance"
+                                    ? "border-[#8FAFD4] bg-[#8FAFD4]/15 text-white shadow-[0_0_12px_rgba(143,175,212,0.25)] ring-1 ring-[#8FAFD4]"
+                                    : "border-white/10 bg-black/40 text-white/50 hover:border-white/30 hover:text-white/80"
+                                }`}
+                              >
+                                <div className="absolute top-0.5 right-1 px-1 py-0.2 text-[7px] font-bold bg-[#8FAFD4] text-black uppercase tracking-wider">
+                                  +1 OFFERTE
+                                </div>
+                                <div className="flex items-baseline justify-between">
+                                  <span className={`text-xl font-display ${perfIsPack && selectedPlan === "performance" ? "text-[#8FAFD4]" : "text-white"}`}>
+                                    60 €
+                                  </span>
+                                  <span className="text-[8px] font-mono uppercase tracking-wider text-white/40 mr-10">PACK 3+1</span>
+                                </div>
+                                <div className="text-[10px] font-mono text-white/70">4 séances au total</div>
+                              </button>
                             </div>
                           </div>
 
                           <p className="text-[11px] text-white/60 leading-snug">
-                            Immersion totale : VOD review approfondie, simulation de match et routine KovaaK&apos;s sur-mesure.
+                            Coaching axé évolution compétitive, développement du pool d'agents, points tactiques hors-ranked et VOD de pracc (fiche technique avancée).
                           </p>
 
                           <div className="space-y-1 pt-1 text-[11px] text-white/70">
                             <div className="flex items-center gap-2">
                               <span className="w-1.5 h-1.5 bg-[#8FAFD4] shrink-0" />
-                              <span>Double session VOD & coaching live</span>
+                              <span>Évolution compétitive & pool d'agents</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="w-1.5 h-1.5 bg-[#8FAFD4] shrink-0" />
-                              <span>Programme KovaaK&apos;s / Aim Lab</span>
+                              <span>VOD de pracc & points tactiques team</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <span className="w-1.5 h-1.5 bg-[#8FAFD4] shrink-0" />
-                              <span>Suivi Discord prioritaire</span>
+                              <span>Fiche technique avancée de suivi</span>
                             </div>
                           </div>
                         </div>
@@ -874,6 +1024,29 @@ export default function Booking() {
                   </span>
                 </div>
 
+                {!user && (
+                  <div className="p-4 bg-[#FF7582]/10 border border-[#FF7582]/40 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <Shield className="w-5 h-5 text-[#FF7582] shrink-0" />
+                      <div>
+                        <div className="text-xs font-bold text-white uppercase tracking-wider">
+                          COMPTE ÉLÈVE REQUIS POUR RÉSERVER
+                        </div>
+                        <p className="text-[11px] text-white/70 mt-0.5">
+                          Vous devez être connecté pour bloquer votre créneau et accéder à votre suivi personnalisé.
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setAuthModalOpen(true)}
+                      className="btn-cyber-primary py-2 px-5 text-xs font-bold shrink-0 text-center cursor-pointer"
+                    >
+                      <span>SE CONNECTER / S'INSCRIRE</span>
+                    </button>
+                  </div>
+                )}
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-4">
                     <div>
@@ -980,23 +1153,34 @@ export default function Booking() {
                     <ChevronLeft className="w-4 h-4" />
                     <span>RETOUR CRÉNEAU</span>
                   </button>
-                  <button
-                    disabled={isSubmitting}
-                    onClick={handleNextStep}
-                    className="btn-cyber-primary flex items-center gap-2 py-2.5 px-7 text-xs font-bold uppercase disabled:opacity-50 cursor-pointer"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        <span>VERROUILLAGE EN COURS...</span>
-                      </>
-                    ) : (
-                      <>
-                        <span>CONFIRMER LA SESSION</span>
-                        <Send className="w-4 h-4" />
-                      </>
-                    )}
-                  </button>
+                  {user ? (
+                    <button
+                      disabled={isSubmitting}
+                      onClick={handleNextStep}
+                      className="btn-cyber-primary flex items-center gap-2 py-2.5 px-7 text-xs font-bold uppercase disabled:opacity-50 cursor-pointer"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>VERROUILLAGE EN COURS...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>CONFIRMER LA SESSION</span>
+                          <Send className="w-4 h-4" />
+                        </>
+                      )}
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setAuthModalOpen(true)}
+                      className="btn-cyber-primary flex items-center gap-2 py-2.5 px-7 text-xs font-bold uppercase cursor-pointer"
+                    >
+                      <User className="w-4 h-4" />
+                      <span>SE CONNECTER POUR CONFIRMER</span>
+                    </button>
+                  )}
                 </div>
               </motion.div>
             )}
@@ -1041,6 +1225,37 @@ export default function Booking() {
                   </div>
                 </div>
 
+                {/* Discord CTA with IMPORTANT badge */}
+                <div className="relative p-5 bg-[#0c0f15] border border-[#FF7582] shadow-[0_0_25px_rgba(255,117,130,0.2)] text-left">
+                  {/* Badge matching the pack badges */}
+                  <div className="absolute top-2 right-2 px-2 py-0.5 text-[9px] font-bold bg-[#FF7582] text-black uppercase tracking-wider shadow-[0_0_10px_rgba(255,117,130,0.5)]">
+                    IMPORTANT !
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
+                    <div className="space-y-1 pr-0 sm:pr-4">
+                      <div className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                        <span className="w-2 h-2 bg-[#FF7582] animate-pulse" />
+                        <span>REJOINDRE LE SERVEUR DISCORD</span>
+                      </div>
+                      <p className="text-[11px] text-white/70 leading-relaxed">
+                        Le salon vocal et le partage d'écran de coaching se déroulent exclusivement sur le serveur Discord de Poulpy.
+                      </p>
+                    </div>
+
+                    <a
+                      href="https://discord.gg/rJMg3ZZRkp"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-cyber-primary flex items-center justify-center gap-2 py-3 px-6 text-xs font-bold uppercase tracking-wider shrink-0 cursor-pointer shadow-[0_0_20px_rgba(255,117,130,0.3)]"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      <span>REJOINDRE LE DISCORD</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                </div>
+
                 <div className="pt-2 flex justify-center">
                   <button
                     onClick={handleReset}
@@ -1054,6 +1269,8 @@ export default function Booking() {
           </AnimatePresence>
         </div>
       </div>
+
+      <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
     </section>
   );
 }

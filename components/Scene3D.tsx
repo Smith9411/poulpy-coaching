@@ -87,8 +87,8 @@ export default function Scene3D() {
 
           radii[i] = r;
           angles[i] = theta;
-          // Calibrated slow, serene fluid vortex rotation
-          speeds[i] = (0.0008 + 0.0016 / (r * 0.018 + 1)) * (0.8 + Math.random() * 0.4);
+          // Calibrated harmonic rotation: slightly faster base speed
+          speeds[i] = (0.00175 + 0.00025 / (r * 0.008 + 1)) * (0.99 + Math.random() * 0.02);
           zOffsets[i] = z;
           verticalWaves[i] = Math.random() * Math.PI * 2;
 
@@ -181,12 +181,14 @@ export default function Scene3D() {
 
         // When user scrolls past hero section, pause rendering to free 100% CPU/GPU for smooth scrolling
         if (currentScroll > window.innerHeight * 0.75) {
+          lastTime = performance.now();
           return;
         }
 
         const now = performance.now();
         const delta = Math.min((now - lastTime) * 0.001, 0.05);
         lastTime = now;
+        const timeFactor = delta * 60; // Locked constant rotational speed across 60Hz/120Hz/144Hz monitors
 
         // Smooth mouse follow
         mouseX += (targetX - mouseX) * 0.045;
@@ -198,8 +200,7 @@ export default function Scene3D() {
         camera.position.z = Math.max(200, 560 - currentScroll * 0.48);
         camera.lookAt(0, 0, 0);
 
-        // Slow, tranquil, elegant vortex rotation
-        vortexMesh.rotation.z += 0.0006;
+        // 3D subtle orientation tilt without Z-axis wobble
         vortexMesh.rotation.x = -mouseY * 0.00035 + 0.12;
         vortexMesh.rotation.y = mouseX * 0.00035;
 
@@ -211,7 +212,7 @@ export default function Scene3D() {
         const vortexCenterY = -mouseY * 0.18;
 
         for (let i = 0; i < PARTICLE_COUNT; i++) {
-          angles[i] += speeds[i];
+          angles[i] += speeds[i] * timeFactor;
           verticalWaves[i] += delta * 0.55;
 
           const r = radii[i];

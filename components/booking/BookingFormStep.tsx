@@ -54,6 +54,10 @@ export default function BookingFormStep({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      setError('Tu dois être connecté avec ton compte pour réserver une session.');
+      return;
+    }
     if (!formData.name.trim()) {
       setError('Merci de renseigner ton pseudo ou nom.');
       return;
@@ -71,13 +75,24 @@ export default function BookingFormStep({
     setError(null);
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      let { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        const { data: refreshData, error: refreshErr } = await supabase.auth.refreshSession();
+        if (refreshErr || !refreshData.session) {
+          throw new Error('Session expirée. Reconnecte-toi pour finaliser.');
+        }
+        session = refreshData.session;
+      }
+
+      const token = session?.access_token;
+      if (!token) {
+        throw new Error('Tu dois être connecté pour réserver une session.');
+      }
+
       const headers: Record<string, string> = {
         'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       };
-      if (session?.access_token) {
-        headers['Authorization'] = `Bearer ${session.access_token}`;
-      }
 
       const res = await fetch('/api/bookings/create', {
         method: 'POST',
