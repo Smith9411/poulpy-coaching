@@ -3,9 +3,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 import DecryptedText from "./DecryptedText";
 import CornerBrackets from "./CornerBrackets";
 import { Target, Brain, Crosshair, TrendingUp, ShieldCheck, Flame, ChevronRight, ArrowRight } from "lucide-react";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+}
 
 const PILLARS = [
   {
@@ -155,10 +160,26 @@ export default function WhyPoulpy() {
               if (progressBarRef.current) {
                 progressBarRef.current.style.transform = `scaleX(${progress})`;
               }
-              const idx = Math.min(5, Math.floor(progress * 6));
-              if (idx !== activeIndexRef.current) {
-                activeIndexRef.current = idx;
-                updatePills(idx);
+              if (trackRef.current) {
+                const scrollDist = Math.max(0, trackRef.current.scrollWidth - window.innerWidth + 120);
+                const currentX = progress * scrollDist;
+                const cards = trackRef.current.children;
+                let closestIdx = 0;
+                let minDiff = Infinity;
+                for (let i = 0; i < pillars.length; i++) {
+                  const card = cards[i] as HTMLElement;
+                  if (card) {
+                    const diff = Math.abs(card.offsetLeft - currentX);
+                    if (diff < minDiff) {
+                      minDiff = diff;
+                      closestIdx = i;
+                    }
+                  }
+                }
+                if (closestIdx !== activeIndexRef.current) {
+                  activeIndexRef.current = closestIdx;
+                  updatePills(closestIdx);
+                }
               }
             },
           },
@@ -193,11 +214,50 @@ export default function WhyPoulpy() {
     const track = trackRef.current;
     if (!section || !track) return;
 
-    const scrollDistance = Math.max(0, track.scrollWidth - window.innerWidth + 120);
-    const sectionTop = section.getBoundingClientRect().top + window.scrollY;
-    const targetY = sectionTop + (index / (pillars.length - 1)) * scrollDistance;
+    const cards = track.children;
+    const targetCard = cards[index] as HTMLElement;
+    if (!targetCard) return;
 
-    window.scrollTo({ top: targetY, behavior: "smooth" });
+    const scrollDistance = Math.max(0, track.scrollWidth - window.innerWidth + 120);
+    if (scrollDistance <= 0) return;
+
+    const targetProgress = Math.min(1, Math.max(0, targetCard.offsetLeft / scrollDistance));
+    const st = ScrollTrigger.getById("whypoulpy-scroll");
+
+    let targetY: number;
+    if (st) {
+      targetY = st.start + targetProgress * (st.end - st.start);
+    } else {
+      const pinSpacer = section.closest(".pin-spacer") as HTMLElement | null;
+      const baseTop = pinSpacer
+        ? pinSpacer.getBoundingClientRect().top + window.scrollY
+        : section.getBoundingClientRect().top + window.scrollY;
+      targetY = baseTop + targetProgress * scrollDistance;
+    }
+
+    gsap.to(window, {
+      scrollTo: { y: targetY, autoKill: false },
+      duration: 0.8,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
+  };
+
+  const handleGoToTarifs = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const el = document.getElementById("booking") || document.getElementById("tarifs");
+    if (el) {
+      const navOffset = 70;
+      const targetTop = el.getBoundingClientRect().top + window.scrollY - navOffset;
+      gsap.to(window, {
+        scrollTo: { y: targetTop, autoKill: false },
+        duration: 1.2,
+        ease: "power3.inOut",
+        overwrite: "auto",
+      });
+    } else {
+      window.location.hash = "booking";
+    }
   };
 
   return (
@@ -362,8 +422,9 @@ export default function WhyPoulpy() {
 
           <div className="pt-6 border-t border-white/10 relative z-10">
             <a
-              href="#tarifs"
-              className="btn-cyber-primary w-full justify-center text-xs py-3"
+              href="#booking"
+              onClick={handleGoToTarifs}
+              className="btn-cyber-primary w-full justify-center text-xs py-3 cursor-pointer"
             >
               <span>DÉCOUVRIR LES TARIFS</span>
               <ArrowRight className="w-4 h-4" />
