@@ -15,7 +15,6 @@ export default function PwaRegister() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showInstallBanner, setShowInstallBanner] = useState(false);
   const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
-  const [showAdminNotifPrompt, setShowAdminNotifPrompt] = useState(false);
   const hasCheckedVersionRef = useRef(false);
 
   // Fonction pour vérifier la version du serveur et notifier l'admin si mise à jour
@@ -80,12 +79,6 @@ export default function PwaRegister() {
       // Check notification permission
       if ('Notification' in window) {
         setNotificationPermission(Notification.permission);
-        if (user?.isAdmin && Notification.permission === 'default') {
-          const dismissedPrompt = sessionStorage.getItem('poulpy_admin_notif_dismissed');
-          if (!dismissedPrompt) {
-            setShowAdminNotifPrompt(true);
-          }
-        }
       }
 
       // Vérification immédiate de mise à jour au montage
@@ -162,7 +155,6 @@ export default function PwaRegister() {
   const handleEnableNotifications = async () => {
     const permission = await requestNotificationPermission();
     setNotificationPermission(permission);
-    setShowAdminNotifPrompt(false);
 
     if (permission === 'granted') {
       sendNotification({
@@ -171,11 +163,6 @@ export default function PwaRegister() {
         tag: 'notif-admin-ready',
       });
     }
-  };
-
-  const handleDismissAdminPrompt = () => {
-    setShowAdminNotifPrompt(false);
-    sessionStorage.setItem('poulpy_admin_notif_dismissed', 'true');
   };
 
   return (
@@ -216,57 +203,6 @@ export default function PwaRegister() {
                 <X size={16} />
               </button>
             </div>
-          </div>
-        </aside>
-      )}
-
-      {/* Admin Notification Enable Banner */}
-      {showAdminNotifPrompt && user?.isAdmin && notificationPermission === 'default' && (
-        <aside
-          aria-label="Activer les notifications administrateur"
-          className="fixed top-20 right-4 left-4 sm:left-auto sm:max-w-sm z-50 animate-in fade-in slide-in-from-top-4 duration-300"
-        >
-          <div className="glass-dark border border-cyan-500/40 rounded-2xl p-4 shadow-2xl backdrop-blur-xl flex items-start gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 border border-cyan-500/30 flex items-center justify-center flex-shrink-0 text-cyan-400">
-              <Bell size={18} className="animate-bounce" />
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-cyan-400">Admin Alerte</span>
-              </div>
-              <h5 className="font-bold text-white text-sm">Notifications mises à jour</h5>
-              <p className="text-xs text-gray-300 mt-0.5">
-                Recevoir une notification directe à chaque déploiement du site.
-              </p>
-
-              <div className="flex items-center gap-2 mt-3">
-                <button
-                  type="button"
-                  onClick={handleEnableNotifications}
-                  className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 text-white font-bold text-xs shadow-md hover:shadow-cyan-500/30 flex items-center gap-1.5 transition-all"
-                >
-                  <Check size={14} />
-                  <span>Activer</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleDismissAdminPrompt}
-                  className="px-2.5 py-1.5 rounded-xl text-gray-400 hover:text-white text-xs transition-colors"
-                >
-                  Plus tard
-                </button>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={handleDismissAdminPrompt}
-              className="p-1 rounded-lg hover:bg-white/10 text-gray-400 hover:text-white transition-colors flex-shrink-0"
-              aria-label="Fermer"
-            >
-              <X size={16} />
-            </button>
           </div>
         </aside>
       )}

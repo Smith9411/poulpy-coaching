@@ -14,8 +14,6 @@ import {
   ArrowRight,
   Play,
   Pause,
-  Volume2,
-  VolumeX,
 } from "lucide-react";
 
 if (typeof window !== "undefined") {
@@ -81,14 +79,6 @@ function PillarLargeVideo({
     }
   };
 
-  const toggleMute = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const video = videoRef.current;
-    if (!video) return;
-    video.muted = !video.muted;
-    setIsMuted(video.muted);
-  };
-
   const handleTimeUpdate = () => {
     if (videoRef.current) {
       setCurrentTime(videoRef.current.currentTime);
@@ -129,34 +119,17 @@ function PillarLargeVideo({
         className="w-full h-full object-cover"
       />
 
-      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent pointer-events-none" />
+      {/* CRT Old TV Scanlines Texture Overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none z-[5]"
+        style={{
+          background:
+            "repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.45) 0px, rgba(0, 0, 0, 0.45) 2px, transparent 2px, transparent 4px)",
+        }}
+        aria-hidden="true"
+      />
 
-      {/* Top telemetry tag */}
-      <div className="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none z-10">
-        <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[9px] font-mono">
-          <span className={`w-2 h-2 rounded-full ${isAcid ? "bg-[#CA1C30]" : "bg-[#00B4A0]"} animate-pulse`} />
-          <span className="text-white/90 font-bold uppercase tracking-wider">EXTRAIT VOD // 1080P</span>
-        </div>
-
-        {/* Audio Toggle Button */}
-        <button
-          type="button"
-          onClick={toggleMute}
-          className="pointer-events-auto bg-black/60 backdrop-blur-md hover:bg-white/20 px-3 py-1 rounded-full text-white text-[10px] flex items-center gap-1.5 transition-colors cursor-pointer"
-        >
-          {isMuted ? (
-            <>
-              <VolumeX className="w-3 h-3 text-white/60" />
-              <span className="text-[9px] font-mono text-white/60">MUET</span>
-            </>
-          ) : (
-            <>
-              <Volume2 className={`w-3 h-3 ${isAcid ? "text-[#CA1C30]" : "text-[#00B4A0]"}`} />
-              <span className={`text-[9px] font-mono font-bold ${isAcid ? "text-[#CA1C30]" : "text-[#00B4A0]"}`}>SON ACTIF</span>
-            </>
-          )}
-        </button>
-      </div>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent pointer-events-none z-[6]" />
 
       {/* Play/Pause center overlay if manually paused */}
       {!isPlaying && (
