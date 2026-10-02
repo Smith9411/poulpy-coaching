@@ -425,16 +425,6 @@ export default function Booking() {
                       {/* Corner Brackets */}
                       <CornerBrackets color="coral" />
 
-                      {/* Dynamic Spotlight Follower */}
-                      {proTilt.isHovered && (
-                        <div
-                          className="absolute inset-0 pointer-events-none transition-opacity duration-200"
-                          style={{
-                            background: `radial-gradient(circle 280px at ${proTilt.mousePos.x}% ${proTilt.mousePos.y}%, rgba(202, 28, 48, 0.16), transparent 80%)`,
-                          }}
-                        />
-                      )}
-
                       <div className="space-y-5 relative z-10" style={{ transform: "translateZ(8px)" }}>
                         {/* Top Badges */}
                         <div className="flex items-center justify-between border-b border-white/10 pb-4">
@@ -595,15 +585,6 @@ export default function Booking() {
                             : "bg-[#121117] border-white/15 hover:border-white/30"
                         }`}
                       >
-                        {sessionTilt.isHovered && (
-                          <div
-                            className="absolute inset-0 pointer-events-none transition-opacity duration-200"
-                            style={{
-                              background: `radial-gradient(circle 200px at ${sessionTilt.mousePos.x}% ${sessionTilt.mousePos.y}%, rgba(245, 244, 240, 0.1), transparent 80%)`,
-                            }}
-                          />
-                        )}
-
                         <div className="space-y-3 relative z-10" style={{ transform: "translateZ(6px)" }}>
                           <div className="flex items-center justify-between border-b border-white/10 pb-2">
                             <span className="bg-[#F5F4F0]/15 text-[#F5F4F0] text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest border border-[#F5F4F0]/30">
@@ -687,15 +668,6 @@ export default function Booking() {
                             : "bg-[#121117] border-white/15 hover:border-white/30"
                         }`}
                       >
-                        {perfTilt.isHovered && (
-                          <div
-                            className="absolute inset-0 pointer-events-none transition-opacity duration-200"
-                            style={{
-                              background: `radial-gradient(circle 200px at ${perfTilt.mousePos.x}% ${perfTilt.mousePos.y}%, rgba(0, 180, 160, 0.15), transparent 80%)`,
-                            }}
-                          />
-                        )}
-
                         <div className="space-y-3 relative z-10" style={{ transform: "translateZ(6px)" }}>
                           <div className="flex items-center justify-between border-b border-white/10 pb-2">
                             <span className="bg-[#00B4A0]/20 text-[#00B4A0] text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-widest">
