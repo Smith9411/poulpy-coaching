@@ -97,9 +97,6 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
         {/* Section Header with Minimal Game Selectors */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-8">
           <div className="space-y-2">
-            <span className="data-badge data-badge-laser">
-              <DecryptedText text="DISCIPLINES // PROGRAMMES" />
-            </span>
             <h2 className="text-3xl sm:text-5xl font-display text-[#F5F4F0] tracking-wider">
               JEUX &amp; <span className="text-[#CA1C30]">PÔLES D&apos;EXCELLENCE</span>
             </h2>
