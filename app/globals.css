@@ -495,17 +495,18 @@ html.light .bg-black {
 }
 
 html.light .fade-top-gradient {
-  background: linear-gradient(to bottom, #F4EFE6 0%, rgba(244, 239, 230, 0.8) 50%, #F4EFE6 100%) !important;
+  display: none !important;
+  background: none !important;
+  opacity: 0 !important;
 }
 
-.methodology-card {
-  box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+html.light [class*="shadow-black"] {
+  --tw-shadow-color: rgba(60, 45, 30, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(60, 45, 30, 0.06) !important;
 }
 
 /* Cartes principales et panneaux : crème soyeux (#EDE5D8) */
 html.light .reticle-box,
-html.light .methodology-card,
 html.light [class*="bg-[#121117]"],
 html.light [class*="bg-[#132426]"],
 html.light [class*="bg-[#13161e]"],
@@ -517,14 +518,6 @@ html.light .bg-black\/90 {
   border-color: rgba(60, 45, 30, 0.12) !important;
   box-shadow: 0 4px 20px rgba(60, 45, 30, 0.06) !important;
   color: #1C1917 !important;
-}
-
-html.light .methodology-card {
-  box-shadow: 0 4px 25px rgba(60, 45, 30, 0.06), 0 -2px 10px rgba(60, 45, 30, 0.04) !important;
-}
-
-html.light [class*="shadow-[0_-20px_50px"] {
-  box-shadow: none !important;
 }
 
 /* Direct Booking Components rules in light mode */

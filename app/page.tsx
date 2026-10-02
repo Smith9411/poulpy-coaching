@@ -56,7 +56,7 @@ export default function CybercorePoulpyPage() {
       <div className="bg-[#121417] relative z-20">
         {/* Extended smooth fade (~200px) stretching down to just above the cards */}
         <div
-          className="absolute top-0 left-0 right-0 h-48 sm:h-56 bg-gradient-to-b from-[#0A1C1D] via-[#0A1C1D]/60 via-30% via-[#121417]/90 via-75% to-[#121417] pointer-events-none z-30"
+          className="fade-top-gradient absolute top-0 left-0 right-0 h-48 sm:h-56 bg-gradient-to-b from-[#0A1C1D] via-[#0A1C1D]/60 via-30% via-[#121417]/90 via-75% to-[#121417] pointer-events-none z-30"
           aria-hidden="true"
         />
 
