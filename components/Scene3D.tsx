@@ -64,12 +64,14 @@ export default function Scene3D() {
       const verticalWaves = new Float32Array(PARTICLE_COUNT);
       const isPollen = new Uint8Array(PARTICLE_COUNT);
 
-      // Japanese Koi Vinyl Palette (#CA1C30, #00B4A0, #064E48, #5EEAD4, #0B0A0D)
-      const cKoiRed = new THREE.Color(0xca1c30);      // 1. Japanese Koi Scarlet Red (Center Core)
+      // Oceanic Cyber Palette with Rich Azure / Cyan / Seafoam Harmony & Japanese Koi Red Accents
+      const cKoiRed = new THREE.Color(0xca1c30);      // Japanese Koi Scarlet Red (Accent)
       const cKoiRedLight = new THREE.Color(0xff4655); // Luminous Koi Spark
-      const cSeafoam = new THREE.Color(0x00b4a0);     // 2. Aquamarine Seafoam (Vinyl Ripples)
-      const cPetrol = new THREE.Color(0x064e48);      // 3. Deep Petrol Ocean Teal
-      const cWashi = new THREE.Color(0x5eead4);       // 4. Japanese Washi Cream
+      const cElectricCyan = new THREE.Color(0x00e5ff); // Vibrant Electric Cyan Glow
+      const cDeepAzure = new THREE.Color(0x0ea5e9);   // Deep Cosmic Blue
+      const cSeafoam = new THREE.Color(0x00b4a0);     // Aquamarine Seafoam
+      const cPetrol = new THREE.Color(0x064e48);      // Deep Petrol Ocean Teal
+      const cWashi = new THREE.Color(0x5eead4);       // Mint Washi Light
       const cWhiteLight = new THREE.Color(0xffffff);  // Pure White Water Spore
 
       for (let i = 0; i < PARTICLE_COUNT; i++) {
@@ -96,19 +98,20 @@ export default function Scene3D() {
           positions[i * 3 + 1] = r * Math.sin(theta);
           positions[i * 3 + 2] = z;
 
-          // Koi Red in center core, Bleu-Vert / Seafoam & Petrol in outer spirals, Washi / Mint in ambient ripples
-          let col = cKoiRed;
+          // Cosmic Cyan & Seafoam Blue-Green Dominance with Balanced Scarlet Sparks
+          let col = cSeafoam;
           if (r < 180) {
-            col = Math.random() > 0.25 ? cKoiRed : cKoiRedLight;
+            const rand = Math.random();
+            col = rand > 0.65 ? cElectricCyan : rand > 0.4 ? cSeafoam : rand > 0.25 ? cWashi : rand > 0.1 ? cKoiRedLight : cKoiRed;
           } else if (r < 320) {
             const rand = Math.random();
-            col = rand > 0.5 ? cSeafoam : rand > 0.3 ? cPetrol : rand > 0.12 ? cKoiRed : cWashi;
+            col = rand > 0.6 ? cSeafoam : rand > 0.35 ? cElectricCyan : rand > 0.2 ? cDeepAzure : rand > 0.08 ? cWashi : cKoiRedLight;
           } else if (r < 460) {
             const rand = Math.random();
-            col = rand > 0.5 ? cSeafoam : rand > 0.25 ? cWashi : cPetrol;
+            col = rand > 0.55 ? cSeafoam : rand > 0.3 ? cElectricCyan : rand > 0.15 ? cWashi : cPetrol;
           } else {
             const rand = Math.random();
-            col = rand > 0.5 ? cWashi : rand > 0.25 ? cSeafoam : cPetrol;
+            col = rand > 0.5 ? cWashi : rand > 0.25 ? cElectricCyan : cPetrol;
           }
 
           colors[i * 3] = col.r;
@@ -131,7 +134,7 @@ export default function Scene3D() {
           positions[i * 3 + 2] = z;
 
           const rand = Math.random();
-          const col = rand > 0.5 ? cSeafoam : rand > 0.3 ? cWashi : rand > 0.15 ? cWhiteLight : cKoiRedLight;
+          const col = rand > 0.5 ? cSeafoam : rand > 0.3 ? cElectricCyan : rand > 0.15 ? cWashi : rand > 0.05 ? cWhiteLight : cKoiRedLight;
           colors[i * 3] = col.r;
           colors[i * 3 + 1] = col.g;
           colors[i * 3 + 2] = col.b;
