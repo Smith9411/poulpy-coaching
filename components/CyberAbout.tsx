@@ -34,9 +34,9 @@ export default function CyberAbout({ onOpenBooking }: CyberAboutProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           {/* Left: Photo Frame with Cyber Reticles */}
           <div className="lg:col-span-5 relative">
-            <div className="group reticle-box p-3 bg-[#102A2C] rounded-3xl border border-[#CA1C30]/30 relative overflow-hidden">
+            <div className="group reticle-box p-3 bg-[#121117] rounded-3xl border border-[#CA1C30]/30 relative overflow-hidden">
               <CornerBrackets size={12} />
-              <div className="relative aspect-square w-full bg-[#0D2224] rounded-2xl overflow-hidden flex items-center justify-center">
+              <div className="relative aspect-square w-full bg-[#0B0A0D] rounded-2xl overflow-hidden flex items-center justify-center">
                 <Image
                   src="/poulpy-profile.png"
                   alt="Coach Poulpy"
@@ -45,8 +45,8 @@ export default function CyberAbout({ onOpenBooking }: CyberAboutProps) {
                   style={{ width: "100%", height: "100%" }}
                   className="object-cover filter contrast-125 transition-transform duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0D2224] via-transparent to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-[11px] bg-[#173B3E]/90 backdrop-blur-md p-2.5 rounded-xl border border-white/10">
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0B0A0D] via-transparent to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-[11px] bg-[#1A1822]/90 backdrop-blur-md p-2.5 rounded-xl border border-white/10">
                   <span className="text-[#F5F4F0] font-bold flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-[#CA1C30] animate-ping" />
                     <span className="glitch-text">STATUS: COACH EN LIGNE</span>
@@ -70,7 +70,7 @@ export default function CyberAbout({ onOpenBooking }: CyberAboutProps) {
 
             {/* Achievements Grid */}
             <div className="grid grid-cols-2 gap-3 pt-2">
-              <div className="p-4 bg-[#173B3E] border border-white/10 rounded-2xl space-y-1">
+              <div className="p-4 bg-[#1A1822] border border-white/10 rounded-2xl space-y-1">
                 <div className="text-[#CA1C30] font-bold text-xs uppercase">
                   ATHERIS ESPORT
                 </div>
@@ -79,7 +79,7 @@ export default function CyberAbout({ onOpenBooking }: CyberAboutProps) {
                 </div>
               </div>
 
-              <div className="p-4 bg-[#173B3E] border border-white/10 rounded-2xl space-y-1">
+              <div className="p-4 bg-[#1A1822] border border-white/10 rounded-2xl space-y-1">
                 <div className="text-[#00B4A0] font-bold text-xs uppercase">
                   +120 ÉLÈVES
                 </div>
@@ -88,7 +88,7 @@ export default function CyberAbout({ onOpenBooking }: CyberAboutProps) {
                 </div>
               </div>
 
-              <div className="p-4 bg-[#173B3E] border border-white/10 rounded-2xl space-y-1">
+              <div className="p-4 bg-[#1A1822] border border-white/10 rounded-2xl space-y-1">
                 <div className="text-[#F5F4F0] font-bold text-xs uppercase">
                   VOLTAIC JADE
                 </div>
@@ -97,7 +97,7 @@ export default function CyberAbout({ onOpenBooking }: CyberAboutProps) {
                 </div>
               </div>
 
-              <div className="p-4 bg-[#173B3E] border border-white/10 rounded-2xl space-y-1">
+              <div className="p-4 bg-[#1A1822] border border-white/10 rounded-2xl space-y-1">
                 <div className="text-[#00B4A0] font-bold text-xs uppercase">
                   IMMO 2 / PREDATOR
                 </div>

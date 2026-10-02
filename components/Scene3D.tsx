@@ -17,7 +17,7 @@ export default function Scene3D() {
 
       // 1. Scene, Fog, Camera, Renderer
       const scene = new THREE.Scene();
-      scene.fog = new THREE.FogExp2(0x0A1C1D, 0.0008);
+      scene.fog = new THREE.FogExp2(0x0B0A0D, 0.0008);
 
       const width = window.innerWidth;
       const height = window.innerHeight;
@@ -32,7 +32,7 @@ export default function Scene3D() {
       });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
       renderer.setSize(width, height);
-      renderer.setClearColor(0x0A1C1D, 0);
+      renderer.setClearColor(0x0B0A0D, 0);
       mount.appendChild(renderer.domElement);
 
       // 2. Procedural Soft Glow Droplet Texture (In-memory, 0ms latency)

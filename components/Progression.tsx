@@ -142,7 +142,7 @@ export default function Progression() {
           </div>
 
           {/* Tab Switchers */}
-          <div className="flex items-center gap-2 border border-white/15 bg-[#102A2C] p-1">
+          <div className="flex items-center gap-2 border border-white/15 bg-[#121117] p-1">
             {(["global", "valorant", "apex"] as const).map((key) => {
               const active = activeTab === key;
               return (
@@ -163,7 +163,7 @@ export default function Progression() {
         </div>
 
         {/* Analytics Brutalist Frame */}
-        <div className="reticle-box bg-[#102A2C] border border-white/10 overflow-hidden">
+        <div className="reticle-box bg-[#121117] border border-white/10 overflow-hidden">
           {/* Terminal Sub-header */}
           <div className="px-6 py-3 border-b border-white/10 bg-black/80 flex flex-wrap items-center justify-between text-xs text-white/40 gap-4">
             <div className="flex items-center gap-3">

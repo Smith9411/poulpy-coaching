@@ -35,7 +35,7 @@ export default function CyberVODScrubber() {
   ];
 
   return (
-    <div className="reticle-box p-6 sm:p-8 bg-[#102A2C] space-y-6">
+    <div className="reticle-box p-6 sm:p-8 bg-[#121117] space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[rgba(255,255,255,0.08)] pb-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-xs font-mono">

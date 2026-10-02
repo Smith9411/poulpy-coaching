@@ -6,9 +6,9 @@
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
-  --black: #0A1C1D;
-  --dark-1: #102A2C;
-  --dark-2: #173B3E;
+  --black: #0B0A0D;
+  --dark-1: #121117;
+  --dark-2: #1A1822;
   --dark-3: #064E48;
   
   /* 1. Primary Accent: VCT Champions Crimson Vermilion Red */
@@ -56,7 +56,7 @@
 }
 
 html {
-  background-color: #0A1C1D;
+  background-color: #0B0A0D;
   color: #F5F4F0;
   max-width: 100%;
 }
@@ -64,7 +64,7 @@ html {
 body {
   margin: 0;
   padding: 0;
-  background-color: #0A1C1D;
+  background-color: #0B0A0D;
   color: #F5F4F0;
   min-height: 100vh;
   max-width: 100%;
@@ -486,7 +486,7 @@ html.light .scanlines-overlay {
 html.light main,
 html.light .theme-canvas,
 html.light .theme-section-wrapper,
-html.light [class*="bg-[#0A1C1D]"],
+html.light [class*="bg-[#0B0A0D]"],
 html.light [class*="bg-[#060606]"],
 html.light [class*="bg-[#121417]"],
 html.light .bg-black {
@@ -501,10 +501,10 @@ html.light .fade-top-gradient {
 /* Cartes principales et panneaux : crème soyeux (#EDE5D8) */
 html.light .reticle-box,
 html.light [class*="bg-[#121117]"],
-html.light [class*="bg-[#132426]"],
+html.light [class*="bg-[#121117]"],
 html.light [class*="bg-[#13161e]"],
-html.light [class*="bg-[#102A2C]"],
-html.light [class*="bg-[#173B3E]"],
+html.light [class*="bg-[#121117]"],
+html.light [class*="bg-[#1A1822]"],
 html.light .bg-black\/95,
 html.light .bg-black\/90 {
   background-color: #EDE5D8 !important;
@@ -552,11 +552,9 @@ html.light .booking-checklist-item {
 }
 
 /* Vignettes secondaires, métriques, options, checklists et cartes internes : crème taupe (#DFD7C4) */
-html.light [class*="bg-[#0D2224]"],
 html.light [class*="bg-[#0B0A0D]"],
 html.light [class*="bg-[#1A1822]"],
-html.light [class*="bg-[#173B3E]"],
-html.light [class*="bg-[#1B3235]"],
+html.light [class*="bg-[#1A1822]"],
 html.light [class*="bg-[#090C12]"],
 html.light [class*="bg-[#0c0f15]"],
 html.light [class*="bg-[#0d1017]"],

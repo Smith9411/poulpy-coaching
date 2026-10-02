@@ -74,7 +74,7 @@ export default function CyberFooter() {
       {/* Interactive Modal: CGV / Terms of Service */}
       {legalModal === "cgv" && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md font-mono">
-          <div className="relative w-full max-w-2xl bg-[#102A2C] border border-[#CA1C30]/50 shadow-[0_0_60px_rgba(0,0,0,0.9)] p-6 sm:p-8 space-y-6 max-h-[85vh] overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-[#121117] border border-[#CA1C30]/50 shadow-[0_0_60px_rgba(0,0,0,0.9)] p-6 sm:p-8 space-y-6 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div className="flex items-center gap-2">
                 <FileText className="w-4 h-4 text-[#CA1C30]" />
@@ -135,7 +135,7 @@ export default function CyberFooter() {
       {/* Interactive Modal: Privacy Policy / RGPD */}
       {legalModal === "privacy" && (
         <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md font-mono">
-          <div className="relative w-full max-w-2xl bg-[#102A2C] border border-[#00B4A0]/50 shadow-[0_0_60px_rgba(0,0,0,0.9)] p-6 sm:p-8 space-y-6 max-h-[85vh] overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-[#121117] border border-[#00B4A0]/50 shadow-[0_0_60px_rgba(0,0,0,0.9)] p-6 sm:p-8 space-y-6 max-h-[85vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-white/10 pb-4">
               <div className="flex items-center gap-2">
                 <Lock className="w-4 h-4 text-[#00B4A0]" />

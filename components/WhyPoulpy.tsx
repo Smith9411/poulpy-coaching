@@ -347,7 +347,7 @@ export default function WhyPoulpy() {
           return (
             <div
               key={item.num}
-              className="w-[92vw] sm:w-[860px] lg:w-[980px] xl:w-[1060px] h-[520px] sm:h-[540px] shrink-0 rounded-3xl bg-[#102A2C]/70 backdrop-blur-md p-8 sm:p-10 lg:p-12 flex flex-col justify-between transition-colors relative shadow-2xl shadow-black/80 overflow-hidden"
+              className="w-[92vw] sm:w-[860px] lg:w-[980px] xl:w-[1060px] h-[520px] sm:h-[540px] shrink-0 rounded-3xl bg-[#121117]/70 backdrop-blur-md p-8 sm:p-10 lg:p-12 flex flex-col justify-between transition-colors relative shadow-2xl shadow-black/80 overflow-hidden"
             >
               {/* Header inside module */}
               <div className="flex items-center justify-between border-b border-white/10 pb-4">
