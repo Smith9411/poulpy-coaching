@@ -402,38 +402,8 @@ export default function WhyPoulpy() {
     >
       <div
         ref={pinnedContainerRef}
-        className="relative w-full h-screen overflow-hidden flex flex-col justify-between pt-14 sm:pt-16 pb-6 sm:pb-8"
+        className="relative w-full h-screen overflow-hidden flex flex-col justify-between pt-8 sm:pt-12 pb-6 sm:pb-8"
       >
-      {/* Top Header */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 flex flex-wrap items-center justify-between gap-4 pb-2 z-20">
-        <div className="flex items-center gap-3">
-          <span className="text-[#CA1C30] font-bold text-xs tracking-widest uppercase flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#CA1C30]" />
-            <DecryptedText text="03 PILIERS D'ENTRAÎNEMENT // EXTRAITS VIDÉO" />
-          </span>
-        </div>
-
-        {/* Pillar Jump Index */}
-        <div className="flex items-center gap-2 text-xs">
-          {pillars.map((p, idx) => (
-            <button
-              key={p.num}
-              ref={(el) => {
-                if (el) pillBtnsRef.current[idx] = el;
-              }}
-              onClick={() => goToCard(idx)}
-              className={`px-4 py-1.5 text-[11px] font-mono font-bold rounded-full transition-all cursor-pointer ${
-                idx === 0
-                  ? "bg-[#CA1C30] text-black shadow-[0_0_15px_rgba(202, 28, 48,0.4)]"
-                  : "text-white/50 hover:text-white bg-white/5 hover:bg-white/10"
-              }`}
-            >
-              PILIER {p.num}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Large Rectangular Horizontal Sliding Track */}
       <div
         ref={trackRef}
