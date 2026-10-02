@@ -135,7 +135,7 @@ export default function Methodology() {
                   zIndex: 10 + index,
                 }}
               >
-                <div className="methodology-card p-8 sm:p-12 bg-[#121417]/95 backdrop-blur-xl rounded-3xl transition-all duration-300 space-y-8">
+                <div className="methodology-card p-8 sm:p-12 bg-[#102A2C]/95 backdrop-blur-xl rounded-3xl transition-all duration-300 space-y-8">
                   {/* Top Phase Header Row */}
                   <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
                     <div className="flex items-center gap-3">

@@ -51,7 +51,7 @@ export default function CyberMedia() {
               className={`px-6 py-2.5 text-xs font-bold uppercase rounded-full border transition-all flex items-center gap-2 cursor-pointer ${
                 platform === "youtube"
                   ? "bg-[#CA1C30] text-black border-[#CA1C30] shadow-[0_0_20px_rgba(202, 28, 48,0.4)]"
-                  : "bg-[#121117] text-[#F5F4F0]/60 border-white/15 hover:border-white/40"
+                  : "bg-[#102A2C] text-[#F5F4F0]/60 border-white/15 hover:border-white/40"
               }`}
             >
               <YoutubeIcon className="w-4 h-4" />
@@ -63,7 +63,7 @@ export default function CyberMedia() {
               className={`px-6 py-2.5 text-xs font-bold uppercase rounded-full border transition-all flex items-center gap-2 cursor-pointer ${
                 platform === "twitch"
                   ? "bg-[#9146FF] text-white border-[#9146FF] shadow-[0_0_20px_rgba(145,70,255,0.4)]"
-                  : "bg-[#121117] text-[#F5F4F0]/60 border-white/15 hover:border-white/40"
+                  : "bg-[#102A2C] text-[#F5F4F0]/60 border-white/15 hover:border-white/40"
               }`}
             >
               <TwitchIcon className="w-4 h-4" />
@@ -73,9 +73,9 @@ export default function CyberMedia() {
         </div>
 
         {/* Video Player Frame with Cybercore Reticles */}
-        <div className="reticle-box p-3 sm:p-4 bg-[#121117] rounded-3xl border border-white/15 relative shadow-[0_10px_40px_rgba(0,0,0,0.8)] overflow-hidden">
+        <div className="reticle-box p-3 sm:p-4 bg-[#102A2C] rounded-3xl border border-white/15 relative shadow-[0_10px_40px_rgba(0,0,0,0.8)] overflow-hidden">
           {/* Top Status Bar */}
-          <div className="flex items-center justify-between px-4 py-2.5 bg-[#1A1822] rounded-xl border border-white/5 mb-3 text-[11px]">
+          <div className="flex items-center justify-between px-4 py-2.5 bg-[#173B3E] rounded-xl border border-white/5 mb-3 text-[11px]">
             <div className="flex items-center gap-2.5">
               <span className="relative flex h-2 w-2">
                 <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${platform === "youtube" ? "bg-[#CA1C30]" : "bg-purple-500"}`} />

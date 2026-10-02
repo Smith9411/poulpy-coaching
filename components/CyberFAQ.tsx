@@ -57,8 +57,8 @@ export default function CyberFAQ() {
                 key={idx}
                 className={`reticle-box rounded-2xl transition-all duration-200 overflow-hidden ${
                   isOpen
-                    ? "border-[#CA1C30]/50 bg-[#121117]"
-                    : "border-white/10 bg-[#1A1822] hover:border-white/20"
+                    ? "border-[#CA1C30]/50 bg-[#102A2C]"
+                    : "border-white/10 bg-[#173B3E] hover:border-white/20"
                 }`}
               >
                 <button

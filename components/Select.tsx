@@ -69,7 +69,7 @@ export default function Select({ value, onChange, options, placeholder = 'Sélec
         type="button"
         onClick={() => !disabled && setIsOpen((v) => !v)}
         disabled={disabled}
-        className={`w-full px-4 py-3 bg-[#121117] border text-left flex items-center justify-between gap-2 transition-all cursor-pointer ${
+        className={`w-full px-4 py-3 bg-[#102A2C] border text-left flex items-center justify-between gap-2 transition-all cursor-pointer ${
           value ? colors.selected : 'border-white/15 text-white/60 hover:border-white/30'
         } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
@@ -89,7 +89,7 @@ export default function Select({ value, onChange, options, placeholder = 'Sélec
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.12 }}
-            className="absolute left-0 right-0 top-full z-[100] max-h-64 overflow-y-auto bg-[#121117] border border-white/20 shadow-[0_10px_30px_rgba(0,0,0,0.9)] mt-1"
+            className="absolute left-0 right-0 top-full z-[100] max-h-64 overflow-y-auto bg-[#102A2C] border border-white/20 shadow-[0_10px_30px_rgba(0,0,0,0.9)] mt-1"
           >
             {options.map((opt) => {
               const isSelected = opt.value === value;

@@ -111,7 +111,7 @@ export default function CyberTestimonials() {
               <button
                 onClick={prevReview}
                 aria-label="Avis précédent"
-                className="w-10 h-10 border border-white/20 bg-[#121117] rounded-full flex items-center justify-center hover:border-[#CA1C30] hover:text-[#CA1C30] transition-colors cursor-pointer"
+                className="w-10 h-10 border border-white/20 bg-[#102A2C] rounded-full flex items-center justify-center hover:border-[#CA1C30] hover:text-[#CA1C30] transition-colors cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -121,7 +121,7 @@ export default function CyberTestimonials() {
               <button
                 onClick={nextReview}
                 aria-label="Avis suivant"
-                className="w-10 h-10 border border-white/20 bg-[#121117] rounded-full flex items-center justify-center hover:border-[#CA1C30] hover:text-[#CA1C30] transition-colors cursor-pointer"
+                className="w-10 h-10 border border-white/20 bg-[#102A2C] rounded-full flex items-center justify-center hover:border-[#CA1C30] hover:text-[#CA1C30] transition-colors cursor-pointer"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -131,7 +131,7 @@ export default function CyberTestimonials() {
 
         {/* Infinite Live Ticker Bar (Never pauses on hover) */}
         {marqueeItems.length > 0 && (
-          <div className="overflow-hidden border-y border-white/10 py-3.5 bg-[#121117]/80 relative rounded-full">
+          <div className="overflow-hidden border-y border-white/10 py-3.5 bg-[#102A2C]/80 relative rounded-full">
             <div className="animate-marquee gap-8 text-xs font-mono tracking-wider">
               {marqueeItems.map((r, i) => {
                 const parsed = parseRank(r.rank);
@@ -158,7 +158,7 @@ export default function CyberTestimonials() {
             <span className="text-xs">Chargement des avis vérifiés...</span>
           </div>
         ) : reviews.length === 0 ? (
-          <div className="py-16 text-center text-[#F5F4F0]/40 space-y-3 bg-[#121117] border border-white/10 rounded-2xl p-8">
+          <div className="py-16 text-center text-[#F5F4F0]/40 space-y-3 bg-[#102A2C] border border-white/10 rounded-2xl p-8">
             <MessageSquare className="w-8 h-8 text-white/20 mx-auto" />
             <p className="text-sm text-[#F5F4F0]/70 font-bold">AUCUN AVIS SÉLECTIONNÉ</p>
             <p className="text-xs text-[#F5F4F0]/40">
@@ -169,7 +169,7 @@ export default function CyberTestimonials() {
           <div className="relative min-h-[340px]">
             <div
               key={current.id}
-              className="reticle-box p-8 sm:p-12 bg-[#121117]/95 border border-white/10 rounded-3xl space-y-8 relative overflow-hidden transition-all duration-300 shadow-[0_0_30px_rgba(0,0,0,0.8)]"
+              className="reticle-box p-8 sm:p-12 bg-[#102A2C]/95 border border-white/10 rounded-3xl space-y-8 relative overflow-hidden transition-all duration-300 shadow-[0_0_30px_rgba(0,0,0,0.8)]"
             >
               <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-6 relative z-10">
                 <div className="flex items-center gap-3">
@@ -200,17 +200,17 @@ export default function CyberTestimonials() {
 
               {/* Progression Badges */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-white/10 relative z-10">
-                <div className="p-3.5 bg-[#1A1822] border border-white/5 rounded-2xl space-y-1">
+                <div className="p-3.5 bg-[#173B3E] border border-white/5 rounded-2xl space-y-1">
                   <span className="text-[10px] text-[#F5F4F0]/50 block">RANG INITIAL</span>
                   <span className="text-base font-bold text-[#F5F4F0]/60">{currentParsed.before}</span>
                 </div>
 
-                <div className="p-3.5 bg-[#1A1822] border border-white/5 rounded-2xl space-y-1">
+                <div className="p-3.5 bg-[#173B3E] border border-white/5 rounded-2xl space-y-1">
                   <span className="text-[10px] text-[#F5F4F0]/50 block">RANG ATTEINT / ACTUEL</span>
                   <span className="text-base font-bold text-[#00B4A0]">{currentParsed.after}</span>
                 </div>
 
-                <div className="p-3.5 bg-[#1A1822] border border-white/5 rounded-2xl space-y-1">
+                <div className="p-3.5 bg-[#173B3E] border border-white/5 rounded-2xl space-y-1">
                   <span className="text-[10px] text-[#F5F4F0]/50 block">STATUT DE VALIDATION</span>
                   <span className="text-base font-bold text-[#CA1C30]">{currentParsed.gain}</span>
                 </div>
@@ -223,7 +223,7 @@ export default function CyberTestimonials() {
         <div className="text-center pt-2">
           <Link
             href="/avis"
-            className="inline-flex items-center justify-center gap-2 text-xs py-3.5 px-8 bg-[#121117] border border-white/15 hover:border-[#CA1C30] rounded-full text-[#F5F4F0] hover:text-white transition-all font-mono tracking-widest uppercase shadow-md group w-full sm:w-auto"
+            className="inline-flex items-center justify-center gap-2 text-xs py-3.5 px-8 bg-[#102A2C] border border-white/15 hover:border-[#CA1C30] rounded-full text-[#F5F4F0] hover:text-white transition-all font-mono tracking-widest uppercase shadow-md group w-full sm:w-auto"
           >
             <span>CONSULTER LES AVIS</span>
             <ArrowUpRight className="w-4 h-4 text-[#CA1C30] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform shrink-0" />

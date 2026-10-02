@@ -137,7 +137,7 @@ export default function CyberRadarChart() {
   }, []);
 
   return (
-    <div className="reticle-box p-6 bg-[#121117] space-y-4">
+    <div className="reticle-box p-6 bg-[#102A2C] space-y-4">
       <div className="flex items-center justify-between border-b border-white/5 pb-3">
         <span className="text-xs font-mono font-bold text-[#F5F4F0]">
           <DecryptedText text="PROFIL MULTI-AXES // RADAR" />

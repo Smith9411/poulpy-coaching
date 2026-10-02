@@ -91,7 +91,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in font-mono">
-      <div className="relative w-full max-w-md bg-[#121117] border border-[#CA1C30]/40 shadow-[0_0_50px_rgba(0,0,0,0.9)] p-6 sm:p-8 space-y-6 rounded-3xl">
+      <div className="relative w-full max-w-md bg-[#102A2C] border border-[#CA1C30]/40 shadow-[0_0_50px_rgba(0,0,0,0.9)] p-6 sm:p-8 space-y-6 rounded-3xl">
         {/* Corner Reticle Accents */}
         <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-[#CA1C30]" />
         <div className="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-[#CA1C30]" />
@@ -118,7 +118,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         </div>
 
         {/* Mode Switch Tabs */}
-        <div className="grid grid-cols-2 gap-2 border border-white/10 p-1 bg-[#0B0A0D] text-xs rounded-xl">
+        <div className="grid grid-cols-2 gap-2 border border-white/10 p-1 bg-[#0D2224] text-xs rounded-xl">
           <button
             type="button"
             onClick={() => { setMode("login"); setError(null); }}
@@ -203,7 +203,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="ex: PoulpyViper"
-                className="w-full p-2.5 bg-[#0B0A0D] border border-white/15 text-xs text-[#F5F4F0] placeholder-white/25 focus:border-[#00B4A0] focus:outline-none transition-colors rounded-xl"
+                className="w-full p-2.5 bg-[#0D2224] border border-white/15 text-xs text-[#F5F4F0] placeholder-white/25 focus:border-[#00B4A0] focus:outline-none transition-colors rounded-xl"
               />
             </div>
           )}
@@ -219,7 +219,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="joueur@domaine.com"
-              className="w-full p-2.5 bg-[#0B0A0D] border border-white/15 text-xs text-[#F5F4F0] placeholder-white/25 focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
+              className="w-full p-2.5 bg-[#0D2224] border border-white/15 text-xs text-[#F5F4F0] placeholder-white/25 focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
             />
           </div>
 
@@ -234,7 +234,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••••••"
-              className="w-full p-2.5 bg-[#0B0A0D] border border-white/15 text-xs text-[#F5F4F0] placeholder-white/25 focus:border-[#00B4A0] focus:outline-none transition-colors rounded-xl"
+              className="w-full p-2.5 bg-[#0D2224] border border-white/15 text-xs text-[#F5F4F0] placeholder-white/25 focus:border-[#00B4A0] focus:outline-none transition-colors rounded-xl"
             />
           </div>
 
@@ -254,7 +254,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           </button>
         </form>
 
-        <div className="p-3 bg-[#1A1822] border border-white/5 flex items-start gap-2.5 text-[10px] text-[#F5F4F0]/60 leading-normal rounded-xl">
+        <div className="p-3 bg-[#173B3E] border border-white/5 flex items-start gap-2.5 text-[10px] text-[#F5F4F0]/60 leading-normal rounded-xl">
           <span className="text-[#00B4A0] font-bold">ACCÈS :</span>
           <span>
             L&apos;espace élève débloque le calendrier de coaching, le suivi VOD en continu et les fiches KovaaK&apos;s.

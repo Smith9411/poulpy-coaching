@@ -1,0 +1,16 @@
+{
+  "coucou": {
+    "PreInvocation": [
+      {
+        "type": "command",
+        "command": "\"C:/Users/borge/AppData/Local/Coucou/coucou-hook.exe\" --agent antigravity PreInvocation"
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "\"C:/Users/borge/AppData/Local/Coucou/coucou-hook.exe\" --agent antigravity Stop"
+      }
+    ]
+  }
+}

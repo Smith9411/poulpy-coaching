@@ -352,12 +352,20 @@ export default function CyberNavbar({
                   key={link.label}
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.href)}
-                  className={`relative px-2.5 py-1.5 transition-colors tracking-wider uppercase font-semibold ${
+                  className={`relative px-3 py-1.5 rounded-full transition-colors flex items-center gap-1.5 tracking-wider uppercase font-semibold ${
                     isActive
                       ? "text-[#CA1C30]"
-                      : "text-white/70 hover:text-[#CA1C30]"
+                      : "text-white/70 hover:text-[#CA1C30] hover:bg-white/5"
                   }`}
                 >
+                  {isActive && (
+                    <motion.div
+                      layoutId="cyber-nav-active-pill"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      className="absolute inset-0 border border-[#CA1C30]/60 bg-[#CA1C30]/10 rounded-full shadow-[0_0_12px_rgba(202, 28, 48,0.25)] pointer-events-none"
+                    />
+                  )}
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-[#CA1C30] animate-pulse relative z-10" />}
                   <span className="relative z-10">{link.label}</span>
                 </a>
               );
@@ -387,7 +395,7 @@ export default function CyberNavbar({
 
               {/* Notification Dropdown Panel */}
               {notifsOpen && (
-                <div className="absolute top-full right-0 mt-2 w-80 bg-[#121117] border border-[#CA1C30]/30 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.9)] p-4 space-y-3 font-mono text-xs z-50">
+                <div className="absolute top-full right-0 mt-2 w-80 bg-[#102A2C] border border-[#CA1C30]/30 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.9)] p-4 space-y-3 font-mono text-xs z-50">
                   <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
                     <span className="text-[10px] text-[#CA1C30] font-bold tracking-wider flex items-center gap-1.5">
                       <span className="w-1.5 h-1.5 bg-[#CA1C30] animate-pulse rounded-full" />
@@ -431,7 +439,7 @@ export default function CyberNavbar({
                           key={item.id}
                           href={item.href}
                           onClick={() => setNotifsOpen(false)}
-                          className="block p-2.5 bg-[#1A1822] border border-white/5 space-y-1 hover:border-[#CA1C30]/40 transition-colors rounded-xl"
+                          className="block p-2.5 bg-[#173B3E] border border-white/5 space-y-1 hover:border-[#CA1C30]/40 transition-colors rounded-xl"
                         >
                           <div className="flex items-center justify-between">
                             <span className="text-[10px] text-[#CA1C30] font-bold flex items-center gap-1">
@@ -481,8 +489,8 @@ export default function CyberNavbar({
                 </button>
 
                 {userMenuOpen && (
-                  <div className="absolute top-full right-0 mt-2 w-60 bg-[#121117] border border-[#CA1C30]/40 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.9)] p-2 space-y-1 font-mono text-xs z-50 overflow-hidden">
-                    <div className="p-2.5 border-b border-white/10 mb-1 bg-[#1A1822] rounded-xl">
+                  <div className="absolute top-full right-0 mt-2 w-60 bg-[#102A2C] border border-[#CA1C30]/40 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.9)] p-2 space-y-1 font-mono text-xs z-50 overflow-hidden">
+                    <div className="p-2.5 border-b border-white/10 mb-1 bg-[#173B3E] rounded-xl">
                       <div className="text-[10px] text-[#F5F4F0]/40 uppercase">CONNECTÉ EN TANT QUE</div>
                       <div className="text-[#F5F4F0] font-bold truncate">{user.username}</div>
                       <div className="text-[10px] text-[#F5F4F0]/50 truncate">{user.email}</div>
@@ -591,7 +599,7 @@ export default function CyberNavbar({
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="sm:hidden bg-[#121117]/95 border-b border-white/10 backdrop-blur-lg px-6 py-6 space-y-4 font-mono text-xs overflow-hidden"
+              className="sm:hidden bg-[#102A2C]/95 border-b border-white/10 backdrop-blur-lg px-6 py-6 space-y-4 font-mono text-xs overflow-hidden"
             >
               <div className="space-y-2">
                 {navLinks.map((link) => (

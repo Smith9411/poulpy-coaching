@@ -495,14 +495,7 @@ html.light .bg-black {
 }
 
 html.light .fade-top-gradient {
-  display: none !important;
-  background: none !important;
-  opacity: 0 !important;
-}
-
-html.light [class*="shadow-black"] {
-  --tw-shadow-color: rgba(60, 45, 30, 0.08) !important;
-  box-shadow: 0 4px 20px rgba(60, 45, 30, 0.06) !important;
+  background: linear-gradient(to bottom, #F4EFE6 0%, rgba(244, 239, 230, 0.8) 50%, #F4EFE6 100%) !important;
 }
 
 /* Cartes principales et panneaux : crème soyeux (#EDE5D8) */
@@ -559,8 +552,10 @@ html.light .booking-checklist-item {
 }
 
 /* Vignettes secondaires, métriques, options, checklists et cartes internes : crème taupe (#DFD7C4) */
+html.light [class*="bg-[#0D2224]"],
 html.light [class*="bg-[#0B0A0D]"],
 html.light [class*="bg-[#1A1822]"],
+html.light [class*="bg-[#173B3E]"],
 html.light [class*="bg-[#1B3235]"],
 html.light [class*="bg-[#090C12]"],
 html.light [class*="bg-[#0c0f15]"],

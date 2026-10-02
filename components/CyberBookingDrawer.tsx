@@ -50,7 +50,7 @@ export default function CyberBookingDrawer({ isOpen, onClose }: CyberBookingDraw
       onClick={onClose}
     >
       <div
-        className="max-w-2xl w-full bg-[#121117] border border-[#CA1C30]/35 rounded-2xl p-6 sm:p-10 reticle-box space-y-6 relative shadow-[0_20px_60px_rgba(0,0,0,0.9)]"
+        className="max-w-2xl w-full bg-[#102A2C] border border-[#CA1C30]/35 rounded-2xl p-6 sm:p-10 reticle-box space-y-6 relative shadow-[0_20px_60px_rgba(0,0,0,0.9)]"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -101,7 +101,7 @@ export default function CyberBookingDrawer({ isOpen, onClose }: CyberBookingDraw
                     className={`p-4 rounded-xl border cursor-pointer transition-all space-y-2 ${
                       isSelected
                         ? "border-[#CA1C30] bg-[#CA1C30]/10 shadow-[0_0_20px_rgba(202, 28, 48,0.25)]"
-                        : "border-white/10 bg-[#1A1822] hover:border-white/30"
+                        : "border-white/10 bg-[#173B3E] hover:border-white/30"
                     }`}
                   >
                     <div className="flex items-center justify-between text-[11px] font-bold">
@@ -130,7 +130,7 @@ export default function CyberBookingDrawer({ isOpen, onClose }: CyberBookingDraw
                 <select
                   value={game}
                   onChange={(e) => setGame(e.target.value)}
-                  className="w-full bg-[#0B0A0D] border border-white/15 rounded-xl px-3 py-2.5 text-xs text-[#F5F4F0] font-mono outline-none focus:border-[#CA1C30] transition-colors"
+                  className="w-full bg-[#0D2224] border border-white/15 rounded-xl px-3 py-2.5 text-xs text-[#F5F4F0] font-mono outline-none focus:border-[#CA1C30] transition-colors"
                 >
                   <option value="Valorant">VALORANT (RIOT GAMES)</option>
                   <option value="Apex Legends">APEX LEGENDS (EA)</option>
@@ -147,7 +147,7 @@ export default function CyberBookingDrawer({ isOpen, onClose }: CyberBookingDraw
                   placeholder="ex: Poulpy#0001"
                   value={discord}
                   onChange={(e) => setDiscord(e.target.value)}
-                  className="w-full bg-[#0B0A0D] border border-white/15 rounded-xl px-3 py-2.5 text-xs text-[#F5F4F0] font-mono outline-none focus:border-[#CA1C30] placeholder-white/30 transition-colors"
+                  className="w-full bg-[#0D2224] border border-white/15 rounded-xl px-3 py-2.5 text-xs text-[#F5F4F0] font-mono outline-none focus:border-[#CA1C30] placeholder-white/30 transition-colors"
                 />
               </div>
             </div>

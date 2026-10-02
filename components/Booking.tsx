@@ -355,7 +355,7 @@ export default function Booking() {
                       ? "border-[#CA1C30] bg-[#CA1C30] text-black shadow-[0_0_15px_rgba(202, 28, 48,0.35)]"
                       : isDone
                       ? "border-[#CA1C30]/50 text-[#CA1C30] bg-[#CA1C30]/10"
-                      : "border-white/10 text-white/40 bg-[#121117]"
+                      : "border-white/10 text-white/40 bg-[#102A2C]"
                   }`}
                 >
                   {s.label}
@@ -366,7 +366,7 @@ export default function Booking() {
         </div>
 
         {/* Dynamic Step Container */}
-        <div className="reticle-box p-6 sm:p-8 bg-[#121117] rounded-3xl border border-white/20 relative shadow-[0_0_50px_rgba(0,0,0,0.9)]">
+        <div className="reticle-box p-6 sm:p-8 bg-[#102A2C] rounded-3xl border border-white/20 relative shadow-[0_0_50px_rgba(0,0,0,0.9)]">
           <AnimatePresence mode="wait" initial={false}>
             {/* ======================================================== */}
             {/* STEP 1: EXACT PNG LAYOUT + DYNAMIC 3D TILT MOTION */}
@@ -416,10 +416,10 @@ export default function Booking() {
                       style={{ transformStyle: "preserve-3d" }}
                       className={`relative h-full p-7 flex flex-col justify-between transition-colors duration-200 border rounded-2xl overflow-hidden select-none ${
                         selectedPlan === "pro"
-                          ? "bg-[#1A1822] border-[#CA1C30] shadow-[0_0_35px_rgba(202, 28, 48,0.25)] ring-1 ring-[#CA1C30]"
+                          ? "bg-[#173B3E] border-[#CA1C30] shadow-[0_0_35px_rgba(202, 28, 48,0.25)] ring-1 ring-[#CA1C30]"
                           : proTilt.isHovered
-                          ? "bg-[#1A1822] border-[#CA1C30]/60 shadow-[0_0_25px_rgba(202, 28, 48,0.15)]"
-                          : "bg-[#121117] border-white/15 hover:border-white/30"
+                          ? "bg-[#173B3E] border-[#CA1C30]/60 shadow-[0_0_25px_rgba(202, 28, 48,0.15)]"
+                          : "bg-[#102A2C] border-white/15 hover:border-white/30"
                       }`}
                     >
                       {/* Corner Brackets */}
@@ -468,7 +468,7 @@ export default function Booking() {
                               className={`p-3 border rounded-xl text-left transition-all relative cursor-pointer ${
                                 !proIsPack && selectedPlan === "pro"
                                   ? "border-[#CA1C30] bg-[#CA1C30]/15 text-white shadow-[0_0_15px_rgba(202, 28, 48,0.25)] ring-1 ring-[#CA1C30]"
-                                  : "border-white/10 bg-[#0B0A0D]/80 text-[#F5F4F0]/60 hover:border-white/30 hover:text-white"
+                                  : "border-white/10 bg-[#0D2224]/80 text-[#F5F4F0]/60 hover:border-white/30 hover:text-white"
                               }`}
                             >
                               <div className="flex items-baseline justify-between">
@@ -499,7 +499,7 @@ export default function Booking() {
                               className={`p-3 border rounded-xl text-left transition-all relative overflow-hidden cursor-pointer ${
                                 proIsPack && selectedPlan === "pro"
                                   ? "border-[#CA1C30] bg-[#CA1C30]/15 text-white shadow-[0_0_15px_rgba(202, 28, 48,0.25)] ring-1 ring-[#CA1C30]"
-                                  : "border-white/10 bg-[#0B0A0D]/80 text-[#F5F4F0]/60 hover:border-white/30 hover:text-white"
+                                  : "border-white/10 bg-[#0D2224]/80 text-[#F5F4F0]/60 hover:border-white/30 hover:text-white"
                               }`}
                             >
                               <div className="absolute top-1.5 right-1.5 px-2 py-0.5 text-[8px] font-bold rounded-full bg-[#CA1C30] text-black uppercase tracking-wider">
@@ -541,7 +541,7 @@ export default function Booking() {
                               "Fiche technique de suivi Notion",
                               "Suivi Discord & progression continue",
                             ].map((feat, i) => (
-                              <div key={i} className="p-2.5 bg-[#0B0A0D] border border-white/5 rounded-xl flex items-center gap-2">
+                              <div key={i} className="p-2.5 bg-[#0D2224] border border-white/5 rounded-xl flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 rounded-full bg-[#CA1C30] shrink-0" />
                                 <span className="text-[#F5F4F0]/90 text-[11px] leading-tight">{feat}</span>
                               </div>
@@ -589,10 +589,10 @@ export default function Booking() {
                         style={{ transformStyle: "preserve-3d" }}
                         className={`relative h-full p-5 flex flex-col justify-between transition-colors duration-200 border rounded-2xl overflow-hidden select-none ${
                           selectedPlan === "session"
-                            ? "bg-[#1A1822] border-[#F5F4F0] shadow-[0_0_25px_rgba(245, 244, 240,0.2)] ring-1 ring-[#F5F4F0]"
+                            ? "bg-[#173B3E] border-[#F5F4F0] shadow-[0_0_25px_rgba(245, 244, 240,0.2)] ring-1 ring-[#F5F4F0]"
                             : sessionTilt.isHovered
-                            ? "bg-[#1A1822] border-[#F5F4F0]/50 shadow-[0_0_20px_rgba(245, 244, 240,0.1)]"
-                            : "bg-[#121117] border-white/15 hover:border-white/30"
+                            ? "bg-[#173B3E] border-[#F5F4F0]/50 shadow-[0_0_20px_rgba(245, 244, 240,0.1)]"
+                            : "bg-[#102A2C] border-white/15 hover:border-white/30"
                         }`}
                       >
                         {sessionTilt.isHovered && (
@@ -681,10 +681,10 @@ export default function Booking() {
                         style={{ transformStyle: "preserve-3d" }}
                         className={`relative h-full p-5 flex flex-col justify-between transition-colors duration-200 border rounded-2xl overflow-hidden select-none ${
                           selectedPlan === "performance"
-                            ? "bg-[#1A1822] border-[#00B4A0] shadow-[0_0_25px_rgba(0, 180, 160,0.25)] ring-1 ring-[#00B4A0]"
+                            ? "bg-[#173B3E] border-[#00B4A0] shadow-[0_0_25px_rgba(0, 180, 160,0.25)] ring-1 ring-[#00B4A0]"
                             : perfTilt.isHovered
-                            ? "bg-[#1A1822] border-[#00B4A0]/60 shadow-[0_0_20px_rgba(0, 180, 160,0.15)]"
-                            : "bg-[#121117] border-white/15 hover:border-white/30"
+                            ? "bg-[#173B3E] border-[#00B4A0]/60 shadow-[0_0_20px_rgba(0, 180, 160,0.15)]"
+                            : "bg-[#102A2C] border-white/15 hover:border-white/30"
                         }`}
                       >
                         {perfTilt.isHovered && (
@@ -724,7 +724,7 @@ export default function Booking() {
                                 className={`p-2 border rounded-xl text-left transition-all cursor-pointer ${
                                   !perfIsPack && selectedPlan === "performance"
                                     ? "border-[#00B4A0] bg-[#00B4A0]/15 text-white shadow-[0_0_12px_rgba(0, 180, 160,0.25)] ring-1 ring-[#00B4A0]"
-                                    : "border-white/10 bg-[#0B0A0D]/80 text-[#F5F4F0]/60 hover:border-white/30 hover:text-white"
+                                    : "border-white/10 bg-[#0D2224]/80 text-[#F5F4F0]/60 hover:border-white/30 hover:text-white"
                                 }`}
                               >
                                 <div className="flex items-baseline justify-between">
@@ -747,7 +747,7 @@ export default function Booking() {
                                 className={`p-2 border rounded-xl text-left transition-all relative overflow-hidden cursor-pointer ${
                                   perfIsPack && selectedPlan === "performance"
                                     ? "border-[#00B4A0] bg-[#00B4A0]/15 text-white shadow-[0_0_12px_rgba(0, 180, 160,0.25)] ring-1 ring-[#00B4A0]"
-                                    : "border-white/10 bg-[#0B0A0D]/80 text-[#F5F4F0]/60 hover:border-white/30 hover:text-white"
+                                    : "border-white/10 bg-[#0D2224]/80 text-[#F5F4F0]/60 hover:border-white/30 hover:text-white"
                                 }`}
                               >
                                 <div className="absolute top-0.5 right-1 px-1.5 py-0.5 text-[7px] font-bold rounded-full bg-[#00B4A0] text-black uppercase tracking-wider">
@@ -861,7 +861,7 @@ export default function Booking() {
                             className={`flex-shrink-0 w-24 sm:w-28 p-3 border text-center cursor-pointer transition-all flex flex-col justify-between rounded-xl ${
                               isDaySelected
                                 ? "border-[#CA1C30] bg-[#CA1C30]/15 text-[#F5F4F0] shadow-[0_0_15px_rgba(202, 28, 48,0.3)] ring-1 ring-[#CA1C30]"
-                                : "border-white/15 bg-[#1A1822] hover:border-white/40 text-[#F5F4F0]"
+                                : "border-white/15 bg-[#173B3E] hover:border-white/40 text-[#F5F4F0]"
                             }`}
                           >
                             <div>
@@ -896,7 +896,7 @@ export default function Booking() {
                     </div>
 
                     {currentDay.availableCount === 0 ? (
-                      <div className="p-6 bg-[#1A1822] border border-white/10 text-center space-y-2 rounded-2xl">
+                      <div className="p-6 bg-[#173B3E] border border-white/10 text-center space-y-2 rounded-2xl">
                         <Clock className="w-7 h-7 text-white/30 mx-auto mb-1" />
                         <h4 className="text-xs font-bold text-[#F5F4F0] uppercase tracking-wider">
                           AUCUN CRÉNEAU DISPONIBLE POUR CETTE DATE
@@ -922,7 +922,7 @@ export default function Booking() {
                                   ? "border-white/5 bg-white/[0.02] text-white/30 cursor-not-allowed line-through opacity-40"
                                   : isTimeSelected
                                   ? "border-[#CA1C30] bg-[#CA1C30] text-black font-bold shadow-[0_0_20px_rgba(202, 28, 48,0.4)] cursor-pointer"
-                                  : "border-white/15 bg-[#1A1822] hover:border-[#CA1C30]/60 text-[#F5F4F0] cursor-pointer"
+                                  : "border-white/15 bg-[#173B3E] hover:border-[#CA1C30]/60 text-[#F5F4F0] cursor-pointer"
                               }`}
                             >
                               <div className="flex items-center gap-1.5">
@@ -960,7 +960,7 @@ export default function Booking() {
 
                   {/* Selected Summary Badge */}
                   {selectedTime && (
-                    <div className="p-3 bg-[#1A1822] border border-[#CA1C30]/40 flex items-center justify-between text-xs rounded-xl">
+                    <div className="p-3 bg-[#173B3E] border border-[#CA1C30]/40 flex items-center justify-between text-xs rounded-xl">
                       <div className="flex items-center gap-3">
                         <Calendar className="w-4 h-4 text-[#CA1C30]" />
                         <span>
@@ -1053,7 +1053,7 @@ export default function Booking() {
                         placeholder="Ex: TenZ ou Thomas"
                         value={studentName}
                         onChange={(e) => setStudentName(e.target.value)}
-                        className="w-full bg-[#1A1822] border border-white/20 p-3 text-xs text-[#F5F4F0] placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
+                        className="w-full bg-[#173B3E] border border-white/20 p-3 text-xs text-[#F5F4F0] placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
                       />
                     </div>
 
@@ -1066,7 +1066,7 @@ export default function Booking() {
                         placeholder="Ex: poulpy_94 ou monpseudo#1234"
                         value={studentDiscord}
                         onChange={(e) => setStudentDiscord(e.target.value)}
-                        className="w-full bg-[#1A1822] border border-white/20 p-3 text-xs text-[#F5F4F0] placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
+                        className="w-full bg-[#173B3E] border border-white/20 p-3 text-xs text-[#F5F4F0] placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
                       />
                     </div>
 
@@ -1079,7 +1079,7 @@ export default function Booking() {
                         placeholder="Ex: contact@email.com"
                         value={studentEmail}
                         onChange={(e) => setStudentEmail(e.target.value)}
-                        className="w-full bg-[#1A1822] border border-white/20 p-3 text-xs text-[#F5F4F0] placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
+                        className="w-full bg-[#173B3E] border border-white/20 p-3 text-xs text-[#F5F4F0] placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
                       />
                     </div>
                   </div>
@@ -1093,7 +1093,7 @@ export default function Booking() {
                         <select
                           value={game}
                           onChange={(e) => setGame(e.target.value)}
-                          className="w-full bg-[#1A1822] border border-white/20 p-3 text-xs text-[#F5F4F0] focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
+                          className="w-full bg-[#173B3E] border border-white/20 p-3 text-xs text-[#F5F4F0] focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
                         >
                           <option value="Valorant">Valorant</option>
                           <option value="CS2">Counter-Strike 2</option>
@@ -1113,7 +1113,7 @@ export default function Booking() {
                           placeholder="Ex: Diamant 2, Ascendant 1"
                           value={currentRank}
                           onChange={(e) => setCurrentRank(e.target.value)}
-                          className="w-full bg-[#1A1822] border border-white/20 p-3 text-xs text-[#F5F4F0] placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
+                          className="w-full bg-[#173B3E] border border-white/20 p-3 text-xs text-[#F5F4F0] placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
                         />
                       </div>
                     </div>
@@ -1127,7 +1127,7 @@ export default function Booking() {
                         placeholder="Ex: Difficulté à monter au-delà de Diamant, perte de duels en 1v1, problème de crosshair placement..."
                         value={objective}
                         onChange={(e) => setObjective(e.target.value)}
-                        className="w-full bg-[#1A1822] border border-white/20 p-3 text-xs text-[#F5F4F0] placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors resize-none rounded-xl"
+                        className="w-full bg-[#173B3E] border border-white/20 p-3 text-xs text-[#F5F4F0] placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors resize-none rounded-xl"
                       />
                     </div>
                   </div>
@@ -1205,7 +1205,7 @@ export default function Booking() {
                   </p>
                 </div>
 
-                <div className="p-4 bg-[#1A1822] border border-white/10 text-left text-xs space-y-2 rounded-2xl">
+                <div className="p-4 bg-[#173B3E] border border-white/10 text-left text-xs space-y-2 rounded-2xl">
                   <div className="flex justify-between border-b border-white/5 pb-1.5">
                     <span className="text-[#F5F4F0]/50">Formule :</span>
                     <span className="text-[#F5F4F0] font-bold">{activePlan.name} ({activePlan.price})</span>
@@ -1221,7 +1221,7 @@ export default function Booking() {
                 </div>
 
                 {/* Discord CTA with IMPORTANT badge */}
-                <div className="relative p-5 bg-[#1A1822] border border-[#CA1C30] shadow-[0_0_25px_rgba(202, 28, 48,0.2)] text-left rounded-2xl">
+                <div className="relative p-5 bg-[#173B3E] border border-[#CA1C30] shadow-[0_0_25px_rgba(202, 28, 48,0.2)] text-left rounded-2xl">
                   {/* Badge matching the pack badges */}
                   <div className="absolute top-2 right-2 px-2 py-0.5 text-[9px] font-bold bg-[#CA1C30] text-black uppercase tracking-wider shadow-[0_0_10px_rgba(202, 28, 48,0.5)] rounded-full">
                     IMPORTANT !
