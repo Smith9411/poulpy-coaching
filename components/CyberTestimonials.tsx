@@ -95,9 +95,6 @@ export default function CyberTestimonials() {
       <div className="max-w-7xl mx-auto space-y-8 sm:space-y-10">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-8">
           <div className="space-y-2">
-            <span className="data-badge data-badge-laser">
-              <DecryptedText text="AVIS ÉLÈVES" />
-            </span>
             <h2 className="text-4xl sm:text-6xl font-display text-[#F5F4F0] tracking-wider">
               RÉSULTATS DES <span className="text-[#CA1C30]">ÉLÈVES</span>
             </h2>

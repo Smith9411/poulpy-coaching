@@ -324,9 +324,6 @@ export default function Booking() {
         {/* Top Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-white/10 pb-6">
           <div className="space-y-2">
-            <span className="data-badge data-badge-laser">
-              <DecryptedText text="MODULE DE RÉSERVATION" />
-            </span>
             <h2 className="text-3xl sm:text-5xl font-display text-[#F5F4F0] tracking-wider">
               RÉSERVE TON <span className="text-[#CA1C30]">COACHING</span>
             </h2>

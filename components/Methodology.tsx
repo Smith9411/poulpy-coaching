@@ -100,16 +100,6 @@ export default function Methodology() {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-8">
           <div className="space-y-2">
-            <div className="flex items-center gap-3">
-              <span className="data-badge data-badge-acid">
-                <DecryptedText text="MÉTHODOLOGIE D'ENTRAÎNEMENT" />
-              </span>
-              <span className="text-xs text-white/40 font-mono flex items-center gap-1.5">
-                <Layers className="w-3.5 h-3.5 text-[#CA1C30]" />
-                4 PHASES CHIRURGICALES EN EMPILAGE
-              </span>
-            </div>
-
             <h2 className="text-3xl sm:text-5xl font-display text-[#F5F4F0] tracking-wider">
               UNE MÉTHODE. PAS DE <span className="text-[#CA1C30]">RECETTE MAGIQUE.</span>
             </h2>

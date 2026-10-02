@@ -38,9 +38,6 @@ export default function CyberFAQ() {
     <section id="faq" className="py-14 sm:py-16 px-6 sm:px-12 lg:px-16 bg-transparent font-mono">
       <div className="max-w-4xl mx-auto space-y-8 sm:space-y-10">
         <div className="space-y-3 text-center">
-          <span className="data-badge data-badge-laser inline-flex">
-            <DecryptedText text="QUESTIONS FRÉQUENTES" />
-          </span>
           <h2 className="text-4xl sm:text-6xl font-display text-[#F5F4F0] tracking-wider">
             FOIRE AUX <span className="text-[#CA1C30]">QUESTIONS</span>
           </h2>

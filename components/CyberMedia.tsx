@@ -33,9 +33,6 @@ export default function CyberMedia() {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-6">
           <div className="space-y-2">
-            <span className="data-badge data-badge-laser">
-              <DecryptedText text="MÉDIAS &amp; STREAMS" />
-            </span>
             <h2 className="text-4xl sm:text-6xl font-display text-[#F5F4F0] tracking-wider">
               YOUTUBE &amp; <span className="text-[#CA1C30]">TWITCH</span>
             </h2>
