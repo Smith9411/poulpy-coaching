@@ -494,9 +494,7 @@ html.light .bg-black {
   color: #1C1917 !important;
 }
 
-html.light .fade-top-gradient,
-html.light .hero-veil,
-html.light .hero-bottom-fade {
+html.light .fade-top-gradient {
   display: none !important;
   background: none !important;
   opacity: 0 !important;

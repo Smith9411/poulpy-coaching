@@ -40,7 +40,7 @@ export default function CybercorePoulpyPage() {
   };
 
   return (
-    <main className="w-full block text-[#F5F4F0] selection:bg-[#CA1C30] selection:text-[#0B0A0D] relative z-10 overflow-x-clip bg-[#0B0A0D]">
+    <main className="w-full block text-[#F5F4F0] selection:bg-[#CA1C30] selection:text-[#0A1C1D] relative z-10 overflow-x-clip bg-[#0A1C1D]">
       {/* 3D WebGL Background Scene (Asynchronously decoupled, non-blocking) */}
       <Scene3D />
 
@@ -52,8 +52,14 @@ export default function CybercorePoulpyPage() {
         <HeroCyber onOpenBooking={scrollToBooking} />
       </div>
 
-      {/* Solid dark background starting strictly below Hero fold */}
+      {/* Solid softer dark background starting strictly below Hero fold */}
       <div className="bg-[#0B0A0D] relative z-20">
+        {/* Extended smooth fade stretching down from cyan atmosphere to dark obsidian */}
+        <div
+          className="fade-top-gradient absolute top-0 left-0 right-0 h-56 sm:h-72 bg-gradient-to-b from-[#0A1C1D] via-[#0A1C1D]/60 via-30% via-[#0B0A0D]/90 via-75% to-[#0B0A0D] pointer-events-none z-30"
+          aria-hidden="true"
+        />
+
         {/* 03. Pourquoi Poulpy (06 piliers avec défilement horizontal fluide) */}
         <WhyPoulpy />
 
