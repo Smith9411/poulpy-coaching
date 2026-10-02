@@ -129,7 +129,7 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
         </div>
 
         {/* Pure Typographic Game Content (Zero Vignettes / Zero Card Boxes) */}
-        <div className="relative min-h-[420px]">
+        <div className="relative min-h-[380px]">
           <AnimatePresence mode="wait">
             <motion.div
               key={current.id}
@@ -137,49 +137,38 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="space-y-10"
+              className="space-y-8"
             >
-              {/* Subtitle & Badge */}
-              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`w-2.5 h-2.5 rounded-full ${
-                      isAcid ? "bg-[#CA1C30] shadow-[0_0_10px_#CA1C30]" : "bg-[#00B4A0] shadow-[0_0_10px_#00B4A0]"
-                    }`}
-                  />
-                  <span className="text-xs font-mono tracking-widest text-[#F5F4F0]/70 uppercase">
-                    {current.subtitle}
-                  </span>
+              {/* Monumental Animated Title + Rank Directly Below */}
+              <div className="space-y-2 py-1">
+                <div className="overflow-hidden">
+                  <h3 className="text-5xl sm:text-7xl lg:text-8xl font-display font-bold tracking-tight text-[#F5F4F0] flex flex-wrap">
+                    {current.title.split("").map((letter, i) => (
+                      <motion.span
+                        key={`${current.id}-${i}`}
+                        custom={i}
+                        variants={letterVariants}
+                        initial="hidden"
+                        animate="visible"
+                        exit="exit"
+                        className="inline-block whitespace-pre"
+                      >
+                        {letter}
+                      </motion.span>
+                    ))}
+                  </h3>
                 </div>
 
-                <span
-                  className={`text-xs font-mono font-bold px-4 py-1.5 rounded-full ${
-                    isAcid
-                      ? "bg-[#CA1C30]/15 text-[#CA1C30] border border-[#CA1C30]/30"
-                      : "bg-[#00B4A0]/15 text-[#00B4A0] border border-[#00B4A0]/30"
-                  }`}
+                {/* Small rank in pure red without contour */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  transition={{ delay: 0.08, duration: 0.25 }}
+                  className="text-xs sm:text-sm font-mono font-bold tracking-widest uppercase text-[#CA1C30]"
                 >
                   {current.badge}
-                </span>
-              </div>
-
-              {/* Monumental Animated Title (Letter by Letter Animation) */}
-              <div className="overflow-hidden py-2">
-                <h3 className="text-5xl sm:text-7xl lg:text-8xl font-display font-bold tracking-tight text-[#F5F4F0] flex flex-wrap">
-                  {current.title.split("").map((letter, i) => (
-                    <motion.span
-                      key={`${current.id}-${i}`}
-                      custom={i}
-                      variants={letterVariants}
-                      initial="hidden"
-                      animate="visible"
-                      exit="exit"
-                      className="inline-block whitespace-pre"
-                    >
-                      {letter}
-                    </motion.span>
-                  ))}
-                </h3>
+                </motion.div>
               </div>
 
               {/* Description */}
