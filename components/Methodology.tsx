@@ -95,7 +95,7 @@ const STEPS: StepData[] = [
 
 export default function Methodology() {
   return (
-    <section id="methodology" className="py-16 sm:py-24 px-6 sm:px-12 lg:px-16 bg-transparent font-mono relative">
+    <section id="methodology" className="pt-24 sm:pt-36 pb-16 sm:pb-24 px-6 sm:px-12 lg:px-16 bg-transparent font-mono relative">
       <div className="max-w-6xl mx-auto space-y-12 sm:space-y-16 relative z-10">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-8">
@@ -103,9 +103,6 @@ export default function Methodology() {
             <h2 className="text-3xl sm:text-5xl font-display text-[#F5F4F0] tracking-wider">
               UNE MÉTHODE. PAS DE <span className="text-[#00B4A0]">RECETTE MAGIQUE.</span>
             </h2>
-            <p className="text-xs sm:text-sm text-[#F5F4F0]/60 max-w-2xl leading-relaxed">
-              Chaque phase s&apos;empile naturellement au scroll pour structurer et verrouiller ton plan de progression.
-            </p>
           </div>
         </div>
 
@@ -126,27 +123,15 @@ export default function Methodology() {
                 }}
               >
                 <div className="p-8 sm:p-12 bg-[#121417]/95 backdrop-blur-xl rounded-3xl transition-all duration-300 shadow-[0_-20px_50px_rgba(0,0,0,0.95)] space-y-8">
-                  {/* Top Phase Header Row */}
-                  <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
-                    <div className="flex items-center gap-3">
-                      <span
-                        className={`w-2.5 h-2.5 rounded-full ${
-                          isAcid ? "bg-[#CA1C30] shadow-[0_0_10px_#CA1C30]" : "bg-[#00B4A0] shadow-[0_0_10px_#00B4A0]"
-                        }`}
-                      />
-                      <span className="text-xs font-mono tracking-widest text-[#F5F4F0]/60 uppercase">
-                        PHASE {step.num} / 04 · {step.code}
-                      </span>
-                    </div>
-
+                  {/* Top Phase Header Row (Épuré sans boîte/case) */}
+                  <div className="flex items-center gap-3 border-b border-white/10 pb-4">
                     <span
-                      className={`text-xs font-mono font-bold px-4 py-1.5 rounded-full ${
-                        isAcid
-                          ? "bg-[#CA1C30]/15 text-[#CA1C30]"
-                          : "bg-[#00B4A0]/15 text-[#00B4A0]"
+                      className={`w-2.5 h-2.5 rounded-full ${
+                        isAcid ? "bg-[#CA1C30] shadow-[0_0_10px_#CA1C30]" : "bg-[#00B4A0] shadow-[0_0_10px_#00B4A0]"
                       }`}
-                    >
-                      {step.tag}
+                    />
+                    <span className="text-xs font-mono tracking-widest text-[#F5F4F0]/60 uppercase">
+                      PHASE {step.num} / 04 · {step.code}
                     </span>
                   </div>
 
@@ -187,9 +172,9 @@ export default function Methodology() {
                     </div>
                   </div>
 
-                  {/* Action Link on the last stacked phase (Phase 04) */}
+                  {/* Action Link on the last stacked phase (Phase 04) - Sans ligne au-dessus */}
                   {isLast && (
-                    <div className="pt-4 border-t border-white/10 flex items-center justify-between">
+                    <div className="pt-4 flex items-center justify-between">
                       <span className="text-xs font-mono font-bold text-white/50">
                         PROTOCOLE 100% VALIDÉ
                       </span>
