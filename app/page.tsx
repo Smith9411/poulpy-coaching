@@ -50,20 +50,24 @@ export default function CybercorePoulpyPage() {
       {/* 02. Monumental Hero Section (Transparent so 3D planet is visible) */}
       <div id="hero" className="relative z-10">
         <HeroCyber onOpenBooking={scrollToBooking} />
+
+        {/* Soft blurred bottom veil that gently feathers 3D particles into deep obsidian without harsh cuts */}
+        <div
+          className="fade-top-gradient absolute bottom-0 left-0 right-0 h-64 sm:h-80 md:h-96 pointer-events-none z-20"
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(11, 10, 13, 0) 0%, rgba(11, 10, 13, 0.15) 20%, rgba(11, 10, 13, 0.45) 45%, rgba(11, 10, 13, 0.78) 70%, rgba(11, 10, 13, 0.95) 90%, #0B0A0D 100%)",
+            backdropFilter: "blur(8px)",
+            WebkitBackdropFilter: "blur(8px)",
+            maskImage: "linear-gradient(to bottom, transparent 0%, black 30%, black 100%)",
+            WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 30%, black 100%)",
+          }}
+          aria-hidden="true"
+        />
       </div>
 
       {/* Solid softer dark background starting strictly below Hero fold */}
       <div className="bg-[#0B0A0D] relative z-20">
-        {/* Extended smooth scrim gradient placed behind cards (z-0) easing gradually from hero teal into obsidian */}
-        <div
-          className="fade-top-gradient absolute top-0 left-0 right-0 h-96 sm:h-[480px] lg:h-[560px] pointer-events-none z-0"
-          style={{
-            background:
-              "linear-gradient(to bottom, #0A1C1D 0%, #0A1B1C 12%, #0A191A 25%, #0A1718 38%, #0A1415 50%, #0B1113 62%, #0B0E10 75%, #0B0C0E 88%, #0B0A0D 100%)",
-          }}
-          aria-hidden="true"
-        />
-
         {/* 03. Pourquoi Poulpy (06 piliers avec défilement horizontal fluide) */}
         <WhyPoulpy />
 
