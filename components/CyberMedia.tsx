@@ -71,24 +71,6 @@ export default function CyberMedia() {
 
         {/* Video Player Frame with Cybercore Reticles */}
         <div className="reticle-box p-3 sm:p-4 bg-[#121117] rounded-3xl border border-white/15 relative shadow-[0_10px_40px_rgba(0,0,0,0.8)] overflow-hidden">
-          {/* Top Status Bar */}
-          <div className="flex items-center justify-between px-4 py-2.5 bg-[#1A1822] rounded-xl border border-white/5 mb-3 text-[11px]">
-            <div className="flex items-center gap-2.5">
-              <span className="relative flex h-2 w-2">
-                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${platform === "youtube" ? "bg-[#CA1C30]" : "bg-purple-500"}`} />
-                <span className={`relative inline-flex h-2 w-2 rounded-full ${platform === "youtube" ? "bg-[#CA1C30]" : "bg-purple-500"}`} />
-              </span>
-              <span className="text-[#F5F4F0] font-bold tracking-wider">
-                {platform === "youtube" ? "CANAL : YOUTUBE REPLAY · REVIEWS APEX & VALORANT" : "CANAL : TWITCH EN DIRECT · @POULPY_COACHING"}
-              </span>
-            </div>
-            <div className="hidden sm:flex items-center gap-3 text-[#F5F4F0]/40 text-[10px]">
-              <span>QUALITÉ 1080P60</span>
-              <span>•</span>
-              <span>AUDIO HI-FI</span>
-            </div>
-          </div>
-
           {/* Video Container (16:9 Aspect Ratio) */}
           <div className="relative w-full aspect-video bg-black rounded-2xl border border-white/10 overflow-hidden">
             {platform === "youtube" ? (
