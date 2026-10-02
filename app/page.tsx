@@ -54,9 +54,13 @@ export default function CybercorePoulpyPage() {
 
       {/* Solid softer dark background starting strictly below Hero fold */}
       <div className="bg-[#0B0A0D] relative z-20">
-        {/* Extended smooth fade placed behind cards (z-0) with rich teal progression transitioning smoothly into dark obsidian */}
+        {/* Extended smooth scrim gradient placed behind cards (z-0) easing gradually from hero teal into obsidian */}
         <div
-          className="fade-top-gradient absolute top-0 left-0 right-0 h-44 sm:h-56 bg-gradient-to-b from-[#0A1C1D] from-0% via-[#0A1C1D] via-25% via-[#0A1C1D]/80 via-50% via-[#0A1C1D]/40 via-75% to-[#0B0A0D] to-100% pointer-events-none z-0"
+          className="fade-top-gradient absolute top-0 left-0 right-0 h-96 sm:h-[480px] lg:h-[560px] pointer-events-none z-0"
+          style={{
+            background:
+              "linear-gradient(to bottom, #0A1C1D 0%, #0A1B1C 12%, #0A191A 25%, #0A1718 38%, #0A1415 50%, #0B1113 62%, #0B0E10 75%, #0B0C0E 88%, #0B0A0D 100%)",
+          }}
           aria-hidden="true"
         />
 
