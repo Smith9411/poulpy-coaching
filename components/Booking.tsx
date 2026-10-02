@@ -329,34 +329,37 @@ export default function Booking() {
             </h2>
           </div>
 
-          {/* Stepper Progress Badges */}
-          <div className="flex items-center gap-2">
+          {/* Stepper Progress Steps — Sleek & Épuré */}
+          <div className="flex items-center gap-3 sm:gap-4 text-xs font-mono">
             {[
               { id: 1, label: "01. FORMULE" },
               { id: 2, label: "02. CRÉNEAU" },
               { id: 3, label: "03. INFOS" },
               { id: 4, label: "04. STATUT" },
-            ].map((s) => {
+            ].map((s, idx) => {
               const isActive = step === s.id;
               const isDone = step > s.id;
               return (
-                <div
+                <button
                   key={s.id}
+                  type="button"
                   onClick={() => {
                     if (isDone) setStep(s.id);
                   }}
-                  className={`px-3.5 py-1 text-xs font-bold border rounded-full transition-all ${
+                  disabled={!isDone && !isActive}
+                  className={`transition-colors font-bold tracking-wider uppercase flex items-center gap-1.5 ${
                     isDone ? "cursor-pointer" : ""
                   } ${
                     isActive
-                      ? "border-[#CA1C30] bg-[#CA1C30] text-black shadow-[0_0_15px_rgba(202, 28, 48,0.35)]"
+                      ? "text-[#CA1C30]"
                       : isDone
-                      ? "border-[#CA1C30]/50 text-[#CA1C30] bg-[#CA1C30]/10"
-                      : "border-white/10 text-white/40 bg-[#121117]"
+                      ? "text-[#F5F4F0]/80 hover:text-[#CA1C30]"
+                      : "text-white/30"
                   }`}
                 >
-                  {s.label}
-                </div>
+                  <span>{s.label}</span>
+                  {idx < 3 && <span className="text-white/20 ml-2 font-normal">/</span>}
+                </button>
               );
             })}
           </div>
