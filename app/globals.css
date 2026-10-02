@@ -462,19 +462,19 @@ html.theme-transition *::after {
 
 html.light {
   color-scheme: light;
-  --black: #EDE5D8;
-  --dark-1: #F5EFE6;
-  --dark-2: #E2DAC8;
-  --dark-3: #D5CBB5;
+  --black: #F4EFE6;
+  --dark-1: #EDE5D8;
+  --dark-2: #DFD7C4;
+  --dark-3: #D2C7B1;
   --acid: #CA1C30;
   --laser: #00897B;
   --grid-line: rgba(60, 45, 30, 0.05);
-  background-color: #EDE5D8 !important;
+  background-color: #F4EFE6 !important;
   color: #1C1917 !important;
 }
 
 html.light body {
-  background-color: #EDE5D8 !important;
+  background-color: #F4EFE6 !important;
   color: #1C1917 !important;
 }
 
@@ -482,7 +482,7 @@ html.light .scanlines-overlay {
   opacity: 0.02;
 }
 
-/* Surfaces de base et canvas principal : crème doux (#EDE5D8) */
+/* Surfaces de base et canvas principal : crème doux (#F4EFE6) */
 html.light main,
 html.light .theme-canvas,
 html.light .theme-section-wrapper,
@@ -490,17 +490,20 @@ html.light [class*="bg-[#0A1C1D]"],
 html.light [class*="bg-[#060606]"],
 html.light [class*="bg-[#121417]"],
 html.light .bg-black {
-  background-color: #EDE5D8 !important;
+  background-color: #F4EFE6 !important;
   color: #1C1917 !important;
 }
 
 html.light .fade-top-gradient {
-  display: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
+  background: linear-gradient(to bottom, #F4EFE6 0%, rgba(244, 239, 230, 0.8) 50%, #F4EFE6 100%) !important;
 }
 
-/* Cartes principales et panneaux : crème soyeux (#F5EFE6) */
+.methodology-card {
+  box-shadow: 0 -20px 50px rgba(0, 0, 0, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Cartes principales et panneaux : crème soyeux (#EDE5D8) */
 html.light .reticle-box,
 html.light .methodology-card,
 html.light [class*="bg-[#121117]"],
@@ -510,23 +513,29 @@ html.light [class*="bg-[#102A2C]"],
 html.light [class*="bg-[#173B3E]"],
 html.light .bg-black\/95,
 html.light .bg-black\/90 {
-  background-color: #F5EFE6 !important;
+  background-color: #EDE5D8 !important;
   border-color: rgba(60, 45, 30, 0.12) !important;
-  box-shadow: 0 8px 30px rgba(60, 45, 30, 0.06) !important;
+  box-shadow: 0 4px 20px rgba(60, 45, 30, 0.06) !important;
   color: #1C1917 !important;
+}
+
+html.light .methodology-card {
+  box-shadow: 0 4px 25px rgba(60, 45, 30, 0.06), 0 -2px 10px rgba(60, 45, 30, 0.04) !important;
+}
+
+html.light [class*="shadow-[0_-20px_50px"] {
+  box-shadow: none !important;
 }
 
 /* Direct Booking Components rules in light mode */
 html.light .booking-card-main {
-  background-color: #F5EFE6 !important;
+  background-color: #EDE5D8 !important;
   border-color: rgba(60, 45, 30, 0.15) !important;
-  box-shadow: 0 10px 40px rgba(60, 45, 30, 0.07) !important;
 }
 
 html.light .booking-plan-card {
   background-color: #FAF7F2 !important;
   border-color: rgba(60, 45, 30, 0.12) !important;
-  box-shadow: 0 4px 20px rgba(60, 45, 30, 0.05) !important;
   color: #1C1917 !important;
 }
 html.light .booking-plan-card.plan-active {
@@ -534,7 +543,7 @@ html.light .booking-plan-card.plan-active {
 }
 
 html.light .booking-tier-btn {
-  background-color: #EAE3D4 !important;
+  background-color: #EDE5D8 !important;
   border-color: rgba(60, 45, 30, 0.15) !important;
   color: #1C1917 !important;
 }
@@ -551,7 +560,7 @@ html.light .booking-tier-btn.tier-active {
 }
 
 html.light .booking-checklist-item {
-  background-color: #EAE3D4 !important;
+  background-color: #EDE5D8 !important;
   border-color: rgba(60, 45, 30, 0.1) !important;
   color: #1C1917 !important;
 }
