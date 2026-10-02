@@ -352,21 +352,13 @@ export default function CyberNavbar({
                   key={link.label}
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.href)}
-                  className={`relative px-2.5 xl:px-3 py-1.5 rounded-full transition-colors flex items-center gap-1.5 tracking-wider uppercase font-semibold whitespace-nowrap shrink-0 ${
+                  className={`px-2.5 xl:px-3 py-1.5 transition-colors tracking-wider uppercase font-semibold whitespace-nowrap shrink-0 ${
                     isActive
                       ? "text-[#CA1C30]"
-                      : "text-white/70 hover:text-[#CA1C30] hover:bg-white/5"
+                      : "text-white/70 hover:text-[#CA1C30]"
                   }`}
                 >
-                  {isActive && (
-                    <motion.div
-                      layoutId="cyber-nav-active-pill"
-                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      className="absolute inset-0 border border-[#CA1C30]/60 bg-[#CA1C30]/10 rounded-full shadow-[0_0_12px_rgba(202,28,48,0.25)] pointer-events-none"
-                    />
-                  )}
-                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-[#CA1C30] animate-pulse relative z-10 shrink-0" />}
-                  <span className="relative z-10 whitespace-nowrap">{link.label}</span>
+                  {link.label}
                 </a>
               );
             })}
