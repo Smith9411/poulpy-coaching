@@ -20,28 +20,28 @@ interface SelectProps {
 
 const ACCENT_MAP = {
   purple: {
-    selected: 'border-[#FF7582]/60 bg-[#FF7582]/15 text-[#FF7582]',
-    itemHover: 'hover:bg-[#FF7582]/15 hover:text-[#FF7582]',
-    ring: 'focus-within:border-[#FF7582]',
-    dot: 'bg-[#FF7582]',
+    selected: 'border-[#CA1C30]/60 bg-[#CA1C30]/15 text-[#CA1C30]',
+    itemHover: 'hover:bg-[#CA1C30]/15 hover:text-[#CA1C30]',
+    ring: 'focus-within:border-[#CA1C30]',
+    dot: 'bg-[#CA1C30]',
   },
   red: {
-    selected: 'border-[#FF7582]/60 bg-[#FF7582]/15 text-[#FF7582]',
-    itemHover: 'hover:bg-[#FF7582]/15 hover:text-[#FF7582]',
-    ring: 'focus-within:border-[#FF7582]',
-    dot: 'bg-[#FF7582]',
+    selected: 'border-[#CA1C30]/60 bg-[#CA1C30]/15 text-[#CA1C30]',
+    itemHover: 'hover:bg-[#CA1C30]/15 hover:text-[#CA1C30]',
+    ring: 'focus-within:border-[#CA1C30]',
+    dot: 'bg-[#CA1C30]',
   },
   orange: {
-    selected: 'border-[#8FAFD4]/60 bg-[#8FAFD4]/15 text-[#8FAFD4]',
-    itemHover: 'hover:bg-[#8FAFD4]/15 hover:text-[#8FAFD4]',
-    ring: 'focus-within:border-[#8FAFD4]',
-    dot: 'bg-[#8FAFD4]',
+    selected: 'border-[#00B4A0]/60 bg-[#00B4A0]/15 text-[#00B4A0]',
+    itemHover: 'hover:bg-[#00B4A0]/15 hover:text-[#00B4A0]',
+    ring: 'focus-within:border-[#00B4A0]',
+    dot: 'bg-[#00B4A0]',
   },
   cyan: {
-    selected: 'border-[#A4DE87]/60 bg-[#A4DE87]/15 text-[#A4DE87]',
-    itemHover: 'hover:bg-[#A4DE87]/15 hover:text-[#A4DE87]',
-    ring: 'focus-within:border-[#A4DE87]',
-    dot: 'bg-[#A4DE87]',
+    selected: 'border-[#F5F4F0]/60 bg-[#F5F4F0]/15 text-[#F5F4F0]',
+    itemHover: 'hover:bg-[#F5F4F0]/15 hover:text-[#F5F4F0]',
+    ring: 'focus-within:border-[#F5F4F0]',
+    dot: 'bg-[#F5F4F0]',
   },
 };
 
@@ -69,7 +69,7 @@ export default function Select({ value, onChange, options, placeholder = 'Sélec
         type="button"
         onClick={() => !disabled && setIsOpen((v) => !v)}
         disabled={disabled}
-        className={`w-full px-4 py-3 bg-[#090c10] border text-left flex items-center justify-between gap-2 transition-all cursor-pointer ${
+        className={`w-full px-4 py-3 bg-[#121117] border text-left flex items-center justify-between gap-2 transition-all cursor-pointer ${
           value ? colors.selected : 'border-white/15 text-white/60 hover:border-white/30'
         } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
@@ -78,7 +78,7 @@ export default function Select({ value, onChange, options, placeholder = 'Sélec
         </span>
         <ChevronDown
           size={16}
-          className={`shrink-0 text-white/50 transition-transform duration-200 ${isOpen ? 'rotate-180 text-[#FF7582]' : ''}`}
+          className={`shrink-0 text-white/50 transition-transform duration-200 ${isOpen ? 'rotate-180 text-[#CA1C30]' : ''}`}
         />
       </button>
 
@@ -89,7 +89,7 @@ export default function Select({ value, onChange, options, placeholder = 'Sélec
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.12 }}
-            className="absolute left-0 right-0 top-full z-[100] max-h-64 overflow-y-auto bg-[#090c10] border border-white/20 shadow-[0_10px_30px_rgba(0,0,0,0.9)] mt-1"
+            className="absolute left-0 right-0 top-full z-[100] max-h-64 overflow-y-auto bg-[#121117] border border-white/20 shadow-[0_10px_30px_rgba(0,0,0,0.9)] mt-1"
           >
             {options.map((opt) => {
               const isSelected = opt.value === value;

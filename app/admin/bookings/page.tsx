@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
@@ -457,20 +457,20 @@ export default function AdminBookingsPage() {
 
   if (authLoading) {
     return (
-      <main className="min-h-screen bg-[#07090D] py-24 flex items-center justify-center">
-        <Loader2 className="w-10 h-10 animate-spin text-[#FF7582]" />
+      <main className="min-h-screen bg-[#0B0A0D] py-24 flex items-center justify-center">
+        <Loader2 className="w-10 h-10 animate-spin text-[#CA1C30]" />
       </main>
     );
   }
 
   if (!user || !user.isAdmin) {
     return (
-      <main className="min-h-screen bg-[#07090D] py-24 flex items-center justify-center">
-        <div className="bg-[#090c10] border border-white/8 p-8 text-center max-w-md">
+      <main className="min-h-screen bg-[#0B0A0D] py-24 flex items-center justify-center">
+        <div className="bg-[#121117] border border-white/8 p-8 text-center max-w-md">
           <Shield size={48} className="mx-auto text-red-400 mb-4" />
           <h2 className="text-xl font-bold text-white mb-2">Accès refusé</h2>
           <p className="text-sm text-gray-400 mb-4">Cette section est réservée à l'administrateur.</p>
-          <Link href="/" className="px-4 py-2 bg-[#FF7582] text-white text-sm font-bold">
+          <Link href="/" className="px-4 py-2 bg-[#CA1C30] text-white text-sm font-bold">
             Retour à l'accueil
           </Link>
         </div>
@@ -479,7 +479,7 @@ export default function AdminBookingsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#07090D] py-20 px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-[#0B0A0D] py-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Top Header */}
         <div className="flex items-center justify-between flex-wrap gap-4 pt-4">
@@ -493,7 +493,7 @@ export default function AdminBookingsPage() {
             </Link>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold px-2.5 py-0.5 bg-[#8FAFD4]/20 text-[#8FAFD4]/80">
+                <span className="text-xs font-bold px-2.5 py-0.5 bg-[#00B4A0]/20 text-[#00B4A0]/80">
                   ADMIN COACHING
                 </span>
                 <span className="text-xs text-gray-400">• Sans paiement</span>
@@ -511,7 +511,7 @@ export default function AdminBookingsPage() {
               onClick={() => setActiveTab('slots')}
               className={`flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-bold transition-all ${
                 activeTab === 'slots'
-                  ? 'bg-gradient-to-r from-[#FF7582] to-[#FF7582]/70 text-white shadow-md'
+                  ? 'bg-gradient-to-r from-[#CA1C30] to-[#CA1C30]/70 text-white shadow-md'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
@@ -523,14 +523,14 @@ export default function AdminBookingsPage() {
               onClick={() => setActiveTab('bookings')}
               className={`flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-bold transition-all relative ${
                 activeTab === 'bookings'
-                  ? 'bg-gradient-to-r from-[#FF7582] to-[#FF7582]/70 text-white shadow-md'
+                  ? 'bg-gradient-to-r from-[#CA1C30] to-[#CA1C30]/70 text-white shadow-md'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
               <Clock size={16} />
               <span>2. Réservations ({bookingsList.length})</span>
               {bookingsList.some((b) => !b.read_by_admin) && (
-                <span className="w-2 h-2 bg-[#8FAFD4] animate-pulse" />
+                <span className="w-2 h-2 bg-[#00B4A0] animate-pulse" />
               )}
             </button>
           </div>
@@ -591,7 +591,7 @@ export default function AdminBookingsPage() {
                     <button
                       type="button"
                       onClick={() => setWeekOffset(0)}
-                      className="px-2.5 py-1 text-xs bg-black/40 border border-white/10 backdrop-blur-md text-[#FF7582] hover:text-white"
+                      className="px-2.5 py-1 text-xs bg-black/40 border border-white/10 backdrop-blur-md text-[#CA1C30] hover:text-white"
                     >
                       Aujourd'hui
                     </button>
@@ -610,7 +610,7 @@ export default function AdminBookingsPage() {
                     type="button"
                     onClick={handleSaveSlots}
                     disabled={isSavingSlots}
-                    className="px-5 py-2.5 bg-gradient-to-r from-[#FF7582] to-[#FF7582]/70 text-white font-bold text-sm shadow-md hover:shadow-cyan-500/30 flex items-center gap-2 transition-all disabled:opacity-50"
+                    className="px-5 py-2.5 bg-gradient-to-r from-[#CA1C30] to-[#CA1C30]/70 text-white font-bold text-sm shadow-md hover:shadow-cyan-500/30 flex items-center gap-2 transition-all disabled:opacity-50"
                   >
                     {isSavingSlots ? <Loader2 size={16} className="animate-spin" /> : <Check size={16} />}
                     <span>Enregistrer les disponibilités</span>
@@ -661,12 +661,12 @@ export default function AdminBookingsPage() {
                   placeholder="Ex: 16:00"
                   value={customHourInput}
                   onChange={(e) => setCustomHourInput(e.target.value)}
-                  className="px-3 py-1 bg-white/5 border border-white/10 text-white w-24 text-center focus:outline-none focus:border-[#FF7582]"
+                  className="px-3 py-1 bg-white/5 border border-white/10 text-white w-24 text-center focus:outline-none focus:border-[#CA1C30]"
                 />
                 <button
                   type="button"
                   onClick={handleAddCustomHour}
-                  className="px-3 py-1 bg-[#FF7582]/30 border border-[#FF7582]/40 text-[#FF7582]/80 font-medium hover:bg-[#FF7582]/50"
+                  className="px-3 py-1 bg-[#CA1C30]/30 border border-[#CA1C30]/40 text-[#CA1C30]/80 font-medium hover:bg-[#CA1C30]/50"
                 >
                   + Ajouter
                 </button>
@@ -685,13 +685,13 @@ export default function AdminBookingsPage() {
                     className={`reticle-box p-3.5 flex flex-col justify-between border transition-all ${
                       day.isPast
                         ? 'opacity-40 bg-white/[0.02] border-white/5'
-                        : 'border-white/10 hover:border-[#FF7582]/30'
+                        : 'border-white/10 hover:border-[#CA1C30]/30'
                     }`}
                   >
                     {/* Day Column Header */}
                     <div className="border-b border-white/10 pb-2.5 mb-2.5">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold uppercase tracking-wider text-[#FF7582]">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#CA1C30]">
                           {day.dayName.slice(0, 3)}
                         </span>
                         <span className="text-xs text-gray-400 font-medium">{day.dateStr}</span>
@@ -699,7 +699,7 @@ export default function AdminBookingsPage() {
 
                       {/* Day count & Quick toggles */}
                       <div className="flex items-center justify-between mt-2 pt-1 text-[11px]">
-                        <span className={`font-semibold ${activeCount > 0 ? 'text-[#8FAFD4]' : 'text-gray-500'}`}>
+                        <span className={`font-semibold ${activeCount > 0 ? 'text-[#00B4A0]' : 'text-gray-500'}`}>
                           {activeCount} ouvert{activeCount > 1 ? 's' : ''}
                         </span>
                         {!day.isPast && (
@@ -760,7 +760,7 @@ export default function AdminBookingsPage() {
                             key={key}
                             className={`flex items-center justify-between p-2 text-xs font-semibold cursor-pointer select-none transition-all border ${
                               isChecked
-                                ? 'bg-gradient-to-r from-[#FF7582]/30 to-cyan-500/20 border-[#8FAFD4]/60 text-white shadow-sm'
+                                ? 'bg-gradient-to-r from-[#CA1C30]/30 to-cyan-500/20 border-[#00B4A0]/60 text-white shadow-sm'
                                 : 'bg-white/5 border-white/5 text-gray-400 hover:bg-white/10 hover:text-gray-200'
                             }`}
                           >
@@ -769,13 +769,13 @@ export default function AdminBookingsPage() {
                                 type="checkbox"
                                 checked={isChecked}
                                 onChange={() => toggleSlot(day.fullDate, time)}
-                                className="w-3.5 h-3.5 rounded border-gray-600 text-[#8FAFD4] focus:ring-[#8FAFD4] focus:ring-offset-0 bg-gray-800 cursor-pointer"
+                                className="w-3.5 h-3.5 rounded border-gray-600 text-[#00B4A0] focus:ring-[#00B4A0] focus:ring-offset-0 bg-gray-800 cursor-pointer"
                               />
                               <span>{time}</span>
                             </span>
                             <span
                               className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${
-                                isChecked ? 'text-[#8FAFD4]/80 bg-[#8FAFD4]/20' : 'text-gray-500'
+                                isChecked ? 'text-[#00B4A0]/80 bg-[#00B4A0]/20' : 'text-gray-500'
                               }`}
                             >
                               {isChecked ? 'Dispo' : 'Fermé'}
@@ -806,7 +806,7 @@ export default function AdminBookingsPage() {
                   placeholder="Rechercher par nom, email, Discord ou jeu..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 text-white placeholder-gray-500 text-xs sm:text-sm focus:outline-none focus:border-[#FF7582]"
+                  className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/10 text-white placeholder-gray-500 text-xs sm:text-sm focus:outline-none focus:border-[#CA1C30]"
                 />
               </div>
 
@@ -825,7 +825,7 @@ export default function AdminBookingsPage() {
                     onClick={() => setStatusFilter(tab.id)}
                     className={`px-3 py-1.5 text-xs font-bold transition-all flex items-center gap-1.5 ${
                       statusFilter === tab.id
-                        ? 'bg-gradient-to-r from-[#FF7582] to-[#FF7582]/70 text-white shadow-md'
+                        ? 'bg-gradient-to-r from-[#CA1C30] to-[#CA1C30]/70 text-white shadow-md'
                         : 'bg-white/5 border border-white/10 text-gray-400 hover:text-white hover:bg-white/10'
                     }`}
                   >
@@ -856,7 +856,7 @@ export default function AdminBookingsPage() {
             {/* Bookings List */}
             {bookingsLoading ? (
               <div className="py-20 text-center">
-                <Loader2 size={32} className="animate-spin text-[#FF7582] mx-auto mb-3" />
+                <Loader2 size={32} className="animate-spin text-[#CA1C30] mx-auto mb-3" />
                 <p className="text-sm text-gray-400">Chargement des réservations...</p>
               </div>
             ) : filteredBookings.length === 0 ? (
@@ -879,9 +879,9 @@ export default function AdminBookingsPage() {
                       key={b.id}
                       className={`reticle-box p-5 border flex flex-col justify-between space-y-4 transition-colors duration-200 ${
                         b.status === 'confirmed'
-                          ? 'border-[#8FAFD4]/30 hover:border-[#8FAFD4]'
+                          ? 'border-[#00B4A0]/30 hover:border-[#00B4A0]'
                           : b.status === 'rescheduled'
-                          ? 'border-[#FF7582]/40 hover:border-[#FF7582]'
+                          ? 'border-[#CA1C30]/40 hover:border-[#CA1C30]'
                           : b.status === 'completed'
                           ? 'border-green-500/20 opacity-75'
                           : 'border-red-500/20 opacity-60'
@@ -890,7 +890,7 @@ export default function AdminBookingsPage() {
                       {/* Header with Plan and Status */}
                       <div>
                         <div className="flex items-center justify-between gap-2 mb-2">
-                          <span className="text-xs font-extrabold px-2.5 py-0.5 bg-[#FF7582]/20 text-[#FF7582]/80">
+                          <span className="text-xs font-extrabold px-2.5 py-0.5 bg-[#CA1C30]/20 text-[#CA1C30]/80">
                             {b.plan_name}
                           </span>
                           <span
@@ -898,9 +898,9 @@ export default function AdminBookingsPage() {
                               b.status === 'confirmed'
                                 ? 'bg-green-500/20 text-green-300'
                                 : b.status === 'rescheduled'
-                                ? 'bg-[#FF7582]/20 text-[#FF7582]/80'
+                                ? 'bg-[#CA1C30]/20 text-[#CA1C30]/80'
                                 : b.status === 'completed'
-                                ? 'bg-[#8FAFD4]/20 text-[#8FAFD4]/80'
+                                ? 'bg-[#00B4A0]/20 text-[#00B4A0]/80'
                                 : 'bg-red-500/20 text-red-400'
                             }`}
                           >
@@ -913,7 +913,7 @@ export default function AdminBookingsPage() {
 
                         {/* Date & Time Highlight */}
                         <div className="flex items-center gap-2 text-white font-extrabold text-base mb-1">
-                          <CalendarIcon size={16} className="text-[#8FAFD4]" />
+                          <CalendarIcon size={16} className="text-[#00B4A0]" />
                           <span>
                             {new Date(b.booking_date).toLocaleDateString('fr-FR', {
                               weekday: 'short',
@@ -926,7 +926,7 @@ export default function AdminBookingsPage() {
                         <div className="text-xs text-gray-400 flex items-center gap-2">
                           <span>{b.plan_duration}</span>
                           <span>•</span>
-                          <span className="text-[#FF7582]/80 font-bold">{b.plan_price}</span>
+                          <span className="text-[#CA1C30]/80 font-bold">{b.plan_price}</span>
                         </div>
                       </div>
 
@@ -935,14 +935,14 @@ export default function AdminBookingsPage() {
                         <div className="flex items-center justify-between">
                           <span className="text-gray-400">Élève :</span>
                           <span className="font-bold text-white flex items-center gap-1">
-                            <User size={12} className="text-[#FF7582]" />
+                            <User size={12} className="text-[#CA1C30]" />
                             {b.student_name}
                           </span>
                         </div>
 
                         <div className="flex items-center justify-between">
                           <span className="text-gray-400">Discord :</span>
-                          <div className="flex items-center gap-1 text-[#8FAFD4]/80 font-mono font-semibold">
+                          <div className="flex items-center gap-1 text-[#00B4A0]/80 font-mono font-semibold">
                             <MessageSquare size={12} />
                             <span>{b.student_discord}</span>
                             <button
@@ -987,7 +987,7 @@ export default function AdminBookingsPage() {
                                 setRescheduleDate(b.booking_date);
                                 setRescheduleTime(b.booking_time);
                               }}
-                              className="flex-1 py-1.5 bg-[#FF7582]/15 border border-[#FF7582]/30 text-xs font-semibold text-[#FF7582]/80 hover:bg-[#FF7582]/30 hover:text-white transition-colors flex items-center justify-center gap-1 cursor-pointer"
+                              className="flex-1 py-1.5 bg-[#CA1C30]/15 border border-[#CA1C30]/30 text-xs font-semibold text-[#CA1C30]/80 hover:bg-[#CA1C30]/30 hover:text-white transition-colors flex items-center justify-center gap-1 cursor-pointer"
                             >
                               <Edit2 size={13} />
                               <span>Reporter</span>
@@ -1037,10 +1037,10 @@ export default function AdminBookingsPage() {
         {/* ══════════════════════════════════════════════════════════════════════════ */}
         {rescheduleBooking && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
-            <div className="bg-black/40 border border-white/10 backdrop-blur-md-dark border border-[#FF7582]/40 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl animate-in zoom-in-95">
+            <div className="bg-black/40 border border-white/10 backdrop-blur-md-dark border border-[#CA1C30]/40 rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl animate-in zoom-in-95">
               <div className="flex items-center justify-between border-b border-white/10 pb-3">
                 <div className="flex items-center gap-2">
-                  <Clock size={20} className="text-[#FF7582]" />
+                  <Clock size={20} className="text-[#CA1C30]" />
                   <h3 className="font-bold text-white text-lg">Reporter la session</h3>
                 </div>
                 <button
@@ -1066,7 +1066,7 @@ export default function AdminBookingsPage() {
                   type="date"
                   value={rescheduleDate}
                   onChange={(e) => setRescheduleDate(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-[#FF7582]"
+                  className="w-full px-3.5 py-2.5 bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-[#CA1C30]"
                 />
               </div>
 
@@ -1078,7 +1078,7 @@ export default function AdminBookingsPage() {
                 <select
                   value={rescheduleTime}
                   onChange={(e) => setRescheduleTime(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-gray-900 border border-white/10 text-white text-sm focus:outline-none focus:border-[#FF7582]"
+                  className="w-full px-3.5 py-2.5 bg-gray-900 border border-white/10 text-white text-sm focus:outline-none focus:border-[#CA1C30]"
                 >
                   {availableHours.map((t) => (
                     <option key={t} value={t}>
@@ -1099,7 +1099,7 @@ export default function AdminBookingsPage() {
                 <button
                   type="button"
                   onClick={handleConfirmReschedule}
-                  className="px-5 py-2 bg-gradient-to-r from-[#FF7582] to-[#FF7582]/70 text-white font-bold text-xs shadow-md"
+                  className="px-5 py-2 bg-gradient-to-r from-[#CA1C30] to-[#CA1C30]/70 text-white font-bold text-xs shadow-md"
                 >
                   Confirmer le report
                 </button>
@@ -1140,7 +1140,7 @@ export default function AdminBookingsPage() {
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-400">Formule :</span>
-                  <span className="font-medium text-[#FF7582]/80">{cancelModalBooking.plan_name}</span>
+                  <span className="font-medium text-[#CA1C30]/80">{cancelModalBooking.plan_name}</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-400">Date et heure :</span>

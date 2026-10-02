@@ -94,7 +94,7 @@ export default function CyberAimCanvas() {
       ctx.clearRect(0, 0, width, height);
 
       // Cyber Grid
-      ctx.strokeStyle = "rgba(0, 255, 65, 0.08)";
+      ctx.strokeStyle = "rgba(245, 244, 240, 0.08)";
       ctx.lineWidth = 1;
       const step = 40;
       for (let x = 0; x < width; x += step) {
@@ -120,7 +120,7 @@ export default function CyberAimCanvas() {
         }
 
         ctx.save();
-        ctx.strokeStyle = `rgba(0, 240, 255, ${p.alpha})`;
+        ctx.strokeStyle = `rgba(0, 180, 160, ${p.alpha})`;
         ctx.lineWidth = 2;
         ctx.setLineDash([6, 4]);
 
@@ -130,7 +130,7 @@ export default function CyberAimCanvas() {
         ctx.stroke();
 
         // Sharp square landing impact (NO ROUND CORNERS)
-        ctx.strokeStyle = `rgba(0, 255, 65, ${p.alpha})`;
+        ctx.strokeStyle = `rgba(245, 244, 240, ${p.alpha})`;
         ctx.lineWidth = 1.5;
         const s = (1 - p.alpha) * 36 + 6;
         ctx.strokeRect(p.toX - s / 2, p.toY - s / 2, s, s);
@@ -142,13 +142,13 @@ export default function CyberAimCanvas() {
 
       ctx.save();
       // Outer square reticle
-      ctx.strokeStyle = "#00ff41";
+      ctx.strokeStyle = "#F5F4F0";
       ctx.lineWidth = 1.5;
       const boxSize = target.radius * 2 + pulse;
       ctx.strokeRect(target.x - boxSize / 2, target.y - boxSize / 2, boxSize, boxSize);
 
       // Center laser dot
-      ctx.fillStyle = "#00f0ff";
+      ctx.fillStyle = "#00B4A0";
       ctx.fillRect(target.x - 2, target.y - 2, 4, 4);
 
       // Corner crosshair ticks
@@ -179,7 +179,7 @@ export default function CyberAimCanvas() {
   }, [hitsCount]);
 
   return (
-    <div className="reticle-box p-6 sm:p-8 bg-[#040404] space-y-6">
+    <div className="reticle-box p-6 sm:p-8 bg-[#121117] space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[rgba(255,255,255,0.08)] pb-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-xs font-mono">
@@ -209,19 +209,19 @@ export default function CyberAimCanvas() {
         {/* Interactive Canvas */}
         <div className="lg:col-span-8 relative aspect-[16/10] w-full bg-[#000000] border border-[rgba(255,255,255,0.08)] cursor-crosshair">
           <canvas ref={canvasRef} className="w-full h-full block" />
-          <div className="absolute top-3 left-3 px-3 py-1 bg-black/80 border border-white/10 text-[10px] font-mono text-[#00ff41]">
+          <div className="absolute top-3 left-3 px-3 py-1 bg-black/80 border border-white/10 text-[10px] font-mono text-[#F5F4F0]">
             [CLIQUEZ SUR LA CIBLE POUR MESURER VOTRE TEMPS DE RÉACTION]
           </div>
         </div>
 
         {/* Telemetry Numbers */}
         <div className="lg:col-span-4 space-y-4">
-          <div className="p-4 bg-black/60 border border-[rgba(0,255,65,0.2)] space-y-1">
+          <div className="p-4 bg-black/60 border border-[rgba(245, 244, 240,0.2)] space-y-1">
             <div className="flex items-center justify-between text-xs text-white/50 font-mono">
               <span>RÉACTION BRUTE</span>
-              <Zap className="w-3.5 h-3.5 text-[#00ff41]" />
+              <Zap className="w-3.5 h-3.5 text-[#F5F4F0]" />
             </div>
-            <div className="text-3xl font-bold font-mono text-[#00ff41]">
+            <div className="text-3xl font-bold font-mono text-[#F5F4F0]">
               {reactionMs} <span className="text-sm font-normal text-white/40">MS</span>
             </div>
             <div className="text-[10px] text-white/40 font-mono">
@@ -229,12 +229,12 @@ export default function CyberAimCanvas() {
             </div>
           </div>
 
-          <div className="p-4 bg-black/60 border border-[rgba(0,240,255,0.2)] space-y-1">
+          <div className="p-4 bg-black/60 border border-[rgba(0, 180, 160,0.2)] space-y-1">
             <div className="flex items-center justify-between text-xs text-white/50 font-mono">
               <span>VÉLOCITÉ DU FLICK</span>
-              <Activity className="w-3.5 h-3.5 text-[#00f0ff]" />
+              <Activity className="w-3.5 h-3.5 text-[#00B4A0]" />
             </div>
-            <div className="text-3xl font-bold font-mono text-[#00f0ff]">
+            <div className="text-3xl font-bold font-mono text-[#00B4A0]">
               {flickSpeed} <span className="text-sm font-normal text-white/40">PX/S</span>
             </div>
             <div className="text-[10px] text-white/40 font-mono">

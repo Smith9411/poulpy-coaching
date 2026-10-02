@@ -475,15 +475,15 @@ export default function StudentCoachingPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#07090D] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#FF7582]" />
+      <div className="min-h-screen bg-[#0B0A0D] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#CA1C30]" />
       </div>
     );
   }
 
   if (!user?.isAdmin) {
     return (
-      <div className="min-h-screen bg-[#07090D] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0B0A0D] flex items-center justify-center">
         <div className="text-center">
           <Shield className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2">Accès refusé</h1>
@@ -494,7 +494,7 @@ export default function StudentCoachingPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#07090D] py-24">
+    <main className="min-h-screen bg-[#0B0A0D] py-24">
       {/* Lightbox zoom image */}
       {zoomedImage && (
         <div
@@ -635,7 +635,7 @@ export default function StudentCoachingPage() {
           >
             {isLoading ? (
               <div className="flex items-center justify-center h-full">
-                <Loader2 className="w-8 h-8 animate-spin text-[#FF7582]" />
+                <Loader2 className="w-8 h-8 animate-spin text-[#CA1C30]" />
               </div>
             ) : messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-gray-500">
@@ -650,12 +650,12 @@ export default function StudentCoachingPage() {
                     <div
                       className={`max-w-[75%] px-4 py-3 shadow-lg ${
                         isMine
-                          ? 'bg-gradient-to-br from-[#FF7582] to-[#8FAFD4] text-black font-bold'
+                          ? 'bg-gradient-to-br from-[#CA1C30] to-[#00B4A0] text-black font-bold'
                           : 'bg-white/5 border border-white/10 text-gray-200'
                       }`}
                     >
                       {!isMine && (
-                        <div className="text-xs font-semibold text-[#FF7582] mb-1">{student?.username}</div>
+                        <div className="text-xs font-semibold text-[#CA1C30] mb-1">{student?.username}</div>
                       )}
                       {isMine && msg.message_type !== 'student' && (
                         <div className="text-xs font-semibold text-white/80 mb-1">{msg.message_type}</div>
@@ -726,7 +726,7 @@ export default function StudentCoachingPage() {
                     onClick={() => setMessageType(t)}
                     className={`px-2.5 py-0.5 text-xs font-semibold capitalize transition-all ${
                       messageType === t
-                        ? 'bg-[#FF7582]/20 text-[#FF7582] border border-[#FF7582]/50'
+                        ? 'bg-[#CA1C30]/20 text-[#CA1C30] border border-[#CA1C30]/50'
                         : 'bg-white/5 text-gray-400 hover:text-white border border-transparent'
                     }`}
                   >
@@ -781,7 +781,7 @@ export default function StudentCoachingPage() {
                   <button
                     type="button"
                     onClick={stopAndSendRecording}
-                    className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-[#FF7582] text-black font-bold text-white text-xs font-semibold hover:shadow-md transition-all"
+                    className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-[#CA1C30] text-black font-bold text-white text-xs font-semibold hover:shadow-md transition-all"
                   >
                     <Send size={12} />
                     Envoyer le vocal
@@ -816,7 +816,7 @@ export default function StudentCoachingPage() {
                   onClick={startRecording}
                   disabled={isSending}
                   title="Enregistrer une note vocale"
-                  className="p-3 bg-white/5 hover:bg-white/10 text-[#FF7582] hover:text-[#FF7582]/80 transition-colors border border-white/10 disabled:opacity-50"
+                  className="p-3 bg-white/5 hover:bg-white/10 text-[#CA1C30] hover:text-[#CA1C30]/80 transition-colors border border-white/10 disabled:opacity-50"
                 >
                   <Mic size={18} />
                 </button>
@@ -829,14 +829,14 @@ export default function StudentCoachingPage() {
                   placeholder={selectedFile ? "Ajoute un commentaire (optionnel)..." : "Écris un message à l'élève..."}
                   disabled={isSending}
                   maxLength={2000}
-                  className="flex-1 px-4 py-3 bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-[#FF7582] disabled:opacity-50 text-sm"
+                  className="flex-1 px-4 py-3 bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-[#CA1C30] disabled:opacity-50 text-sm"
                 />
 
                 {/* Bouton envoyer */}
                 <button
                   type="submit"
                   disabled={isSending || (!newMessage.trim() && !selectedFile)}
-                  className="px-5 py-3 bg-[#FF7582] text-black font-bold font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40 transition-all disabled:opacity-40 flex items-center gap-2 shrink-0"
+                  className="px-5 py-3 bg-[#CA1C30] text-black font-bold font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40 transition-all disabled:opacity-40 flex items-center gap-2 shrink-0"
                 >
                   {isSending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
                 </button>

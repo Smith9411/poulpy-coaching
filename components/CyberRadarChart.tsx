@@ -79,9 +79,9 @@ export default function CyberRadarChart() {
       animT = Math.min(1, animT + 0.02);
 
       ctx.save();
-      ctx.strokeStyle = "#00ff41";
+      ctx.strokeStyle = "#F5F4F0";
       ctx.lineWidth = 2;
-      ctx.fillStyle = "rgba(0, 255, 65, 0.15)";
+      ctx.fillStyle = "rgba(245, 244, 240, 0.15)";
       ctx.beginPath();
       for (let i = 0; i < count; i++) {
         const angle = (i * Math.PI * 2) / count - Math.PI / 2;
@@ -96,7 +96,7 @@ export default function CyberRadarChart() {
       ctx.stroke();
 
       // Vertex dots
-      ctx.fillStyle = "#00ff41";
+      ctx.fillStyle = "#F5F4F0";
       for (let i = 0; i < count; i++) {
         const angle = (i * Math.PI * 2) / count - Math.PI / 2;
         const val = postStats[i] * animT;
@@ -137,17 +137,17 @@ export default function CyberRadarChart() {
   }, []);
 
   return (
-    <div className="reticle-box p-6 bg-[#040404] space-y-4">
+    <div className="reticle-box p-6 bg-[#121117] space-y-4">
       <div className="flex items-center justify-between border-b border-white/5 pb-3">
-        <span className="text-xs font-mono font-bold text-[#00ff41]">
+        <span className="text-xs font-mono font-bold text-[#F5F4F0]">
           <DecryptedText text="PROFIL MULTI-AXES // RADAR" />
         </span>
         <div className="flex items-center gap-3 text-[10px] font-mono">
           <span className="flex items-center gap-1 text-[#ff0033]">
             <span className="w-2 h-2 bg-[#ff0033]" /> INITIAL
           </span>
-          <span className="flex items-center gap-1 text-[#00ff41]">
-            <span className="w-2 h-2 bg-[#00ff41]" /> APRÈS COACHING
+          <span className="flex items-center gap-1 text-[#F5F4F0]">
+            <span className="w-2 h-2 bg-[#F5F4F0]" /> APRÈS COACHING
           </span>
         </div>
       </div>
@@ -158,7 +158,7 @@ export default function CyberRadarChart() {
 
       <div className="pt-2 border-t border-white/5 text-[10px] font-mono text-white/40 flex justify-between">
         <span>COGNITIVE EXPANSION INDEX</span>
-        <span className="text-[#00ff41] font-bold">+86.4%</span>
+        <span className="text-[#F5F4F0] font-bold">+86.4%</span>
       </div>
     </div>
   );

@@ -542,9 +542,9 @@ USING (student_id = auth.uid());`;
 
   if (authLoading || isLoading) {
     return (
-      <main className="min-h-screen bg-[#07090D] py-24 flex items-center justify-center">
+      <main className="min-h-screen bg-[#0B0A0D] py-24 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 size={40} className="animate-spin text-[#FF7582] mx-auto mb-4" />
+          <Loader2 size={40} className="animate-spin text-[#CA1C30] mx-auto mb-4" />
           <p className="text-gray-400">Chargement de la fiche personnalisée...</p>
         </div>
       </main>
@@ -553,12 +553,12 @@ USING (student_id = auth.uid());`;
 
   if (!user?.isAdmin) {
     return (
-      <main className="min-h-screen bg-[#07090D] py-24 flex items-center justify-center px-4">
+      <main className="min-h-screen bg-[#0B0A0D] py-24 flex items-center justify-center px-4">
         <div className="bg-black/40 border border-white/10 backdrop-blur-md p-8 max-w-md text-center border-red-500/30">
           <Shield size={48} className="text-red-400 mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2">Accès restreint</h1>
           <p className="text-gray-400 mb-6">Cette page est réservée aux coachs administrateurs.</p>
-          <Link href="/" className="px-6 py-2.5 bg-[#FF7582] text-black font-bold inline-block">
+          <Link href="/" className="px-6 py-2.5 bg-[#CA1C30] text-black font-bold inline-block">
             Retour à l'accueil
           </Link>
         </div>
@@ -567,7 +567,7 @@ USING (student_id = auth.uid());`;
   }
 
   return (
-    <main className="min-h-screen bg-[#07090D] py-20 pb-28">
+    <main className="min-h-screen bg-[#0B0A0D] py-20 pb-28">
       {/* Hidden file input for images */}
       <input
         type="file"
@@ -595,7 +595,7 @@ USING (student_id = auth.uid());`;
           <div className="flex items-center gap-3">
             <Link
               href={`/admin/coaching/${studentId}`}
-              className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#8FAFD4]/10 hover:bg-[#8FAFD4]/20 text-[#8FAFD4] border border-[#8FAFD4]/20 text-xs sm:text-sm font-medium transition-colors"
+              className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#00B4A0]/10 hover:bg-[#00B4A0]/20 text-[#00B4A0] border border-[#00B4A0]/20 text-xs sm:text-sm font-medium transition-colors"
             >
               <MessageSquare size={15} />
               Chat avec l'élève
@@ -641,16 +641,16 @@ USING (student_id = auth.uid());`;
         )}
 
         {/* Bannière élève */}
-        <div className="bg-[#090c10] border border-white/8 p-6 mb-8 flex items-center justify-between gap-6 flex-wrap shadow-xl">
+        <div className="bg-[#121117] border border-white/8 p-6 mb-8 flex items-center justify-between gap-6 flex-wrap shadow-xl">
           <div className="flex items-center gap-4 min-w-0">
             {student?.avatarUrl ? (
               <img
                 src={student.avatarUrl}
                 alt={student.username}
-                className="w-16 h-16 object-cover border-2 border-[#FF7582]/40 shadow-lg"
+                className="w-16 h-16 object-cover border-2 border-[#CA1C30]/40 shadow-lg"
               />
             ) : (
-              <div className="w-16 h-16 bg-[#FF7582] flex items-center justify-center text-black text-2xl font-black shadow-lg">
+              <div className="w-16 h-16 bg-[#CA1C30] flex items-center justify-center text-black text-2xl font-black shadow-lg">
                 {student?.initial}
               </div>
             )}
@@ -693,7 +693,7 @@ USING (student_id = auth.uid());`;
                 saveSuccess
                   ? 'bg-emerald-500 text-white shadow-emerald-500/30'
                   : isDirty
-                  ? 'bg-[#FF7582] text-black font-bold hover:bg-[#FF7582]/80 shadow-[0_0_15px_rgba(255,117,130,0.3)] hover:scale-[1.02]'
+                  ? 'bg-[#CA1C30] text-black font-bold hover:bg-[#CA1C30]/80 shadow-[0_0_15px_rgba(202, 28, 48,0.3)] hover:scale-[1.02]'
                   : 'bg-white/10 hover:bg-white/15 text-gray-300 border border-white/10'
               }`}
             >
@@ -734,7 +734,7 @@ USING (student_id = auth.uid());`;
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Titre de la fiche..."
-            className="w-full text-xl sm:text-2xl font-bold bg-white/5 border border-white/10 focus:border-[#FF7582]/60 px-4 py-2.5 text-white focus:outline-none transition-colors"
+            className="w-full text-xl sm:text-2xl font-bold bg-white/5 border border-white/10 focus:border-[#CA1C30]/60 px-4 py-2.5 text-white focus:outline-none transition-colors"
           />
         </div>
 
@@ -819,10 +819,10 @@ USING (student_id = auth.uid());`;
                 setIsTableModalOpen(true);
                 setShowTemplatesMenu(false);
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#FF7582]/20 to-[#8FAFD4]/20 hover:from-[#FF7582]/30 hover:to-[#8FAFD4]/30 text-[#FF7582] border border-[#FF7582]/30 text-xs font-semibold transition-all hover:scale-105"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-[#CA1C30]/20 to-[#00B4A0]/20 hover:from-[#CA1C30]/30 hover:to-[#00B4A0]/30 text-[#CA1C30] border border-[#CA1C30]/30 text-xs font-semibold transition-all hover:scale-105"
               title="Insérer un tableau avec l'éditeur visuel (sans code markdown)"
             >
-              <Table size={15} className="text-[#8FAFD4]" />
+              <Table size={15} className="text-[#00B4A0]" />
               <span>Tableaux</span>
             </button>
 
@@ -830,7 +830,7 @@ USING (student_id = auth.uid());`;
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploadingImage}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#8FAFD4]/15 hover:bg-[#8FAFD4]/25 text-[#8FAFD4]/80 border border-[#8FAFD4]/30 text-xs font-semibold transition-colors disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#00B4A0]/15 hover:bg-[#00B4A0]/25 text-[#00B4A0]/80 border border-[#00B4A0]/30 text-xs font-semibold transition-colors disabled:opacity-50"
               title="Ajouter une capture d'écran ou coller directement avec Ctrl+V"
             >
               {isUploadingImage ? <Loader2 size={15} className="animate-spin" /> : <ImageIcon size={15} />}
@@ -906,7 +906,7 @@ USING (student_id = auth.uid());`;
               }}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-all ${
                 viewMode === 'visual'
-                  ? 'bg-[#FF7582] text-black font-bold text-white shadow-md'
+                  ? 'bg-[#CA1C30] text-black font-bold text-white shadow-md'
                   : 'text-gray-400 hover:text-white'
               }`}
             >
@@ -921,7 +921,7 @@ USING (student_id = auth.uid());`;
                 setViewMode('preview');
               }}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-all ${
-                viewMode === 'preview' ? 'bg-[#FF7582] text-white shadow-md' : 'text-gray-400 hover:text-white'
+                viewMode === 'preview' ? 'bg-[#CA1C30] text-white shadow-md' : 'text-gray-400 hover:text-white'
               }`}
             >
               <Eye size={14} />
@@ -935,7 +935,7 @@ USING (student_id = auth.uid());`;
                 setViewMode('raw');
               }}
               className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-all ${
-                viewMode === 'raw' ? 'bg-[#FF7582] text-white shadow-md' : 'text-gray-400 hover:text-white'
+                viewMode === 'raw' ? 'bg-[#CA1C30] text-white shadow-md' : 'text-gray-400 hover:text-white'
               }`}
             >
               <Edit3 size={14} />
@@ -959,7 +959,7 @@ USING (student_id = auth.uid());`;
         {viewMode === 'preview' && (
           <div className="bg-black/40 border border-white/10 backdrop-blur-md-dark border border-white/10 overflow-hidden shadow-2xl bg-black/40">
             <div className="px-4 py-2.5 bg-white/5 border-b border-white/10 flex items-center justify-between text-xs text-gray-400">
-              <span className="font-mono text-[#FF7582]/80 font-semibold">APERÇU FICHE ÉLÈVE</span>
+              <span className="font-mono text-[#CA1C30]/80 font-semibold">APERÇU FICHE ÉLÈVE</span>
               <span className="text-[11px] text-gray-500">Rendu final exact tel que l'élève le voit</span>
             </div>
             <div className="p-6 sm:p-10 overflow-y-auto">
@@ -995,7 +995,7 @@ USING (student_id = auth.uid());`;
               spellCheck={false}
             />
             {isUploadingImage && (
-              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center gap-3 text-[#8FAFD4]/80 font-medium text-sm">
+              <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center gap-3 text-[#00B4A0]/80 font-medium text-sm">
                 <Loader2 size={24} className="animate-spin" />
                 Téléversement de la capture d'écran...
               </div>

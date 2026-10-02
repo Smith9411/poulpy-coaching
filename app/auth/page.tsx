@@ -107,7 +107,7 @@ export default function AuthPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#07090D] text-white selection:bg-[#FF7582] selection:text-black pt-28 pb-20 font-mono relative z-10">
+    <main className="min-h-screen bg-[#0B0A0D] text-white selection:bg-[#CA1C30] selection:text-black pt-28 pb-20 font-mono relative z-10">
       <CyberNavbar />
 
       <div className="max-w-xl mx-auto px-4 sm:px-6">
@@ -115,7 +115,7 @@ export default function AuthPage() {
         <div className="flex items-center gap-3 mb-6">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-xs font-mono text-[#8FAFD4] hover:text-white transition-colors uppercase tracking-wider"
+            className="inline-flex items-center gap-2 text-xs font-mono text-[#00B4A0] hover:text-white transition-colors uppercase tracking-wider"
           >
             <ArrowLeft size={14} />
             <span>RETOUR À L'ACCUEIL</span>
@@ -125,28 +125,28 @@ export default function AuthPage() {
         </div>
 
         {/* Main Cyber Box */}
-        <div className="reticle-box p-6 sm:p-10 bg-[#090c10] border border-[#FF7582]/40 relative shadow-[0_0_60px_rgba(0,0,0,0.95)]">
+        <div className="reticle-box p-6 sm:p-10 bg-[#121117] border border-[#CA1C30]/40 relative shadow-[0_0_60px_rgba(0,0,0,0.95)]">
           <CornerBrackets color="coral" />
 
           {/* Header */}
           <div className="border-b border-white/10 pb-5 mb-6 space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <span className="w-2.5 h-2.5 bg-[#FF7582] shadow-[0_0_10px_#FF7582] animate-pulse" />
+                <span className="w-2.5 h-2.5 bg-[#CA1C30] shadow-[0_0_10px_#CA1C30] animate-pulse" />
                 <span className="text-xs text-white/50 tracking-widest uppercase">
                   MODULE D'AUTHENTIFICATION // {isLogin ? '01_LOGIN' : '02_REGISTER'}
                 </span>
               </div>
-              <span className="text-[10px] text-[#FF7582] font-bold tracking-wider">
+              <span className="text-[10px] text-[#CA1C30] font-bold tracking-wider">
                 SSL 256-BIT ENCRYPTED
               </span>
             </div>
 
             <h1 className="text-3xl sm:text-4xl font-display uppercase tracking-wider text-white">
               {isLogin ? (
-                <>ACCÉDER AU <span className="text-[#FF7582]">QG ÉLÈVE</span></>
+                <>ACCÉDER AU <span className="text-[#CA1C30]">QG ÉLÈVE</span></>
               ) : (
-                <>CRÉER TON <span className="text-[#FF7582]">DOSSIER JOUEUR</span></>
+                <>CRÉER TON <span className="text-[#CA1C30]">DOSSIER JOUEUR</span></>
               )}
             </h1>
             <p className="text-xs text-white/60 leading-relaxed">
@@ -165,7 +165,7 @@ export default function AuthPage() {
               }}
               className={`py-2 text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer ${
                 isLogin
-                  ? 'bg-[#FF7582] text-black border-[#FF7582] shadow-[0_0_15px_rgba(255,117,130,0.35)]'
+                  ? 'bg-[#CA1C30] text-black border-[#CA1C30] shadow-[0_0_15px_rgba(202, 28, 48,0.35)]'
                   : 'bg-black/60 text-white/50 border-white/10 hover:border-white/30 hover:text-white'
               }`}
             >
@@ -178,7 +178,7 @@ export default function AuthPage() {
               }}
               className={`py-2 text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer ${
                 !isLogin
-                  ? 'bg-[#FF7582] text-black border-[#FF7582] shadow-[0_0_15px_rgba(255,117,130,0.35)]'
+                  ? 'bg-[#CA1C30] text-black border-[#CA1C30] shadow-[0_0_15px_rgba(202, 28, 48,0.35)]'
                   : 'bg-black/60 text-white/50 border-white/10 hover:border-white/30 hover:text-white'
               }`}
             >
@@ -195,8 +195,8 @@ export default function AuthPage() {
           )}
 
           {success && (
-            <div className="mb-6 p-3.5 bg-[#A4DE87]/10 border border-[#A4DE87]/40 text-[#A4DE87] text-xs flex items-center gap-2.5">
-              <CheckCircle2 className="w-4 h-4 shrink-0 text-[#A4DE87]" />
+            <div className="mb-6 p-3.5 bg-[#F5F4F0]/10 border border-[#F5F4F0]/40 text-[#F5F4F0] text-xs flex items-center gap-2.5">
+              <CheckCircle2 className="w-4 h-4 shrink-0 text-[#F5F4F0]" />
               <span>{success}</span>
             </div>
           )}
@@ -227,7 +227,7 @@ export default function AuthPage() {
           {/* Divider */}
           <div className="relative flex items-center justify-center mb-6">
             <div className="w-full border-t border-white/10" />
-            <span className="absolute bg-[#090c10] px-3 text-[10px] text-white/40 uppercase tracking-widest">
+            <span className="absolute bg-[#121117] px-3 text-[10px] text-white/40 uppercase tracking-widest">
               OU VIA IDENTIFIANTS
             </span>
           </div>
@@ -237,7 +237,7 @@ export default function AuthPage() {
             {!isLogin && (
               <div>
                 <label className="block text-[11px] font-bold text-white/70 uppercase tracking-wider mb-1.5">
-                  PSEUDO DE JOUEUR <span className="text-[#FF7582]">*</span>
+                  PSEUDO DE JOUEUR <span className="text-[#CA1C30]">*</span>
                 </label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" size={16} />
@@ -247,7 +247,7 @@ export default function AuthPage() {
                     onChange={(e) => setUsername(e.target.value)}
                     required={!isLogin}
                     placeholder="Ex: TenZ_94"
-                    className="w-full pl-9 pr-3 py-2.5 bg-black/60 border border-white/15 text-white placeholder-white/30 focus:border-[#FF7582] focus:outline-none transition-colors"
+                    className="w-full pl-9 pr-3 py-2.5 bg-black/60 border border-white/15 text-white placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors"
                   />
                 </div>
               </div>
@@ -255,7 +255,7 @@ export default function AuthPage() {
 
             <div>
               <label className="block text-[11px] font-bold text-white/70 uppercase tracking-wider mb-1.5">
-                ADRESSE EMAIL <span className="text-[#FF7582]">*</span>
+                ADRESSE EMAIL <span className="text-[#CA1C30]">*</span>
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" size={16} />
@@ -265,14 +265,14 @@ export default function AuthPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="nom@exemple.com"
-                  className="w-full pl-9 pr-3 py-2.5 bg-black/60 border border-white/15 text-white placeholder-white/30 focus:border-[#FF7582] focus:outline-none transition-colors"
+                  className="w-full pl-9 pr-3 py-2.5 bg-black/60 border border-white/15 text-white placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors"
                 />
               </div>
             </div>
 
             <div>
               <label className="block text-[11px] font-bold text-white/70 uppercase tracking-wider mb-1.5">
-                MOT DE PASSE <span className="text-[#FF7582]">*</span>
+                MOT DE PASSE <span className="text-[#CA1C30]">*</span>
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" size={16} />
@@ -282,7 +282,7 @@ export default function AuthPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   placeholder="••••••••••••"
-                  className="w-full pl-9 pr-10 py-2.5 bg-black/60 border border-white/15 text-white placeholder-white/30 focus:border-[#FF7582] focus:outline-none transition-colors"
+                  className="w-full pl-9 pr-10 py-2.5 bg-black/60 border border-white/15 text-white placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors"
                 />
                 <button
                   type="button"
@@ -318,7 +318,7 @@ export default function AuthPage() {
                 <button
                   type="button"
                   onClick={toggleMode}
-                  className="text-[#FF7582] hover:underline font-bold cursor-pointer"
+                  className="text-[#CA1C30] hover:underline font-bold cursor-pointer"
                 >
                   Créer un compte
                 </button>
@@ -329,7 +329,7 @@ export default function AuthPage() {
                 <button
                   type="button"
                   onClick={toggleMode}
-                  className="text-[#FF7582] hover:underline font-bold cursor-pointer"
+                  className="text-[#CA1C30] hover:underline font-bold cursor-pointer"
                 >
                   Se connecter
                 </button>

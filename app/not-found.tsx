@@ -7,16 +7,16 @@ import { ArrowLeft } from "lucide-react";
 
 export default function NotFound() {
   return (
-    <main className="min-h-screen bg-[#07090D] text-white font-mono flex flex-col justify-between p-6 sm:p-12 relative overflow-hidden selection:bg-[#FF7582] selection:text-black">
+    <main className="min-h-screen bg-[#0B0A0D] text-white font-mono flex flex-col justify-between p-6 sm:p-12 relative overflow-hidden selection:bg-[#CA1C30] selection:text-black">
       {/* Subtle ambient background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#FF7582]/[0.03] blur-[140px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#CA1C30]/[0.03] blur-[140px] pointer-events-none" />
 
       {/* Top Brand Logo */}
       <header className="relative z-10">
         <Link href="/" className="inline-flex items-center gap-2.5 group">
-          <span className="w-2.5 h-2.5 bg-[#FF7582] shadow-[0_0_10px_#FF7582] inline-block animate-pulse" />
-          <span className="text-xl font-display text-white group-hover:text-[#FF7582] transition-colors tracking-widest font-bold">
-            POULPY<span className="text-[#FF7582]">.</span>
+          <span className="w-2.5 h-2.5 bg-[#CA1C30] shadow-[0_0_10px_#CA1C30] inline-block animate-pulse" />
+          <span className="text-xl font-display text-white group-hover:text-[#CA1C30] transition-colors tracking-widest font-bold">
+            POULPY<span className="text-[#CA1C30]">.</span>
           </span>
         </Link>
       </header>
@@ -31,7 +31,7 @@ export default function NotFound() {
           className="relative"
         >
           <div className="text-7xl sm:text-8xl font-display text-white tracking-wider">
-            4<span className="text-[#FF7582]">0</span>4
+            4<span className="text-[#CA1C30]">0</span>4
           </div>
         </motion.div>
 

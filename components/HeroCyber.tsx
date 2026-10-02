@@ -3,7 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import DecryptedText from "./DecryptedText";
-import { ArrowUpRight, Terminal, Crosshair, Shield, Zap, Activity } from "lucide-react";
+import { ArrowUpRight, ChevronDown } from "lucide-react";
 
 interface HeroCyberProps {
   onOpenBooking: () => void;
@@ -26,7 +26,7 @@ export default function HeroCyber({ onOpenBooking }: HeroCyberProps) {
       });
     }
     if (hudMetricsRef.current) {
-      gsap.set(hudMetricsRef.current, { opacity: 0, y: 30 });
+      gsap.set(hudMetricsRef.current, { opacity: 0, y: 20 });
     }
 
     let hasAnimated = false;
@@ -70,58 +70,51 @@ export default function HeroCyber({ onOpenBooking }: HeroCyberProps) {
   return (
     <section
       ref={containerRef}
-      className="relative min-h-[90vh] flex flex-col justify-between pt-36 sm:pt-40 pb-16 sm:pb-20 px-4 sm:px-12 lg:px-16 z-10 overflow-hidden"
+      className="relative min-h-[100dvh] h-screen flex flex-col justify-between pt-20 pb-6 px-6 sm:px-12 lg:px-16 z-10 overflow-hidden"
     >
-      {/* Center Monumental Architectural Title */}
-      <div className="my-auto py-12 sm:py-16 flex flex-col items-start select-none max-w-full">
-        <div className="data-badge data-badge-acid mb-6">
-          <span>COACHING E-SPORT HAUT NIVEAU</span>
-        </div>
+      {/* Spacer top for navbar clearance */}
+      <div className="h-4 sm:h-8" aria-hidden="true" />
 
-        {/* Huge Title Animated by GSAP */}
+      {/* Main Centered Hero Block */}
+      <div className="max-w-5xl mx-auto w-full my-auto py-6 flex flex-col items-center justify-center text-center select-none">
+        {/* Architectural Title with Subtle Smooth Hover Lift & Color Glow */}
         <div
           ref={titleLettersRef}
-          className="relative overflow-hidden flex items-center leading-[0.82] text-[clamp(2.75rem,13.5vw,18.5rem)] font-display text-white tracking-tighter py-2 max-w-full"
+          className="relative flex items-center justify-center leading-[0.95] text-[clamp(2.75rem,8.5vw,7.8rem)] font-display font-bold text-[#F5F4F0] tracking-tight py-2"
         >
           {titleString.split("").map((letter, idx) => (
             <span
               key={idx}
-              className="letter-reveal inline-block will-change-transform text-white hover:text-[#FF7582] transition-colors duration-150 cursor-crosshair"
+              className="letter-reveal inline-block will-change-transform transition-all duration-300 ease-out hover:-translate-y-2 hover:scale-105 hover:text-[#CA1C30] hover:drop-shadow-[0_4px_25px_rgba(202,28,48,0.45)] cursor-default"
             >
               {letter}
             </span>
           ))}
-          <span className="letter-reveal text-[#FF7582] inline-block ml-2 will-change-transform animate-pulse">
-            .
-          </span>
         </div>
 
-        {/* Sub-headline & Tagline */}
-        <div className="mt-6 max-w-3xl grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
-          <div className="md:col-span-8 space-y-2">
-            <p className="text-lg md:text-2xl text-white font-mono font-medium leading-snug tracking-tight">
-              L&apos;ÉLITE DU COACHING FPS COMPÉTITIF.
-              <br />
-              <span className="text-[#8FAFD4]">
-                VALORANT (IMMORTAL 2 #5000) &amp; APEX (3x PICK #450).
-              </span>
-            </p>
-            <p className="text-xs md:text-sm text-white/40 font-mono leading-relaxed">
-              Zéro théorie inutile. Zéro dégradé complaisant. Analyse biomécanique sub-pixel, déconstruction chirurgicale de VOD et domination psychologique en clutch.
-            </p>
-          </div>
+        {/* Sub-headline & Call-To-Actions (Centered) */}
+        <div className="mt-6 sm:mt-8 max-w-2xl mx-auto flex flex-col items-center text-center space-y-6">
+          <p className="text-lg sm:text-xl md:text-2xl text-[#F5F4F0] font-semibold leading-snug tracking-tight">
+            L&apos;ÉLITE DU COACHING FPS COMPÉTITIF.
+            <br />
+            <span className="font-accent text-[#00B4A0] text-sm sm:text-base md:text-lg font-semibold tracking-wider block mt-2">
+              VALORANT (IMMORTAL 2 #5000) &amp; APEX (3x PICK #450).
+            </span>
+          </p>
 
-          <div className="md:col-span-4 flex flex-col gap-3">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2 w-full max-w-md">
             <button
               onClick={onOpenBooking}
-              className="btn-cyber-primary"
+              className="btn-cyber-primary w-full sm:w-auto rounded-full px-8 py-3.5 shadow-[0_0_30px_rgba(202, 28, 48,0.4)] justify-center font-bold text-xs tracking-wider cursor-pointer"
             >
               <span>ENGAGER LE COACHING</span>
-              <ArrowUpRight className="w-4 h-4" />
+              <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+                <ArrowUpRight className="w-3.5 h-3.5 text-white" />
+              </div>
             </button>
             <a
               href="#methodology"
-              className="px-6 py-3 border border-transparent hover:border-[#8FAFD4] hover:bg-[#8FAFD4]/10 hover:shadow-[0_0_15px_rgba(143,175,212,0.25)] text-white/50 hover:text-[#8FAFD4] text-xs font-mono font-bold tracking-wider uppercase transition-all duration-200 flex items-center justify-center text-center cursor-pointer"
+              className="px-7 py-3.5 border border-white/20 hover:border-[#00B4A0] rounded-full bg-black/40 hover:bg-[#00B4A0]/10 text-white/80 hover:text-white text-xs font-semibold tracking-wider uppercase transition-all duration-200 flex items-center justify-center text-center cursor-pointer backdrop-blur-sm w-full sm:w-auto"
             >
               <span>EXPLORER LA MÉTHODE</span>
             </a>
@@ -129,50 +122,18 @@ export default function HeroCyber({ onOpenBooking }: HeroCyberProps) {
         </div>
       </div>
 
-      {/* Bottom Telemetry HUD Bar */}
+      {/* Bottom Subtle Bouncing Down Arrow */}
       <div
         ref={hudMetricsRef}
-        className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6 border-t border-[rgba(255,255,255,0.08)]"
+        className="flex items-center justify-center pb-2 z-20 pointer-events-auto"
       >
-        <div className="reticle-box p-4 space-y-1">
-          <span className="text-[10px] text-white/40 font-mono tracking-widest uppercase block">
-            01 // AIM TRAINING
-          </span>
-          <div className="text-xl font-bold font-mono text-[#A4DE87]">
-            VT JADE CONFIRMED
-          </div>
-          <span className="text-[11px] text-white/60">Voltaic Benchmark Officiel</span>
-        </div>
-
-        <div className="reticle-box reticle-laser p-4 space-y-1">
-          <span className="text-[10px] text-white/40 font-mono tracking-widest uppercase block">
-            02 // VALORANT PEAK
-          </span>
-          <div className="text-xl font-bold font-mono text-[#8FAFD4]">
-            IMMORTAL 2 #5000
-          </div>
-          <span className="text-[11px] text-white/60">Top 0.05% Serveur Europe</span>
-        </div>
-
-        <div className="reticle-box p-4 space-y-1">
-          <span className="text-[10px] text-white/40 font-mono tracking-widest uppercase block">
-            03 // APEX LEGENDS
-          </span>
-          <div className="text-xl font-bold font-mono text-[#FF7582]">
-            3x PICK #450 S24
-          </div>
-          <span className="text-[11px] text-white/60">Predator MNK Pure Mechanics</span>
-        </div>
-
-        <div className="reticle-box p-4 space-y-1">
-          <span className="text-[10px] text-white/40 font-mono tracking-widest uppercase block">
-            04 // PRO STRUCTURE
-          </span>
-          <div className="text-xl font-bold font-mono text-[#FF7582]">
-            ATHERIS ESPORT
-          </div>
-          <span className="text-[11px] text-white/60">Coach Officiel de l&apos;Équipe</span>
-        </div>
+        <a
+          href="#coaching"
+          aria-label="Dérouler vers la suite"
+          className="p-3 text-white/40 hover:text-[#CA1C30] transition-colors flex items-center justify-center animate-bounce"
+        >
+          <ChevronDown className="w-6 h-6" />
+        </a>
       </div>
     </section>
   );

@@ -109,7 +109,7 @@ export default function MethodologyHorizontal() {
           <DecryptedText text="MÉTHODOLOGIE D'ÉLITE // 04 ÉTAPES" />
         </span>
         <span className="text-white/40 hidden sm:inline flex items-center gap-2">
-          <span className="w-1.5 h-1.5 bg-[#00ff41] animate-ping" />
+          <span className="w-1.5 h-1.5 bg-[#F5F4F0] animate-ping" />
           DÉFILEMENT HORIZONTAL GSAP SCROLLTRIGGER PINNED
         </span>
       </div>
@@ -127,12 +127,12 @@ export default function MethodologyHorizontal() {
               key={step.num}
               className={`w-[85vw] sm:w-[580px] lg:w-[650px] shrink-0 reticle-box ${
                 isAcid ? "" : "reticle-laser"
-              } p-8 sm:p-12 space-y-8 bg-[#040404]`}
+              } p-8 sm:p-12 space-y-8 bg-[#121117]`}
             >
               {/* Card Header */}
               <div className="flex items-start justify-between border-b border-[rgba(255,255,255,0.08)] pb-6">
                 <div className="space-y-1">
-                  <div className="text-xs font-mono text-[#00ff41] font-bold tracking-widest uppercase">
+                  <div className="text-xs font-mono text-[#F5F4F0] font-bold tracking-widest uppercase">
                     {step.code}
                   </div>
                   <div className="text-5xl sm:text-7xl font-display text-white tracking-wider">
@@ -143,8 +143,8 @@ export default function MethodologyHorizontal() {
                 <div
                   className={`w-14 h-14 border flex items-center justify-center ${
                     isAcid
-                      ? "border-[#00ff41]/40 text-[#00ff41] bg-[#00ff41]/5"
-                      : "border-[#00f0ff]/40 text-[#00f0ff] bg-[#00f0ff]/5"
+                      ? "border-[#F5F4F0]/40 text-[#F5F4F0] bg-[#F5F4F0]/5"
+                      : "border-[#00B4A0]/40 text-[#00B4A0] bg-[#00B4A0]/5"
                   }`}
                 >
                   <Icon className="w-7 h-7" />
@@ -170,7 +170,7 @@ export default function MethodologyHorizontal() {
                     </div>
                     <div
                       className={`text-base sm:text-lg font-bold font-mono ${
-                        isAcid ? "text-[#00ff41]" : "text-[#00f0ff]"
+                        isAcid ? "text-[#F5F4F0]" : "text-[#00B4A0]"
                       }`}
                     >
                       {m.value}
@@ -183,7 +183,7 @@ export default function MethodologyHorizontal() {
               <div className="flex items-center justify-between text-[11px] font-mono text-white/40 pt-2">
                 <span>{step.tag}</span>
                 <span className="flex items-center gap-1 text-white">
-                  ÉTAPE SUIVANTE <ChevronRight className="w-3.5 h-3.5 text-[#00ff41]" />
+                  ÉTAPE SUIVANTE <ChevronRight className="w-3.5 h-3.5 text-[#F5F4F0]" />
                 </span>
               </div>
             </div>

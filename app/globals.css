@@ -6,30 +6,41 @@
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
-  --black: #06080a;
-  --dark-1: #090c10;
-  --dark-2: #0e1217;
-  --dark-3: #141820;
+  --black: #0A1C1D;
+  --dark-1: #102A2C;
+  --dark-2: #173B3E;
+  --dark-3: #064E48;
   
-  /* Primary Accent: Poulpy Pastel Coral */
-  --acid: #FF7582;
-  --acid-glow: 0 0 20px rgba(255, 117, 130, 0.35), 0 0 60px rgba(255, 117, 130, 0.12);
+  /* 1. Primary Accent: VCT Champions Crimson Vermilion Red */
+  --acid: #CA1C30;
+  --acid-glow: 0 0 20px rgba(202, 28, 48, 0.45), 0 0 60px rgba(202, 28, 48, 0.18);
   
-  /* Secondary Accent: Pastel Slate / Muted Indigo */
-  --laser: #8FAFD4;
-  --laser-glow: 0 0 20px rgba(143, 175, 212, 0.35), 0 0 60px rgba(143, 175, 212, 0.12);
+  /* 2. Secondary Accent: Champions Burnished Gold (Dragon Spine & Accents) */
+  --laser: #00B4A0;
+  --laser-glow: 0 0 20px rgba(0, 180, 160, 0.45), 0 0 60px rgba(0, 180, 160, 0.18);
   
-  /* Tertiary Accent: Pastel Bamboo / Matcha Sage */
-  --bamboo: #A4DE87;
-  --bamboo-glow: 0 0 20px rgba(164, 222, 135, 0.35);
-  
-  --red: #FF7582;
-  --red-glow: 0 0 20px rgba(255, 117, 130, 0.35);
+  /* 3. Complementary Accent: Champagne Pale Gold / Trophy Inscription */
+  --gold: #5EEAD4;
+  --gold-glow: 0 0 20px rgba(94, 234, 212, 0.45), 0 0 50px rgba(94, 234, 212, 0.18);
 
-  --font-display: var(--font-bebas), "Bebas Neue", "Syne", "Impact", sans-serif;
-  --font-mono: var(--font-jetbrains), "JetBrains Mono", monospace;
+  /* 4. Deep Metallic Bronze / Burnished Trim */
+  --teal-deep: #064E48;
+  --teal-glow: 0 0 20px rgba(6, 78, 72, 0.45);
   
-  --grid-line: rgba(255, 255, 255, 0.04);
+  /* 5. Tertiary Accent: Ceramic Platinum / White Weapon Trim */
+  --bamboo: #F5F4F0;
+  --bamboo-glow: 0 0 20px rgba(245, 244, 240, 0.4);
+  
+  /* Red Alert & Contrast */
+  --red: #CA1C30;
+  --red-glow: 0 0 20px rgba(202, 28, 48, 0.45), 0 0 50px rgba(202, 28, 48, 0.18);
+
+  --font-display: var(--font-unbounded), "Unbounded", sans-serif;
+  --font-sans: var(--font-sans), "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-accent: var(--font-accent), "Space Grotesk", sans-serif;
+  --font-mono: var(--font-sans), "Plus Jakarta Sans", sans-serif;
+  
+  --grid-line: rgba(0, 180, 160, 0.05);
 
   /* Emil Kowalski / Animate Skill Certified Easing Tokens */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -37,28 +48,27 @@
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-/* ZERO ROUNDED CORNERS — MANDATORY BRUTALIST TECHNICAL SPEC */
+/* BALANCED DESIGN SPEC — ORGANIC ASYMMETRY + TECHNICAL SHARP ACCENTS */
 *,
 *::before,
 *::after {
   box-sizing: border-box;
-  border-radius: 0px !important;
 }
 
 html {
-  background-color: #000000;
-  color: #ffffff;
+  background-color: #0A1C1D;
+  color: #F5F4F0;
   max-width: 100%;
 }
 
 body {
   margin: 0;
   padding: 0;
-  background-color: #000000;
-  color: #ffffff;
+  background-color: #0A1C1D;
+  color: #F5F4F0;
   min-height: 100vh;
   max-width: 100%;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -67,14 +77,18 @@ button, a {
   touch-action: manipulation;
 }
 
-/* Radical Display Typography */
+/* Radical Display & Interface Typography */
 .font-display {
-  font-family: var(--font-display);
-  letter-spacing: 0.02em;
+  font-family: var(--font-display), 'Unbounded', sans-serif !important;
+  letter-spacing: -0.02em;
+}
+
+.font-accent {
+  font-family: var(--font-accent), 'Space Grotesk', sans-serif !important;
 }
 
 .font-mono {
-  font-family: var(--font-mono);
+  font-family: var(--font-sans), 'Plus Jakarta Sans', sans-serif !important;
 }
 
 /* Visible Technical 1px Grid Background */
@@ -85,11 +99,12 @@ button, a {
     linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
 }
 
-/* Corner Reticle Marks on Panels */
+/* Corner Reticle Marks on Panels (hybrid rounded card with cyber corner markers) */
 .reticle-box {
   position: relative;
   background: var(--dark-1);
   border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 18px;
 }
 
 .reticle-box::before {
@@ -97,10 +112,11 @@ button, a {
   position: absolute;
   top: -1px;
   left: -1px;
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
   border-top: 2px solid var(--acid);
   border-left: 2px solid var(--acid);
+  border-top-left-radius: 18px;
   pointer-events: none;
 }
 
@@ -109,10 +125,11 @@ button, a {
   position: absolute;
   bottom: -1px;
   right: -1px;
-  width: 8px;
-  height: 8px;
+  width: 12px;
+  height: 12px;
   border-bottom: 2px solid var(--acid);
   border-right: 2px solid var(--acid);
+  border-bottom-right-radius: 18px;
   pointer-events: none;
 }
 
@@ -129,39 +146,43 @@ button, a {
 
 /* Custom Minimal Scrollbar */
 ::-webkit-scrollbar {
-  width: 3px;
-  height: 3px;
+  width: 4px;
+  height: 4px;
 }
 ::-webkit-scrollbar-track {
-  background: #000000;
+  background: #0B0A0D;
 }
 ::-webkit-scrollbar-thumb {
   background: var(--acid);
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--laser);
 }
 
-/* Magnetic Button State */
+/* Magnetic Button State — Sleek rounded pill / asymmetric luxury */
 .btn-cyber-primary {
   background: var(--acid);
-  color: #000000;
-  font-family: var(--font-mono);
+  color: #F6F3EE;
+  font-family: var(--font-sans);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.05em;
   padding: 12px 28px;
   border: 1px solid var(--acid);
+  border-radius: 9999px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
+  box-shadow: 0 0 20px rgba(202, 28, 48, 0.25);
 }
 
 .btn-cyber-primary:hover {
-  background: #000000;
-  color: var(--acid);
+  background: #0B0A0D;
+  color: #F6F3EE;
+  border-color: var(--acid);
   box-shadow: var(--acid-glow);
   transform: translateY(-2px);
 }
@@ -174,12 +195,13 @@ button, a {
 .btn-cyber-ghost {
   background: transparent;
   color: #ffffff;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.05em;
   padding: 12px 24px;
   border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 9999px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -190,7 +212,7 @@ button, a {
 .btn-cyber-ghost:hover {
   border-color: var(--laser);
   color: var(--laser);
-  background: rgba(0, 240, 255, 0.05);
+  background: rgba(0, 180, 160, 0.08);
   box-shadow: var(--laser-glow);
 }
 
@@ -199,36 +221,40 @@ button, a {
   transition-duration: 120ms;
 }
 
-/* Data Pill Badge */
+/* Data Pill Badge — Smooth rounded pill */
 .data-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 10px;
-  font-family: var(--font-mono);
-  font-size: 10px;
+  padding: 4px 14px;
+  border-radius: 9999px;
+  font-family: var(--font-sans);
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   border: 1px solid;
 }
 
 .data-badge-acid {
   color: var(--acid);
-  border-color: rgba(255, 117, 130, 0.3);
-  background: rgba(255, 117, 130, 0.05);
+  border-color: rgba(202, 28, 48, 0.35);
+  background: rgba(202, 28, 48, 0.08);
+  box-shadow: 0 0 15px rgba(202, 28, 48, 0.1);
 }
 
 .data-badge-laser {
   color: var(--laser);
-  border-color: rgba(143, 175, 212, 0.3);
-  background: rgba(143, 175, 212, 0.05);
+  border-color: rgba(0, 180, 160, 0.35);
+  background: rgba(0, 180, 160, 0.08);
+  box-shadow: 0 0 15px rgba(0, 180, 160, 0.1);
 }
 
 .data-badge-red {
   color: var(--red);
-  border-color: rgba(255, 117, 130, 0.3);
-  background: rgba(255, 117, 130, 0.05);
+  border-color: rgba(202, 28, 48, 0.35);
+  background: rgba(202, 28, 48, 0.08);
+  box-shadow: 0 0 15px rgba(202, 28, 48, 0.1);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -257,8 +283,8 @@ button, a {
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent 5%, #FF7582 50%, transparent 95%);
-  box-shadow: 0 0 18px #FF7582, 0 0 35px rgba(255, 117, 130, 0.4);
+  background: linear-gradient(90deg, transparent 5%, #CA1C30 50%, transparent 95%);
+  box-shadow: 0 0 18px #CA1C30, 0 0 35px rgba(202, 28, 48, 0.4);
   pointer-events: none;
   opacity: 0;
   transform: translateY(-100%);
@@ -286,8 +312,8 @@ button, a {
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent 5%, #8FAFD4 50%, transparent 95%);
-  box-shadow: 0 0 18px #8FAFD4, 0 0 35px rgba(143, 175, 212, 0.4);
+  background: linear-gradient(90deg, transparent 5%, #00B4A0 50%, transparent 95%);
+  box-shadow: 0 0 18px #00B4A0, 0 0 35px rgba(0, 180, 160, 0.4);
   pointer-events: none;
   opacity: 0;
   transform: translateY(-100%);
@@ -301,13 +327,13 @@ button, a {
 
 @keyframes glitch-flicker {
   0%   { text-shadow: none; transform: translate(0, 0); }
-  8%   { text-shadow: -3px 0 #FF7582, 3px 0 #8FAFD4; transform: translate(-2px, 0); }
-  16%  { text-shadow: 3px 0 #FF7582, -3px 0 #8FAFD4; transform: translate(2px, 0); }
-  24%  { text-shadow: -2px 0 #FF7582, 2px 0 #8FAFD4; transform: translate(0, 0); }
+  8%   { text-shadow: -3px 0 #CA1C30, 3px 0 #00B4A0; transform: translate(-2px, 0); }
+  16%  { text-shadow: 3px 0 #CA1C30, -3px 0 #00B4A0; transform: translate(2px, 0); }
+  24%  { text-shadow: -2px 0 #CA1C30, 2px 0 #00B4A0; transform: translate(0, 0); }
   32%  { text-shadow: none; transform: translate(0, 0); }
   50%  { text-shadow: none; transform: translate(0, 0); }
-  58%  { text-shadow: -1px 0 #FF7582, 1px 0 #8FAFD4; transform: translate(-1px, 0); }
-  66%  { text-shadow: 1px 0 #FF7582, -1px 0 #8FAFD4; transform: translate(1px, 0); }
+  58%  { text-shadow: -1px 0 #CA1C30, 1px 0 #00B4A0; transform: translate(-1px, 0); }
+  66%  { text-shadow: 1px 0 #CA1C30, -1px 0 #00B4A0; transform: translate(1px, 0); }
   74%  { text-shadow: none; transform: translate(0, 0); }
   100% { text-shadow: none; transform: translate(0, 0); }
 }
@@ -394,12 +420,12 @@ button, a {
 
 @keyframes border-glow-pulse {
   0%, 100% {
-    box-shadow: 0 0 15px rgba(0, 255, 65, 0.2), inset 0 0 15px rgba(0, 255, 65, 0.05);
-    border-color: rgba(0, 255, 65, 0.4);
+    box-shadow: 0 0 15px rgba(245, 244, 240, 0.2), inset 0 0 15px rgba(245, 244, 240, 0.05);
+    border-color: rgba(245, 244, 240, 0.4);
   }
   50% {
-    box-shadow: 0 0 30px rgba(0, 255, 65, 0.45), inset 0 0 30px rgba(0, 255, 65, 0.15);
-    border-color: rgba(0, 255, 65, 0.9);
+    box-shadow: 0 0 30px rgba(245, 244, 240, 0.45), inset 0 0 30px rgba(245, 244, 240, 0.15);
+    border-color: rgba(245, 244, 240, 0.9);
   }
 }
 
@@ -423,8 +449,8 @@ button, a {
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   LIGHT THEME CALIBRATION (html.light) — SOOTHING WARM BEIGE & SAND
-   Absolument aucun blanc agressif, palette feutrée et douce pour les yeux
+   LIGHT THEME CALIBRATION (html.light) — JAPANESE RICE PAPER & TEAL
+   Exact Koi vinyl color harmony: #00B4A0, #CA1C30, #00B4A0, #F5F4F0
    ═══════════════════════════════════════════════════════════════ */
 
 html.theme-transition,
@@ -436,96 +462,132 @@ html.theme-transition *::after {
 
 html.light {
   color-scheme: light;
-  --black: #EAE3D5;
-  --dark-1: #F2ECE1;
-  --dark-2: #E3DBD0;
-  --dark-3: #D8CFBF;
-  --acid: #C24D42;
-  --laser: #4E6D8E;
-  --grid-line: rgba(50, 40, 30, 0.05);
+  --black: #F5F4F0;
+  --dark-1: #ECECD4;
+  --dark-2: #D9D9B8;
+  --dark-3: #CBCBA4;
+  --acid: #CA1C30;
+  --laser: #00B4A0;
+  --grid-line: rgba(6, 78, 72, 0.05);
 }
 
 html.light body {
-  background-color: #EAE3D5 !important;
-  color: #332B25 !important;
+  background-color: #F5F4F0 !important;
+  color: #102627 !important;
 }
 
 html.light .scanlines-overlay {
   opacity: 0.03;
 }
 
-/* Surfaces de sections : beiges chauds naturels */
-html.light .bg-\[\#07090D\],
-html.light .bg-\[\#06080b\],
+/* Surfaces de sections : papier de riz beige chaud (#F5F4F0) */
+html.light .bg-\[\#0B0A0D\],
+html.light .bg-\[\#0B0A0D\],
 html.light .bg-\[\#060606\],
 html.light .bg-black {
-  background-color: #EAE3D5 !important;
+  background-color: #F5F4F0 !important;
 }
 
-/* Cartes et panneaux : parchemin velouté très doux */
-html.light .bg-\[\#090c10\],
+/* Cartes principales et panneaux : crème doux (#ECECD4) */
+html.light .reticle-box,
+html.light .bg-\[\#132426\],
+html.light .bg-\[\#121117\],
+html.light .bg-black\/95,
+html.light .bg-black\/90 {
+  background-color: #ECECD4 !important;
+  border-color: rgba(6, 78, 72, 0.15) !important;
+  box-shadow: 0 4px 25px rgba(6, 78, 72, 0.06) !important;
+}
+
+/* Vignettes secondaires, métriques, options et cartes internes */
+html.light .bg-\[\#1B3235\],
+html.light .bg-\[\#090C12\],
+html.light .bg-\[\#090C12\]\/95,
+html.light .bg-\[\#0c0f15\],
+html.light .bg-\[\#0d1017\],
 html.light .bg-black\/80,
-html.light .bg-black\/95 {
-  background-color: #F4EFE6 !important;
-}
-
+html.light .bg-black\/70,
+html.light .bg-black\/60,
+html.light .bg-black\/50,
 html.light .bg-black\/40,
-html.light .bg-black\/60 {
-  background-color: #E2DACD !important;
+html.light .bg-black\/30 {
+  background-color: #D9D9B8 !important;
 }
 
-html.light .bg-\[\#040404\] {
-  background-color: #E4DCCF !important;
+/* État actif sélectionné pour les options de cartes */
+html.light .bg-\[\#CA1C30\]\/15,
+html.light .bg-\[\#CA1C30\]\/10,
+html.light .bg-\[\#CA1C30\]\/20,
+html.light .bg-\[\#CA1C30\]\/15,
+html.light .bg-\[\#CA1C30\]\/10,
+html.light .bg-\[\#CA1C30\]\/20 {
+  background-color: rgba(202, 28, 48, 0.15) !important;
+}
+html.light .bg-\[\#00B4A0\]\/15,
+html.light .bg-\[\#00B4A0\]\/10,
+html.light .bg-\[\#00B4A0\]\/15,
+html.light .bg-\[\#00B4A0\]\/10,
+html.light .bg-\[\#00B4A0\]\/15,
+html.light .bg-\[\#00B4A0\]\/10 {
+  background-color: rgba(6, 78, 72, 0.14) !important;
+}
+html.light .bg-\[\#F5F4F0\]\/15,
+html.light .bg-\[\#F5F4F0\]\/20,
+html.light .bg-\[\#F5F4F0\]\/15,
+html.light .bg-\[\#F5F4F0\]\/20 {
+  background-color: rgba(0, 180, 160, 0.2) !important;
 }
 
-/* Textes sombres et lisibles, sépia chaud reposant */
+/* Textes sombres et lisibles, teal sombre noble */
 html.light .text-white {
-  color: #332B25 !important;
+  color: #102627 !important;
 }
 
 html.light .text-white\/90,
 html.light .text-white\/80,
 html.light .text-white\/70 {
-  color: #52473E !important;
+  color: #1A3E40 !important;
 }
 
 html.light .text-white\/60,
 html.light .text-white\/50 {
-  color: #6D6258 !important;
+  color: #2D585A !important;
 }
 
 html.light .text-white\/40,
 html.light .text-white\/30 {
-  color: #897E74 !important;
+  color: #486E70 !important;
 }
 
-/* Bordures douces couleur terre */
+/* Bordures douces couleur teal marin */
 html.light .border-white\/5,
 html.light .border-white\/10,
 html.light .border-white\/15,
-html.light .border-white\/20 {
-  border-color: rgba(50, 40, 30, 0.09) !important;
-}
-
-/* Reticle boxes en thème beige chaud */
-html.light .reticle-box {
-  background-color: #F4EFE6 !important;
-  border-color: rgba(50, 40, 30, 0.11) !important;
-  box-shadow: 0 4px 20px rgba(50, 40, 30, 0.04) !important;
+html.light .border-white\/20,
+html.light .border-white\/30,
+html.light .border-\[rgba\(255\,255\,255\,0\.08\)\] {
+  border-color: rgba(6, 78, 72, 0.12) !important;
 }
 
 /* Header scrollé en beige translucide */
 html.light header {
-  background-color: rgba(234, 227, 213, 0.94) !important;
-  border-bottom-color: rgba(194, 77, 66, 0.22) !important;
+  background-color: rgba(245, 244, 240, 0.94) !important;
+  border-bottom-color: rgba(202, 28, 48, 0.2) !important;
 }
 
-/* Boutons primaires restent bien lisibles */
+/* Boutons primaires restent vibrants et lisibles */
 html.light .btn-cyber-primary {
-  color: #1f1a17 !important;
-  background-color: #FF7582 !important;
+  color: #FFFFFF !important;
+  background-color: #CA1C30 !important;
+  border-color: #CA1C30 !important;
+  box-shadow: 0 0 20px rgba(202, 28, 48, 0.25) !important;
 }
 html.light .btn-cyber-primary span {
-  color: #1f1a17 !important;
+  color: #FFFFFF !important;
+}
+
+html.light .btn-cyber-ghost {
+  border-color: rgba(6, 78, 72, 0.25) !important;
+  color: #102627 !important;
 }
 

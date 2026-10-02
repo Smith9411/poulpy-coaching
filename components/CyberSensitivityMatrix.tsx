@@ -15,7 +15,7 @@ export default function CyberSensitivityMatrix() {
   const cm360 = Math.round((360 / (valSens * 0.07 * dpi)) * 2.54);
 
   return (
-    <div className="reticle-box p-6 sm:p-8 bg-[#040404] space-y-6">
+    <div className="reticle-box p-6 sm:p-8 bg-[#121117] space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[rgba(255,255,255,0.08)] pb-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-xs font-mono">
@@ -47,7 +47,7 @@ export default function CyberSensitivityMatrix() {
                   onClick={() => setDpi(val)}
                   className={`py-2 text-xs font-bold border transition-all ${
                     dpi === val
-                      ? "bg-[#00ff41] text-black border-[#00ff41]"
+                      ? "bg-[#F5F4F0] text-black border-[#F5F4F0]"
                       : "bg-black text-white/60 border-white/10 hover:border-white/30"
                   }`}
                 >
@@ -62,7 +62,7 @@ export default function CyberSensitivityMatrix() {
               <label className="uppercase tracking-widest">
                 SENSIBILITÉ IN-GAME (VALORANT) :
               </label>
-              <span className="text-base font-bold text-[#00ff41] font-mono">
+              <span className="text-base font-bold text-[#F5F4F0] font-mono">
                 {valSens}
               </span>
             </div>
@@ -73,18 +73,18 @@ export default function CyberSensitivityMatrix() {
               step="0.01"
               value={valSens}
               onChange={(e) => setValSens(Number(e.target.value))}
-              className="w-full accent-[#00ff41] cursor-pointer h-1.5 bg-white/10"
+              className="w-full accent-[#F5F4F0] cursor-pointer h-1.5 bg-white/10"
             />
           </div>
 
           <div className="p-4 bg-black border border-white/5 space-y-2">
             <div className="flex items-center justify-between text-xs">
               <span className="text-white/60">Circonférence 360° :</span>
-              <span className="font-mono font-bold text-lg text-[#00f0ff]">{cm360} CM</span>
+              <span className="font-mono font-bold text-lg text-[#00B4A0]">{cm360} CM</span>
             </div>
             <div className="w-full h-1.5 bg-white/10 overflow-hidden">
               <div
-                className="h-full bg-[#00f0ff] transition-all duration-300"
+                className="h-full bg-[#00B4A0] transition-all duration-300"
                 style={{ width: `${Math.min(100, Math.max(10, (cm360 / 60) * 100))}%` }}
               />
             </div>
@@ -96,15 +96,15 @@ export default function CyberSensitivityMatrix() {
 
         {/* Matrix Converted Output */}
         <div className="md:col-span-6 grid grid-cols-2 gap-3 font-mono">
-          <div className="p-4 bg-black border border-[rgba(0,255,65,0.2)] space-y-1">
+          <div className="p-4 bg-black border border-[rgba(245, 244, 240,0.2)] space-y-1">
             <span className="text-[10px] text-white/40 uppercase">VALORANT eDPI</span>
-            <div className="text-3xl font-bold text-[#00ff41]">{edpi}</div>
+            <div className="text-3xl font-bold text-[#F5F4F0]">{edpi}</div>
             <span className="text-[10px] text-white/40 block">Prise d&apos;angle laser</span>
           </div>
 
-          <div className="p-4 bg-black border border-[rgba(0,240,255,0.2)] space-y-1">
+          <div className="p-4 bg-black border border-[rgba(0, 180, 160,0.2)] space-y-1">
             <span className="text-[10px] text-white/40 uppercase">APEX LEGENDS</span>
-            <div className="text-3xl font-bold text-[#00f0ff]">{apexSens}</div>
+            <div className="text-3xl font-bold text-[#00B4A0]">{apexSens}</div>
             <span className="text-[10px] text-white/40 block">Tracking close-quarters</span>
           </div>
 

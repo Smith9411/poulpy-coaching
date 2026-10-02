@@ -317,7 +317,7 @@ export default function Booking() {
   };
 
   return (
-    <section id="booking" className="py-14 sm:py-16 px-6 sm:px-12 lg:px-16 bg-[#07090D] border-t border-[rgba(255,255,255,0.08)] font-mono relative z-20">
+    <section id="booking" className="py-14 sm:py-16 px-6 sm:px-12 lg:px-16 bg-transparent font-mono relative z-20">
       {/* Anchor target for #tarifs */}
       <div id="tarifs" className="absolute -top-20 pointer-events-none" />
       <div className="max-w-6xl mx-auto space-y-8">
@@ -327,8 +327,8 @@ export default function Booking() {
             <span className="data-badge data-badge-laser">
               <DecryptedText text="MODULE DE RÉSERVATION" />
             </span>
-            <h2 className="text-3xl sm:text-5xl font-display text-white tracking-wider">
-              RÉSERVE TON <span className="text-[#FF7582]">COACHING</span>
+            <h2 className="text-3xl sm:text-5xl font-display text-[#F5F4F0] tracking-wider">
+              RÉSERVE TON <span className="text-[#CA1C30]">COACHING</span>
             </h2>
           </div>
 
@@ -348,14 +348,14 @@ export default function Booking() {
                   onClick={() => {
                     if (isDone) setStep(s.id);
                   }}
-                  className={`px-3 py-1 text-xs font-bold border transition-all ${
+                  className={`px-3.5 py-1 text-xs font-bold border rounded-full transition-all ${
                     isDone ? "cursor-pointer" : ""
                   } ${
                     isActive
-                      ? "border-[#FF7582] bg-[#FF7582] text-black shadow-[0_0_15px_rgba(255,117,130,0.35)]"
+                      ? "border-[#CA1C30] bg-[#CA1C30] text-black shadow-[0_0_15px_rgba(202, 28, 48,0.35)]"
                       : isDone
-                      ? "border-[#FF7582]/50 text-[#FF7582] bg-[#FF7582]/10"
-                      : "border-white/10 text-white/40 bg-black"
+                      ? "border-[#CA1C30]/50 text-[#CA1C30] bg-[#CA1C30]/10"
+                      : "border-white/10 text-white/40 bg-[#121117]"
                   }`}
                 >
                   {s.label}
@@ -366,7 +366,7 @@ export default function Booking() {
         </div>
 
         {/* Dynamic Step Container */}
-        <div className="reticle-box p-6 sm:p-8 bg-[#090c10] border border-white/20 relative shadow-[0_0_50px_rgba(0,0,0,0.9)]">
+        <div className="reticle-box p-6 sm:p-8 bg-[#121117] rounded-3xl border border-white/20 relative shadow-[0_0_50px_rgba(0,0,0,0.9)]">
           <AnimatePresence mode="wait" initial={false}>
             {/* ======================================================== */}
             {/* STEP 1: EXACT PNG LAYOUT + DYNAMIC 3D TILT MOTION */}
@@ -382,11 +382,11 @@ export default function Booking() {
               >
                 {/* Step Subheader matching PNG */}
                 <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                  <div className="text-xs text-white/80 uppercase tracking-wider font-bold flex items-center gap-2">
-                    <span className="w-2 h-2 bg-[#FF7582]" />
+                  <div className="text-xs text-[#F5F4F0]/80 uppercase tracking-wider font-bold flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#CA1C30]" />
                     ÉTAPE 01 : SÉLECTION DU PROTOCOLE D&apos;ENTRAÎNEMENT
                   </div>
-                  <span className="text-xs text-[#FF7582] font-bold tracking-wider">3 FORMULES DISPONIBLES</span>
+                  <span className="text-xs text-[#CA1C30] font-bold tracking-wider">3 FORMULES DISPONIBLES</span>
                 </div>
 
                 {/* Main Grid: Left Pro (7 cols) + Right Stacked Satellite cards (5 cols) */}
@@ -414,12 +414,12 @@ export default function Booking() {
                         damping: 22,
                       }}
                       style={{ transformStyle: "preserve-3d" }}
-                      className={`relative h-full p-7 flex flex-col justify-between transition-colors duration-200 border overflow-hidden select-none ${
+                      className={`relative h-full p-7 flex flex-col justify-between transition-colors duration-200 border rounded-2xl overflow-hidden select-none ${
                         selectedPlan === "pro"
-                          ? "bg-[#0c0f15] border-[#FF7582] shadow-[0_0_35px_rgba(255,117,130,0.25)] ring-1 ring-[#FF7582]"
+                          ? "bg-[#1A1822] border-[#CA1C30] shadow-[0_0_35px_rgba(202, 28, 48,0.25)] ring-1 ring-[#CA1C30]"
                           : proTilt.isHovered
-                          ? "bg-[#0c0f15] border-[#FF7582]/60 shadow-[0_0_25px_rgba(255,117,130,0.15)]"
-                          : "bg-[#090C12] border-white/15 hover:border-white/30"
+                          ? "bg-[#1A1822] border-[#CA1C30]/60 shadow-[0_0_25px_rgba(202, 28, 48,0.15)]"
+                          : "bg-[#121117] border-white/15 hover:border-white/30"
                       }`}
                     >
                       {/* Corner Brackets */}
@@ -430,7 +430,7 @@ export default function Booking() {
                         <div
                           className="absolute inset-0 pointer-events-none transition-opacity duration-200"
                           style={{
-                            background: `radial-gradient(circle 280px at ${proTilt.mousePos.x}% ${proTilt.mousePos.y}%, rgba(255, 117, 130, 0.16), transparent 80%)`,
+                            background: `radial-gradient(circle 280px at ${proTilt.mousePos.x}% ${proTilt.mousePos.y}%, rgba(202, 28, 48, 0.16), transparent 80%)`,
                           }}
                         />
                       )}
@@ -438,20 +438,20 @@ export default function Booking() {
                       <div className="space-y-5 relative z-10" style={{ transform: "translateZ(8px)" }}>
                         {/* Top Badges */}
                         <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                          <span className="bg-[#FF7582] text-black text-[10px] font-bold px-3 py-1 uppercase tracking-widest">
+                          <span className="bg-[#CA1C30] text-black text-[10px] font-bold px-3 py-1 uppercase tracking-widest">
                             FORMULE DE RÉFÉRENCE
                           </span>
-                          <span className="text-xs text-white/70 tracking-widest font-mono">
+                          <span className="text-xs text-[#F5F4F0]/70 tracking-widest font-mono">
                             {proIsPack ? "PACK 5 SÉANCES + 2 OFFERTES" : "DURÉE : 1H - 1H30"}
                           </span>
                         </div>
 
                         {/* Title & Interactive Price Selector */}
                         <div>
-                          <span className="text-[10px] text-white/40 uppercase tracking-widest block font-mono">
+                          <span className="text-[10px] text-[#F5F4F0]/50 uppercase tracking-widest block font-mono">
                             COACHING INDIVIDUEL COMPLET
                           </span>
-                          <h3 className="text-3xl sm:text-4xl font-display text-white tracking-wider mt-1">
+                          <h3 className="text-3xl sm:text-4xl font-display text-[#F5F4F0] tracking-wider mt-1">
                             COACHING PRO
                           </h3>
 
@@ -465,25 +465,25 @@ export default function Booking() {
                                 setSelectedPlan("pro");
                                 setProIsPack(false);
                               }}
-                              className={`p-3 border text-left transition-all relative ${
+                              className={`p-3 border rounded-xl text-left transition-all relative cursor-pointer ${
                                 !proIsPack && selectedPlan === "pro"
-                                  ? "border-[#FF7582] bg-[#FF7582]/15 text-white shadow-[0_0_15px_rgba(255,117,130,0.25)] ring-1 ring-[#FF7582]"
-                                  : "border-white/10 bg-black/40 text-white/50 hover:border-white/30 hover:text-white/80"
+                                  ? "border-[#CA1C30] bg-[#CA1C30]/15 text-white shadow-[0_0_15px_rgba(202, 28, 48,0.25)] ring-1 ring-[#CA1C30]"
+                                  : "border-white/10 bg-[#0B0A0D]/80 text-[#F5F4F0]/60 hover:border-white/30 hover:text-white"
                               }`}
                             >
                               <div className="flex items-baseline justify-between">
-                                <span className={`text-2xl sm:text-3xl font-display ${!proIsPack && selectedPlan === "pro" ? "text-[#FF7582]" : "text-white"}`}>
+                                <span className={`text-2xl sm:text-3xl font-display ${!proIsPack && selectedPlan === "pro" ? "text-[#CA1C30]" : "text-[#F5F4F0]"}`}>
                                   10 €
                                 </span>
-                                <span className={`text-[9px] font-mono uppercase font-bold tracking-wider px-1.5 py-0.5 border ${
+                                <span className={`text-[9px] font-mono uppercase font-bold tracking-wider px-2 py-0.5 rounded-full border ${
                                   !proIsPack && selectedPlan === "pro"
-                                    ? "border-[#FF7582]/40 bg-[#FF7582]/20 text-[#FF7582]"
-                                    : "border-white/10 text-white/40"
+                                    ? "border-[#CA1C30]/40 bg-[#CA1C30]/20 text-[#CA1C30]"
+                                    : "border-white/10 text-[#F5F4F0]/40"
                                 }`}>
-                                  À L'UNITÉ
+                                  À L&apos;UNITÉ
                                 </span>
                               </div>
-                              <div className="text-[11px] font-mono text-white/70 mt-1">
+                              <div className="text-[11px] font-mono text-[#F5F4F0]/70 mt-1">
                                 1 séance complète (1h - 1h30)
                               </div>
                             </button>
@@ -496,28 +496,28 @@ export default function Booking() {
                                 setSelectedPlan("pro");
                                 setProIsPack(true);
                               }}
-                              className={`p-3 border text-left transition-all relative overflow-hidden ${
+                              className={`p-3 border rounded-xl text-left transition-all relative overflow-hidden cursor-pointer ${
                                 proIsPack && selectedPlan === "pro"
-                                  ? "border-[#FF7582] bg-[#FF7582]/15 text-white shadow-[0_0_15px_rgba(255,117,130,0.25)] ring-1 ring-[#FF7582]"
-                                  : "border-white/10 bg-black/40 text-white/50 hover:border-white/30 hover:text-white/80"
+                                  ? "border-[#CA1C30] bg-[#CA1C30]/15 text-white shadow-[0_0_15px_rgba(202, 28, 48,0.25)] ring-1 ring-[#CA1C30]"
+                                  : "border-white/10 bg-[#0B0A0D]/80 text-[#F5F4F0]/60 hover:border-white/30 hover:text-white"
                               }`}
                             >
-                              <div className="absolute top-1.5 right-1.5 px-1.5 py-0.5 text-[8px] font-bold bg-[#FF7582] text-black uppercase tracking-wider">
+                              <div className="absolute top-1.5 right-1.5 px-2 py-0.5 text-[8px] font-bold rounded-full bg-[#CA1C30] text-black uppercase tracking-wider">
                                 +2 GRATUITES
                               </div>
                               <div className="flex items-baseline justify-between">
-                                <span className={`text-2xl sm:text-3xl font-display ${proIsPack && selectedPlan === "pro" ? "text-[#FF7582]" : "text-white"}`}>
+                                <span className={`text-2xl sm:text-3xl font-display ${proIsPack && selectedPlan === "pro" ? "text-[#CA1C30]" : "text-[#F5F4F0]"}`}>
                                   50 €
                                 </span>
-                                <span className={`text-[9px] font-mono uppercase font-bold tracking-wider mr-16 px-1.5 py-0.5 border ${
+                                <span className={`text-[9px] font-mono uppercase font-bold tracking-wider mr-16 px-2 py-0.5 rounded-full border ${
                                   proIsPack && selectedPlan === "pro"
-                                    ? "border-[#FF7582]/40 bg-[#FF7582]/20 text-[#FF7582]"
-                                    : "border-white/10 text-white/40"
+                                    ? "border-[#CA1C30]/40 bg-[#CA1C30]/20 text-[#CA1C30]"
+                                    : "border-white/10 text-[#F5F4F0]/40"
                                 }`}>
                                   PACK BUNDLE
                                 </span>
                               </div>
-                              <div className="text-[11px] font-mono text-white/70 mt-1">
+                              <div className="text-[11px] font-mono text-[#F5F4F0]/70 mt-1">
                                 5 séances + 2 offertes (7 au total)
                               </div>
                             </button>
@@ -525,26 +525,25 @@ export default function Booking() {
                         </div>
 
                         {/* Description */}
-                        <p className="text-xs text-white/70 leading-relaxed max-w-xl">
-                          Analyse tracker, diagnostic mécanique puis VOD review avec protocoles à mettre en place pour progresser (fiche technique de suivi Notion).
+                        <p className="text-xs text-[#F5F4F0]/75 leading-relaxed max-w-xl">
+                          Diagnostic mécanique, analyse de VOD en direct et plan d&apos;action personnalisé sur Notion avec suivi Discord.
                         </p>
 
                         {/* Features Matrix (2 columns of dark boxes) */}
                         <div className="space-y-2 pt-1">
-                          <span className="text-[10px] text-white/40 uppercase tracking-widest block font-mono">
+                          <span className="text-[10px] text-[#F5F4F0]/50 uppercase tracking-widest block font-mono">
                             CONTENU DU PROTOCOLE :
                           </span>
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                             {[
-                              "Analyse tracker & statistiques",
                               "Diagnostic mécanique & viseur",
                               "VOD review & correction en vocal",
-                              "Protocoles & fiches techniques Notion",
+                              "Fiche technique de suivi Notion",
                               "Suivi Discord & progression continue",
                             ].map((feat, i) => (
-                              <div key={i} className="p-2.5 bg-black/70 border border-white/5 flex items-center gap-2">
-                                <span className="w-1.5 h-1.5 bg-[#FF7582] shrink-0" />
-                                <span className="text-white/80 text-[11px] leading-tight">{feat}</span>
+                              <div key={i} className="p-2.5 bg-[#0B0A0D] border border-white/5 rounded-xl flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#CA1C30] shrink-0" />
+                                <span className="text-[#F5F4F0]/90 text-[11px] leading-tight">{feat}</span>
                               </div>
                             ))}
                           </div>
@@ -552,10 +551,10 @@ export default function Booking() {
                       </div>
 
                       {/* Footer note */}
-                      <div className="pt-4 mt-5 border-t border-white/10 text-[10px] text-white/40 font-mono flex items-center justify-between relative z-10">
-                        <span>Idéal pour débloquer un palier de ranked tenace</span>
+                      <div className="pt-4 mt-5 border-t border-white/10 text-[10px] text-[#F5F4F0]/40 font-mono flex items-center justify-between relative z-10">
+                        <span>Recommandé pour franchir un palier</span>
                         <span className={`font-bold uppercase tracking-wider text-[11px] ${
-                          selectedPlan === "pro" ? "text-[#FF7582]" : "text-white/30"
+                          selectedPlan === "pro" ? "text-[#CA1C30]" : "text-[#F5F4F0]/30"
                         }`}>
                           {selectedPlan === "pro" ? "CHOISI" : "CLIQUE POUR CHOISIR"}
                         </span>
@@ -588,74 +587,70 @@ export default function Booking() {
                           damping: 22,
                         }}
                         style={{ transformStyle: "preserve-3d" }}
-                        className={`relative h-full p-5 flex flex-col justify-between transition-colors duration-200 border overflow-hidden select-none ${
+                        className={`relative h-full p-5 flex flex-col justify-between transition-colors duration-200 border rounded-2xl overflow-hidden select-none ${
                           selectedPlan === "session"
-                            ? "bg-[#0c0f15] border-[#A4DE87] shadow-[0_0_25px_rgba(164,222,135,0.2)] ring-1 ring-[#A4DE87]"
+                            ? "bg-[#1A1822] border-[#F5F4F0] shadow-[0_0_25px_rgba(245, 244, 240,0.2)] ring-1 ring-[#F5F4F0]"
                             : sessionTilt.isHovered
-                            ? "bg-[#0c0f15] border-[#A4DE87]/50 shadow-[0_0_20px_rgba(164,222,135,0.1)]"
-                            : "bg-[#090C12] border-white/15 hover:border-white/30"
+                            ? "bg-[#1A1822] border-[#F5F4F0]/50 shadow-[0_0_20px_rgba(245, 244, 240,0.1)]"
+                            : "bg-[#121117] border-white/15 hover:border-white/30"
                         }`}
                       >
                         {sessionTilt.isHovered && (
                           <div
                             className="absolute inset-0 pointer-events-none transition-opacity duration-200"
                             style={{
-                              background: `radial-gradient(circle 200px at ${sessionTilt.mousePos.x}% ${sessionTilt.mousePos.y}%, rgba(164, 222, 135, 0.1), transparent 80%)`,
+                              background: `radial-gradient(circle 200px at ${sessionTilt.mousePos.x}% ${sessionTilt.mousePos.y}%, rgba(245, 244, 240, 0.1), transparent 80%)`,
                             }}
                           />
                         )}
 
                         <div className="space-y-3 relative z-10" style={{ transform: "translateZ(6px)" }}>
                           <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                            <span className="bg-[#A4DE87]/15 text-[#A4DE87] text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest border border-[#A4DE87]/30">
+                            <span className="bg-[#F5F4F0]/15 text-[#F5F4F0] text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest border border-[#F5F4F0]/30">
                               OFFRE UNIQUE (1X)
                             </span>
-                            <span className="text-[11px] text-white/50 tracking-wider font-mono">
+                            <span className="text-[11px] text-[#F5F4F0]/50 tracking-wider font-mono">
                               45 MIN - 1H
                             </span>
                           </div>
 
                           <div>
-                            <h4 className="text-xl font-display text-white tracking-wider">
+                            <h4 className="text-xl font-display text-[#F5F4F0] tracking-wider">
                               SESSION DIAGNOSTIC
                             </h4>
                             <div className="flex items-baseline gap-2 mt-0.5">
-                              <span className="text-2xl font-display text-[#A4DE87]">
+                              <span className="text-2xl font-display text-[#F5F4F0]">
                                 0 €
                               </span>
-                              <span className="text-[10px] font-mono text-[#A4DE87] font-bold tracking-wider">
+                              <span className="text-[10px] font-mono text-[#00B4A0] font-bold tracking-wider">
                                 GRATUIT // EN STREAM
                               </span>
                             </div>
                           </div>
 
-                          <p className="text-[11px] text-white/60 leading-snug">
-                            VOD review avec analyse des erreurs, review réalisée en Stream. Pas de méthode d'entraînement ni diagnostic long terme. Analyse d'une game sur un personnage.
+                          <p className="text-[11px] text-[#F5F4F0]/65 leading-snug">
+                            Review VOD en direct sur Twitch pour identifier tes erreurs majeures.
                           </p>
 
-                          <div className="space-y-1 pt-1 text-[11px] text-white/70">
+                          <div className="space-y-1 pt-1 text-[11px] text-[#F5F4F0]/70">
                             <div className="flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 bg-[#A4DE87] shrink-0" />
-                              <span>VOD review d'une game (1 personnage)</span>
+                              <span className="w-1.5 h-1.5 bg-[#F5F4F0] shrink-0" />
+                              <span>VOD review d&apos;une partie complète</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 bg-[#A4DE87] shrink-0" />
-                              <span>Analyse chirurgicale des erreurs</span>
+                              <span className="w-1.5 h-1.5 bg-[#F5F4F0] shrink-0" />
+                              <span>Identification des erreurs clés</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 bg-[#A4DE87] shrink-0" />
-                              <span>Review réalisée en direct en Stream</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 bg-[#A4DE87] shrink-0" />
-                              <span>Disponible 1 seule fois par élève</span>
+                              <span className="w-1.5 h-1.5 bg-[#F5F4F0] shrink-0" />
+                              <span>En direct sur Twitch (1x par élève)</span>
                             </div>
                           </div>
                         </div>
 
                         <div className="pt-2 text-right relative z-10">
                           <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                            selectedPlan === "session" ? "text-[#A4DE87]" : "text-white/30"
+                            selectedPlan === "session" ? "text-[#F5F4F0]" : "text-white/30"
                           }`}>
                             {selectedPlan === "session" ? "SÉLECTIONNÉ" : "SÉLECTIONNER"}
                           </span>
@@ -684,35 +679,35 @@ export default function Booking() {
                           damping: 22,
                         }}
                         style={{ transformStyle: "preserve-3d" }}
-                        className={`relative h-full p-5 flex flex-col justify-between transition-colors duration-200 border overflow-hidden select-none ${
+                        className={`relative h-full p-5 flex flex-col justify-between transition-colors duration-200 border rounded-2xl overflow-hidden select-none ${
                           selectedPlan === "performance"
-                            ? "bg-[#0c0f15] border-[#8FAFD4] shadow-[0_0_25px_rgba(143,175,212,0.25)] ring-1 ring-[#8FAFD4]"
+                            ? "bg-[#1A1822] border-[#00B4A0] shadow-[0_0_25px_rgba(0, 180, 160,0.25)] ring-1 ring-[#00B4A0]"
                             : perfTilt.isHovered
-                            ? "bg-[#0c0f15] border-[#8FAFD4]/60 shadow-[0_0_20px_rgba(143,175,212,0.15)]"
-                            : "bg-[#090C12] border-white/15 hover:border-white/30"
+                            ? "bg-[#1A1822] border-[#00B4A0]/60 shadow-[0_0_20px_rgba(0, 180, 160,0.15)]"
+                            : "bg-[#121117] border-white/15 hover:border-white/30"
                         }`}
                       >
                         {perfTilt.isHovered && (
                           <div
                             className="absolute inset-0 pointer-events-none transition-opacity duration-200"
                             style={{
-                              background: `radial-gradient(circle 200px at ${perfTilt.mousePos.x}% ${perfTilt.mousePos.y}%, rgba(143, 175, 212, 0.15), transparent 80%)`,
+                              background: `radial-gradient(circle 200px at ${perfTilt.mousePos.x}% ${perfTilt.mousePos.y}%, rgba(0, 180, 160, 0.15), transparent 80%)`,
                             }}
                           />
                         )}
 
                         <div className="space-y-3 relative z-10" style={{ transform: "translateZ(6px)" }}>
                           <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                            <span className="bg-[#8FAFD4]/20 text-[#8FAFD4] text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
+                            <span className="bg-[#00B4A0]/20 text-[#00B4A0] text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-widest">
                               AXE COMPÉTITION & TEAM
                             </span>
-                            <span className="text-[11px] text-[#8FAFD4] tracking-wider font-mono">
+                            <span className="text-[11px] text-[#00B4A0] tracking-wider font-mono">
                               {perfIsPack ? "PACK 3 + 1 OFFERTE" : "1H30 - 2H"}
                             </span>
                           </div>
 
                           <div>
-                            <h4 className="text-xl font-display text-white tracking-wider">
+                            <h4 className="text-xl font-display text-[#F5F4F0] tracking-wider">
                               COACHING COMPÉTITION
                             </h4>
 
@@ -722,23 +717,23 @@ export default function Booking() {
                               <button
                                 type="button"
                                 onClick={(e) => {
-                                  e.stopPropagation();
+                                   e.stopPropagation();
                                   setSelectedPlan("performance");
                                   setPerfIsPack(false);
                                 }}
-                                className={`p-2 border text-left transition-all ${
+                                className={`p-2 border rounded-xl text-left transition-all cursor-pointer ${
                                   !perfIsPack && selectedPlan === "performance"
-                                    ? "border-[#8FAFD4] bg-[#8FAFD4]/15 text-white shadow-[0_0_12px_rgba(143,175,212,0.25)] ring-1 ring-[#8FAFD4]"
-                                    : "border-white/10 bg-black/40 text-white/50 hover:border-white/30 hover:text-white/80"
+                                    ? "border-[#00B4A0] bg-[#00B4A0]/15 text-white shadow-[0_0_12px_rgba(0, 180, 160,0.25)] ring-1 ring-[#00B4A0]"
+                                    : "border-white/10 bg-[#0B0A0D]/80 text-[#F5F4F0]/60 hover:border-white/30 hover:text-white"
                                 }`}
                               >
                                 <div className="flex items-baseline justify-between">
-                                  <span className={`text-xl font-display ${!perfIsPack && selectedPlan === "performance" ? "text-[#8FAFD4]" : "text-white"}`}>
+                                  <span className={`text-xl font-display ${!perfIsPack && selectedPlan === "performance" ? "text-[#00B4A0]" : "text-[#F5F4F0]"}`}>
                                     20 €
                                   </span>
-                                  <span className="text-[8px] font-mono uppercase tracking-wider text-white/40">À L'UNITÉ</span>
+                                  <span className="text-[8px] font-mono uppercase tracking-wider text-white/40">À L&apos;UNITÉ</span>
                                 </div>
-                                <div className="text-[10px] font-mono text-white/70">1 séance (1h30-2h)</div>
+                                <div className="text-[10px] font-mono text-[#F5F4F0]/70">1 séance (1h30-2h)</div>
                               </button>
 
                               {/* Option 2: Pack 60€ */}
@@ -749,41 +744,41 @@ export default function Booking() {
                                   setSelectedPlan("performance");
                                   setPerfIsPack(true);
                                 }}
-                                className={`p-2 border text-left transition-all relative overflow-hidden ${
+                                className={`p-2 border rounded-xl text-left transition-all relative overflow-hidden cursor-pointer ${
                                   perfIsPack && selectedPlan === "performance"
-                                    ? "border-[#8FAFD4] bg-[#8FAFD4]/15 text-white shadow-[0_0_12px_rgba(143,175,212,0.25)] ring-1 ring-[#8FAFD4]"
-                                    : "border-white/10 bg-black/40 text-white/50 hover:border-white/30 hover:text-white/80"
+                                    ? "border-[#00B4A0] bg-[#00B4A0]/15 text-white shadow-[0_0_12px_rgba(0, 180, 160,0.25)] ring-1 ring-[#00B4A0]"
+                                    : "border-white/10 bg-[#0B0A0D]/80 text-[#F5F4F0]/60 hover:border-white/30 hover:text-white"
                                 }`}
                               >
-                                <div className="absolute top-0.5 right-1 px-1 py-0.2 text-[7px] font-bold bg-[#8FAFD4] text-black uppercase tracking-wider">
+                                <div className="absolute top-0.5 right-1 px-1.5 py-0.5 text-[7px] font-bold rounded-full bg-[#00B4A0] text-black uppercase tracking-wider">
                                   +1 OFFERTE
                                 </div>
                                 <div className="flex items-baseline justify-between">
-                                  <span className={`text-xl font-display ${perfIsPack && selectedPlan === "performance" ? "text-[#8FAFD4]" : "text-white"}`}>
+                                  <span className={`text-xl font-display ${perfIsPack && selectedPlan === "performance" ? "text-[#00B4A0]" : "text-[#F5F4F0]"}`}>
                                     60 €
                                   </span>
                                   <span className="text-[8px] font-mono uppercase tracking-wider text-white/40 mr-10">PACK 3+1</span>
                                 </div>
-                                <div className="text-[10px] font-mono text-white/70">4 séances au total</div>
+                                <div className="text-[10px] font-mono text-[#F5F4F0]/70">4 séances au total</div>
                               </button>
                             </div>
                           </div>
 
-                          <p className="text-[11px] text-white/60 leading-snug">
-                            Coaching axé évolution compétitive, développement du pool d'agents, points tactiques hors-ranked et VOD de pracc (fiche technique avancée).
+                          <p className="text-[11px] text-[#F5F4F0]/65 leading-snug">
+                            Préparation compétitive, pool d&apos;agents et analyse tactique de praccs.
                           </p>
 
-                          <div className="space-y-1 pt-1 text-[11px] text-white/70">
+                          <div className="space-y-1 pt-1 text-[11px] text-[#F5F4F0]/70">
                             <div className="flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 bg-[#8FAFD4] shrink-0" />
-                              <span>Évolution compétitive & pool d'agents</span>
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#00B4A0] shrink-0" />
+                              <span>Vision de jeu compétitive & pool d&apos;agents</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 bg-[#8FAFD4] shrink-0" />
-                              <span>VOD de pracc & points tactiques team</span>
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#00B4A0] shrink-0" />
+                              <span>Analyse de pracc & points tactiques</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 bg-[#8FAFD4] shrink-0" />
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#00B4A0] shrink-0" />
                               <span>Fiche technique avancée de suivi</span>
                             </div>
                           </div>
@@ -791,7 +786,7 @@ export default function Booking() {
 
                         <div className="pt-2 text-right relative z-10">
                           <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                            selectedPlan === "performance" ? "text-[#8FAFD4]" : "text-white/30"
+                            selectedPlan === "performance" ? "text-[#00B4A0]" : "text-[#F5F4F0]/30"
                           }`}>
                             {selectedPlan === "performance" ? "SÉLECTIONNÉ" : "SÉLECTIONNER"}
                           </span>
@@ -803,8 +798,8 @@ export default function Booking() {
 
                 {/* Bottom Action Bar */}
                 <div className="pt-4 border-t border-white/15 flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <span className="text-xs text-white/60">
-                    SÉLECTION : <strong className="text-white font-mono">{activePlan.name} ({activePlan.price} - {activePlan.duration})</strong>
+                  <span className="text-xs text-[#F5F4F0]/60">
+                    SÉLECTION : <strong className="text-[#F5F4F0] font-mono">{activePlan.name} ({activePlan.price} - {activePlan.duration})</strong>
                   </span>
                   <button
                     onClick={handleNextStep}
@@ -828,22 +823,22 @@ export default function Booking() {
                 className="space-y-6"
               >
                 <div className="flex items-center justify-between border-b border-white/15 pb-3">
-                  <div className="text-xs text-white/70 uppercase tracking-wider font-bold flex items-center gap-2">
-                    <span className="w-2 h-2 bg-[#FF7582]" />
+                  <div className="text-xs text-[#F5F4F0]/70 uppercase tracking-wider font-bold flex items-center gap-2">
+                    <span className="w-2 h-2 bg-[#CA1C30]" />
                     ÉTAPE 02 : VERROUILLAGE DU CALENDRIER // CRÉNEAUX EN DIRECT
                   </div>
-                  <span className="text-xs text-[#FF7582] font-bold tracking-wider">FORMULE: {activePlan.name}</span>
+                  <span className="text-xs text-[#CA1C30] font-bold tracking-wider">FORMULE: {activePlan.name}</span>
                 </div>
 
                 <div className="space-y-5">
                   {/* Days Bar */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <label className="text-xs text-white/70 block uppercase font-bold tracking-wider">
+                      <label className="text-xs text-[#F5F4F0]/70 block uppercase font-bold tracking-wider">
                         1. SÉLECTIONNER UN JOUR (14 PROCHAINS JOURS) :
                       </label>
                       {loadingSlots && (
-                        <div className="flex items-center gap-1.5 text-xs text-[#8FAFD4]">
+                        <div className="flex items-center gap-1.5 text-xs text-[#00B4A0]">
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
                           <span>Actualisation...</span>
                         </div>
@@ -863,24 +858,24 @@ export default function Booking() {
                               setSelectedTime("");
                               setSelectedSlotId(null);
                             }}
-                            className={`flex-shrink-0 w-24 sm:w-28 p-3 border text-center cursor-pointer transition-all flex flex-col justify-between ${
+                            className={`flex-shrink-0 w-24 sm:w-28 p-3 border text-center cursor-pointer transition-all flex flex-col justify-between rounded-xl ${
                               isDaySelected
-                                ? "border-[#FF7582] bg-[#FF7582]/15 text-white shadow-[0_0_15px_rgba(255,117,130,0.3)] ring-1 ring-[#FF7582]"
-                                : "border-white/15 bg-black/60 hover:border-white/40 text-white"
+                                ? "border-[#CA1C30] bg-[#CA1C30]/15 text-[#F5F4F0] shadow-[0_0_15px_rgba(202, 28, 48,0.3)] ring-1 ring-[#CA1C30]"
+                                : "border-white/15 bg-[#1A1822] hover:border-white/40 text-[#F5F4F0]"
                             }`}
                           >
                             <div>
-                              <div className="text-[10px] text-white/50 uppercase tracking-wider font-bold">{d.dayName}</div>
+                              <div className="text-[10px] text-[#F5F4F0]/50 uppercase tracking-wider font-bold">{d.dayName}</div>
                               <div className="text-lg font-display tracking-wider">{d.dayNumber} {d.monthName}</div>
                             </div>
 
                             <div className="mt-2">
                               {hasAvailable ? (
-                                <span className="text-[9px] font-bold px-1.5 py-0.5 bg-[#A4DE87]/15 border border-[#A4DE87]/40 text-[#A4DE87] uppercase block">
+                                <span className="text-[9px] font-bold px-1.5 py-0.5 bg-[#00B4A0]/15 border border-[#00B4A0]/40 text-[#00B4A0] uppercase block rounded-md">
                                   {d.availableCount} dispo
                                 </span>
                               ) : (
-                                <span className="text-[9px] font-medium px-1.5 py-0.5 bg-white/5 border border-white/10 text-white/30 uppercase block">
+                                <span className="text-[9px] font-medium px-1.5 py-0.5 bg-white/5 border border-white/10 text-white/30 uppercase block rounded-md">
                                   Complet
                                 </span>
                               )}
@@ -894,19 +889,19 @@ export default function Booking() {
                   {/* Time Slots Section for Selected Day */}
                   <div className="space-y-3 pt-3 border-t border-white/10">
                     <div className="flex items-center justify-between">
-                      <label className="text-xs text-white/70 block uppercase font-bold tracking-wider">
+                      <label className="text-xs text-[#F5F4F0]/70 block uppercase font-bold tracking-wider">
                         2. SÉLECTIONNER L&apos;HORAIRE POUR LE {currentDay.fullDateLabel.toUpperCase()} :
                       </label>
-                      <span className="text-xs text-white/40 font-mono">FUSEAU : PARIS (UTC+1)</span>
+                      <span className="text-xs text-[#F5F4F0]/40 font-mono">FUSEAU : PARIS (UTC+1)</span>
                     </div>
 
                     {currentDay.availableCount === 0 ? (
-                      <div className="p-6 bg-black/80 border border-white/10 text-center space-y-2">
+                      <div className="p-6 bg-[#1A1822] border border-white/10 text-center space-y-2 rounded-2xl">
                         <Clock className="w-7 h-7 text-white/30 mx-auto mb-1" />
-                        <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+                        <h4 className="text-xs font-bold text-[#F5F4F0] uppercase tracking-wider">
                           AUCUN CRÉNEAU DISPONIBLE POUR CETTE DATE
                         </h4>
-                        <p className="text-xs text-white/50 max-w-md mx-auto">
+                        <p className="text-xs text-[#F5F4F0]/50 max-w-md mx-auto">
                           Le coach n&apos;a pas ouvert de disponibilités pour ce jour ou tous les créneaux ont déjà été réservés.
                         </p>
                       </div>
@@ -922,12 +917,12 @@ export default function Booking() {
                               type="button"
                               disabled={!isAvailable}
                               onClick={() => handleSelectSlot(s)}
-                              className={`p-3 border text-center transition-all flex flex-col items-center justify-center gap-1 ${
+                              className={`p-3 border text-center transition-all flex flex-col items-center justify-center gap-1 rounded-xl ${
                                 !isAvailable
                                   ? "border-white/5 bg-white/[0.02] text-white/30 cursor-not-allowed line-through opacity-40"
                                   : isTimeSelected
-                                  ? "border-[#FF7582] bg-[#FF7582] text-black font-bold shadow-[0_0_20px_rgba(255,117,130,0.4)] cursor-pointer"
-                                  : "border-white/15 bg-black/60 hover:border-[#FF7582]/60 text-white cursor-pointer"
+                                  ? "border-[#CA1C30] bg-[#CA1C30] text-black font-bold shadow-[0_0_20px_rgba(202, 28, 48,0.4)] cursor-pointer"
+                                  : "border-white/15 bg-[#1A1822] hover:border-[#CA1C30]/60 text-[#F5F4F0] cursor-pointer"
                               }`}
                             >
                               <div className="flex items-center gap-1.5">
@@ -936,7 +931,7 @@ export default function Booking() {
                               </div>
 
                               <span className={`text-[9px] uppercase font-bold tracking-widest ${
-                                isTimeSelected ? "text-black" : isAvailable ? "text-[#A4DE87]" : "text-white/20"
+                                isTimeSelected ? "text-black" : isAvailable ? "text-[#00B4A0]" : "text-white/20"
                               }`}>
                                 {isTimeSelected ? "SÉLECTIONNÉ" : isAvailable ? "DISPONIBLE" : "INDISPONIBLE"}
                               </span>
@@ -947,17 +942,17 @@ export default function Booking() {
                     )}
 
                     {/* Legend */}
-                    <div className="flex flex-wrap items-center justify-center gap-6 pt-2 text-[10px] text-white/50 font-mono">
+                    <div className="flex flex-wrap items-center justify-center gap-6 pt-2 text-[10px] text-[#F5F4F0]/50 font-mono">
                       <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 bg-[#A4DE87]" />
+                        <span className="w-2 h-2 bg-[#00B4A0] rounded-full" />
                         <span>DISPONIBLE</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 bg-[#FF7582]" />
+                        <span className="w-2 h-2 bg-[#CA1C30] rounded-full" />
                         <span>SÉLECTIONNÉ</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 bg-white/20" />
+                        <span className="w-2 h-2 bg-white/20 rounded-full" />
                         <span className="line-through">INDISPONIBLE / COMPLET</span>
                       </div>
                     </div>
@@ -965,19 +960,19 @@ export default function Booking() {
 
                   {/* Selected Summary Badge */}
                   {selectedTime && (
-                    <div className="p-3 bg-black border border-[#FF7582]/40 flex items-center justify-between text-xs">
+                    <div className="p-3 bg-[#1A1822] border border-[#CA1C30]/40 flex items-center justify-between text-xs rounded-xl">
                       <div className="flex items-center gap-3">
-                        <Calendar className="w-4 h-4 text-[#FF7582]" />
+                        <Calendar className="w-4 h-4 text-[#CA1C30]" />
                         <span>
-                          CRÉNEAU SÉLECTIONNÉ : <strong className="text-white">{currentDay.fullDateLabel} à {selectedTime}</strong>
+                          CRÉNEAU SÉLECTIONNÉ : <strong className="text-[#F5F4F0]">{currentDay.fullDateLabel} à {selectedTime}</strong>
                         </span>
                       </div>
-                      <span className="text-[#A4DE87] font-bold text-[11px]">[ CRÉNEAU VALIDÉ ]</span>
+                      <span className="text-[#00B4A0] font-bold text-[11px]">[ CRÉNEAU VALIDÉ ]</span>
                     </div>
                   )}
 
                   {submitError && (
-                    <div className="p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-2">
+                    <div className="p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-2 rounded-xl">
                       <AlertCircle className="w-4 h-4 shrink-0" />
                       <span>{submitError}</span>
                     </div>
@@ -1015,24 +1010,24 @@ export default function Booking() {
                 className="space-y-6"
               >
                 <div className="flex items-center justify-between border-b border-white/15 pb-3">
-                  <div className="text-xs text-white/70 uppercase tracking-wider font-bold flex items-center gap-2">
-                    <span className="w-2 h-2 bg-[#FF7582]" />
+                  <div className="text-xs text-[#F5F4F0]/70 uppercase tracking-wider font-bold flex items-center gap-2">
+                    <span className="w-2 h-2 bg-[#CA1C30]" />
                     ÉTAPE 03 : DOSSIER DU JOUEUR // BRIEF TACTIQUE
                   </div>
-                  <span className="text-xs text-[#FF7582] font-bold tracking-wider">
+                  <span className="text-xs text-[#CA1C30] font-bold tracking-wider">
                     {activePlan.name} • {selectedTime}
                   </span>
                 </div>
 
                 {!user && (
-                  <div className="p-4 bg-[#FF7582]/10 border border-[#FF7582]/40 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="p-4 bg-[#CA1C30]/10 border border-[#CA1C30]/40 flex flex-col sm:flex-row items-center justify-between gap-4 rounded-2xl">
                     <div className="flex items-center gap-3">
-                      <Shield className="w-5 h-5 text-[#FF7582] shrink-0" />
+                      <Shield className="w-5 h-5 text-[#CA1C30] shrink-0" />
                       <div>
-                        <div className="text-xs font-bold text-white uppercase tracking-wider">
+                        <div className="text-xs font-bold text-[#F5F4F0] uppercase tracking-wider">
                           COMPTE ÉLÈVE REQUIS POUR RÉSERVER
                         </div>
-                        <p className="text-[11px] text-white/70 mt-0.5">
+                        <p className="text-[11px] text-[#F5F4F0]/70 mt-0.5">
                           Vous devez être connecté pour bloquer votre créneau et accéder à votre suivi personnalisé.
                         </p>
                       </div>
@@ -1042,7 +1037,7 @@ export default function Booking() {
                       onClick={() => setAuthModalOpen(true)}
                       className="btn-cyber-primary py-2 px-5 text-xs font-bold shrink-0 text-center cursor-pointer"
                     >
-                      <span>SE CONNECTER / S'INSCRIRE</span>
+                      <span>SE CONNECTER / S&apos;INSCRIRE</span>
                     </button>
                   </div>
                 )}
@@ -1050,7 +1045,7 @@ export default function Booking() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-4">
                     <div>
-                      <label className="text-[11px] text-white/70 block uppercase font-bold tracking-wider mb-1.5">
+                      <label className="text-[11px] text-[#F5F4F0]/70 block uppercase font-bold tracking-wider mb-1.5">
                         PSEUDO / PRÉNOM :
                       </label>
                       <input
@@ -1058,33 +1053,33 @@ export default function Booking() {
                         placeholder="Ex: TenZ ou Thomas"
                         value={studentName}
                         onChange={(e) => setStudentName(e.target.value)}
-                        className="w-full bg-black/60 border border-white/20 p-3 text-xs text-white placeholder-white/30 focus:border-[#FF7582] focus:outline-none transition-colors"
+                        className="w-full bg-[#1A1822] border border-white/20 p-3 text-xs text-[#F5F4F0] placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
                       />
                     </div>
 
                     <div>
-                      <label className="text-[11px] text-white/70 block uppercase font-bold tracking-wider mb-1.5">
-                        IDENTIFIANT DISCORD <span className="text-[#FF7582]">*</span> :
+                      <label className="text-[11px] text-[#F5F4F0]/70 block uppercase font-bold tracking-wider mb-1.5">
+                        IDENTIFIANT DISCORD <span className="text-[#CA1C30]">*</span> :
                       </label>
                       <input
                         type="text"
                         placeholder="Ex: poulpy_94 ou monpseudo#1234"
                         value={studentDiscord}
                         onChange={(e) => setStudentDiscord(e.target.value)}
-                        className="w-full bg-black/60 border border-white/20 p-3 text-xs text-white placeholder-white/30 focus:border-[#FF7582] focus:outline-none transition-colors"
+                        className="w-full bg-[#1A1822] border border-white/20 p-3 text-xs text-[#F5F4F0] placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
                       />
                     </div>
 
                     <div>
-                      <label className="text-[11px] text-white/70 block uppercase font-bold tracking-wider mb-1.5">
-                        ADRESSE EMAIL <span className="text-[#FF7582]">*</span> :
+                      <label className="text-[11px] text-[#F5F4F0]/70 block uppercase font-bold tracking-wider mb-1.5">
+                        ADRESSE EMAIL <span className="text-[#CA1C30]">*</span> :
                       </label>
                       <input
                         type="email"
                         placeholder="Ex: contact@email.com"
                         value={studentEmail}
                         onChange={(e) => setStudentEmail(e.target.value)}
-                        className="w-full bg-black/60 border border-white/20 p-3 text-xs text-white placeholder-white/30 focus:border-[#FF7582] focus:outline-none transition-colors"
+                        className="w-full bg-[#1A1822] border border-white/20 p-3 text-xs text-[#F5F4F0] placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
                       />
                     </div>
                   </div>
@@ -1092,13 +1087,13 @@ export default function Booking() {
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="text-[11px] text-white/70 block uppercase font-bold tracking-wider mb-1.5">
+                        <label className="text-[11px] text-[#F5F4F0]/70 block uppercase font-bold tracking-wider mb-1.5">
                           JEU :
                         </label>
                         <select
                           value={game}
                           onChange={(e) => setGame(e.target.value)}
-                          className="w-full bg-black/60 border border-white/20 p-3 text-xs text-white focus:border-[#FF7582] focus:outline-none transition-colors"
+                          className="w-full bg-[#1A1822] border border-white/20 p-3 text-xs text-[#F5F4F0] focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
                         >
                           <option value="Valorant">Valorant</option>
                           <option value="CS2">Counter-Strike 2</option>
@@ -1110,7 +1105,7 @@ export default function Booking() {
                       </div>
 
                       <div>
-                        <label className="text-[11px] text-white/70 block uppercase font-bold tracking-wider mb-1.5">
+                        <label className="text-[11px] text-[#F5F4F0]/70 block uppercase font-bold tracking-wider mb-1.5">
                           RANG ACTUEL :
                         </label>
                         <input
@@ -1118,13 +1113,13 @@ export default function Booking() {
                           placeholder="Ex: Diamant 2, Ascendant 1"
                           value={currentRank}
                           onChange={(e) => setCurrentRank(e.target.value)}
-                          className="w-full bg-black/60 border border-white/20 p-3 text-xs text-white placeholder-white/30 focus:border-[#FF7582] focus:outline-none transition-colors"
+                          className="w-full bg-[#1A1822] border border-white/20 p-3 text-xs text-[#F5F4F0] placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="text-[11px] text-white/70 block uppercase font-bold tracking-wider mb-1.5">
+                      <label className="text-[11px] text-[#F5F4F0]/70 block uppercase font-bold tracking-wider mb-1.5">
                         OBJECTIFS / BLOCAGES PRINCIPAUX :
                       </label>
                       <textarea
@@ -1132,14 +1127,14 @@ export default function Booking() {
                         placeholder="Ex: Difficulté à monter au-delà de Diamant, perte de duels en 1v1, problème de crosshair placement..."
                         value={objective}
                         onChange={(e) => setObjective(e.target.value)}
-                        className="w-full bg-black/60 border border-white/20 p-3 text-xs text-white placeholder-white/30 focus:border-[#FF7582] focus:outline-none transition-colors resize-none"
+                        className="w-full bg-[#1A1822] border border-white/20 p-3 text-xs text-[#F5F4F0] placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors resize-none rounded-xl"
                       />
                     </div>
                   </div>
                 </div>
 
                 {submitError && (
-                  <div className="p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-2">
+                  <div className="p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-2 rounded-xl">
                     <AlertCircle className="w-4 h-4 shrink-0" />
                     <span>{submitError}</span>
                   </div>
@@ -1194,52 +1189,52 @@ export default function Booking() {
                 transition={{ duration: 0.2 }}
                 className="py-6 text-center space-y-6 max-w-xl mx-auto"
               >
-                <div className="w-16 h-16 bg-[#A4DE87]/15 border border-[#A4DE87] text-[#A4DE87] flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(164,222,135,0.3)]">
+                <div className="w-16 h-16 bg-[#00B4A0]/15 border border-[#00B4A0] text-[#00B4A0] flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(0, 180, 160,0.3)] rounded-2xl">
                   <Check className="w-8 h-8" />
                 </div>
 
                 <div className="space-y-2">
-                  <span className="text-xs text-[#A4DE87] font-bold tracking-widest uppercase block">
+                  <span className="text-xs text-[#00B4A0] font-bold tracking-widest uppercase block">
                     CRÉNEAU VERROUILLÉ AVEC SUCCÈS
                   </span>
-                  <h3 className="text-2xl sm:text-3xl font-display text-white tracking-wider">
+                  <h3 className="text-2xl sm:text-3xl font-display text-[#F5F4F0] tracking-wider">
                     ORDRE DE MISSION : {confirmedMissionId}
                   </h3>
-                  <p className="text-xs text-white/60 leading-relaxed">
-                    Ta session <strong className="text-white">{activePlan.name}</strong> du <strong className="text-white">{currentDay.fullDateLabel} à {selectedTime}</strong> a été enregistrée. Poulpy te contactera sur Discord (<strong className="text-[#8FAFD4]">{studentDiscord}</strong>) avant le début de la séance.
+                  <p className="text-xs text-[#F5F4F0]/60 leading-relaxed">
+                    Ta session <strong className="text-[#F5F4F0]">{activePlan.name}</strong> du <strong className="text-[#F5F4F0]">{currentDay.fullDateLabel} à {selectedTime}</strong> a été enregistrée. Poulpy te contactera sur Discord (<strong className="text-[#00B4A0]">{studentDiscord}</strong>) avant le début de la séance.
                   </p>
                 </div>
 
-                <div className="p-4 bg-black/60 border border-white/10 text-left text-xs space-y-2">
+                <div className="p-4 bg-[#1A1822] border border-white/10 text-left text-xs space-y-2 rounded-2xl">
                   <div className="flex justify-between border-b border-white/5 pb-1.5">
-                    <span className="text-white/50">Formule :</span>
-                    <span className="text-white font-bold">{activePlan.name} ({activePlan.price})</span>
+                    <span className="text-[#F5F4F0]/50">Formule :</span>
+                    <span className="text-[#F5F4F0] font-bold">{activePlan.name} ({activePlan.price})</span>
                   </div>
                   <div className="flex justify-between border-b border-white/5 pb-1.5">
-                    <span className="text-white/50">Date & Heure :</span>
-                    <span className="text-white font-bold">{currentDay.fullDateLabel} à {selectedTime}</span>
+                    <span className="text-[#F5F4F0]/50">Date & Heure :</span>
+                    <span className="text-[#F5F4F0] font-bold">{currentDay.fullDateLabel} à {selectedTime}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-white/50">Contact Discord :</span>
-                    <span className="text-[#FF7582] font-bold">{studentDiscord}</span>
+                    <span className="text-[#F5F4F0]/50">Contact Discord :</span>
+                    <span className="text-[#CA1C30] font-bold">{studentDiscord}</span>
                   </div>
                 </div>
 
                 {/* Discord CTA with IMPORTANT badge */}
-                <div className="relative p-5 bg-[#0c0f15] border border-[#FF7582] shadow-[0_0_25px_rgba(255,117,130,0.2)] text-left">
+                <div className="relative p-5 bg-[#1A1822] border border-[#CA1C30] shadow-[0_0_25px_rgba(202, 28, 48,0.2)] text-left rounded-2xl">
                   {/* Badge matching the pack badges */}
-                  <div className="absolute top-2 right-2 px-2 py-0.5 text-[9px] font-bold bg-[#FF7582] text-black uppercase tracking-wider shadow-[0_0_10px_rgba(255,117,130,0.5)]">
+                  <div className="absolute top-2 right-2 px-2 py-0.5 text-[9px] font-bold bg-[#CA1C30] text-black uppercase tracking-wider shadow-[0_0_10px_rgba(202, 28, 48,0.5)] rounded-full">
                     IMPORTANT !
                   </div>
 
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
                     <div className="space-y-1 pr-0 sm:pr-4">
-                      <div className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                        <span className="w-2 h-2 bg-[#FF7582] animate-pulse" />
+                      <div className="text-xs font-bold text-[#F5F4F0] uppercase tracking-wider flex items-center gap-2">
+                        <span className="w-2 h-2 bg-[#CA1C30] animate-pulse rounded-full" />
                         <span>REJOINDRE LE SERVEUR DISCORD</span>
                       </div>
-                      <p className="text-[11px] text-white/70 leading-relaxed">
-                        Le salon vocal et le partage d'écran de coaching se déroulent exclusivement sur le serveur Discord de Poulpy.
+                      <p className="text-[11px] text-[#F5F4F0]/70 leading-relaxed">
+                        Le salon vocal et le partage d&apos;écran de coaching se déroulent exclusivement sur le serveur Discord de Poulpy.
                       </p>
                     </div>
 
@@ -1247,7 +1242,7 @@ export default function Booking() {
                       href="https://discord.gg/rJMg3ZZRkp"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn-cyber-primary flex items-center justify-center gap-2 py-3 px-6 text-xs font-bold uppercase tracking-wider shrink-0 cursor-pointer shadow-[0_0_20px_rgba(255,117,130,0.3)]"
+                      className="btn-cyber-primary flex items-center justify-center gap-2 py-3 px-6 text-xs font-bold uppercase tracking-wider shrink-0 cursor-pointer shadow-[0_0_20px_rgba(202, 28, 48,0.3)]"
                     >
                       <MessageCircle className="w-4 h-4" />
                       <span>REJOINDRE LE DISCORD</span>

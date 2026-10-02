@@ -37,3 +37,7 @@ next-env.d.ts
 
 # raw local video sources
 Vidéo why poulpy/
+video-studio/
+brag-output/
+public/poulpy-*.mp4
+public/poulpy-*.jpg

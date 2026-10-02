@@ -35,7 +35,7 @@ export default function CyberVODScrubber() {
   ];
 
   return (
-    <div className="reticle-box p-6 sm:p-8 bg-[#040404] space-y-6">
+    <div className="reticle-box p-6 sm:p-8 bg-[#121117] space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[rgba(255,255,255,0.08)] pb-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-xs font-mono">
@@ -50,7 +50,7 @@ export default function CyberVODScrubber() {
         <button
           onClick={() => setSightlines(!sightlines)}
           className={`btn-cyber-ghost text-xs py-1.5 px-3 ${
-            sightlines ? "border-[#00f0ff] text-[#00f0ff]" : ""
+            sightlines ? "border-[#00B4A0] text-[#00B4A0]" : ""
           }`}
         >
           <Eye className="w-3.5 h-3.5" />
@@ -66,12 +66,12 @@ export default function CyberVODScrubber() {
             <div className="absolute inset-0 cyber-grid opacity-30" />
 
             {/* Geometry Site Walls */}
-            <div className="absolute w-44 h-28 border border-[rgba(0,255,65,0.3)] bg-[rgba(0,255,65,0.02)]" />
-            <div className="absolute top-1/4 left-1/4 w-32 h-20 border border-[rgba(0,240,255,0.2)]" />
+            <div className="absolute w-44 h-28 border border-[rgba(245, 244, 240,0.3)] bg-[rgba(245, 244, 240,0.02)]" />
+            <div className="absolute top-1/4 left-1/4 w-32 h-20 border border-[rgba(0, 180, 160,0.2)]" />
 
             {/* Player Point */}
             <div
-              className="absolute w-4 h-4 bg-[#00ff41] border border-white shadow-[0_0_12px_#00ff41] transition-all duration-150"
+              className="absolute w-4 h-4 bg-[#F5F4F0] border border-white shadow-[0_0_12px_#F5F4F0] transition-all duration-150"
               style={{
                 left: `${scrub * 0.7 + 15}%`,
                 top: `${46 + Math.sin(scrub * 0.1) * 10}%`,
@@ -88,7 +88,7 @@ export default function CyberVODScrubber() {
                   transform: "translate(-10%, -50%) rotate(20deg)",
                   width: "220px",
                   height: "90px",
-                  background: "linear-gradient(to right, rgba(0,240,255,0.35), transparent)",
+                  background: "linear-gradient(to right, rgba(0, 180, 160,0.35), transparent)",
                   clipPath: "polygon(0 50%, 100% 0, 100% 100%)",
                 }}
               />
@@ -100,7 +100,7 @@ export default function CyberVODScrubber() {
             </div>
 
             {/* Reticle error readout */}
-            <div className="absolute bottom-3 right-3 font-mono text-[10px] text-[#00ff41] bg-black/80 px-2 py-1 border border-white/10">
+            <div className="absolute bottom-3 right-3 font-mono text-[10px] text-[#F5F4F0] bg-black/80 px-2 py-1 border border-white/10">
               FRAME: 0{Math.round(scrub * 14.4)} // SIGHT_CONE: 48°
             </div>
           </div>
@@ -111,7 +111,7 @@ export default function CyberVODScrubber() {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setIsPlaying(!isPlaying)}
-                  className="w-7 h-7 bg-white text-black flex items-center justify-center font-bold hover:bg-[#00ff41] transition-colors"
+                  className="w-7 h-7 bg-white text-black flex items-center justify-center font-bold hover:bg-[#F5F4F0] transition-colors"
                 >
                   {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 ml-0.5" />}
                 </button>
@@ -119,7 +119,7 @@ export default function CyberVODScrubber() {
                   {logs[activeLogIdx].time} / 22:15.00
                 </span>
               </div>
-              <span className="text-[11px] text-[#00f0ff] uppercase">
+              <span className="text-[11px] text-[#00B4A0] uppercase">
                 {logs[activeLogIdx].title}
               </span>
             </div>
@@ -130,7 +130,7 @@ export default function CyberVODScrubber() {
               max="100"
               value={scrub}
               onChange={(e) => setScrub(Number(e.target.value))}
-              className="w-full accent-[#00ff41] cursor-pointer h-1.5 bg-white/10"
+              className="w-full accent-[#F5F4F0] cursor-pointer h-1.5 bg-white/10"
             />
           </div>
         </div>
@@ -150,17 +150,17 @@ export default function CyberVODScrubber() {
               }}
               className={`p-4 border cursor-pointer transition-all space-y-1.5 ${
                 activeLogIdx === idx
-                  ? "bg-black/90 border-[#00ff41] shadow-[0_0_15px_rgba(0,255,65,0.15)]"
+                  ? "bg-black/90 border-[#F5F4F0] shadow-[0_0_15px_rgba(245, 244, 240,0.15)]"
                   : "bg-black/40 border-white/5 hover:border-white/20"
               }`}
             >
               <div className="flex items-center justify-between text-[11px]">
-                <span className="text-[#00ff41] font-bold">{log.time}</span>
+                <span className="text-[#F5F4F0] font-bold">{log.time}</span>
                 <span
                   className={`text-[9px] px-1.5 py-0.5 uppercase font-bold ${
                     log.severity === "CRITIQUE"
                       ? "bg-[#ff0033]/20 text-[#ff0033] border border-[#ff0033]/40"
-                      : "bg-[#00ff41]/20 text-[#00ff41] border border-[#00ff41]/40"
+                      : "bg-[#F5F4F0]/20 text-[#F5F4F0] border border-[#F5F4F0]/40"
                   }`}
                 >
                   {log.severity}

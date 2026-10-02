@@ -49,7 +49,7 @@ function ClipEmbed({ url }: { url: string }) {
   if (!parsed) {
     return (
       <a href={url} target="_blank" rel="noopener noreferrer"
-        className="flex items-center gap-2 text-[#8FAFD4] hover:underline text-sm">
+        className="flex items-center gap-2 text-[#00B4A0] hover:underline text-sm">
         <ExternalLink size={14} />
         Ouvrir le lien
       </a>
@@ -58,7 +58,7 @@ function ClipEmbed({ url }: { url: string }) {
 
   const colorMap: Record<string, string> = {
     red: 'border-red-500/40',
-    purple: 'border-[#FF7582]/40',
+    purple: 'border-[#CA1C30]/40',
     yellow: 'border-yellow-500/40',
     gray: 'border-white/20',
   };
@@ -217,7 +217,7 @@ function ClipCard({
 
   const colorBadge: Record<string, string> = {
     red: 'bg-red-500/10 border-red-500/30 text-red-400',
-    purple: 'bg-[#FF7582]/10 border-[#FF7582]/30 text-[#FF7582]',
+    purple: 'bg-[#CA1C30]/10 border-[#CA1C30]/30 text-[#CA1C30]',
     yellow: 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400',
     gray: 'bg-white/5 border-white/10 text-gray-400',
   };
@@ -300,12 +300,12 @@ function ClipCard({
           </button>
           <button
             onClick={() => setExpanded(v => !v)}
-            className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-[#FF7582]/10 hover:bg-[#FF7582]/20 text-[#FF7582] border border-[#FF7582]/20 text-sm font-medium transition-colors"
+            className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-[#CA1C30]/10 hover:bg-[#CA1C30]/20 text-[#CA1C30] border border-[#CA1C30]/20 text-sm font-medium transition-colors"
           >
             {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
             Annotations
             {annotations.length > 0 && (
-              <span className="ml-1 inline-flex items-center justify-center w-5 h-5 bg-[#FF7582] text-white text-[10px] font-bold">
+              <span className="ml-1 inline-flex items-center justify-center w-5 h-5 bg-[#CA1C30] text-white text-[10px] font-bold">
                 {annotations.length}
               </span>
             )}
@@ -325,7 +325,7 @@ function ClipCard({
         <div className="border-t border-white/5 p-5 space-y-4">
           {loadingAnnotations ? (
             <div className="flex items-center justify-center py-6">
-              <Loader2 className="w-6 h-6 animate-spin text-[#FF7582]" />
+              <Loader2 className="w-6 h-6 animate-spin text-[#CA1C30]" />
             </div>
           ) : annotations.length === 0 ? (
             <p className="text-sm text-gray-500 text-center py-4">Aucune annotation pour ce clip.</p>
@@ -337,7 +337,7 @@ function ClipCard({
                   green: 'border-green-500/30 bg-green-500/5',
                   red: 'border-red-500/30 bg-red-500/5',
                   orange: 'border-orange-500/30 bg-orange-500/5',
-                  blue: 'border-[#8FAFD4]/30 bg-[#8FAFD4]/5',
+                  blue: 'border-[#00B4A0]/30 bg-[#00B4A0]/5',
                 };
                 const borderBg = colorStyles[style.color] ?? 'border-white/10 bg-white/5';
                 return (
@@ -384,7 +384,7 @@ function ClipCard({
                 <select
                   value={newCategory}
                   onChange={e => setNewCategory(e.target.value as AnnotationCategory)}
-                  className="w-full px-3 py-2 bg-white/5 border border-white/10 text-inherit text-sm focus:outline-none focus:border-[#FF7582]"
+                  className="w-full px-3 py-2 bg-white/5 border border-white/10 text-inherit text-sm focus:outline-none focus:border-[#CA1C30]"
                 >
                   {ANNOTATION_CATEGORIES.map(cat => (
                     <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -398,7 +398,7 @@ function ClipCard({
                   value={newTimestampRaw}
                   onChange={e => setNewTimestampRaw(e.target.value)}
                   placeholder="ex: 1:23 ou 83"
-                  className="w-full px-3 py-2 bg-white/5 border border-white/10 text-inherit placeholder-gray-600 text-sm focus:outline-none focus:border-[#FF7582]"
+                  className="w-full px-3 py-2 bg-white/5 border border-white/10 text-inherit placeholder-gray-600 text-sm focus:outline-none focus:border-[#CA1C30]"
                 />
               </div>
             </div>
@@ -409,7 +409,7 @@ function ClipCard({
               placeholder="Ton commentaire sur ce moment de la vidéo..."
               rows={3}
               maxLength={1000}
-              className="w-full px-3 py-2 bg-white/5 border border-white/10 text-inherit placeholder-gray-600 text-sm focus:outline-none focus:border-[#FF7582] resize-none"
+              className="w-full px-3 py-2 bg-white/5 border border-white/10 text-inherit placeholder-gray-600 text-sm focus:outline-none focus:border-[#CA1C30] resize-none"
             />
 
             {formError && (
@@ -423,7 +423,7 @@ function ClipCard({
               <button
                 type="submit"
                 disabled={isSending || !newContent.trim()}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-[#FF7582] text-black font-bold text-sm font-semibold text-white hover:shadow-lg hover:shadow-purple-500/30 transition-all disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#CA1C30] text-black font-bold text-sm font-semibold text-white hover:shadow-lg hover:shadow-purple-500/30 transition-all disabled:opacity-50"
               >
                 {isSending ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
                 Envoyer
@@ -511,15 +511,15 @@ export default function StudentClipsPage() {
 
   if (authLoading || isLoading) {
     return (
-      <div className="min-h-screen bg-[#07090D] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#FF7582]" />
+      <div className="min-h-screen bg-[#0B0A0D] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#CA1C30]" />
       </div>
     );
   }
 
   if (!user?.isAdmin) {
     return (
-      <div className="min-h-screen bg-[#07090D] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0B0A0D] flex items-center justify-center">
         <div className="text-center">
           <Shield className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2">Accès refusé</h1>
@@ -531,7 +531,7 @@ export default function StudentClipsPage() {
 
   if (error && !student) {
     return (
-      <div className="min-h-screen bg-[#07090D] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0B0A0D] flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <p className="text-gray-400 mb-4">{error}</p>
@@ -545,7 +545,7 @@ export default function StudentClipsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#07090D] py-24">
+    <main className="min-h-screen bg-[#0B0A0D] py-24">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">

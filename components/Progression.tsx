@@ -36,10 +36,10 @@ const views: Record<"global" | "valorant" | "apex", GameView> = {
     tag: "TOUS TITRES CONFONDUS",
     description: "Moyenne pondérée des performances mécaniques et cognitives mesurées sur l'ensemble de nos élèves actifs.",
     metrics: [
-      { label: "AIM SCORE", subLabel: "FLICK / TRACKING SUB-PIXEL", value: 78, color: "#00ff41", accent: "rgba(0,255,65,0.2)", icon: Target },
-      { label: "GAME SENSE", subLabel: "MACRO & VISION TACTIQUE", value: 72, color: "#00f0ff", accent: "rgba(0,240,255,0.2)", icon: Zap },
+      { label: "AIM SCORE", subLabel: "FLICK / TRACKING SUB-PIXEL", value: 78, color: "#F5F4F0", accent: "rgba(245, 244, 240,0.2)", icon: Target },
+      { label: "GAME SENSE", subLabel: "MACRO & VISION TACTIQUE", value: 72, color: "#00B4A0", accent: "rgba(0, 180, 160,0.2)", icon: Zap },
       { label: "MOUVEMENT", subLabel: "FLUIDITÉ & TIMING DEADZONE", value: 68, color: "#ff0033", accent: "rgba(255,0,51,0.2)", icon: Activity },
-      { label: "CONSISTENCY", subLabel: "RÉGULARITÉ EN CLUTCH", value: 81, color: "#00ff41", accent: "rgba(0,255,65,0.2)", icon: BarChart3 },
+      { label: "CONSISTENCY", subLabel: "RÉGULARITÉ EN CLUTCH", value: 81, color: "#F5F4F0", accent: "rgba(245, 244, 240,0.2)", icon: BarChart3 },
     ],
     sessions: [
       { s: "S1 // AUDIT", rr: 0 },
@@ -48,19 +48,19 @@ const views: Record<"global" | "valorant" | "apex", GameView> = {
       { s: "S4 // REPAIR", rr: 71 },
       { s: "S5 // MASTERY", rr: 105 },
     ],
-    strokeColor: "#00ff41",
-    fillColor: "rgba(0,255,65,0.15)",
-    pointColor: "#00ff41",
+    strokeColor: "#F5F4F0",
+    fillColor: "rgba(245, 244, 240,0.15)",
+    pointColor: "#F5F4F0",
   },
   valorant: {
     label: "VALORANT PROTOCOL",
     tag: "RIOT COMPETITIVE // IMMORTAL+",
     description: "Métriques spécifiques à l'écosystème Valorant : crosshair placement, first-bullet accuracy et timing d'utilitaires.",
     metrics: [
-      { label: "AIM SCORE", subLabel: "HEADSHOT % & FIRST-BULLET", value: 84, color: "#00f0ff", accent: "rgba(0,240,255,0.2)", icon: Target },
-      { label: "GAME SENSE", subLabel: "ROTATIONS & UTIL TIMING", value: 76, color: "#00ff41", accent: "rgba(0,255,65,0.2)", icon: Zap },
+      { label: "AIM SCORE", subLabel: "HEADSHOT % & FIRST-BULLET", value: 84, color: "#00B4A0", accent: "rgba(0, 180, 160,0.2)", icon: Target },
+      { label: "GAME SENSE", subLabel: "ROTATIONS & UTIL TIMING", value: 76, color: "#F5F4F0", accent: "rgba(245, 244, 240,0.2)", icon: Zap },
       { label: "MOUVEMENT", subLabel: "COUNTER-STRAFING & JIGGLE", value: 74, color: "#ff0033", accent: "rgba(255,0,51,0.2)", icon: Activity },
-      { label: "CONSISTENCY", subLabel: "K/D RATIO EN SITUATION DE RETAKE", value: 86, color: "#00f0ff", accent: "rgba(0,240,255,0.2)", icon: BarChart3 },
+      { label: "CONSISTENCY", subLabel: "K/D RATIO EN SITUATION DE RETAKE", value: 86, color: "#00B4A0", accent: "rgba(0, 180, 160,0.2)", icon: BarChart3 },
     ],
     sessions: [
       { s: "S1 // AUDIT", rr: 0 },
@@ -69,9 +69,9 @@ const views: Record<"global" | "valorant" | "apex", GameView> = {
       { s: "S4 // REPAIR", rr: 80 },
       { s: "S5 // MASTERY", rr: 120 },
     ],
-    strokeColor: "#00f0ff",
-    fillColor: "rgba(0,240,255,0.15)",
-    pointColor: "#00f0ff",
+    strokeColor: "#00B4A0",
+    fillColor: "rgba(0, 180, 160,0.15)",
+    pointColor: "#00B4A0",
   },
   apex: {
     label: "APEX LEGENDS MATRIX",
@@ -79,8 +79,8 @@ const views: Record<"global" | "valorant" | "apex", GameView> = {
     description: "Métriques axées sur les combats haute vélocité : tracking continu, tap-strafing, shield-swap et rotations de zone.",
     metrics: [
       { label: "AIM SCORE", subLabel: "SMG TRACKING & BEAM ACCURACY", value: 88, color: "#ff0033", accent: "rgba(255,0,51,0.2)", icon: Target },
-      { label: "GAME SENSE", subLabel: "ZONE READING & THIRD-PARTY", value: 79, color: "#00ff41", accent: "rgba(0,255,65,0.2)", icon: Zap },
-      { label: "MOUVEMENT", subLabel: "TAP-STRAFE / WALLBOUNCE / EVASION", value: 92, color: "#00f0ff", accent: "rgba(0,240,255,0.2)", icon: Activity },
+      { label: "GAME SENSE", subLabel: "ZONE READING & THIRD-PARTY", value: 79, color: "#F5F4F0", accent: "rgba(245, 244, 240,0.2)", icon: Zap },
+      { label: "MOUVEMENT", subLabel: "TAP-STRAFE / WALLBOUNCE / EVASION", value: 92, color: "#00B4A0", accent: "rgba(0, 180, 160,0.2)", icon: Activity },
       { label: "CONSISTENCY", subLabel: "SURVIVAL TIME & TOP 3 FINISH", value: 75, color: "#ff0033", accent: "rgba(255,0,51,0.2)", icon: BarChart3 },
     ],
     sessions: [
@@ -134,7 +134,7 @@ export default function Progression() {
               <DecryptedText text="SUIVI MÉTRIQUE RIGOUREUX // TELEMETRY" />
             </span>
             <h2 className="text-4xl sm:text-6xl font-display text-white tracking-wider">
-              TA PROGRESSION <span className="text-[#00ff41]">VISUALISÉE</span>
+              TA PROGRESSION <span className="text-[#F5F4F0]">VISUALISÉE</span>
             </h2>
             <p className="text-xs sm:text-sm text-white/50 max-w-xl leading-relaxed">
               Après chaque session. Visualise objectivement tes gains de performance, ton taux de conversion de duels et ton ascension en RR/LP.
@@ -142,7 +142,7 @@ export default function Progression() {
           </div>
 
           {/* Tab Switchers */}
-          <div className="flex items-center gap-2 border border-white/15 bg-[#040404] p-1">
+          <div className="flex items-center gap-2 border border-white/15 bg-[#121117] p-1">
             {(["global", "valorant", "apex"] as const).map((key) => {
               const active = activeTab === key;
               return (
@@ -151,7 +151,7 @@ export default function Progression() {
                   onClick={() => setActiveTab(key)}
                   className={`px-4 py-2 text-xs uppercase font-bold transition-all ${
                     active
-                      ? "bg-[#00ff41] text-black shadow-[0_0_15px_rgba(0,255,65,0.3)]"
+                      ? "bg-[#F5F4F0] text-black shadow-[0_0_15px_rgba(245, 244, 240,0.3)]"
                       : "text-white/60 hover:text-white hover:bg-white/5"
                   }`}
                 >
@@ -163,17 +163,17 @@ export default function Progression() {
         </div>
 
         {/* Analytics Brutalist Frame */}
-        <div className="reticle-box bg-[#040404] border border-white/10 overflow-hidden">
+        <div className="reticle-box bg-[#121117] border border-white/10 overflow-hidden">
           {/* Terminal Sub-header */}
           <div className="px-6 py-3 border-b border-white/10 bg-black/80 flex flex-wrap items-center justify-between text-xs text-white/40 gap-4">
             <div className="flex items-center gap-3">
-              <span className="w-2 h-2 bg-[#00ff41] animate-pulse" />
+              <span className="w-2 h-2 bg-[#F5F4F0] animate-pulse" />
               <span className="text-white font-bold">{view.label}</span>
               <span className="text-white/30">//</span>
               <span>{view.tag}</span>
             </div>
             <div className="text-[11px] text-white/50">
-              GAINS MOYENS CONSTATÉS: <span className="text-[#00ff41] font-bold">+105 à +120 RR EN 5 SÉANCES</span>
+              GAINS MOYENS CONSTATÉS: <span className="text-[#F5F4F0] font-bold">+105 à +120 RR EN 5 SÉANCES</span>
             </div>
           </div>
 
@@ -182,7 +182,7 @@ export default function Progression() {
             <div className="lg:col-span-7 p-6 sm:p-8 space-y-6 flex flex-col justify-between">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-[#00ff41]" />
+                  <TrendingUp className="w-4 h-4 text-[#F5F4F0]" />
                   <span className="text-sm font-bold text-white tracking-wider">
                     COURBE D&apos;ASCENSION COMPETITIVE
                   </span>
@@ -323,7 +323,7 @@ export default function Progression() {
 
               <div className="text-[11px] text-white/40 pt-2 border-t border-white/5 flex items-center justify-between">
                 <span>MESURE PROTOCOLAIRE // 5 SEMAINES</span>
-                <span className="text-[#00ff41]">+100% SUCCÈS CLUTCH</span>
+                <span className="text-[#F5F4F0]">+100% SUCCÈS CLUTCH</span>
               </div>
             </div>
 
@@ -331,7 +331,7 @@ export default function Progression() {
             <div className="lg:col-span-5 p-6 sm:p-8 space-y-6 flex flex-col justify-between bg-black/40">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <BarChart3 className="w-4 h-4 text-[#00f0ff]" />
+                  <BarChart3 className="w-4 h-4 text-[#00B4A0]" />
                   <span className="text-sm font-bold text-white tracking-wider">
                     SCORES D&apos;ÉVALUATION
                   </span>
@@ -384,7 +384,7 @@ export default function Progression() {
           {/* Bottom Action Bar */}
           <div className="px-6 py-5 bg-[#080808] border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <Shield className="w-5 h-5 text-[#00ff41]" />
+              <Shield className="w-5 h-5 text-[#F5F4F0]" />
               <div className="text-xs text-white/70">
                 <span className="text-white font-bold">GARANTIE D&apos;ÉLÉVATION COMPÉTITIVE :</span> Montée de palier minimum de +1 division ou séances offertes.
               </div>

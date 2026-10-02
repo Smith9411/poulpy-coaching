@@ -314,17 +314,17 @@ export default function Profile() {
 
   if (authLoading) {
     return (
-      <main className="min-h-screen bg-[#07090D] flex items-center justify-center font-mono">
-        <div className="w-8 h-8 border-2 border-[#FF7582] border-t-transparent animate-spin" />
+      <main className="min-h-screen bg-[#0B0A0D] flex items-center justify-center font-mono">
+        <div className="w-8 h-8 border-2 border-[#CA1C30] border-t-transparent animate-spin" />
       </main>
     );
   }
 
   if (!user) {
     return (
-      <main className="min-h-screen bg-[#07090D] text-white flex items-center justify-center font-mono px-4">
+      <main className="min-h-screen bg-[#0B0A0D] text-white flex items-center justify-center font-mono px-4">
         <CyberNavbar />
-        <div className="text-center reticle-box bg-[#090c10] border border-white/10 p-12 max-w-md mx-auto">
+        <div className="text-center reticle-box bg-[#121117] border border-white/10 p-12 max-w-md mx-auto">
           <User size={48} className="mx-auto mb-4 text-white/30" />
           <h1 className="text-2xl font-display uppercase tracking-wider mb-2">ACCÈS NON AUTHENTIFIÉ</h1>
           <p className="text-xs text-white/60 mb-6">Connecte-toi pour accéder à ton espace personnel et ton suivi.</p>
@@ -457,7 +457,7 @@ export default function Profile() {
   };
 
   return (
-    <main className="min-h-screen bg-[#07090D] text-white selection:bg-[#FF7582] selection:text-black pt-28 pb-20 font-mono relative z-10">
+    <main className="min-h-screen bg-[#0B0A0D] text-white selection:bg-[#CA1C30] selection:text-black pt-28 pb-20 font-mono relative z-10">
       <CyberNavbar />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -467,7 +467,7 @@ export default function Profile() {
           <div className="flex items-center gap-3 mb-3">
             <Link
               href="/"
-              className="inline-flex items-center gap-1.5 text-xs font-mono text-[#8FAFD4] hover:text-white transition-colors uppercase tracking-wider"
+              className="inline-flex items-center gap-1.5 text-xs font-mono text-[#00B4A0] hover:text-white transition-colors uppercase tracking-wider"
             >
               <ArrowLeft size={13} />
               <span>RETOUR AU SITE</span>
@@ -477,7 +477,7 @@ export default function Profile() {
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-display uppercase tracking-wider text-white">
-            BIENVENUE, <span className="text-[#FF7582]">{user.username}</span>
+            BIENVENUE, <span className="text-[#CA1C30]">{user.username}</span>
           </h1>
           <p className="text-xs text-white/60 mt-1 tracking-wide">
             Espace de gestion de compte, sessions réservées et suivi e-sport.
@@ -489,8 +489,8 @@ export default function Profile() {
           <div
             className={`mb-6 p-3 text-xs font-mono flex items-center gap-2 border ${
               statusMsg.type === 'success'
-                ? 'bg-[#A4DE87]/10 border-[#A4DE87]/40 text-[#A4DE87]'
-                : 'bg-[#FF7582]/10 border-[#FF7582]/40 text-[#FF7582]'
+                ? 'bg-[#F5F4F0]/10 border-[#F5F4F0]/40 text-[#F5F4F0]'
+                : 'bg-[#CA1C30]/10 border-[#CA1C30]/40 text-[#CA1C30]'
             }`}
           >
             {statusMsg.type === 'success' ? <Check size={16} /> : <X size={16} />}
@@ -505,7 +505,7 @@ export default function Profile() {
             className={`mb-6 p-4 border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono text-xs ${
               alert.status === 'cancelled'
                 ? 'bg-red-500/10 border-red-500/30 text-red-200'
-                : 'bg-[#FF7582]/10 border-[#FF7582]/30 text-white'
+                : 'bg-[#CA1C30]/10 border-[#CA1C30]/30 text-white'
             }`}
           >
             <div className="space-y-1">
@@ -539,14 +539,14 @@ export default function Profile() {
         ))}
 
         {/* Profile Card */}
-        <div className="reticle-box bg-[#090c10] border border-white/10 p-6 sm:p-8 mb-8">
+        <div className="reticle-box bg-[#121117] border border-white/10 p-6 sm:p-8 mb-8">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
 
             {/* Avatar */}
             <div className="relative group">
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="w-24 h-24 sm:w-28 sm:h-28 bg-[#FF7582]/15 border border-[#FF7582]/40 flex items-center justify-center text-3xl font-bold text-[#FF7582] overflow-hidden cursor-pointer relative shadow-[0_0_15px_rgba(255,117,130,0.15)] group-hover:border-[#FF7582] transition-colors"
+                className="w-24 h-24 sm:w-28 sm:h-28 bg-[#CA1C30]/15 border border-[#CA1C30]/40 flex items-center justify-center text-3xl font-bold text-[#CA1C30] overflow-hidden cursor-pointer relative shadow-[0_0_15px_rgba(202, 28, 48,0.15)] group-hover:border-[#CA1C30] transition-colors"
                 title="Cliquer pour changer de photo"
               >
                 {user.avatarUrl ? (
@@ -586,13 +586,13 @@ export default function Profile() {
                       type="text"
                       value={newName}
                       onChange={(e) => setNewName(e.target.value)}
-                      className="px-2.5 py-1 bg-black border border-white/20 text-white text-lg font-bold font-mono focus:border-[#FF7582]"
+                      className="px-2.5 py-1 bg-black border border-white/20 text-white text-lg font-bold font-mono focus:border-[#CA1C30]"
                       autoFocus
                     />
                     <button
                       onClick={handleSaveUsername}
                       disabled={isSavingName}
-                      className="p-1.5 bg-[#A4DE87]/20 text-[#A4DE87] border border-[#A4DE87]/40 text-xs"
+                      className="p-1.5 bg-[#F5F4F0]/20 text-[#F5F4F0] border border-[#F5F4F0]/40 text-xs"
                       title="Enregistrer"
                     >
                       {isSavingName ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
@@ -631,7 +631,7 @@ export default function Profile() {
               </div>
 
               <div className="flex items-center justify-center sm:justify-start gap-2 text-white/60 text-xs mb-4">
-                <Mail size={13} className="text-[#8FAFD4]" />
+                <Mail size={13} className="text-[#00B4A0]" />
                 <span>{user.email}</span>
               </div>
 
@@ -672,10 +672,10 @@ export default function Profile() {
         </div>
 
         {/* Bio */}
-        <div className="reticle-box bg-[#090c10] border border-white/10 p-6 mb-8">
+        <div className="reticle-box bg-[#121117] border border-white/10 p-6 mb-8">
           <div className="flex items-center justify-between mb-3 pb-3 border-b border-white/10">
             <div className="flex items-center gap-2">
-              <Quote size={16} className="text-[#FF7582]" />
+              <Quote size={16} className="text-[#CA1C30]" />
               <h3 className="font-bold text-sm uppercase tracking-wider text-white">MA BIO // PRÉSENTATION</h3>
             </div>
             {!isEditingBio && (
@@ -685,7 +685,7 @@ export default function Profile() {
                   setBioDraft(user.bio || '');
                   setIsEditingBio(true);
                 }}
-                className="text-[10px] text-[#8FAFD4] hover:text-white uppercase font-bold tracking-wider cursor-pointer"
+                className="text-[10px] text-[#00B4A0] hover:text-white uppercase font-bold tracking-wider cursor-pointer"
               >
                 {user.bio ? '[ MODIFIER ]' : '[ AJOUTER ]'}
               </button>
@@ -700,7 +700,7 @@ export default function Profile() {
                 placeholder="Présente ton niveau de jeu, ton rang actuel et tes objectifs e-sport..."
                 rows={4}
                 maxLength={280}
-                className="w-full p-3 bg-black border border-white/20 text-white placeholder-white/30 text-xs focus:border-[#FF7582] resize-none font-mono"
+                className="w-full p-3 bg-black border border-white/20 text-white placeholder-white/30 text-xs focus:border-[#CA1C30] resize-none font-mono"
                 autoFocus
               />
               <div className="flex items-center justify-between mt-2">
@@ -751,15 +751,15 @@ export default function Profile() {
         {/* Disparaît automatiquement dès que toutes les séances sont réservées */}
         {/* ======================================================== */}
         {packSummary && packSummary.hasActivePack && packSummary.remainingSessions > 0 && (
-          <div className="reticle-box bg-[#090C12] border-2 border-[#FF7582] shadow-[0_0_35px_rgba(255,117,130,0.2)] p-6 sm:p-8 mb-8 relative overflow-hidden">
+          <div className="reticle-box bg-[#090C12] border-2 border-[#CA1C30] shadow-[0_0_35px_rgba(202, 28, 48,0.2)] p-6 sm:p-8 mb-8 relative overflow-hidden">
             {/* Top Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5 mb-6">
               <div>
                 <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                  <span className="bg-[#FF7582] text-black text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
+                  <span className="bg-[#CA1C30] text-black text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
                     PACK SÉANCES ACTIF
                   </span>
-                  <span className="text-[10px] text-[#A4DE87] font-bold tracking-wider font-mono border border-[#A4DE87]/30 bg-[#A4DE87]/10 px-2 py-0.5">
+                  <span className="text-[10px] text-[#F5F4F0] font-bold tracking-wider font-mono border border-[#F5F4F0]/30 bg-[#F5F4F0]/10 px-2 py-0.5">
                     {packSummary.remainingSessions} SÉANCE(S) RESTANTE(S) À PLANIFIER
                   </span>
                 </div>
@@ -774,7 +774,7 @@ export default function Profile() {
               <button
                 type="button"
                 onClick={() => setShowPackBooking(!showPackBooking)}
-                className="btn-cyber-primary text-xs py-2.5 px-5 shrink-0 flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(255,117,130,0.3)]"
+                className="btn-cyber-primary text-xs py-2.5 px-5 shrink-0 flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(202, 28, 48,0.3)]"
               >
                 <Calendar size={14} />
                 <span>{showPackBooking ? 'MASQUER LE CALENDRIER' : `RÉSERVER SÉANCE ${packSummary.nextSessionNumber}/${packSummary.totalSessions}`}</span>
@@ -792,9 +792,9 @@ export default function Profile() {
                     key={s.number}
                     className={`p-3 border text-center font-mono transition-all flex flex-col justify-between ${
                       s.isBooked
-                        ? 'border-[#A4DE87]/40 bg-[#A4DE87]/10 text-white shadow-[0_0_10px_rgba(164,222,135,0.1)]'
+                        ? 'border-[#F5F4F0]/40 bg-[#F5F4F0]/10 text-white shadow-[0_0_10px_rgba(245, 244, 240,0.1)]'
                         : s.number === packSummary.nextSessionNumber
-                        ? 'border-[#FF7582] bg-[#FF7582]/15 text-white ring-1 ring-[#FF7582] shadow-[0_0_15px_rgba(255,117,130,0.25)]'
+                        ? 'border-[#CA1C30] bg-[#CA1C30]/15 text-white ring-1 ring-[#CA1C30] shadow-[0_0_15px_rgba(202, 28, 48,0.25)]'
                         : 'border-white/10 bg-black/40 text-white/40'
                     }`}
                   >
@@ -804,14 +804,14 @@ export default function Profile() {
 
                     {s.isBooked ? (
                       <div className="mt-1 space-y-0.5">
-                        <span className="text-[8px] text-[#A4DE87] font-bold block">[ RÉSERVÉE ]</span>
+                        <span className="text-[8px] text-[#F5F4F0] font-bold block">[ RÉSERVÉE ]</span>
                         <span className="text-[10px] text-white/80 block font-bold truncate">
                           {new Date(s.bookingDate!).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} à {s.bookingTime}
                         </span>
                       </div>
                     ) : s.number === packSummary.nextSessionNumber ? (
                       <div className="mt-1">
-                        <span className="text-[8px] text-[#FF7582] font-bold block animate-pulse">À RÉSERVER</span>
+                        <span className="text-[8px] text-[#CA1C30] font-bold block animate-pulse">À RÉSERVER</span>
                         <span className="text-[10px] text-white font-bold block">0 € INCLUS</span>
                       </div>
                     ) : (
@@ -835,11 +835,11 @@ export default function Profile() {
               >
                 <div className="flex items-center justify-between">
                   <div className="text-xs text-white/80 uppercase font-bold tracking-wider flex items-center gap-2">
-                    <span className="w-2 h-2 bg-[#FF7582]" />
+                    <span className="w-2 h-2 bg-[#CA1C30]" />
                     <span>PLANIFICATION DE LA SÉANCE {packSummary.nextSessionNumber} / {packSummary.totalSessions}</span>
                   </div>
                   {loadingPackSlots && (
-                    <div className="flex items-center gap-1.5 text-xs text-[#8FAFD4]">
+                    <div className="flex items-center gap-1.5 text-xs text-[#00B4A0]">
                       <Loader2 size={13} className="animate-spin" />
                       <span>Actualisation des créneaux...</span>
                     </div>
@@ -864,7 +864,7 @@ export default function Profile() {
                           }}
                           className={`flex-shrink-0 w-24 p-2.5 border text-center cursor-pointer transition-all ${
                             isSelected
-                              ? 'border-[#FF7582] bg-[#FF7582]/20 text-white shadow-[0_0_12px_rgba(255,117,130,0.3)] ring-1 ring-[#FF7582]'
+                              ? 'border-[#CA1C30] bg-[#CA1C30]/20 text-white shadow-[0_0_12px_rgba(202, 28, 48,0.3)] ring-1 ring-[#CA1C30]'
                               : 'border-white/10 bg-black/60 hover:border-white/30 text-white/70'
                           }`}
                         >
@@ -872,7 +872,7 @@ export default function Profile() {
                           <div className="text-base font-display">{d.dayNumber} {d.monthName}</div>
                           <div className="mt-1">
                             {d.availableCount > 0 ? (
-                              <span className="text-[8px] font-bold px-1 py-0.2 bg-[#A4DE87]/15 border border-[#A4DE87]/30 text-[#A4DE87] uppercase block">
+                              <span className="text-[8px] font-bold px-1 py-0.2 bg-[#F5F4F0]/15 border border-[#F5F4F0]/30 text-[#F5F4F0] uppercase block">
                                 {d.availableCount} dispo
                               </span>
                             ) : (
@@ -908,14 +908,14 @@ export default function Profile() {
                           }}
                           className={`p-2.5 border text-center font-mono transition-all text-xs ${
                             isSelected
-                              ? 'border-[#FF7582] bg-[#FF7582] text-black font-bold shadow-[0_0_15px_rgba(255,117,130,0.4)] cursor-pointer'
+                              ? 'border-[#CA1C30] bg-[#CA1C30] text-black font-bold shadow-[0_0_15px_rgba(202, 28, 48,0.4)] cursor-pointer'
                               : slot.available
-                              ? 'border-[#A4DE87]/40 bg-black/60 hover:border-[#A4DE87] text-white cursor-pointer'
+                              ? 'border-[#F5F4F0]/40 bg-black/60 hover:border-[#F5F4F0] text-white cursor-pointer'
                               : 'border-white/5 bg-black/20 text-white/20 cursor-not-allowed opacity-40'
                           }`}
                         >
                           <div className="font-bold">{slot.time}</div>
-                          <div className={`text-[8px] font-bold uppercase mt-0.5 ${isSelected ? 'text-black' : slot.available ? 'text-[#A4DE87]' : 'text-white/20'}`}>
+                          <div className={`text-[8px] font-bold uppercase mt-0.5 ${isSelected ? 'text-black' : slot.available ? 'text-[#F5F4F0]' : 'text-white/20'}`}>
                             {isSelected ? 'CHOISI' : slot.available ? 'LIBRE' : 'OCCUPÉ'}
                           </div>
                         </button>
@@ -933,7 +933,7 @@ export default function Profile() {
                     <select
                       value={packGame}
                       onChange={(e) => setPackGame(e.target.value)}
-                      className="w-full bg-black border border-white/20 p-2.5 text-xs text-white focus:border-[#FF7582] focus:outline-none"
+                      className="w-full bg-black border border-white/20 p-2.5 text-xs text-white focus:border-[#CA1C30] focus:outline-none"
                     >
                       <option value="Valorant">Valorant</option>
                       <option value="CS2">Counter-Strike 2</option>
@@ -953,7 +953,7 @@ export default function Profile() {
                       placeholder="Ex: Analyse VOD sur Bind, travail de l'aim..."
                       value={packNotes}
                       onChange={(e) => setPackNotes(e.target.value)}
-                      className="w-full bg-black border border-white/20 p-2.5 text-xs text-white placeholder-white/30 focus:border-[#FF7582] focus:outline-none"
+                      className="w-full bg-black border border-white/20 p-2.5 text-xs text-white placeholder-white/30 focus:border-[#CA1C30] focus:outline-none"
                     />
                   </div>
                 </div>
@@ -1005,24 +1005,24 @@ export default function Profile() {
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4 pb-2 border-b border-white/10">
             <h2 className="text-lg font-display uppercase tracking-wider text-white flex items-center gap-2">
-              <Calendar size={18} className="text-[#8FAFD4]" />
+              <Calendar size={18} className="text-[#00B4A0]" />
               <span>SÉANCES DE COACHING RÉSERVÉES</span>
             </h2>
             <Link
               href="/#booking"
-              className="text-xs text-[#FF7582] hover:underline font-bold"
+              className="text-xs text-[#CA1C30] hover:underline font-bold"
             >
               + RÉSERVER UN NOUVEAU CRÉNEAU
             </Link>
           </div>
 
           {bookingsLoading ? (
-            <div className="reticle-box bg-[#090c10] border border-white/10 p-8 text-center">
-              <div className="w-6 h-6 border-2 border-[#FF7582] border-t-transparent animate-spin mx-auto mb-2" />
+            <div className="reticle-box bg-[#121117] border border-white/10 p-8 text-center">
+              <div className="w-6 h-6 border-2 border-[#CA1C30] border-t-transparent animate-spin mx-auto mb-2" />
               <p className="text-xs text-white/50">Chargement de tes réservations...</p>
             </div>
           ) : studentBookings.length === 0 ? (
-            <div className="reticle-box bg-[#090c10] border border-white/10 p-8 text-center">
+            <div className="reticle-box bg-[#121117] border border-white/10 p-8 text-center">
               <Clock size={32} className="mx-auto mb-3 text-white/30" />
               <p className="text-xs font-bold text-white uppercase tracking-wider mb-1">AUCUNE SESSION PROGRAMMÉE</p>
               <p className="text-xs text-white/50 mb-4 max-w-md mx-auto">
@@ -1041,7 +1041,7 @@ export default function Profile() {
               {studentBookings.map((b) => (
                 <div
                   key={b.id}
-                  className="reticle-box bg-[#090c10] border border-white/15 hover:border-[#FF7582]/50 transition-colors p-5 flex flex-col justify-between space-y-3"
+                  className="reticle-box bg-[#121117] border border-white/15 hover:border-[#CA1C30]/50 transition-colors p-5 flex flex-col justify-between space-y-3"
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-2">
@@ -1062,7 +1062,7 @@ export default function Profile() {
                     </div>
 
                     <div className="text-sm font-bold text-white flex items-center gap-2">
-                      <Calendar size={15} className="text-[#8FAFD4]" />
+                      <Calendar size={15} className="text-[#00B4A0]" />
                       <span>
                         {new Date(b.booking_date).toLocaleDateString('fr-FR', {
                           weekday: 'short',
@@ -1073,7 +1073,7 @@ export default function Profile() {
                       </span>
                     </div>
                     <p className="text-xs text-white/60 mt-1">
-                      {b.plan_duration} • Discipline : <span className="text-[#FF7582] font-bold">{b.game}</span>
+                      {b.plan_duration} • Discipline : <span className="text-[#CA1C30] font-bold">{b.game}</span>
                     </p>
                   </div>
 
@@ -1085,7 +1085,7 @@ export default function Profile() {
                       href="https://discord.gg/rJMg3ZZRkp"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-2.5 py-1 bg-[#8FAFD4]/10 border border-[#8FAFD4]/30 text-[#8FAFD4] hover:text-white text-[10px] font-bold uppercase"
+                      className="px-2.5 py-1 bg-[#00B4A0]/10 border border-[#00B4A0]/30 text-[#00B4A0] hover:text-white text-[10px] font-bold uppercase"
                     >
                       DISCORD
                     </a>
@@ -1100,27 +1100,27 @@ export default function Profile() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <Link
             href="/profile/coaching"
-            className="reticle-box bg-[#090c10] border border-white/10 hover:border-[#8FAFD4] p-5 text-center transition-colors group cursor-pointer"
+            className="reticle-box bg-[#121117] border border-white/10 hover:border-[#00B4A0] p-5 text-center transition-colors group cursor-pointer"
           >
-            <MessageSquare size={22} className="text-[#8FAFD4] mx-auto mb-2 group-hover:scale-110 transition-transform" />
+            <MessageSquare size={22} className="text-[#00B4A0] mx-auto mb-2 group-hover:scale-110 transition-transform" />
             <h3 className="font-bold text-xs uppercase tracking-wider mb-0.5">MESSAGES COACH</h3>
             <p className="text-[10px] text-white/50">Retours & feed-back</p>
           </Link>
 
           <Link
             href="/profile/vod"
-            className="reticle-box bg-[#090c10] border border-white/10 hover:border-[#FF7582] p-5 text-center transition-colors group cursor-pointer"
+            className="reticle-box bg-[#121117] border border-white/10 hover:border-[#CA1C30] p-5 text-center transition-colors group cursor-pointer"
           >
-            <Film size={22} className="text-[#FF7582] mx-auto mb-2 group-hover:scale-110 transition-transform" />
+            <Film size={22} className="text-[#CA1C30] mx-auto mb-2 group-hover:scale-110 transition-transform" />
             <h3 className="font-bold text-xs uppercase tracking-wider mb-0.5">CLIPS VOD</h3>
             <p className="text-[10px] text-white/50">Analyses de replays</p>
           </Link>
 
           <Link
             href="/#booking"
-            className="reticle-box bg-[#090c10] border border-white/10 hover:border-[#A4DE87] p-5 text-center transition-colors group cursor-pointer"
+            className="reticle-box bg-[#121117] border border-white/10 hover:border-[#F5F4F0] p-5 text-center transition-colors group cursor-pointer"
           >
-            <Clock size={22} className="text-[#A4DE87] mx-auto mb-2 group-hover:scale-110 transition-transform" />
+            <Clock size={22} className="text-[#F5F4F0] mx-auto mb-2 group-hover:scale-110 transition-transform" />
             <h3 className="font-bold text-xs uppercase tracking-wider mb-0.5">SESSIONS</h3>
             <p className="text-[10px] text-white/50">
               {studentBookings.length > 0
@@ -1131,7 +1131,7 @@ export default function Profile() {
 
           <Link
             href="/profile/sheet"
-            className="reticle-box bg-[#090c10] border border-white/10 hover:border-white p-5 text-center transition-colors group cursor-pointer"
+            className="reticle-box bg-[#121117] border border-white/10 hover:border-white p-5 text-center transition-colors group cursor-pointer"
           >
             <FileText size={22} className="text-white mx-auto mb-2 group-hover:scale-110 transition-transform" />
             <h3 className="font-bold text-xs uppercase tracking-wider mb-0.5">FICHE PERSO</h3>

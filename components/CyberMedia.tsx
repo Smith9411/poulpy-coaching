@@ -28,19 +28,19 @@ export default function CyberMedia() {
   const twitchUrl = "https://www.twitch.tv/poulpy_coaching";
 
   return (
-    <section id="media" className="py-14 sm:py-16 px-6 sm:px-12 lg:px-16 bg-[#06080b] border-t border-[rgba(255,255,255,0.08)] font-mono">
+    <section id="media" className="py-14 sm:py-16 px-6 sm:px-12 lg:px-16 bg-transparent font-mono">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-6">
           <div className="space-y-2">
             <span className="data-badge data-badge-laser">
-              <DecryptedText text="FLUX & ARCHIVES VOD" />
+              <DecryptedText text="MÉDIAS &amp; STREAMS" />
             </span>
-            <h2 className="text-4xl sm:text-6xl font-display text-white tracking-wider">
-              DIFFUSIONS <span className="text-[#FF7582]">YOUTUBE &amp; TWITCH</span>
+            <h2 className="text-4xl sm:text-6xl font-display text-[#F5F4F0] tracking-wider">
+              YOUTUBE &amp; <span className="text-[#CA1C30]">TWITCH</span>
             </h2>
-            <p className="text-xs sm:text-sm text-white/50 max-w-xl leading-relaxed">
-              Sessions de coaching en direct, analyses de VOD et démonstrations mécaniques.
+            <p className="text-xs sm:text-sm text-[#F5F4F0]/60 max-w-xl leading-relaxed">
+              Sessions en direct, reviews VOD et replays d&apos;entraînement.
             </p>
           </div>
 
@@ -48,10 +48,10 @@ export default function CyberMedia() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setPlatform("youtube")}
-              className={`px-5 py-2.5 text-xs font-bold uppercase border transition-all flex items-center gap-2 ${
+              className={`px-6 py-2.5 text-xs font-bold uppercase rounded-full border transition-all flex items-center gap-2 cursor-pointer ${
                 platform === "youtube"
-                  ? "bg-[#FF0000] text-white border-[#FF0000] shadow-[0_0_20px_rgba(255,0,0,0.4)]"
-                  : "bg-black text-white/60 border-white/15 hover:border-white/40"
+                  ? "bg-[#CA1C30] text-black border-[#CA1C30] shadow-[0_0_20px_rgba(202, 28, 48,0.4)]"
+                  : "bg-[#121117] text-[#F5F4F0]/60 border-white/15 hover:border-white/40"
               }`}
             >
               <YoutubeIcon className="w-4 h-4" />
@@ -60,10 +60,10 @@ export default function CyberMedia() {
 
             <button
               onClick={() => setPlatform("twitch")}
-              className={`px-5 py-2.5 text-xs font-bold uppercase border transition-all flex items-center gap-2 ${
+              className={`px-6 py-2.5 text-xs font-bold uppercase rounded-full border transition-all flex items-center gap-2 cursor-pointer ${
                 platform === "twitch"
                   ? "bg-[#9146FF] text-white border-[#9146FF] shadow-[0_0_20px_rgba(145,70,255,0.4)]"
-                  : "bg-black text-white/60 border-white/15 hover:border-white/40"
+                  : "bg-[#121117] text-[#F5F4F0]/60 border-white/15 hover:border-white/40"
               }`}
             >
               <TwitchIcon className="w-4 h-4" />
@@ -73,19 +73,19 @@ export default function CyberMedia() {
         </div>
 
         {/* Video Player Frame with Cybercore Reticles */}
-        <div className="reticle-box p-3 sm:p-4 bg-[#090c10] border border-white/15 relative shadow-[0_10px_40px_rgba(0,0,0,0.8)]">
+        <div className="reticle-box p-3 sm:p-4 bg-[#121117] rounded-3xl border border-white/15 relative shadow-[0_10px_40px_rgba(0,0,0,0.8)] overflow-hidden">
           {/* Top Status Bar */}
-          <div className="flex items-center justify-between px-3 py-2 bg-black border border-white/5 mb-3 text-[11px]">
+          <div className="flex items-center justify-between px-4 py-2.5 bg-[#1A1822] rounded-xl border border-white/5 mb-3 text-[11px]">
             <div className="flex items-center gap-2.5">
               <span className="relative flex h-2 w-2">
-                <span className={`animate-ping absolute inline-flex h-full w-full opacity-75 ${platform === "youtube" ? "bg-red-500" : "bg-purple-500"}`} />
-                <span className={`relative inline-flex h-2 w-2 ${platform === "youtube" ? "bg-red-500" : "bg-purple-500"}`} />
+                <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${platform === "youtube" ? "bg-[#CA1C30]" : "bg-purple-500"}`} />
+                <span className={`relative inline-flex h-2 w-2 rounded-full ${platform === "youtube" ? "bg-[#CA1C30]" : "bg-purple-500"}`} />
               </span>
-              <span className="text-white/80 font-bold tracking-wider">
+              <span className="text-[#F5F4F0] font-bold tracking-wider">
                 {platform === "youtube" ? "CANAL : YOUTUBE REPLAY · REVIEWS APEX & VALORANT" : "CANAL : TWITCH EN DIRECT · @POULPY_COACHING"}
               </span>
             </div>
-            <div className="hidden sm:flex items-center gap-3 text-white/40 text-[10px]">
+            <div className="hidden sm:flex items-center gap-3 text-[#F5F4F0]/40 text-[10px]">
               <span>QUALITÉ 1080P60</span>
               <span>•</span>
               <span>AUDIO HI-FI</span>
@@ -93,7 +93,7 @@ export default function CyberMedia() {
           </div>
 
           {/* Video Container (16:9 Aspect Ratio) */}
-          <div className="relative w-full aspect-video bg-black border border-white/10 overflow-hidden">
+          <div className="relative w-full aspect-video bg-black rounded-2xl border border-white/10 overflow-hidden">
             {platform === "youtube" ? (
               <iframe
                 src={youtubeEmbed}
@@ -114,7 +114,7 @@ export default function CyberMedia() {
 
           {/* Bottom Action / Links Row */}
           <div className="mt-4 flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/10 text-xs">
-            <div className="text-white/50 text-[11px]">
+            <div className="text-[#F5F4F0]/60 text-[11px]">
               {platform === "youtube" ? (
                 <span>Chaîne officielle YouTube de Poulpy — VOD reviews, guides et démonstrations.</span>
               ) : (
@@ -128,7 +128,7 @@ export default function CyberMedia() {
                   href={youtubeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2 bg-red-600/10 border border-red-500/40 hover:bg-red-600/20 text-red-400 hover:text-white transition-all flex items-center gap-1.5 font-bold text-[11px]"
+                  className="px-5 py-2.5 rounded-full bg-[#CA1C30]/10 border border-[#CA1C30]/40 hover:bg-[#CA1C30]/20 text-[#CA1C30] hover:text-white transition-all flex items-center gap-1.5 font-bold text-[11px]"
                 >
                   <YoutubeIcon className="w-3.5 h-3.5" />
                   <span>OUVRIR SUR YOUTUBE</span>
@@ -139,7 +139,7 @@ export default function CyberMedia() {
                   href={twitchUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-4 py-2 bg-purple-600/10 border border-purple-500/40 hover:bg-purple-600/20 text-purple-400 hover:text-white transition-all flex items-center gap-1.5 font-bold text-[11px]"
+                  className="px-5 py-2.5 rounded-full bg-purple-600/10 border border-purple-500/40 hover:bg-purple-600/20 text-purple-400 hover:text-white transition-all flex items-center gap-1.5 font-bold text-[11px]"
                 >
                   <TwitchIcon className="w-3.5 h-3.5" />
                   <span>OUVRIR SUR TWITCH</span>
@@ -151,7 +151,7 @@ export default function CyberMedia() {
                 href="https://discord.gg/rJMg3ZZRkp"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-2 bg-white/5 border border-white/10 hover:border-white/30 text-white/70 hover:text-white transition-all flex items-center gap-1.5 font-medium text-[11px]"
+                className="px-5 py-2.5 rounded-full bg-white/5 border border-white/10 hover:border-white/30 text-[#F5F4F0]/70 hover:text-white transition-all flex items-center gap-1.5 font-medium text-[11px]"
               >
                 <MessageCircle className="w-3.5 h-3.5 text-[#5865F2]" />
                 <span>DISCORD</span>

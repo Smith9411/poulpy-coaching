@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 interface CornerBracketsProps {
   color?: "coral" | "slate" | "white";
@@ -6,8 +6,8 @@ interface CornerBracketsProps {
 }
 
 const COLORS = {
-  coral: "#FF7582",
-  slate: "#8FAFD4",
+  coral: "#CA1C30",
+  slate: "#00B4A0",
   white: "rgba(255,255,255,0.5)",
 };
 

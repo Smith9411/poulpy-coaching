@@ -170,13 +170,13 @@ export default function VisualTableModal({
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
       <div
-        className="bg-[#090c10] border border-[#FF7582]/30 w-full max-w-4xl shadow-2xl overflow-hidden my-8"
+        className="bg-[#121117] border border-[#CA1C30]/30 w-full max-w-4xl shadow-2xl overflow-hidden my-8"
         onClick={e => e.stopPropagation()}
       >
         {/* Header Modal */}
         <div className="px-6 py-4 bg-white/5 border-b border-white/10 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 bg-gradient-to-br from-[#FF7582] to-[#8FAFD4] flex items-center justify-center text-white shadow-md">
+            <div className="w-9 h-9 bg-gradient-to-br from-[#CA1C30] to-[#00B4A0] flex items-center justify-center text-white shadow-md">
               <Table size={18} />
             </div>
             <div>
@@ -199,7 +199,7 @@ export default function VisualTableModal({
         {/* Presets rapides (uniquement en mode création) */}
         {mode === 'insert' && (
           <div className="px-6 py-3 bg-white/[0.02] border-b border-white/5 flex items-center gap-2 flex-wrap">
-            <span className="text-xs text-[#FF7582]/80 font-semibold flex items-center gap-1 mr-2">
+            <span className="text-xs text-[#CA1C30]/80 font-semibold flex items-center gap-1 mr-2">
               <Sparkles size={13} /> Modèles :
             </span>
             {Object.entries(PRESETS).map(([key, preset]) => (
@@ -207,7 +207,7 @@ export default function VisualTableModal({
                 key={key}
                 type="button"
                 onClick={() => handleApplyPreset(key)}
-                className="px-3 py-1 bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-medium border border-white/10 hover:border-[#FF7582]/40 transition-colors flex items-center gap-1.5"
+                className="px-3 py-1 bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-medium border border-white/10 hover:border-[#CA1C30]/40 transition-colors flex items-center gap-1.5"
               >
                 <span>{preset.icon}</span>
                 <span>{preset.label}</span>
@@ -232,7 +232,7 @@ export default function VisualTableModal({
                           value={head}
                           onChange={e => handleHeaderChange(colIdx, e.target.value)}
                           placeholder={`Colonne ${colIdx + 1}`}
-                          className="w-full px-3 py-2 bg-[#FF7582]/10 border border-[#FF7582]/40 text-[#FF7582]/60 text-xs font-bold focus:outline-none focus:border-[#8FAFD4]"
+                          className="w-full px-3 py-2 bg-[#CA1C30]/10 border border-[#CA1C30]/40 text-[#CA1C30]/60 text-xs font-bold focus:outline-none focus:border-[#00B4A0]"
                         />
                         {headers.length > 1 && (
                           <button
@@ -253,7 +253,7 @@ export default function VisualTableModal({
                     <button
                       type="button"
                       onClick={handleAddColumn}
-                      className="px-3 py-2 bg-[#8FAFD4]/15 hover:bg-[#8FAFD4]/25 text-[#8FAFD4]/80 border border-[#8FAFD4]/30 text-xs font-bold flex items-center gap-1 whitespace-nowrap shadow-sm hover:scale-105 transition-all"
+                      className="px-3 py-2 bg-[#00B4A0]/15 hover:bg-[#00B4A0]/25 text-[#00B4A0]/80 border border-[#00B4A0]/30 text-xs font-bold flex items-center gap-1 whitespace-nowrap shadow-sm hover:scale-105 transition-all"
                       title="Ajouter une colonne vers la droite"
                     >
                       <Plus size={14} />
@@ -277,7 +277,7 @@ export default function VisualTableModal({
                           value={row[colIdx] || ''}
                           onChange={e => handleCellChange(rowIdx, colIdx, e.target.value)}
                           placeholder="—"
-                          className="w-full px-3 py-2 bg-white/5 border border-white/10 text-gray-200 text-xs focus:outline-none focus:border-[#FF7582] transition-colors"
+                          className="w-full px-3 py-2 bg-white/5 border border-white/10 text-gray-200 text-xs focus:outline-none focus:border-[#CA1C30] transition-colors"
                         />
                       </td>
                     ))}
@@ -306,7 +306,7 @@ export default function VisualTableModal({
             <button
               type="button"
               onClick={handleAddRow}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#FF7582]/15 hover:bg-purple-500/25 text-[#FF7582]/80 border border-[#FF7582]/30 text-xs font-semibold shadow-sm transition-all hover:scale-102"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#CA1C30]/15 hover:bg-purple-500/25 text-[#CA1C30]/80 border border-[#CA1C30]/30 text-xs font-semibold shadow-sm transition-all hover:scale-102"
             >
               <Plus size={15} />
               <span>Ajouter une ligne en bas</span>
@@ -322,7 +322,7 @@ export default function VisualTableModal({
               </button>
               <button
                 type="submit"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FF7582] text-black font-bold hover:from-purple-500 hover:to-cyan-400 text-white text-xs font-bold shadow-lg shadow-purple-500/30 transition-all hover:scale-105"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#CA1C30] text-black font-bold hover:from-purple-500 hover:to-cyan-400 text-white text-xs font-bold shadow-lg shadow-purple-500/30 transition-all hover:scale-105"
               >
                 <Check size={16} />
                 <span>{mode === 'edit' ? 'Mettre à jour le tableau' : 'Insérer dans la fiche'}</span>

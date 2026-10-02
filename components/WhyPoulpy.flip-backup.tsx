@@ -113,7 +113,7 @@ export default function WhyPoulpy() {
     pillBtnsRef.current.forEach((btn, idx) => {
       if (!btn) return;
       if (idx === activeIdx) {
-        btn.className = "px-2 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer border-[#FF7582] bg-[#FF7582] text-black shadow-[0_0_10px_rgba(255,117,130,0.4)]";
+        btn.className = "px-2 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer border-[#CA1C30] bg-[#CA1C30] text-black shadow-[0_0_10px_rgba(202, 28, 48,0.4)]";
       } else {
         btn.className = "px-2 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer border-white/15 text-white/50 hover:border-white/40 hover:text-white bg-black/40";
       }
@@ -285,7 +285,7 @@ export default function WhyPoulpy() {
     <section
       id="coaching"
       ref={sectionRef}
-      className="relative w-full h-screen bg-[#07090D] border-t border-[rgba(255,255,255,0.08)] font-mono overflow-hidden flex flex-col justify-between pt-16 sm:pt-20 pb-6 sm:pb-8 z-20"
+      className="relative w-full h-screen bg-[#0B0A0D] border-t border-[rgba(255,255,255,0.08)] font-mono overflow-hidden flex flex-col justify-between pt-16 sm:pt-20 pb-6 sm:pb-8 z-20"
     >
       {/* Top Telemetry Bar */}
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-12 flex flex-wrap items-center justify-between gap-4 pb-2 z-20">
@@ -294,7 +294,7 @@ export default function WhyPoulpy() {
             <DecryptedText text="POURQUOI CHOISIR POULPY ? // 06 PILIERS" />
           </span>
           <span className="text-white/40 text-xs hidden md:inline-flex items-center">
-            <span className="w-1.5 h-1.5 bg-[#FF7582] animate-ping" />
+            <span className="w-1.5 h-1.5 bg-[#CA1C30] animate-ping" />
           </span>
         </div>
 
@@ -311,7 +311,7 @@ export default function WhyPoulpy() {
                 onClick={() => goToCard(idx)}
                 className={`px-2 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer ${
                   idx === 0
-                    ? "border-[#FF7582] bg-[#FF7582] text-black shadow-[0_0_10px_rgba(255,117,130,0.4)]"
+                    ? "border-[#CA1C30] bg-[#CA1C30] text-black shadow-[0_0_10px_rgba(202, 28, 48,0.4)]"
                     : "border-white/15 text-white/50 hover:border-white/40 hover:text-white bg-black/40"
                 }`}
               >
@@ -321,11 +321,11 @@ export default function WhyPoulpy() {
           </div>
 
           <span className="text-white/40 hidden sm:inline">AVANCEMENT :</span>
-          <span ref={scrollPctRef} className="text-[#FF7582] font-bold">0%</span>
+          <span ref={scrollPctRef} className="text-[#CA1C30] font-bold">0%</span>
           <div className="w-24 sm:w-32 h-1.5 bg-white/10 border border-white/15 relative overflow-hidden">
             <div
               ref={progressBarRef}
-              className="h-full w-full bg-[#FF7582] shadow-[0_0_10px_#FF7582] origin-left will-change-transform"
+              className="h-full w-full bg-[#CA1C30] shadow-[0_0_10px_#CA1C30] origin-left will-change-transform"
               style={{ transform: "scaleX(0)" }}
             />
           </div>
@@ -387,8 +387,8 @@ export default function WhyPoulpy() {
                   }}
                   className={`reticle-box ${
                     isAcid ? "" : "reticle-laser"
-                  } p-8 sm:p-10 space-y-6 bg-[#090c10] border border-white/10 shadow-2xl shadow-black/80 transition-colors duration-150 flex flex-col justify-between ${
-                    isAcid ? "hover:border-[#FF7582]/50" : "hover:border-[#8FAFD4]/50"
+                  } p-8 sm:p-10 space-y-6 bg-[#121117] border border-white/10 shadow-2xl shadow-black/80 transition-colors duration-150 flex flex-col justify-between ${
+                    isAcid ? "hover:border-[#CA1C30]/50" : "hover:border-[#00B4A0]/50"
                   }`}
                 >
                   <CornerBrackets color={isAcid ? "coral" : "slate"} />
@@ -400,8 +400,8 @@ export default function WhyPoulpy() {
                         <span
                           className={`text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider ${
                             isAcid
-                              ? "bg-[#FF7582]/10 text-[#FF7582] border border-[#FF7582]/30"
-                              : "bg-[#8FAFD4]/10 text-[#8FAFD4] border border-[#8FAFD4]/30"
+                              ? "bg-[#CA1C30]/10 text-[#CA1C30] border border-[#CA1C30]/30"
+                              : "bg-[#00B4A0]/10 text-[#00B4A0] border border-[#00B4A0]/30"
                           }`}
                         >
                           {item.badge}
@@ -414,8 +414,8 @@ export default function WhyPoulpy() {
                       <div
                         className={`w-12 h-12 border flex items-center justify-center ${
                           isAcid
-                            ? "border-[#FF7582]/40 text-[#FF7582] bg-[#FF7582]/5"
-                            : "border-[#8FAFD4]/40 text-[#8FAFD4] bg-[#8FAFD4]/5"
+                            ? "border-[#CA1C30]/40 text-[#CA1C30] bg-[#CA1C30]/5"
+                            : "border-[#00B4A0]/40 text-[#00B4A0] bg-[#00B4A0]/5"
                         }`}
                       >
                         <Icon className="w-6 h-6" />
@@ -427,7 +427,7 @@ export default function WhyPoulpy() {
                       <h3 className="text-2xl font-display text-white tracking-wider">
                         {item.title}
                       </h3>
-                      <div className="text-xs text-[#FF7582] font-medium">
+                      <div className="text-xs text-[#CA1C30] font-medium">
                         {item.subtitle}
                       </div>
                       <p className="text-xs text-white/60 leading-relaxed pt-2">
@@ -446,7 +446,7 @@ export default function WhyPoulpy() {
                           </span>
                           <strong
                             className={`text-xs font-mono font-bold block ${
-                              isAcid ? "text-[#FF7582]" : "text-[#8FAFD4]"
+                              isAcid ? "text-[#CA1C30]" : "text-[#00B4A0]"
                             }`}
                           >
                             {s.val}
@@ -461,10 +461,10 @@ export default function WhyPoulpy() {
                       
                       <div className="flex items-center gap-2 text-white/50 font-mono text-[10px] uppercase">
                         <span className="relative flex h-2 w-2">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#FF7582] opacity-75" />
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#FF7582]" />
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#CA1C30] opacity-75" />
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#CA1C30]" />
                         </span>
-                        <span className="text-[#FF7582] font-bold">EXTRAIT VOD DISPONIBLE</span>
+                        <span className="text-[#CA1C30] font-bold">EXTRAIT VOD DISPONIBLE</span>
                       </div>
                     </div>
                   </div>
@@ -486,14 +486,14 @@ export default function WhyPoulpy() {
                     transformStyle: "preserve-3d",
                     WebkitTransformStyle: "preserve-3d",
                   }}
-                  className="reticle-box p-6 sm:p-8 bg-[#090C12] border-2 border-[#FF7582] shadow-[0_0_35px_rgba(255,117,130,0.3)] flex flex-col justify-between"
+                  className="reticle-box p-6 sm:p-8 bg-[#090C12] border-2 border-[#CA1C30] shadow-[0_0_35px_rgba(202, 28, 48,0.3)] flex flex-col justify-between"
                 >
                   <CornerBrackets color="coral" />
 
                   {/* Back Header */}
                   <div className="flex items-center justify-between border-b border-white/10 pb-3 relative z-10">
                     <div className="flex items-center gap-2">
-                      <span className="bg-[#FF7582] text-black text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
+                      <span className="bg-[#CA1C30] text-black text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
                         EXTRAIT VOD // PILIER {item.num}
                       </span>
                       <span className="text-xs text-white/70 font-display hidden sm:inline">
@@ -504,7 +504,7 @@ export default function WhyPoulpy() {
                     <button
                       type="button"
                       onClick={(e) => handleCardClick(idx, e)}
-                      className="btn-cyber-ghost text-[10px] py-1.5 px-3 flex items-center gap-1.5 hover:border-[#FF7582] hover:text-[#FF7582] cursor-pointer"
+                      className="btn-cyber-ghost text-[10px] py-1.5 px-3 flex items-center gap-1.5 hover:border-[#CA1C30] hover:text-[#CA1C30] cursor-pointer"
                     >
                       <RotateCcw className="w-3 h-3" />
                       <span>RETOUR [✕]</span>
@@ -514,12 +514,12 @@ export default function WhyPoulpy() {
                   {/* Video Mockup Container */}
                   <div className="relative my-auto aspect-video w-full bg-black/90 border border-white/20 flex flex-col items-center justify-center overflow-hidden group/player shadow-inner z-10">
                     {/* Scanlines / Grid effect */}
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#FF7582]/10 via-transparent to-black pointer-events-none" />
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-[#CA1C30]/10 via-transparent to-black pointer-events-none" />
                     <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
 
                     {/* Play Button with breathing rings */}
                     <div className="relative z-10 flex flex-col items-center gap-3">
-                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#FF7582]/20 border-2 border-[#FF7582] flex items-center justify-center text-[#FF7582] shadow-[0_0_25px_rgba(255,117,130,0.5)] group-hover/player:scale-110 transition-transform cursor-pointer">
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#CA1C30]/20 border-2 border-[#CA1C30] flex items-center justify-center text-[#CA1C30] shadow-[0_0_25px_rgba(202, 28, 48,0.5)] group-hover/player:scale-110 transition-transform cursor-pointer">
                         <Play className="w-6 h-6 fill-current ml-1" />
                       </div>
                       <div className="text-center space-y-0.5">
@@ -535,7 +535,7 @@ export default function WhyPoulpy() {
                     {/* Bottom bar overlay */}
                     <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between text-[9px] font-mono text-white/60 z-10">
                       <span className="bg-black/80 px-2 py-0.5 border border-white/10">00:45 / 01:30</span>
-                      <span className="text-[#FF7582] font-bold">COACH POULPY REPLAY ARCHIVE</span>
+                      <span className="text-[#CA1C30] font-bold">COACH POULPY REPLAY ARCHIVE</span>
                     </div>
                   </div>
 
@@ -544,7 +544,7 @@ export default function WhyPoulpy() {
                     <span className="text-[10px] text-white/60 truncate">
                       Démonstration : <strong className="text-white">{item.subtitle}</strong>
                     </span>
-                    <span className="text-[9px] font-mono text-[#FF7582] uppercase tracking-wider">
+                    <span className="text-[9px] font-mono text-[#CA1C30] uppercase tracking-wider">
                       [LECTEUR ACTIF]
                     </span>
                   </div>
@@ -557,7 +557,7 @@ export default function WhyPoulpy() {
         {/* Final Callout Card at End of Scroll */}
         <div
           style={{ transform: "translateZ(0)", contain: "layout style paint" }}
-          className="w-[85vw] sm:w-[480px] h-[520px] shrink-0 reticle-box p-8 sm:p-10 flex flex-col justify-between space-y-6 bg-black border border-[#FF7582]/50 relative overflow-hidden shadow-2xl shadow-black/80"
+          className="w-[85vw] sm:w-[480px] h-[520px] shrink-0 reticle-box p-8 sm:p-10 flex flex-col justify-between space-y-6 bg-black border border-[#CA1C30]/50 relative overflow-hidden shadow-2xl shadow-black/80"
         >
           <div className="space-y-3 relative z-10">
             <span className="data-badge data-badge-acid">PRÊT POUR L&apos;ASCENSION ?</span>

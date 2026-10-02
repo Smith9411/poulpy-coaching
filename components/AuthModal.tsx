@@ -91,41 +91,41 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in font-mono">
-      <div className="relative w-full max-w-md bg-[#090c10] border border-[#FF7582]/40 shadow-[0_0_50px_rgba(0,0,0,0.9)] p-6 sm:p-8 space-y-6">
+      <div className="relative w-full max-w-md bg-[#121117] border border-[#CA1C30]/40 shadow-[0_0_50px_rgba(0,0,0,0.9)] p-6 sm:p-8 space-y-6 rounded-3xl">
         {/* Corner Reticle Accents */}
-        <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-[#FF7582]" />
-        <div className="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-[#FF7582]" />
-        <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-[#FF7582]" />
-        <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-[#FF7582]" />
+        <div className="absolute -top-1 -left-1 w-3 h-3 border-t-2 border-l-2 border-[#CA1C30]" />
+        <div className="absolute -top-1 -right-1 w-3 h-3 border-t-2 border-r-2 border-[#CA1C30]" />
+        <div className="absolute -bottom-1 -left-1 w-3 h-3 border-b-2 border-l-2 border-[#CA1C30]" />
+        <div className="absolute -bottom-1 -right-1 w-3 h-3 border-b-2 border-r-2 border-[#CA1C30]" />
 
         {/* Header */}
         <div className="flex items-center justify-between border-b border-white/10 pb-4">
           <div className="space-y-1">
-            <span className="text-[10px] text-[#FF7582] tracking-widest uppercase flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 bg-[#FF7582] animate-pulse" />
+            <span className="text-[10px] text-[#CA1C30] tracking-widest uppercase flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-[#CA1C30] animate-pulse rounded-full" />
               PORTAIL ÉLÈVE // V2.4
             </span>
-            <h3 className="text-xl sm:text-2xl font-display text-white tracking-wider">
+            <h3 className="text-xl sm:text-2xl font-display text-[#F5F4F0] tracking-wider">
               {mode === "login" ? "CONNEXION MEMBRE" : "CRÉATION DE COMPTE"}
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 border border-white/15 text-white/60 hover:text-white hover:border-[#FF7582] transition-colors"
+            className="p-1.5 border border-white/15 text-white/60 hover:text-white hover:border-[#CA1C30] transition-colors cursor-pointer rounded-lg"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Mode Switch Tabs */}
-        <div className="grid grid-cols-2 gap-2 border border-white/10 p-1 bg-black/50 text-xs">
+        <div className="grid grid-cols-2 gap-2 border border-white/10 p-1 bg-[#0B0A0D] text-xs rounded-xl">
           <button
             type="button"
             onClick={() => { setMode("login"); setError(null); }}
-            className={`py-2 text-center transition-all ${
+            className={`py-2 text-center transition-all cursor-pointer rounded-lg ${
               mode === "login"
-                ? "bg-[#FF7582] text-black font-bold shadow-[0_0_10px_rgba(255,117,130,0.3)]"
-                : "text-white/60 hover:text-white"
+                ? "bg-[#CA1C30] text-black font-bold shadow-[0_0_10px_rgba(202, 28, 48,0.3)]"
+                : "text-[#F5F4F0]/60 hover:text-white"
             }`}
           >
             SE CONNECTER
@@ -133,10 +133,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           <button
             type="button"
             onClick={() => { setMode("register"); setError(null); }}
-            className={`py-2 text-center transition-all ${
+            className={`py-2 text-center transition-all cursor-pointer rounded-lg ${
               mode === "register"
-                ? "bg-[#FF7582] text-black font-bold shadow-[0_0_10px_rgba(255,117,130,0.3)]"
-                : "text-white/60 hover:text-white"
+                ? "bg-[#CA1C30] text-black font-bold shadow-[0_0_10px_rgba(202, 28, 48,0.3)]"
+                : "text-[#F5F4F0]/60 hover:text-white"
             }`}
           >
             CRÉER UN COMPTE
@@ -145,14 +145,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
         {/* Error / Success Feedback */}
         {error && (
-          <div className="p-3 bg-red-500/10 border border-red-500/30 flex items-start gap-2 text-xs text-red-400">
+          <div className="p-3 bg-red-500/10 border border-red-500/30 flex items-start gap-2 text-xs text-red-400 rounded-xl">
             <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
             <span>{error}</span>
           </div>
         )}
 
         {successMsg && (
-          <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 flex items-start gap-2 text-xs text-emerald-400">
+          <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 flex items-start gap-2 text-xs text-emerald-400 rounded-xl">
             <ShieldCheck className="w-4 h-4 shrink-0 mt-0.5" />
             <span>{successMsg}</span>
           </div>
@@ -164,7 +164,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             type="button"
             onClick={() => handleOAuth("google")}
             disabled={loading}
-            className="py-2.5 px-3 bg-white/5 hover:bg-white/10 border border-white/15 text-white flex items-center justify-center gap-2 text-xs font-semibold tracking-wider transition-colors disabled:opacity-50"
+            className="py-2.5 px-3 bg-white/5 hover:bg-white/10 border border-white/15 text-[#F5F4F0] flex items-center justify-center gap-2 text-xs font-semibold tracking-wider transition-colors disabled:opacity-50 cursor-pointer rounded-xl"
           >
             <GoogleIcon className="w-4 h-4" />
             <span>GOOGLE</span>
@@ -173,7 +173,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             type="button"
             onClick={() => handleOAuth("discord")}
             disabled={loading}
-            className="py-2.5 px-3 bg-[#5865F2]/20 hover:bg-[#5865F2]/35 border border-[#5865F2]/40 text-white flex items-center justify-center gap-2 text-xs font-semibold tracking-wider transition-colors disabled:opacity-50"
+            className="py-2.5 px-3 bg-[#5865F2]/20 hover:bg-[#5865F2]/35 border border-[#5865F2]/40 text-white flex items-center justify-center gap-2 text-xs font-semibold tracking-wider transition-colors disabled:opacity-50 cursor-pointer rounded-xl"
           >
             <DiscordIcon className="w-4 h-4 text-[#5865F2]" />
             <span>DISCORD</span>
@@ -183,7 +183,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         {/* Divider */}
         <div className="flex items-center gap-3">
           <div className="flex-1 h-px bg-white/10" />
-          <span className="text-[10px] text-white/40 tracking-widest uppercase">
+          <span className="text-[10px] text-[#F5F4F0]/40 tracking-widest uppercase">
             OU VIA EMAIL
           </span>
           <div className="flex-1 h-px bg-white/10" />
@@ -193,8 +193,8 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         <form onSubmit={handleSubmit} className="space-y-3.5">
           {mode === "register" && (
             <div className="space-y-1">
-              <label className="text-[10px] text-white/60 uppercase tracking-wider flex items-center gap-1.5">
-                <UserIcon className="w-3 h-3 text-[#A4DE87]" />
+              <label className="text-[10px] text-[#F5F4F0]/60 uppercase tracking-wider flex items-center gap-1.5">
+                <UserIcon className="w-3 h-3 text-[#00B4A0]" />
                 Pseudo Joueur
               </label>
               <input
@@ -203,14 +203,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="ex: PoulpyViper"
-                className="w-full p-2.5 bg-black border border-white/15 text-xs text-white placeholder-white/25 focus:border-[#A4DE87] focus:outline-none transition-colors"
+                className="w-full p-2.5 bg-[#0B0A0D] border border-white/15 text-xs text-[#F5F4F0] placeholder-white/25 focus:border-[#00B4A0] focus:outline-none transition-colors rounded-xl"
               />
             </div>
           )}
 
           <div className="space-y-1">
-            <label className="text-[10px] text-white/60 uppercase tracking-wider flex items-center gap-1.5">
-              <Mail className="w-3 h-3 text-[#FF7582]" />
+            <label className="text-[10px] text-[#F5F4F0]/60 uppercase tracking-wider flex items-center gap-1.5">
+              <Mail className="w-3 h-3 text-[#CA1C30]" />
               Adresse Email
             </label>
             <input
@@ -219,13 +219,13 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="joueur@domaine.com"
-              className="w-full p-2.5 bg-black border border-white/15 text-xs text-white placeholder-white/25 focus:border-[#FF7582] focus:outline-none transition-colors"
+              className="w-full p-2.5 bg-[#0B0A0D] border border-white/15 text-xs text-[#F5F4F0] placeholder-white/25 focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
             />
           </div>
 
           <div className="space-y-1">
-            <label className="text-[10px] text-white/60 uppercase tracking-wider flex items-center gap-1.5">
-              <Lock className="w-3 h-3 text-[#8FAFD4]" />
+            <label className="text-[10px] text-[#F5F4F0]/60 uppercase tracking-wider flex items-center gap-1.5">
+              <Lock className="w-3 h-3 text-[#00B4A0]" />
               Mot de passe
             </label>
             <input
@@ -234,14 +234,14 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••••••"
-              className="w-full p-2.5 bg-black border border-white/15 text-xs text-white placeholder-white/25 focus:border-[#8FAFD4] focus:outline-none transition-colors"
+              className="w-full p-2.5 bg-[#0B0A0D] border border-white/15 text-xs text-[#F5F4F0] placeholder-white/25 focus:border-[#00B4A0] focus:outline-none transition-colors rounded-xl"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="btn-cyber-primary w-full py-3 text-xs font-bold tracking-wider flex items-center justify-center gap-2 mt-2"
+            className="btn-cyber-primary w-full py-3 text-xs font-bold tracking-wider flex items-center justify-center gap-2 mt-2 cursor-pointer rounded-xl"
           >
             {loading ? (
               <span>TRAITEMENT EN COURS...</span>
@@ -254,10 +254,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           </button>
         </form>
 
-        <div className="p-3 bg-black/60 border border-white/5 flex items-start gap-2.5 text-[10px] text-white/50 leading-normal">
-          <span className="text-[#A4DE87] font-bold">ACCÈS :</span>
+        <div className="p-3 bg-[#1A1822] border border-white/5 flex items-start gap-2.5 text-[10px] text-[#F5F4F0]/60 leading-normal rounded-xl">
+          <span className="text-[#00B4A0] font-bold">ACCÈS :</span>
           <span>
-            L'espace élève débloque le calendrier de coaching, le suivi VOD en continu et les fiches KovaaK's.
+            L&apos;espace élève débloque le calendrier de coaching, le suivi VOD en continu et les fiches KovaaK&apos;s.
           </span>
         </div>
       </div>

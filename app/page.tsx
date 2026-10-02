@@ -40,7 +40,7 @@ export default function CybercorePoulpyPage() {
   };
 
   return (
-    <main className="w-full block text-white selection:bg-[#FF7582] selection:text-black relative z-10 overflow-x-clip">
+    <main className="w-full block text-[#F5F4F0] selection:bg-[#CA1C30] selection:text-[#0A1C1D] relative z-10 overflow-x-clip bg-[#0A1C1D]">
       {/* 3D WebGL Background Scene (Asynchronously decoupled, non-blocking) */}
       <Scene3D />
 
@@ -48,12 +48,18 @@ export default function CybercorePoulpyPage() {
       <CyberNavbar onOpenBooking={scrollToBooking} />
 
       {/* 02. Monumental Hero Section (Transparent so 3D planet is visible) */}
-      <div id="hero">
+      <div id="hero" className="relative z-10">
         <HeroCyber onOpenBooking={scrollToBooking} />
       </div>
 
-      {/* Solid unified dark background for the lower half of the page */}
-      <div className="bg-black relative z-20">
+      {/* Solid softer dark background starting strictly below Hero fold */}
+      <div className="bg-[#121417] relative z-20">
+        {/* Extended smooth fade (~200px) stretching down to just above the cards */}
+        <div
+          className="absolute top-0 left-0 right-0 h-48 sm:h-56 bg-gradient-to-b from-[#0A1C1D] via-[#0A1C1D]/60 via-30% via-[#121417]/90 via-75% to-[#121417] pointer-events-none z-30"
+          aria-hidden="true"
+        />
+
         {/* 03. Pourquoi Poulpy (06 piliers avec défilement horizontal fluide) */}
         <WhyPoulpy />
 

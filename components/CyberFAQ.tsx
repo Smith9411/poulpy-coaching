@@ -10,35 +10,23 @@ export default function CyberFAQ() {
   const faqs = [
     {
       q: "Comment se déroule une session ?",
-      a: "Les sessions se déroulent sur Discord avec partage d'écran. On analyse ensemble ton gameplay, on identifie les points à améliorer, et on met en place un plan d'action concret.",
+      a: "Sur Discord en vocal et partage d'écran. Analyse de VOD en direct, identification des points de blocage et plan d'entraînement concret.",
     },
     {
-      q: "Dois-je avoir un certain niveau ?",
-      a: "Non, tous les niveaux sont acceptés. Que tu sois débutant ou joueur confirmé, le coaching s'adapte à ton niveau actuel et tes objectifs.",
+      q: "Quel niveau faut-il avoir pour commencer ?",
+      a: "Tous les niveaux sont acceptés. L'entraînement est personnalisé en fonction de ton rang et de tes objectifs.",
     },
     {
-      q: "Est-ce que tu coaches les débutants ?",
-      a: "Absolument ! Le coaching est adapté à tous les niveaux. Pour les débutants, on se concentre sur les fondamentaux essentiels pour progresser rapidement.",
+      q: "Comment envoyer ma VOD ?",
+      a: "Enregistre une partie représentative (format YouTube non répertorié ou lien direct) et transmets-la avant la séance.",
     },
     {
-      q: "Les sessions sont disponibles sur Discord ?",
-      a: "Oui, toutes les sessions se font via Discord avec partage d'écran et communication vocale pour un coaching interactif en temps réel.",
+      q: "Sur quels jeux interviens-tu ?",
+      a: "Spécialisation Valorant et Apex Legends (visée pure, biomécanique, game sense et prise de décision).",
     },
     {
-      q: "Puis-je faire analyser une VOD ?",
-      a: "Oui ! L'analyse de VOD est incluse dans les sessions de 60 et 90 minutes. Tu peux m'envoyer tes replays avant la session.",
-    },
-    {
-      q: "Quel jeu dois-je choisir ?",
-      a: "Choisis le jeu sur lequel tu veux progresser. Si tu hésites, on peut faire une session mixte pour évaluer tes besoins sur plusieurs jeux.",
-    },
-    {
-      q: "Puis-je réserver plusieurs sessions ?",
-      a: "Bien sûr ! Pour une progression optimale, je recommande au moins 2-3 sessions espacées pour mesurer les résultats et ajuster le plan.",
-    },
-    {
-      q: "Comment fonctionne le paiement ?",
-      a: "Le paiement se fait en ligne de manière sécurisée lors de la réservation. Tu reçois ensuite une confirmation avec tous les détails de ta session.",
+      q: "Comment fonctionne le paiement et la confirmation ?",
+      a: "Paiement en ligne sécurisé lors de la réservation. Tu reçois instantanément la confirmation de ton créneau par email.",
     },
   ];
 
@@ -47,17 +35,17 @@ export default function CyberFAQ() {
   };
 
   return (
-    <section id="faq" className="py-14 sm:py-16 px-6 sm:px-12 lg:px-16 bg-[#07090D] border-t border-white/10 font-mono">
+    <section id="faq" className="py-14 sm:py-16 px-6 sm:px-12 lg:px-16 bg-transparent font-mono">
       <div className="max-w-4xl mx-auto space-y-8 sm:space-y-10">
         <div className="space-y-3 text-center">
           <span className="data-badge data-badge-laser inline-flex">
-            <DecryptedText text="INFORMATIONS PRATIQUES &amp; FAQ" />
+            <DecryptedText text="QUESTIONS FRÉQUENTES" />
           </span>
-          <h2 className="text-4xl sm:text-6xl font-display text-white tracking-wider">
-            RÉPONSES <span className="text-[#8FAFD4]">TACTIQUES</span>
+          <h2 className="text-4xl sm:text-6xl font-display text-[#F5F4F0] tracking-wider">
+            FOIRE AUX <span className="text-[#CA1C30]">QUESTIONS</span>
           </h2>
-          <p className="text-xs sm:text-sm text-white/50 max-w-lg mx-auto leading-relaxed">
-            Toutes les réponses aux questions techniques et pratiques.
+          <p className="text-xs sm:text-sm text-[#F5F4F0]/60 max-w-lg mx-auto leading-relaxed">
+            Tout ce qu&apos;il faut savoir avant de réserver ta session.
           </p>
         </div>
 
@@ -67,10 +55,10 @@ export default function CyberFAQ() {
             return (
               <div
                 key={idx}
-                className={`reticle-box transition-all duration-200 ${
+                className={`reticle-box rounded-2xl transition-all duration-200 overflow-hidden ${
                   isOpen
-                    ? "border-[#8FAFD4]/40 bg-[#090C12]"
-                    : "border-white/10 bg-[#07090D] hover:border-white/20"
+                    ? "border-[#CA1C30]/50 bg-[#121117]"
+                    : "border-white/10 bg-[#1A1822] hover:border-white/20"
                 }`}
               >
                 <button
@@ -78,16 +66,16 @@ export default function CyberFAQ() {
                   className="w-full p-6 text-left flex items-center justify-between gap-4 select-none cursor-pointer"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-xs font-bold text-[#8FAFD4]">
+                    <span className="text-xs font-bold text-[#00B4A0]">
                       0{idx + 1} ·
                     </span>
-                    <span className="text-sm sm:text-base font-bold text-white tracking-tight">
+                    <span className="text-sm sm:text-base font-bold text-[#F5F4F0] tracking-tight">
                       {faq.q}
                     </span>
                   </div>
 
-                  <div className="w-6 h-6 border border-white/20 flex items-center justify-center shrink-0 text-white">
-                    {isOpen ? <Minus className="w-3.5 h-3.5 text-[#8FAFD4]" /> : <Plus className="w-3.5 h-3.5" />}
+                  <div className="w-7 h-7 rounded-full border border-white/20 flex items-center justify-center shrink-0 text-[#F5F4F0] bg-black/40">
+                    {isOpen ? <Minus className="w-3.5 h-3.5 text-[#CA1C30]" /> : <Plus className="w-3.5 h-3.5" />}
                   </div>
                 </button>
 
@@ -98,7 +86,7 @@ export default function CyberFAQ() {
                   }`}
                   style={{ transitionTimingFunction: "var(--ease-out)" }}
                 >
-                  <div className="p-6 pt-0 border-t border-white/5 text-xs sm:text-sm text-white/60 leading-relaxed">
+                  <div className="p-6 pt-0 border-t border-white/5 text-xs sm:text-sm text-[#F5F4F0]/70 leading-relaxed">
                     {faq.a}
                   </div>
                 </div>

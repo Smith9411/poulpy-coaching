@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from "react";
 import Link from "next/link";
@@ -20,15 +20,15 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ];
 
   return (
-    <div className="min-h-screen bg-[#07090D] text-white font-mono flex flex-col">
+    <div className="min-h-screen bg-[#0B0A0D] text-white font-mono flex flex-col">
       {/* Top Admin Navigation Bar */}
-      <header className="sticky top-0 z-50 bg-[#090c10]/95 backdrop-blur-md border-b border-white/10 px-4 sm:px-8 py-3">
+      <header className="sticky top-0 z-50 bg-[#121117]/95 backdrop-blur-md border-b border-white/10 px-4 sm:px-8 py-3">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
           {/* Left: Back to Home + Brand */}
           <div className="flex items-center gap-4">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 py-1.5 px-3 bg-white/5 hover:bg-white/10 border border-white/15 text-xs text-white hover:text-[#FF7582] transition-colors"
+              className="inline-flex items-center gap-2 py-1.5 px-3 bg-white/5 hover:bg-white/10 border border-white/15 text-xs text-white hover:text-[#CA1C30] transition-colors"
               title="Retourner sur le site principal"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
@@ -38,9 +38,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="h-4 w-px bg-white/15 hidden sm:block" />
 
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 bg-[#FF7582] animate-pulse" />
+              <span className="w-2 h-2 bg-[#CA1C30] animate-pulse" />
               <span className="text-xs font-bold tracking-wider text-white">
-                POULPY <span className="text-[#FF7582]">// ADMIN CENTER</span>
+                POULPY <span className="text-[#CA1C30]">// ADMIN CENTER</span>
               </span>
             </div>
           </div>
@@ -56,7 +56,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   href={link.href}
                   className={`px-3 py-1.5 flex items-center gap-1.5 transition-all ${
                     isActive
-                      ? "bg-[#FF7582] text-black font-bold shadow-[0_0_10px_rgba(255,117,130,0.3)]"
+                      ? "bg-[#CA1C30] text-black font-bold shadow-[0_0_10px_rgba(202, 28, 48,0.3)]"
                       : "text-white/60 hover:text-white hover:bg-white/5"
                   }`}
                 >
@@ -95,7 +95,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 href={link.href}
                 className={`px-2.5 py-1 text-[11px] whitespace-nowrap flex items-center gap-1 transition-all ${
                   isActive
-                    ? "bg-[#FF7582] text-black font-bold"
+                    ? "bg-[#CA1C30] text-black font-bold"
                     : "text-white/60 hover:text-white"
                 }`}
               >

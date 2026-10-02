@@ -71,15 +71,15 @@ export default function AdminStudentsPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#07090D] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#FF7582]" />
+      <div className="min-h-screen bg-[#0B0A0D] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#CA1C30]" />
       </div>
     );
   }
 
   if (!user?.isAdmin) {
     return (
-      <div className="min-h-screen bg-[#07090D] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0B0A0D] flex items-center justify-center">
         <div className="text-center">
           <Shield className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2">Accès refusé</h1>
@@ -102,7 +102,7 @@ export default function AdminStudentsPage() {
   const apexCount = users.filter((u) => u.apexRank).length;
 
   return (
-    <main className="min-h-screen bg-[#07090D] py-24">
+    <main className="min-h-screen bg-[#0B0A0D] py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <Link href="/admin" className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-4 transition-colors">
@@ -144,7 +144,7 @@ export default function AdminStudentsPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Rechercher un élève..."
-              className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-[#FF7582]"
+              className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-[#CA1C30]"
             />
           </div>
           <div className="flex gap-2">
@@ -159,7 +159,7 @@ export default function AdminStudentsPage() {
                 onClick={() => setGameFilter(f.value)}
                 className={`px-4 py-2 text-sm font-medium transition-all ${
                   gameFilter === f.value
-                    ? 'bg-[#FF7582] text-white'
+                    ? 'bg-[#CA1C30] text-white'
                     : 'bg-white/5 text-gray-400 hover:bg-white/10'
                 }`}
               >
@@ -173,7 +173,7 @@ export default function AdminStudentsPage() {
         <div className="reticle-box overflow-hidden">
           {isLoading ? (
             <div className="p-12 text-center">
-              <Loader2 className="w-8 h-8 animate-spin text-[#FF7582] mx-auto" />
+              <Loader2 className="w-8 h-8 animate-spin text-[#CA1C30] mx-auto" />
             </div>
           ) : error ? (
             <div className="p-12 text-center text-red-400">{error}</div>
@@ -200,7 +200,7 @@ export default function AdminStudentsPage() {
                     <tr key={u.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 bg-gradient-to-br from-[#FF7582] to-[#8FAFD4] flex items-center justify-center text-white font-bold text-sm overflow-hidden shrink-0">
+                          <div className="w-9 h-9 bg-gradient-to-br from-[#CA1C30] to-[#00B4A0] flex items-center justify-center text-white font-bold text-sm overflow-hidden shrink-0">
                             {u.avatarUrl ? (
                               <img src={u.avatarUrl} alt={u.username} className="w-full h-full object-cover" />
                             ) : (
@@ -249,7 +249,7 @@ export default function AdminStudentsPage() {
                       <td className="px-4 py-3 max-w-xs">
                         {u.bio ? (
                           <div className="flex items-start gap-2">
-                            <Quote size={12} className="text-[#FF7582] mt-0.5 shrink-0" />
+                            <Quote size={12} className="text-[#CA1C30] mt-0.5 shrink-0" />
                             <span
                               className="text-xs text-gray-300 line-clamp-2"
                               title={u.bio}
@@ -264,7 +264,7 @@ export default function AdminStudentsPage() {
                       <td className="px-4 py-3 text-right">
                         <Link
                           href={`/admin/coaching/${u.id}`}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#FF7582]/10 hover:bg-[#FF7582]/20 text-[#FF7582] text-sm font-medium transition-colors"
+                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#CA1C30]/10 hover:bg-[#CA1C30]/20 text-[#CA1C30] text-sm font-medium transition-colors"
                         >
                           <MessageSquare size={14} />
                           Chatter

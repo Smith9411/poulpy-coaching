@@ -40,7 +40,7 @@ export default function SplashScreen() {
 
   return (
     <div
-      className={`fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#06080a] font-mono select-none transition-all duration-500 ease-out ${
+      className={`fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#0B0A0D] font-mono select-none transition-all duration-500 ease-out ${
         isFadingOut
           ? "opacity-0 scale-105 pointer-events-none"
           : "opacity-100 scale-100 pointer-events-auto"
@@ -50,16 +50,16 @@ export default function SplashScreen() {
       <div className="absolute inset-0 cyber-grid opacity-30 pointer-events-none" />
 
       {/* Ambient Radial Coral Glow */}
-      <div className="absolute w-80 h-80 sm:w-96 sm:h-96 rounded-full bg-[#FF7582]/15 blur-3xl pointer-events-none" />
+      <div className="absolute w-80 h-80 sm:w-96 sm:h-96 rounded-full bg-[#CA1C30]/15 blur-3xl pointer-events-none" />
 
       {/* Center Container */}
       <div className="relative z-10 flex flex-col items-center text-center space-y-6 max-w-sm px-6">
         {/* Logo Frame with Corner Reticles */}
-        <div className="relative p-2 bg-black border border-[#FF7582]/40 shadow-[0_0_30px_rgba(255,117,130,0.25)]">
-          <div className="absolute -top-1 -left-1 w-2.5 h-2.5 border-t-2 border-l-2 border-[#FF7582]" />
-          <div className="absolute -top-1 -right-1 w-2.5 h-2.5 border-t-2 border-r-2 border-[#FF7582]" />
-          <div className="absolute -bottom-1 -left-1 w-2.5 h-2.5 border-b-2 border-l-2 border-[#FF7582]" />
-          <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 border-b-2 border-r-2 border-[#FF7582]" />
+        <div className="relative p-2 bg-black border border-[#CA1C30]/40 shadow-[0_0_30px_rgba(202, 28, 48,0.25)]">
+          <div className="absolute -top-1 -left-1 w-2.5 h-2.5 border-t-2 border-l-2 border-[#CA1C30]" />
+          <div className="absolute -top-1 -right-1 w-2.5 h-2.5 border-t-2 border-r-2 border-[#CA1C30]" />
+          <div className="absolute -bottom-1 -left-1 w-2.5 h-2.5 border-b-2 border-l-2 border-[#CA1C30]" />
+          <div className="absolute -bottom-1 -right-1 w-2.5 h-2.5 border-b-2 border-r-2 border-[#CA1C30]" />
 
           <div className="w-20 h-20 sm:w-24 sm:h-24 relative overflow-hidden bg-black flex items-center justify-center">
             <Image
@@ -75,10 +75,9 @@ export default function SplashScreen() {
 
         {/* Brand Title & Subtitle */}
         <div className="space-y-1">
-          <div className="flex items-center justify-center gap-2">
-            <span className="w-2 h-2 bg-[#FF7582] shadow-[0_0_8px_#FF7582] inline-block animate-ping" />
+          <div className="flex items-center justify-center">
             <span className="text-2xl sm:text-3xl font-display text-white tracking-widest">
-              POULPY<span className="text-[#FF7582]">.</span>
+              POULPY
             </span>
           </div>
           <p className="text-[10px] text-white/50 tracking-widest uppercase">
@@ -90,14 +89,14 @@ export default function SplashScreen() {
         <div className="w-48 sm:w-56 space-y-2">
           <div className="w-full h-1 bg-white/10 overflow-hidden relative border border-white/5">
             <div
-              className="h-full bg-gradient-to-r from-[#FF7582] to-[#8FAFD4] transition-all duration-300 ease-out shadow-[0_0_10px_#FF7582]"
+              className="h-full bg-gradient-to-r from-[#CA1C30] to-[#00B4A0] transition-all duration-300 ease-out shadow-[0_0_10px_#CA1C30]"
               style={{ width: `${progress}%` }}
             />
           </div>
 
           <div className="flex items-center justify-between text-[10px] text-white/40">
             <span>CHARGEMENT 3D</span>
-            <span className="text-[#FF7582] font-bold">{progress}%</span>
+            <span className="text-[#CA1C30] font-bold">{progress}%</span>
           </div>
         </div>
       </div>

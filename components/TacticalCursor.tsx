@@ -75,10 +75,10 @@ export default function TacticalCursor() {
       <div
         className={`fixed -translate-x-1/2 -translate-y-1/2 transition-all duration-100 ease-out border ${
           hovered
-            ? "w-10 h-10 border-[#00ff41] bg-[rgba(0,255,65,0.08)] scale-125"
+            ? "w-10 h-10 border-[#F5F4F0] bg-[rgba(245, 244, 240,0.08)] scale-125"
             : clicked
             ? "w-8 h-8 border-[#ff0033] bg-[rgba(255,0,51,0.15)] scale-90"
-            : "w-7 h-7 border-[rgba(0,240,255,0.4)] bg-transparent"
+            : "w-7 h-7 border-[rgba(0, 180, 160,0.4)] bg-transparent"
         }`}
         style={{
           left: `${trail.x}px`,
@@ -95,7 +95,7 @@ export default function TacticalCursor() {
       {/* Center Sniper Dot */}
       <div
         className={`fixed -translate-x-1/2 -translate-y-1/2 w-1 h-1 transition-colors duration-75 ${
-          hovered ? "bg-[#00ff41]" : clicked ? "bg-[#ff0033]" : "bg-[#00f0ff]"
+          hovered ? "bg-[#F5F4F0]" : clicked ? "bg-[#ff0033]" : "bg-[#00B4A0]"
         }`}
         style={{
           left: `${pos.x}px`,

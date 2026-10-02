@@ -92,19 +92,19 @@ export default function AdminStats() {
 
   if (authLoading) {
     return (
-      <main className="min-h-screen bg-[#07090D] py-24 flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-[#FF7582] border-t-transparent animate-spin" />
+      <main className="min-h-screen bg-[#0B0A0D] py-24 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-[#CA1C30] border-t-transparent animate-spin" />
       </main>
     );
   }
 
   if (!user || !user.isAdmin) {
     return (
-      <main className="min-h-screen bg-[#07090D] py-24 flex items-center justify-center">
+      <main className="min-h-screen bg-[#0B0A0D] py-24 flex items-center justify-center">
         <div className="text-center reticle-box p-12 max-w-md mx-auto px-4">
           <Shield size={64} className="mx-auto mb-6 text-gray-500" />
           <h1 className="text-3xl font-bold mb-4">Accès refusé</h1>
-          <Link href="/admin" className="inline-flex items-center gap-2 px-8 py-4 bg-[#FF7582] text-black font-bold font-semibold hover:shadow-lg hover:shadow-[#FF7582]/30 transition-all">
+          <Link href="/admin" className="inline-flex items-center gap-2 px-8 py-4 bg-[#CA1C30] text-black font-bold font-semibold hover:shadow-lg hover:shadow-[#CA1C30]/30 transition-all">
             Retour à l&apos;admin
           </Link>
         </div>
@@ -117,28 +117,28 @@ export default function AdminStats() {
       label: 'Total utilisateurs',
       value: userCount === null ? '…' : String(userCount),
       subtext: adminCount !== null ? `dont ${adminCount} admin(s)` : undefined,
-      gradient: 'from-[#FF7582] to-[#FF7582]/60',
+      gradient: 'from-[#CA1C30] to-[#CA1C30]/60',
       icon: Users,
     },
     {
       label: 'Sessions ce mois',
       value: sessionsThisMonth === null ? '…' : String(sessionsThisMonth),
       subtext: totalSessions !== null ? `${totalSessions} au total` : undefined,
-      gradient: 'from-[#8FAFD4] to-[#8FAFD4]/60',
+      gradient: 'from-[#00B4A0] to-[#00B4A0]/60',
       icon: Clock,
     },
     {
       label: 'Revenus mensuels',
       value: monthlyRevenue === null ? '…' : `${monthlyRevenue} €`,
       subtext: 'estimé réservations',
-      gradient: 'from-[#A4DE87] to-[#A4DE87]/60',
+      gradient: 'from-[#F5F4F0] to-[#F5F4F0]/60',
       icon: DollarSign,
     },
     {
       label: 'Taux satisfaction',
       value: '99 %',
       subtext: 'basé sur les avis vérifiés',
-      gradient: 'from-[#FF7582] to-[#8FAFD4]',
+      gradient: 'from-[#CA1C30] to-[#00B4A0]',
       icon: TrendingUp,
     },
   ];
@@ -148,7 +148,7 @@ export default function AdminStats() {
   const apexPct = totalGameSessions > 0 ? 100 - valPct : 50;
 
   return (
-    <main className="min-h-screen bg-[#07090D] py-24">
+    <main className="min-h-screen bg-[#0B0A0D] py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div className="mb-12">
@@ -158,10 +158,10 @@ export default function AdminStats() {
           </Link>
           <div>
             <div className="inline-block data-badge data-badge-acid mb-4">
-              <span className="text-sm text-[#8FAFD4] font-medium">STATISTIQUES</span>
+              <span className="text-sm text-[#00B4A0] font-medium">STATISTIQUES</span>
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-              Statistiques <span className="text-[#FF7582]">globales</span>
+              Statistiques <span className="text-[#CA1C30]">globales</span>
             </h1>
             <p className="text-xl text-gray-300 max-w-2xl">Vue d&apos;ensemble des métriques de la plateforme et du coaching</p>
           </div>
@@ -177,7 +177,7 @@ export default function AdminStats() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-400 mb-1">{s.label}</p>
-                  <p className="text-4xl font-bold text-[#FF7582]">{s.value}</p>
+                  <p className="text-4xl font-bold text-[#CA1C30]">{s.value}</p>
                   {s.subtext && <p className="text-xs text-gray-500 mt-1">{s.subtext}</p>}
                 </div>
                 <div className={`w-14 h-14 bg-gradient-to-br ${s.gradient} flex items-center justify-center shrink-0`}>
@@ -193,12 +193,12 @@ export default function AdminStats() {
           {/* Répartition des comptes */}
           <div className="reticle-box p-6">
             <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <Users size={20} className="text-[#FF7582]" />
+              <Users size={20} className="text-[#CA1C30]" />
               Répartition des comptes
             </h3>
             <div className="grid grid-cols-3 gap-4 pt-2">
               <div className="text-center p-3 bg-white/5 border border-white/5">
-                <p className="text-3xl font-bold text-[#FF7582]">{userCount ?? '…'}</p>
+                <p className="text-3xl font-bold text-[#CA1C30]">{userCount ?? '…'}</p>
                 <p className="text-xs text-gray-400 mt-1">Total inscrits</p>
               </div>
               <div className="text-center p-3 bg-white/5 border border-white/5">
@@ -206,7 +206,7 @@ export default function AdminStats() {
                 <p className="text-xs text-gray-400 mt-1">Admins</p>
               </div>
               <div className="text-center p-3 bg-white/5 border border-white/5">
-                <p className="text-3xl font-bold text-[#8FAFD4]">
+                <p className="text-3xl font-bold text-[#00B4A0]">
                   {userCount !== null && adminCount !== null ? userCount - adminCount : '…'}
                 </p>
                 <p className="text-xs text-gray-400 mt-1">Membres</p>
@@ -218,20 +218,20 @@ export default function AdminStats() {
           <div className="reticle-box p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold flex items-center gap-2">
-                <Calendar size={20} className="text-[#8FAFD4]" />
+                <Calendar size={20} className="text-[#00B4A0]" />
                 Activité Coaching
               </h3>
-              <Link href="/admin/bookings" className="text-xs text-[#FF7582] hover:text-[#FF7582]/80 transition-colors">
+              <Link href="/admin/bookings" className="text-xs text-[#CA1C30] hover:text-[#CA1C30]/80 transition-colors">
                 Gérer l&apos;agenda →
               </Link>
             </div>
             <div className="grid grid-cols-3 gap-4 pt-2">
               <div className="text-center p-3 bg-white/5 border border-white/5">
-                <p className="text-3xl font-bold text-[#8FAFD4]">{sessionsThisMonth ?? '…'}</p>
+                <p className="text-3xl font-bold text-[#00B4A0]">{sessionsThisMonth ?? '…'}</p>
                 <p className="text-xs text-gray-400 mt-1">Ce mois-ci</p>
               </div>
               <div className="text-center p-3 bg-white/5 border border-white/5">
-                <p className="text-3xl font-bold text-[#FF7582]">{totalSessions ?? '…'}</p>
+                <p className="text-3xl font-bold text-[#CA1C30]">{totalSessions ?? '…'}</p>
                 <p className="text-xs text-gray-400 mt-1">Total actives</p>
               </div>
               <div className="text-center p-3 bg-white/5 border border-white/5">
@@ -245,7 +245,7 @@ export default function AdminStats() {
         {/* Répartition par jeu & Performance */}
         <div className="reticle-box p-8">
           <h3 className="text-xl font-bold mb-6 flex items-center gap-3">
-            <Gamepad2 size={24} className="text-[#8FAFD4]" />
+            <Gamepad2 size={24} className="text-[#00B4A0]" />
             Répartition par jeu des sessions
           </h3>
           <div className="grid sm:grid-cols-2 gap-6">
@@ -263,7 +263,7 @@ export default function AdminStats() {
               </div>
               <div className="w-full h-3 bg-white/5 overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-[#FF7582] to-[#FF7582]/60 transition-all duration-500"
+                  className="h-full bg-gradient-to-r from-[#CA1C30] to-[#CA1C30]/60 transition-all duration-500"
                   style={{ width: `${totalGameSessions > 0 ? valPct : 0}%` }}
                 />
               </div>
@@ -283,7 +283,7 @@ export default function AdminStats() {
               </div>
               <div className="w-full h-3 bg-white/5 overflow-hidden">
                 <div
-                  className="h-full bg-gradient-to-r from-[#A4DE87] to-[#A4DE87]/60 transition-all duration-500"
+                  className="h-full bg-gradient-to-r from-[#F5F4F0] to-[#F5F4F0]/60 transition-all duration-500"
                   style={{ width: `${totalGameSessions > 0 ? apexPct : 0}%` }}
                 />
               </div>

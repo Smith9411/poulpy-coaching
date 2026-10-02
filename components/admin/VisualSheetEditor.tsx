@@ -298,8 +298,8 @@ export default function VisualSheetEditor({
     <div className="space-y-6">
       {/* Barre d'outils d'ajout rapide en tête */}
       <div className="p-3.5 bg-[#14121F]/90 border border-purple-500/25 shadow-xl flex items-center justify-between gap-2 flex-wrap">
-        <div className="flex items-center gap-1.5 text-xs text-[#FF7582]/80 font-semibold uppercase tracking-wider">
-          <Sparkles size={14} className="text-[#8FAFD4]" />
+        <div className="flex items-center gap-1.5 text-xs text-[#CA1C30]/80 font-semibold uppercase tracking-wider">
+          <Sparkles size={14} className="text-[#00B4A0]" />
           <span>Ajouter au document :</span>
         </div>
 
@@ -307,7 +307,7 @@ export default function VisualSheetEditor({
           <button
             type="button"
             onClick={() => addBlock('table')}
-            className="px-3 py-1.5 bg-gradient-to-r from-purple-600/30 to-cyan-500/30 hover:from-purple-600/50 hover:to-cyan-500/50 text-[#8FAFD4]/80 border border-[#8FAFD4]/30 text-xs font-bold flex items-center gap-1.5 transition-all hover:scale-105 shadow-sm"
+            className="px-3 py-1.5 bg-gradient-to-r from-purple-600/30 to-cyan-500/30 hover:from-purple-600/50 hover:to-cyan-500/50 text-[#00B4A0]/80 border border-[#00B4A0]/30 text-xs font-bold flex items-center gap-1.5 transition-all hover:scale-105 shadow-sm"
           >
             <Table size={14} />
             <span>+ Tableau</span>
@@ -359,7 +359,7 @@ export default function VisualSheetEditor({
           <p className="text-xs text-gray-500 mt-1 mb-4">Clique sur un bouton ci-dessus pour commencer avec un tableau ou un modèle.</p>
           <button
             onClick={() => addBlock('table')}
-            className="px-4 py-2 bg-[#FF7582] hover:bg-purple-700 text-white text-xs font-bold inline-flex items-center gap-2 transition-colors"
+            className="px-4 py-2 bg-[#CA1C30] hover:bg-purple-700 text-white text-xs font-bold inline-flex items-center gap-2 transition-colors"
           >
             <Plus size={15} />
             Créer un premier tableau
@@ -393,7 +393,7 @@ export default function VisualSheetEditor({
             )}
 
             {block.type === 'quote' && (
-              <div className="p-4 bg-purple-950/30 border border-[#FF7582]/30 bg-black/40 border border-white/10 backdrop-blur-md relative shadow-lg">
+              <div className="p-4 bg-purple-950/30 border border-[#CA1C30]/30 bg-black/40 border border-white/10 backdrop-blur-md relative shadow-lg">
                 <div className="flex items-center justify-between gap-2 mb-2">
                   <div className="flex items-center gap-2 text-amber-300 text-xs font-bold">
                     <Quote size={15} />
@@ -432,7 +432,7 @@ export default function VisualSheetEditor({
                   value={block.content}
                   onChange={(e) => updateBlock(idx, { ...block, content: e.target.value })}
                   placeholder="Titre de la section..."
-                  className={`w-full bg-white/5 border border-white/10 px-3 py-2 text-white focus:outline-none focus:border-[#FF7582] transition-colors ${
+                  className={`w-full bg-white/5 border border-white/10 px-3 py-2 text-white focus:outline-none focus:border-[#CA1C30] transition-colors ${
                     block.type === 'h1' ? 'text-2xl font-black' : block.type === 'h2' ? 'text-xl font-bold' : 'text-base font-semibold'
                   }`}
                 />
@@ -454,7 +454,7 @@ export default function VisualSheetEditor({
                   onChange={(e) => updateBlock(idx, { ...block, content: e.target.value })}
                   placeholder="Écris tes consignes, explications ou remarques..."
                   rows={3}
-                  className="w-full bg-white/5 border border-white/10 p-3 text-sm text-gray-200 focus:outline-none focus:border-[#FF7582] leading-relaxed resize-y transition-colors"
+                  className="w-full bg-white/5 border border-white/10 p-3 text-sm text-gray-200 focus:outline-none focus:border-[#CA1C30] leading-relaxed resize-y transition-colors"
                 />
               </div>
             )}
@@ -476,7 +476,7 @@ export default function VisualSheetEditor({
             {block.type === 'image' && (
               <div className="p-4 bg-black/40 border border-white/10 relative shadow-xl">
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <span className="text-xs font-semibold text-[#8FAFD4]/80 flex items-center gap-1.5">
+                  <span className="text-xs font-semibold text-[#00B4A0]/80 flex items-center gap-1.5">
                     <ImageIcon size={14} /> Capture d'écran
                   </span>
                   <BlockControls
@@ -499,7 +499,7 @@ export default function VisualSheetEditor({
                     value={block.alt}
                     onChange={(e) => updateBlock(idx, { ...block, alt: e.target.value })}
                     placeholder="Légende de l'image (ex: Erreur de placement manche 8)..."
-                    className="w-full bg-white/5 border border-white/10 px-3 py-1.5 text-xs text-gray-300 focus:outline-none focus:border-[#8FAFD4]"
+                    className="w-full bg-white/5 border border-white/10 px-3 py-1.5 text-xs text-gray-300 focus:outline-none focus:border-[#00B4A0]"
                   />
                 </div>
               </div>
@@ -513,7 +513,7 @@ export default function VisualSheetEditor({
         <button
           type="button"
           onClick={() => addBlock('table')}
-          className="px-5 py-2.5 bg-[#FF7582] text-black font-bold hover:from-purple-500 hover:to-cyan-400 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-purple-500/30 transition-all hover:scale-105"
+          className="px-5 py-2.5 bg-[#CA1C30] text-black font-bold hover:from-purple-500 hover:to-cyan-400 text-white font-bold text-xs flex items-center gap-2 shadow-lg shadow-purple-500/30 transition-all hover:scale-105"
         >
           <Plus size={16} />
           <span>Ajouter un nouveau tableau</span>
@@ -613,7 +613,7 @@ function VisualTableBlock({
       {/* Barre supérieure du tableau avec boutons d'actions */}
       <div className="px-5 py-3 bg-white/[0.04] border-b border-white/10 flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-[#FF7582] to-[#8FAFD4] flex items-center justify-center text-white shadow-md">
+          <div className="w-8 h-8 bg-gradient-to-br from-[#CA1C30] to-[#00B4A0] flex items-center justify-center text-white shadow-md">
             <Table size={16} />
           </div>
           <div>
@@ -631,7 +631,7 @@ function VisualTableBlock({
           <button
             type="button"
             onClick={addColumn}
-            className="px-3.5 py-1.5 bg-[#8FAFD4]/20 hover:bg-[#8FAFD4]/30 text-[#8FAFD4]/80 border border-[#8FAFD4]/40 text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all hover:scale-105"
+            className="px-3.5 py-1.5 bg-[#00B4A0]/20 hover:bg-[#00B4A0]/30 text-[#00B4A0]/80 border border-[#00B4A0]/40 text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all hover:scale-105"
             title="Ajouter une nouvelle colonne vers la droite"
           >
             <Plus size={14} />
@@ -641,7 +641,7 @@ function VisualTableBlock({
           <button
             type="button"
             onClick={addRow}
-            className="px-3.5 py-1.5 bg-[#FF7582]/20 hover:bg-[#FF7582]/30 text-[#FF7582]/80 border border-[#FF7582]/40 text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all hover:scale-105"
+            className="px-3.5 py-1.5 bg-[#CA1C30]/20 hover:bg-[#CA1C30]/30 text-[#CA1C30]/80 border border-[#CA1C30]/40 text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all hover:scale-105"
             title="Ajouter une nouvelle ligne en bas"
           >
             <Plus size={14} />
@@ -672,7 +672,7 @@ function VisualTableBlock({
                       value={head}
                       onChange={(e) => updateHeader(cIdx, e.target.value)}
                       placeholder={`Colonne ${cIdx + 1}`}
-                      className="w-full px-3 py-2 bg-[#FF7582]/10 border border-[#FF7582]/40 text-[#FF7582]/60 text-xs font-bold focus:outline-none focus:border-[#8FAFD4] transition-colors shadow-inner"
+                      className="w-full px-3 py-2 bg-[#CA1C30]/10 border border-[#CA1C30]/40 text-[#CA1C30]/60 text-xs font-bold focus:outline-none focus:border-[#00B4A0] transition-colors shadow-inner"
                     />
                     {block.headers.length > 1 && (
                       <button
@@ -693,7 +693,7 @@ function VisualTableBlock({
                 <button
                   type="button"
                   onClick={addColumn}
-                  className="px-2.5 py-2 bg-[#8FAFD4]/15 hover:bg-[#8FAFD4]/25 text-[#8FAFD4]/80 border border-dashed border-[#8FAFD4]/40 text-xs font-semibold flex items-center gap-1 whitespace-nowrap transition-colors"
+                  className="px-2.5 py-2 bg-[#00B4A0]/15 hover:bg-[#00B4A0]/25 text-[#00B4A0]/80 border border-dashed border-[#00B4A0]/40 text-xs font-semibold flex items-center gap-1 whitespace-nowrap transition-colors"
                   title="Ajouter une colonne vers la droite"
                 >
                   <Plus size={13} />
@@ -716,7 +716,7 @@ function VisualTableBlock({
                       value={row[cIdx] || ''}
                       onChange={(e) => updateCell(rIdx, cIdx, e.target.value)}
                       placeholder="—"
-                      className="w-full px-3 py-2 bg-white/5 border border-white/10 text-gray-200 text-xs focus:outline-none focus:border-[#FF7582] transition-colors"
+                      className="w-full px-3 py-2 bg-white/5 border border-white/10 text-gray-200 text-xs focus:outline-none focus:border-[#CA1C30] transition-colors"
                     />
                   </td>
                 ))}
@@ -745,7 +745,7 @@ function VisualTableBlock({
         <button
           type="button"
           onClick={addRow}
-          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#FF7582]/15 hover:bg-purple-500/25 text-[#FF7582]/80 border border-[#FF7582]/30 text-xs font-semibold transition-colors"
+          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#CA1C30]/15 hover:bg-purple-500/25 text-[#CA1C30]/80 border border-[#CA1C30]/30 text-xs font-semibold transition-colors"
         >
           <Plus size={14} />
           <span>+ Ajouter une ligne en bas</span>
@@ -797,7 +797,7 @@ function VisualChecklistBlock({
   };
 
   return (
-    <div className="p-4 bg-[#090c10]/80 border border-emerald-500/30 bg-black/40 border border-white/10 backdrop-blur-md shadow-lg">
+    <div className="p-4 bg-[#121117]/80 border border-emerald-500/30 bg-black/40 border border-white/10 backdrop-blur-md shadow-lg">
       <div className="flex items-center justify-between gap-2 mb-3">
         <div className="flex items-center gap-2 text-emerald-300 text-xs font-bold">
           <CheckSquare size={16} />

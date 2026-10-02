@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import Link from 'next/link';
 import {
@@ -111,15 +111,15 @@ export default function AdminCoaching() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-[#07090D] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#FF7582]" />
+      <div className="min-h-screen bg-[#0B0A0D] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#CA1C30]" />
       </div>
     );
   }
 
   if (!user?.isAdmin) {
     return (
-      <div className="min-h-screen bg-[#07090D] flex items-center justify-center">
+      <div className="min-h-screen bg-[#0B0A0D] flex items-center justify-center">
         <div className="text-center">
           <Shield className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2">Accès refusé</h1>
@@ -136,10 +136,10 @@ export default function AdminCoaching() {
         key={student.id}
         className={`reticle-box p-5 border transition-all ${
           hasUnread
-            ? 'border-[#8FAFD4]/40 bg-[#8FAFD4]/5 shadow-[0_0_0_1px_rgba(34,211,238,0.15),0_8px_24px_-8px_rgba(34,211,238,0.35)]'
+            ? 'border-[#00B4A0]/40 bg-[#00B4A0]/5 shadow-[0_0_0_1px_rgba(34,211,238,0.15),0_8px_24px_-8px_rgba(34,211,238,0.35)]'
             : isCoachedSection
             ? 'border-emerald-500/30 bg-emerald-500/5 hover:border-emerald-500/50 shadow-[0_4px_20px_-8px_rgba(16,185,129,0.15)]'
-            : 'border-white/5 hover:border-[#FF7582]/20'
+            : 'border-white/5 hover:border-[#CA1C30]/20'
         }`}
       >
         <div className="flex items-start gap-4 mb-4">
@@ -148,10 +148,10 @@ export default function AdminCoaching() {
             {student.avatarUrl ? (
               <div className={`w-12 h-12 overflow-hidden border-2 flex-shrink-0 ${
                 hasUnread
-                  ? 'border-[#8FAFD4]'
+                  ? 'border-[#00B4A0]'
                   : isCoachedSection
                   ? 'border-emerald-400'
-                  : 'border-[#FF7582]/30'
+                  : 'border-[#CA1C30]/30'
               }`}>
                 <img
                   src={student.avatarUrl}
@@ -162,16 +162,16 @@ export default function AdminCoaching() {
             ) : (
               <div className={`w-12 h-12 bg-gradient-to-br flex items-center justify-center text-white font-bold flex-shrink-0 ${
                 hasUnread
-                  ? 'from-[#8FAFD4] to-[#8FAFD4]/60'
+                  ? 'from-[#00B4A0] to-[#00B4A0]/60'
                   : isCoachedSection
                   ? 'from-emerald-500 to-teal-500'
-                  : 'from-[#FF7582] to-cyan-500'
+                  : 'from-[#CA1C30] to-cyan-500'
               }`}>
                 {student.initial}
               </div>
             )}
             {hasUnread && (
-              <span className="absolute -top-1 -right-1 inline-flex items-center justify-center w-5 h-5 bg-[#8FAFD4] text-white text-[10px] font-bold ring-2 ring-page animate-pulse">
+              <span className="absolute -top-1 -right-1 inline-flex items-center justify-center w-5 h-5 bg-[#00B4A0] text-white text-[10px] font-bold ring-2 ring-page animate-pulse">
                 {student.unreadCount > 9 ? '9+' : student.unreadCount}
               </span>
             )}
@@ -191,7 +191,7 @@ export default function AdminCoaching() {
                   </span>
                 )}
                 {hasUnread && (
-                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-[#8FAFD4]/15 border border-[#8FAFD4]/30 text-[#8FAFD4]/80 text-[10px] font-semibold uppercase tracking-wide">
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-[#00B4A0]/15 border border-[#00B4A0]/30 text-[#00B4A0]/80 text-[10px] font-semibold uppercase tracking-wide">
                     <Bell size={10} />
                     Nouveau
                   </span>
@@ -199,7 +199,7 @@ export default function AdminCoaching() {
               </div>
               <Link
                 href={`/admin/coaching/${student.id}/sheet`}
-                className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#8FAFD4]/15 hover:bg-[#8FAFD4]/25 text-[#8FAFD4] border border-[#8FAFD4]/30 text-xs font-medium transition-colors ml-auto shadow-sm hover:scale-[1.02]"
+                className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#00B4A0]/15 hover:bg-[#00B4A0]/25 text-[#00B4A0] border border-[#00B4A0]/30 text-xs font-medium transition-colors ml-auto shadow-sm hover:scale-[1.02]"
                 title="Consulter et éditer la fiche perso de l'élève"
               >
                 <FileText size={13} />
@@ -225,14 +225,14 @@ export default function AdminCoaching() {
             href={`/admin/coaching/${student.id}`}
             className={`flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium transition-colors ${
               hasUnread
-                ? 'bg-[#8FAFD4]/20 hover:bg-[#8FAFD4]/30 text-[#8FAFD4]/80 border border-[#8FAFD4]/30'
-                : 'bg-[#FF7582]/10 hover:bg-[#FF7582]/20 text-[#FF7582] border border-[#FF7582]/20'
+                ? 'bg-[#00B4A0]/20 hover:bg-[#00B4A0]/30 text-[#00B4A0]/80 border border-[#00B4A0]/30'
+                : 'bg-[#CA1C30]/10 hover:bg-[#CA1C30]/20 text-[#CA1C30] border border-[#CA1C30]/20'
             }`}
           >
             <MessageSquare size={15} />
             Chat
             {hasUnread && (
-              <span className="ml-auto inline-flex items-center justify-center w-4 h-4 bg-[#8FAFD4] text-white text-[9px] font-bold">
+              <span className="ml-auto inline-flex items-center justify-center w-4 h-4 bg-[#00B4A0] text-white text-[9px] font-bold">
                 {student.unreadCount > 9 ? '9+' : student.unreadCount}
               </span>
             )}
@@ -252,7 +252,7 @@ export default function AdminCoaching() {
   const totalResults = coachedStudents.length + regularStudents.length;
 
   return (
-    <main className="min-h-screen bg-[#07090D] py-24">
+    <main className="min-h-screen bg-[#0B0A0D] py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
@@ -302,7 +302,7 @@ export default function AdminCoaching() {
               placeholder="Rechercher un étudiant (pseudo ou email)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-[#FF7582]"
+              className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-[#CA1C30]"
             />
           </div>
         </div>
@@ -310,7 +310,7 @@ export default function AdminCoaching() {
         {/* Loading / Empty States */}
         {isLoading ? (
           <div className="p-20 text-center">
-            <Loader2 className="w-10 h-10 animate-spin text-[#FF7582] mx-auto mb-4" />
+            <Loader2 className="w-10 h-10 animate-spin text-[#CA1C30] mx-auto mb-4" />
             <p className="text-gray-400">Chargement des étudiants...</p>
           </div>
         ) : totalResults === 0 ? (
@@ -345,7 +345,7 @@ export default function AdminCoaching() {
                   <p className="text-gray-300 font-medium">Aucun élève en coaching actuel</p>
                   <p className="text-gray-500 text-xs mt-1">
                     Tu peux basculer un élève en coaching avec le bouton &quot;En coaching&quot; dans la page{' '}
-                    <Link href="/admin/users" className="text-[#FF7582] hover:underline">
+                    <Link href="/admin/users" className="text-[#CA1C30] hover:underline">
                       Gérer les utilisateurs
                     </Link>.
                   </p>
@@ -397,13 +397,13 @@ export default function AdminCoaching() {
             <div className="text-xs text-gray-400 mt-1">Autres élèves</div>
           </div>
           <div className="reticle-box p-5 text-center">
-            <div className="text-3xl font-bold text-[#8FAFD4]">
+            <div className="text-3xl font-bold text-[#00B4A0]">
               {students.reduce((acc, s) => acc + s.unreadCount, 0)}
             </div>
             <div className="text-xs text-gray-400 mt-1">Messages non lus</div>
           </div>
           <div className="reticle-box p-5 text-center">
-            <div className="text-3xl font-bold text-[#FF7582]">
+            <div className="text-3xl font-bold text-[#CA1C30]">
               {students.length}
             </div>
             <div className="text-xs text-gray-400 mt-1">Total élèves</div>

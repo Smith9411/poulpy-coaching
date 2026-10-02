@@ -336,9 +336,8 @@ export default function CyberNavbar({
             className="flex items-center gap-3 group flex-shrink-0"
           >
             <div className="flex items-center gap-2 font-mono">
-              <span className="w-2.5 h-2.5 bg-[#FF7582] shadow-[0_0_10px_#FF7582] inline-block animate-pulse" />
-              <span className="text-xl font-display text-white group-hover:text-[#FF7582] transition-colors duration-150 tracking-widest font-bold">
-                POULPY<span className="text-[#FF7582]">.</span>
+              <span className="text-xl font-display text-[#F5F4F0] group-hover:text-[#CA1C30] transition-colors duration-150 tracking-widest font-bold">
+                POULPY
               </span>
             </div>
           </a>
@@ -353,20 +352,20 @@ export default function CyberNavbar({
                   key={link.label}
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.href)}
-                  className={`relative px-2.5 py-1.5 transition-colors flex items-center gap-1.5 tracking-wider uppercase font-semibold ${
+                  className={`relative px-3 py-1.5 rounded-full transition-colors flex items-center gap-1.5 tracking-wider uppercase font-semibold ${
                     isActive
-                      ? "text-[#FF7582]"
-                      : "text-white/70 hover:text-[#FF7582] hover:bg-white/5"
+                      ? "text-[#CA1C30]"
+                      : "text-white/70 hover:text-[#CA1C30] hover:bg-white/5"
                   }`}
                 >
                   {isActive && (
                     <motion.div
                       layoutId="cyber-nav-active-pill"
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      className="absolute inset-0 border border-[#FF7582]/60 bg-[#FF7582]/10 shadow-[0_0_12px_rgba(255,117,130,0.25)] pointer-events-none"
+                      className="absolute inset-0 border border-[#CA1C30]/60 bg-[#CA1C30]/10 rounded-full shadow-[0_0_12px_rgba(202, 28, 48,0.25)] pointer-events-none"
                     />
                   )}
-                  {isActive && <span className="w-1.5 h-1.5 bg-[#FF7582] animate-pulse relative z-10" />}
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-[#CA1C30] animate-pulse relative z-10" />}
                   <span className="relative z-10">{link.label}</span>
                 </a>
               );
@@ -382,30 +381,30 @@ export default function CyberNavbar({
             <div className="relative" ref={notifsRef}>
               <button
                 onClick={() => setNotifsOpen(!notifsOpen)}
-                className="relative p-2 text-white/70 hover:text-white transition-colors cursor-pointer flex items-center justify-center"
+                className="relative p-2 text-[#F5F4F0]/70 hover:text-[#F5F4F0] transition-colors cursor-pointer flex items-center justify-center"
                 title="Notifications Système"
               >
                 <Bell className="w-4 h-4" />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-[#FF7582] rounded-full animate-ping" />
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-[#CA1C30] rounded-full animate-ping" />
                 )}
                 {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-[#FF7582] rounded-full" />
+                  <span className="absolute top-1 right-1 w-2 h-2 bg-[#CA1C30] rounded-full" />
                 )}
               </button>
 
               {/* Notification Dropdown Panel */}
               {notifsOpen && (
-                <div className="absolute top-full right-0 mt-2 w-80 bg-[#090c10] border border-[#FF7582]/40 shadow-[0_10px_40px_rgba(0,0,0,0.9)] p-4 space-y-3 font-mono text-xs z-50">
+                <div className="absolute top-full right-0 mt-2 w-80 bg-[#121117] border border-[#CA1C30]/30 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.9)] p-4 space-y-3 font-mono text-xs z-50">
                   <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
-                    <span className="text-[10px] text-[#FF7582] font-bold tracking-wider flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 bg-[#FF7582] animate-pulse" />
+                    <span className="text-[10px] text-[#CA1C30] font-bold tracking-wider flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 bg-[#CA1C30] animate-pulse rounded-full" />
                       NOTIFICATIONS // {unreadCount} {unreadCount > 1 ? "NOUVELLES" : "NOUVELLE"}
                     </span>
                     {unreadCount > 0 && (
                       <button
                         onClick={() => setUnreadCount(0)}
-                        className="text-[10px] text-white/50 hover:text-white underline cursor-pointer"
+                        className="text-[10px] text-[#F5F4F0]/50 hover:text-[#F5F4F0] underline cursor-pointer"
                       >
                         TOUT VU
                       </button>
@@ -414,10 +413,10 @@ export default function CyberNavbar({
 
                   <div className="space-y-2 max-h-72 overflow-y-auto">
                     {!user ? (
-                      <div className="py-6 text-center text-white/40 space-y-2">
+                      <div className="py-6 text-center text-[#F5F4F0]/40 space-y-2">
                         <Bell className="w-6 h-6 text-white/20 mx-auto" />
-                        <div className="text-xs font-bold text-white/70">NON CONNECTÉ</div>
-                        <p className="text-[10px] text-white/40">Connectez-vous pour voir vos notifications.</p>
+                        <div className="text-xs font-bold text-[#F5F4F0]/70">NON CONNECTÉ</div>
+                        <p className="text-[10px] text-[#F5F4F0]/40">Connectez-vous pour voir vos notifications.</p>
                         <button
                           onClick={() => {
                             setNotifsOpen(false);
@@ -429,10 +428,10 @@ export default function CyberNavbar({
                         </button>
                       </div>
                     ) : realNotifs.length === 0 ? (
-                      <div className="py-6 text-center text-white/40 space-y-1.5">
-                        <CheckCircle2 className="w-6 h-6 text-[#A4DE87]/40 mx-auto" />
-                        <div className="text-xs font-bold text-white/70">AUCUNE NOTIFICATION</div>
-                        <p className="text-[10px] text-white/30">Toutes vos notifications sont à jour.</p>
+                      <div className="py-6 text-center text-[#F5F4F0]/40 space-y-1.5">
+                        <CheckCircle2 className="w-6 h-6 text-[#00B4A0]/40 mx-auto" />
+                        <div className="text-xs font-bold text-[#F5F4F0]/70">AUCUNE NOTIFICATION</div>
+                        <p className="text-[10px] text-[#F5F4F0]/30">Toutes vos notifications sont à jour.</p>
                       </div>
                     ) : (
                       realNotifs.map((item) => (
@@ -440,10 +439,10 @@ export default function CyberNavbar({
                           key={item.id}
                           href={item.href}
                           onClick={() => setNotifsOpen(false)}
-                          className="block p-2.5 bg-black/60 border border-white/5 space-y-1 hover:border-[#FF7582]/40 transition-colors"
+                          className="block p-2.5 bg-[#1A1822] border border-white/5 space-y-1 hover:border-[#CA1C30]/40 transition-colors rounded-xl"
                         >
                           <div className="flex items-center justify-between">
-                            <span className="text-[10px] text-[#FF7582] font-bold flex items-center gap-1">
+                            <span className="text-[10px] text-[#CA1C30] font-bold flex items-center gap-1">
                               {item.type === "message" ? (
                                 <MessageSquare className="w-3 h-3" />
                               ) : item.type === "annotation" ? (
@@ -453,9 +452,9 @@ export default function CyberNavbar({
                               )}
                               {item.title}
                             </span>
-                            <span className="text-[9px] text-white/40">{item.timeAgo}</span>
+                            <span className="text-[9px] text-[#F5F4F0]/40">{item.timeAgo}</span>
                           </div>
-                          <p className="text-[11px] text-white/80 leading-snug">
+                          <p className="text-[11px] text-[#F5F4F0]/80 leading-snug">
                             {item.description}
                           </p>
                         </Link>
@@ -471,62 +470,62 @@ export default function CyberNavbar({
               <div className="relative" ref={userMenuRef}>
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
-                  className="flex items-center gap-2.5 text-xs font-mono tracking-wider text-white hover:text-[#FF7582] transition-colors py-1 px-1 cursor-pointer group"
+                  className="flex items-center gap-2.5 text-xs font-mono tracking-wider text-[#F5F4F0] hover:text-[#CA1C30] transition-colors py-1 px-1 cursor-pointer group"
                 >
-                  <div className="w-8 h-8 bg-[#FF7582]/15 border border-[#FF7582]/50 text-[#FF7582] text-xs font-bold flex items-center justify-center overflow-hidden shadow-[0_0_10px_rgba(255,117,130,0.2)]">
+                  <div className="w-8 h-8 rounded-full bg-[#CA1C30]/15 border border-[#CA1C30]/50 text-[#CA1C30] text-xs font-bold flex items-center justify-center overflow-hidden shadow-[0_0_10px_rgba(202, 28, 48,0.2)]">
                     {user.avatarUrl ? (
                       <img src={user.avatarUrl} alt={user.username} className="w-full h-full object-cover" />
                     ) : (
                       user.initial || user.username[0]?.toUpperCase() || "P"
                     )}
                   </div>
-                  <span className="font-semibold text-white group-hover:text-[#FF7582] transition-colors truncate max-w-[110px]">
+                  <span className="font-semibold text-[#F5F4F0] group-hover:text-[#CA1C30] transition-colors truncate max-w-[110px]">
                     {user.username}
                   </span>
                   {user.isAdmin && (
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 bg-[#FF7582] text-black">ADMIN</span>
+                    <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#CA1C30] text-white">ADMIN</span>
                   )}
-                  <ChevronDown className="w-3 h-3 text-white/50 group-hover:text-white transition-colors" />
+                  <ChevronDown className="w-3 h-3 text-[#F5F4F0]/50 group-hover:text-white transition-colors" />
                 </button>
 
                 {userMenuOpen && (
-                  <div className="absolute top-full right-0 mt-2 w-60 bg-[#090c10] border border-[#FF7582]/40 shadow-[0_10px_40px_rgba(0,0,0,0.9)] p-2 space-y-1 font-mono text-xs z-50">
-                    <div className="p-2.5 border-b border-white/10 mb-1 bg-black/40">
-                      <div className="text-[10px] text-white/40 uppercase">CONNECTÉ EN TANT QUE</div>
-                      <div className="text-white font-bold truncate">{user.username}</div>
-                      <div className="text-[10px] text-white/50 truncate">{user.email}</div>
+                  <div className="absolute top-full right-0 mt-2 w-60 bg-[#121117] border border-[#CA1C30]/40 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.9)] p-2 space-y-1 font-mono text-xs z-50 overflow-hidden">
+                    <div className="p-2.5 border-b border-white/10 mb-1 bg-[#1A1822] rounded-xl">
+                      <div className="text-[10px] text-[#F5F4F0]/40 uppercase">CONNECTÉ EN TANT QUE</div>
+                      <div className="text-[#F5F4F0] font-bold truncate">{user.username}</div>
+                      <div className="text-[10px] text-[#F5F4F0]/50 truncate">{user.email}</div>
                     </div>
                     <Link
                       href="/profile"
                       onClick={() => setUserMenuOpen(false)}
-                      className="w-full p-2 hover:bg-white/5 text-white/90 hover:text-[#FF7582] flex items-center gap-2.5 transition-colors font-medium"
+                      className="w-full p-2 rounded-lg hover:bg-white/5 text-[#F5F4F0]/90 hover:text-[#CA1C30] flex items-center gap-2.5 transition-colors font-medium"
                     >
-                      <User className="w-3.5 h-3.5 text-[#FF7582]" />
+                      <User className="w-3.5 h-3.5 text-[#CA1C30]" />
                       <span>MON PROFIL</span>
                     </Link>
                     <Link
                       href="/profile/coaching"
                       onClick={() => setUserMenuOpen(false)}
-                      className="w-full p-2 hover:bg-white/5 text-white/80 hover:text-white flex items-center gap-2.5 transition-colors"
+                      className="w-full p-2 rounded-lg hover:bg-white/5 text-[#F5F4F0]/80 hover:text-white flex items-center gap-2.5 transition-colors"
                     >
-                      <LayoutDashboard className="w-3.5 h-3.5 text-[#8FAFD4]" />
+                      <LayoutDashboard className="w-3.5 h-3.5 text-[#00B4A0]" />
                       <span>ESPACE ÉLÈVE</span>
                     </Link>
                     <Link
                       href="/profile/sheet"
                       onClick={() => setUserMenuOpen(false)}
-                      className="w-full p-2 hover:bg-white/5 text-white/80 hover:text-white flex items-center gap-2.5 transition-colors"
+                      className="w-full p-2 rounded-lg hover:bg-white/5 text-[#F5F4F0]/80 hover:text-white flex items-center gap-2.5 transition-colors"
                     >
-                      <Film className="w-3.5 h-3.5 text-[#A4DE87]" />
+                      <Film className="w-3.5 h-3.5 text-[#00B4A0]" />
                       <span>FICHES & SUIVI</span>
                     </Link>
                     {user.isAdmin && (
                       <Link
                         href="/admin"
                         onClick={() => setUserMenuOpen(false)}
-                        className="w-full p-2 hover:bg-[#FF7582]/10 text-[#FF7582] flex items-center gap-2.5 transition-colors font-bold"
+                        className="w-full p-2 rounded-lg hover:bg-[#CA1C30]/10 text-[#CA1C30] flex items-center gap-2.5 transition-colors font-bold"
                       >
-                        <Shield className="w-3.5 h-3.5 text-[#FF7582]" />
+                        <Shield className="w-3.5 h-3.5 text-[#CA1C30]" />
                         <span>PANNEAU ADMIN</span>
                       </Link>
                     )}
@@ -535,7 +534,7 @@ export default function CyberNavbar({
                         setUserMenuOpen(false);
                         await logout();
                       }}
-                      className="w-full p-2 hover:bg-red-500/10 text-red-400 hover:text-red-300 flex items-center gap-2.5 transition-colors border-t border-white/10 mt-1 cursor-pointer"
+                      className="w-full p-2 rounded-lg hover:bg-red-500/10 text-red-400 hover:text-red-300 flex items-center gap-2.5 transition-colors border-t border-white/10 mt-1 cursor-pointer"
                     >
                       <LogOut className="w-3.5 h-3.5" />
                       <span>DÉCONNEXION</span>
@@ -546,7 +545,7 @@ export default function CyberNavbar({
             ) : (
               <button
                 onClick={() => setAuthOpen(true)}
-                className="text-xs font-mono text-white/80 hover:text-white transition-colors py-2 px-3 border border-white/15 hover:border-white/40 cursor-pointer uppercase tracking-wider"
+                className="text-xs font-mono text-[#F5F4F0]/80 hover:text-white transition-colors py-2 px-4 rounded-full border border-white/15 hover:border-[#CA1C30]/50 cursor-pointer uppercase tracking-wider"
               >
                 CONNEXION
               </button>
@@ -572,7 +571,7 @@ export default function CyberNavbar({
                   }
                 }
               }}
-              className="btn-cyber-primary py-2 px-4 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer"
+              className="btn-cyber-primary rounded-full py-2 px-5 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-[0_0_20px_rgba(202, 28, 48,0.3)]"
             >
               <span>RÉSERVER</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -600,7 +599,7 @@ export default function CyberNavbar({
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.25 }}
-              className="sm:hidden bg-[#06080A]/95 border-b border-white/10 backdrop-blur-lg px-6 py-6 space-y-4 font-mono text-xs overflow-hidden"
+              className="sm:hidden bg-[#121117]/95 border-b border-white/10 backdrop-blur-lg px-6 py-6 space-y-4 font-mono text-xs overflow-hidden"
             >
               <div className="space-y-2">
                 {navLinks.map((link) => (
@@ -608,7 +607,7 @@ export default function CyberNavbar({
                     key={link.label}
                     href={link.href}
                     onClick={(e) => handleNavClick(e, link.href)}
-                    className="block py-2 text-white/80 hover:text-[#FF7582] transition-colors uppercase tracking-wider font-semibold border-b border-white/5"
+                    className="block py-2 text-[#F5F4F0]/80 hover:text-[#CA1C30] transition-colors uppercase tracking-wider font-semibold border-b border-white/5"
                   >
                     {link.label}
                   </a>

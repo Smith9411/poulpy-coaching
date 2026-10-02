@@ -57,7 +57,7 @@ export default function SheetMarkdownPreview({
           <span key={`img-${keyIdx++}`} className="inline-block my-2 max-w-full">
             <span
               onClick={() => setZoomImage(src)}
-              className="group relative inline-block cursor-zoom-in overflow-hidden border border-white/20 bg-black/40 shadow-lg hover:border-[#FF7582]/50 transition-all"
+              className="group relative inline-block cursor-zoom-in overflow-hidden border border-white/20 bg-black/40 shadow-lg hover:border-[#CA1C30]/50 transition-all"
             >
               <img
                 src={src}
@@ -87,7 +87,7 @@ export default function SheetMarkdownPreview({
             href={linkMatch[2]}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#8FAFD4] hover:text-[#8FAFD4]/80 underline inline-flex items-center gap-0.5"
+            className="text-[#00B4A0] hover:text-[#00B4A0]/80 underline inline-flex items-center gap-0.5"
           >
             {linkMatch[1]}
             <ExternalLink size={12} className="inline ml-0.5" />
@@ -188,7 +188,7 @@ export default function SheetMarkdownPreview({
       }
       i = nextIdx; // saute après le bloc fermant
       blocks.push(
-        <pre key={`codeblock-${i}`} className="p-4 bg-black/50 border border-white/10 overflow-x-auto text-sm text-[#8FAFD4]/80 font-mono my-4">
+        <pre key={`codeblock-${i}`} className="p-4 bg-black/50 border border-white/10 overflow-x-auto text-sm text-[#00B4A0]/80 font-mono my-4">
           <code>{codeLines.join('\n')}</code>
         </pre>
       );
@@ -203,8 +203,8 @@ export default function SheetMarkdownPreview({
         const titleText = match[2];
         if (level === 1) {
           blocks.push(
-            <h1 key={`h1-${i}`} className="text-2xl sm:text-3xl font-black text-white mt-6 mb-3 pb-2 border-b border-[#FF7582]/30 flex items-center gap-2">
-              <span className="w-2 h-6 bg-gradient-to-b from-[#FF7582] to-[#8FAFD4] inline-block flex-shrink-0" />
+            <h1 key={`h1-${i}`} className="text-2xl sm:text-3xl font-black text-white mt-6 mb-3 pb-2 border-b border-[#CA1C30]/30 flex items-center gap-2">
+              <span className="w-2 h-6 bg-gradient-to-b from-[#CA1C30] to-[#00B4A0] inline-block flex-shrink-0" />
               <span>{renderInline(titleText)}</span>
             </h1>
           );
@@ -217,7 +217,7 @@ export default function SheetMarkdownPreview({
           );
         } else if (level === 3) {
           blocks.push(
-            <h3 key={`h3-${i}`} className="text-lg font-semibold text-[#FF7582]/60 mt-4 mb-2">
+            <h3 key={`h3-${i}`} className="text-lg font-semibold text-[#CA1C30]/60 mt-4 mb-2">
               {renderInline(titleText)}
             </h3>
           );
@@ -244,7 +244,7 @@ export default function SheetMarkdownPreview({
       blocks.push(
         <blockquote
           key={`quote-${i}`}
-          className="my-4 p-4 bg-[#FF7582]/5 border-l-4 border-purple-500 text-gray-200 text-sm leading-relaxed bg-black/40 border border-white/10 backdrop-blur-md shadow-sm"
+          className="my-4 p-4 bg-[#CA1C30]/5 border-l-4 border-purple-500 text-gray-200 text-sm leading-relaxed bg-black/40 border border-white/10 backdrop-blur-md shadow-sm"
         >
           {quoteLines.map((ql, qIdx) => (
             <div key={qIdx} className={qIdx > 0 ? 'mt-1' : ''}>
@@ -287,14 +287,14 @@ export default function SheetMarkdownPreview({
             {/* Barre d'action rapide sur le tableau si éditable */}
             {editable && (
               <div className="px-4 py-2 bg-white/[0.03] border-b border-white/10 flex items-center justify-between gap-2 flex-wrap print:hidden">
-                <span className="text-[11px] font-semibold text-[#FF7582]/80/80 flex items-center gap-1.5 uppercase tracking-wide">
+                <span className="text-[11px] font-semibold text-[#CA1C30]/80/80 flex items-center gap-1.5 uppercase tracking-wide">
                   <Table size={13} /> Tableau #{thisTableIndex + 1}
                 </span>
                 <div className="flex items-center gap-1.5">
                   <button
                     type="button"
                     onClick={() => onAddColumnToTable?.(thisTableIndex)}
-                    className="px-2.5 py-1 bg-[#8FAFD4]/15 hover:bg-[#8FAFD4]/25 text-[#8FAFD4]/80 border border-[#8FAFD4]/30 text-xs font-semibold flex items-center gap-1 transition-all hover:scale-105"
+                    className="px-2.5 py-1 bg-[#00B4A0]/15 hover:bg-[#00B4A0]/25 text-[#00B4A0]/80 border border-[#00B4A0]/30 text-xs font-semibold flex items-center gap-1 transition-all hover:scale-105"
                     title="Ajouter une colonne vers la droite"
                   >
                     <Plus size={13} />
@@ -303,7 +303,7 @@ export default function SheetMarkdownPreview({
                   <button
                     type="button"
                     onClick={() => onAddRowToTable?.(thisTableIndex)}
-                    className="px-2.5 py-1 bg-[#FF7582]/15 hover:bg-purple-500/25 text-[#FF7582]/80 border border-[#FF7582]/30 text-xs font-semibold flex items-center gap-1 transition-all hover:scale-105"
+                    className="px-2.5 py-1 bg-[#CA1C30]/15 hover:bg-purple-500/25 text-[#CA1C30]/80 border border-[#CA1C30]/30 text-xs font-semibold flex items-center gap-1 transition-all hover:scale-105"
                     title="Ajouter une ligne en bas"
                   >
                     <Plus size={13} />
@@ -325,7 +325,7 @@ export default function SheetMarkdownPreview({
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm border-collapse">
                 <thead>
-                  <tr className="bg-white/5 border-b border-white/15 text-[#FF7582]/80 font-semibold uppercase tracking-wider text-xs">
+                  <tr className="bg-white/5 border-b border-white/15 text-[#CA1C30]/80 font-semibold uppercase tracking-wider text-xs">
                     {headerCells.map((cell, cIdx) => (
                       <th key={cIdx} className="px-4 py-3 whitespace-nowrap">
                         {renderInline(cell)}

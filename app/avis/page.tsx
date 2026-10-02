@@ -555,7 +555,7 @@ export default function Avis() {
   const distinctGames = new Set(reviews.map((r) => r.game)).size;
 
   return (
-    <main className="min-h-screen bg-[#07090D] text-white selection:bg-[#FF7582] selection:text-black pt-28 pb-20 font-mono relative z-10">
+    <main className="min-h-screen bg-[#0B0A0D] text-white selection:bg-[#CA1C30] selection:text-black pt-28 pb-20 font-mono relative z-10">
       <CyberNavbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -565,7 +565,7 @@ export default function Avis() {
           <div className="flex items-center gap-3 mb-4">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-xs font-mono text-[#8FAFD4] hover:text-white transition-colors uppercase tracking-wider"
+              className="inline-flex items-center gap-2 text-xs font-mono text-[#00B4A0] hover:text-white transition-colors uppercase tracking-wider"
             >
               <ArrowLeft size={14} />
               <span>RETOUR À L'ACCUEIL</span>
@@ -577,7 +577,7 @@ export default function Avis() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-white/10">
             <div>
               <h1 className="text-4xl sm:text-6xl font-display uppercase tracking-wider text-white">
-                ILS ONT JOUÉ. <span className="text-[#FF7582]">ILS ONT PROGRESSÉ.</span>
+                ILS ONT JOUÉ. <span className="text-[#CA1C30]">ILS ONT PROGRESSÉ.</span>
               </h1>
               <p className="text-xs sm:text-sm text-white/60 max-w-2xl mt-2 tracking-wide">
                 Retours vérifiés et statistiques de progression des élèves coachés par Poulpy.
@@ -612,8 +612,8 @@ export default function Avis() {
           <div
             className={`max-w-2xl mx-auto mb-8 p-3 text-xs font-mono flex items-center gap-2 border ${
               statusMsg.type === 'success'
-                ? 'bg-[#A4DE87]/10 border-[#A4DE87]/40 text-[#A4DE87]'
-                : 'bg-[#FF7582]/10 border-[#FF7582]/40 text-[#FF7582]'
+                ? 'bg-[#F5F4F0]/10 border-[#F5F4F0]/40 text-[#F5F4F0]'
+                : 'bg-[#CA1C30]/10 border-[#CA1C30]/40 text-[#CA1C30]'
             }`}
           >
             {statusMsg.type === 'success' ? <Check size={16} /> : <X size={16} />}
@@ -623,11 +623,11 @@ export default function Avis() {
 
         {/* Admin Moderation Notice */}
         {user?.isAdmin && (
-          <div className="max-w-7xl mx-auto mb-8 p-3 bg-[#FF7582]/10 border border-[#FF7582]/30 text-white text-xs flex items-center justify-between gap-4 font-mono">
+          <div className="max-w-7xl mx-auto mb-8 p-3 bg-[#CA1C30]/10 border border-[#CA1C30]/30 text-white text-xs flex items-center justify-between gap-4 font-mono">
             <div className="flex items-center gap-2">
-              <Shield size={16} className="text-[#FF7582] flex-shrink-0" />
+              <Shield size={16} className="text-[#CA1C30] flex-shrink-0" />
               <span>
-                <strong className="text-[#FF7582]">MODE MODÉRATION ADMIN ACTIF :</strong> Vous pouvez éditer ou supprimer n&apos;importe quel avis et publier des réponses officielles.
+                <strong className="text-[#CA1C30]">MODE MODÉRATION ADMIN ACTIF :</strong> Vous pouvez éditer ou supprimer n&apos;importe quel avis et publier des réponses officielles.
               </span>
             </div>
           </div>
@@ -643,10 +643,10 @@ export default function Avis() {
               transition={{ duration: 0.35 }}
               className="overflow-hidden max-w-3xl mx-auto mb-16"
             >
-              <form onSubmit={handleSubmitReview} className="reticle-box p-6 sm:p-8 bg-[#090c10] border border-[#FF7582]/40">
+              <form onSubmit={handleSubmitReview} className="reticle-box p-6 sm:p-8 bg-[#121117] border border-[#CA1C30]/40">
                 <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
                   <div className="flex items-center gap-2.5">
-                    <span className="w-2 h-2 bg-[#FF7582] animate-pulse" />
+                    <span className="w-2 h-2 bg-[#CA1C30] animate-pulse" />
                     <h3 className="text-xl font-display uppercase tracking-wider text-white">
                       RÉDIGER TON RETOUR D'EXPÉRIENCE
                     </h3>
@@ -700,7 +700,7 @@ export default function Avis() {
                             onClick={() => setRankType('rank')}
                             className={`flex-1 px-3 py-2 text-xs font-bold uppercase transition-all cursor-pointer ${
                               rankType === 'rank'
-                                ? 'bg-[#FF7582] text-black'
+                                ? 'bg-[#CA1C30] text-black'
                                 : 'bg-black/60 text-white/60 hover:text-white border border-white/10'
                             }`}
                           >
@@ -711,7 +711,7 @@ export default function Avis() {
                             onClick={() => setRankType('progression')}
                             className={`flex-1 px-3 py-2 text-xs font-bold uppercase transition-all cursor-pointer ${
                               rankType === 'progression'
-                                ? 'bg-[#FF7582] text-black'
+                                ? 'bg-[#CA1C30] text-black'
                                 : 'bg-black/60 text-white/60 hover:text-white border border-white/10'
                             }`}
                           >
@@ -733,7 +733,7 @@ export default function Avis() {
                         placeholder="Ex: Top 500 Aimlab / Master 1200 LP"
                         value={customRank}
                         onChange={(e) => setCustomRank(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-black/60 border border-white/15 text-white placeholder-white/30 focus:outline-none focus:border-[#FF7582]"
+                        className="w-full px-4 py-2.5 bg-black/60 border border-white/15 text-white placeholder-white/30 focus:outline-none focus:border-[#CA1C30]"
                       />
                     </div>
                   )}
@@ -818,7 +818,7 @@ export default function Avis() {
                             size={24}
                             className={`${
                               (hoverRating || rating) >= star
-                                ? 'fill-[#FF7582] text-[#FF7582]'
+                                ? 'fill-[#CA1C30] text-[#CA1C30]'
                                 : 'text-white/20'
                             } transition-colors`}
                           />
@@ -839,7 +839,7 @@ export default function Avis() {
                       value={text}
                       onChange={(e) => setText(e.target.value)}
                       maxLength={2000}
-                      className="w-full px-4 py-3 bg-black/60 border border-white/15 text-white placeholder-white/30 focus:outline-none focus:border-[#FF7582] resize-none font-mono"
+                      className="w-full px-4 py-3 bg-black/60 border border-white/15 text-white placeholder-white/30 focus:outline-none focus:border-[#CA1C30] resize-none font-mono"
                     />
                     <div className="flex items-center justify-between text-[10px] text-white/40">
                       <span>TEXTE BRUT</span>
@@ -883,7 +883,7 @@ export default function Avis() {
 
         {/* Sort Controls */}
         {!isLoading && reviews.length > 0 && (
-          <div className="mb-8 flex flex-wrap items-center justify-between gap-4 py-3 px-4 bg-[#090c10] border border-white/10 text-xs font-mono">
+          <div className="mb-8 flex flex-wrap items-center justify-between gap-4 py-3 px-4 bg-[#121117] border border-white/10 text-xs font-mono">
             <div className="flex items-center gap-3">
               <span className="text-white/40 uppercase tracking-wider">TRIER PAR :</span>
               <div className="flex gap-1.5">
@@ -891,7 +891,7 @@ export default function Avis() {
                   onClick={() => setSortBy('date')}
                   className={`px-3 py-1 text-xs font-bold uppercase transition-all cursor-pointer ${
                     sortBy === 'date'
-                      ? 'bg-[#FF7582] text-black'
+                      ? 'bg-[#CA1C30] text-black'
                       : 'bg-black/60 text-white/60 hover:text-white border border-white/10'
                   }`}
                 >
@@ -901,7 +901,7 @@ export default function Avis() {
                   onClick={() => setSortBy('name')}
                   className={`px-3 py-1 text-xs font-bold uppercase transition-all cursor-pointer ${
                     sortBy === 'name'
-                      ? 'bg-[#FF7582] text-black'
+                      ? 'bg-[#CA1C30] text-black'
                       : 'bg-black/60 text-white/60 hover:text-white border border-white/10'
                   }`}
                 >
@@ -911,7 +911,7 @@ export default function Avis() {
                   onClick={() => setSortBy('rating')}
                   className={`px-3 py-1 text-xs font-bold uppercase transition-all cursor-pointer ${
                     sortBy === 'rating'
-                      ? 'bg-[#FF7582] text-black'
+                      ? 'bg-[#CA1C30] text-black'
                       : 'bg-black/60 text-white/60 hover:text-white border border-white/10'
                   }`}
                 >
@@ -925,7 +925,7 @@ export default function Avis() {
               className="px-3 py-1 bg-black/60 border border-white/10 text-white/70 hover:text-white text-xs font-mono transition-all cursor-pointer flex items-center gap-1.5"
             >
               <span>ORDRE :</span>
-              <span className="text-[#FF7582] font-bold">{sortOrder === 'asc' ? '↑ CROISSANT' : '↓ DÉCROISSANT'}</span>
+              <span className="text-[#CA1C30] font-bold">{sortOrder === 'asc' ? '↑ CROISSANT' : '↓ DÉCROISSANT'}</span>
             </button>
           </div>
         )}
@@ -933,7 +933,7 @@ export default function Avis() {
         {/* Testimonials Grid */}
         {isLoading ? (
           <div className="py-24 text-center">
-            <div className="w-8 h-8 border-2 border-[#FF7582] border-t-transparent animate-spin mx-auto mb-4" />
+            <div className="w-8 h-8 border-2 border-[#CA1C30] border-t-transparent animate-spin mx-auto mb-4" />
             <p className="text-xs text-white/50 tracking-wider">CHARGEMENT DE LA BASE D'AVIS...</p>
           </div>
         ) : (
@@ -942,7 +942,7 @@ export default function Avis() {
               <article
                 id={`review-${testimonial.id}`}
                 key={testimonial.id}
-                className="reticle-box bg-[#090c10] border border-white/10 hover:border-[#FF7582]/40 p-6 flex flex-col justify-between transition-colors relative"
+                className="reticle-box bg-[#121117] border border-white/10 hover:border-[#CA1C30]/40 p-6 flex flex-col justify-between transition-colors relative"
               >
                 <div>
                   {/* Top: Stars + Owner/Admin Actions */}
@@ -950,7 +950,7 @@ export default function Avis() {
                     <div className="flex items-center gap-2">
                       <div className="flex items-center gap-1">
                         {[...Array(testimonial.rating)].map((_, i) => (
-                          <Star key={i} size={15} className="fill-[#FF7582] text-[#FF7582]" />
+                          <Star key={i} size={15} className="fill-[#CA1C30] text-[#CA1C30]" />
                         ))}
                       </div>
                       {testimonial.featured && (
@@ -970,8 +970,8 @@ export default function Avis() {
                           title={testimonial.featured ? "Retirer de la page d'accueil" : "Afficher sur la page d'accueil (défilement en direct)"}
                           className={`px-2 py-0.5 text-[10px] font-bold font-mono border transition-all cursor-pointer ${
                             testimonial.featured
-                              ? "bg-[#FF7582] text-black border-[#FF7582] shadow-[0_0_10px_rgba(255,117,130,0.4)]"
-                              : "bg-black/80 text-white/60 hover:text-white border-white/20 hover:border-[#FF7582]/60 hover:bg-[#FF7582]/10"
+                              ? "bg-[#CA1C30] text-black border-[#CA1C30] shadow-[0_0_10px_rgba(202, 28, 48,0.4)]"
+                              : "bg-black/80 text-white/60 hover:text-white border-white/20 hover:border-[#CA1C30]/60 hover:bg-[#CA1C30]/10"
                           }`}
                         >
                           <span>{testimonial.featured ? "★ SUR L'ACCUEIL" : "+ ACCUEIL"}</span>
@@ -984,7 +984,7 @@ export default function Avis() {
                             <button
                               onClick={() => handleStartEdit(testimonial)}
                               title={user.isAdmin && testimonial.user_id !== user.id ? 'Modifier (Admin)' : 'Modifier (5 min)'}
-                              className="p-1 text-white/40 hover:text-[#8FAFD4] transition-colors cursor-pointer"
+                              className="p-1 text-white/40 hover:text-[#00B4A0] transition-colors cursor-pointer"
                             >
                               <Edit3 size={14} />
                             </button>
@@ -1026,7 +1026,7 @@ export default function Avis() {
                         VOTRE AVIS
                       </span>
                       {canEdit(testimonial) && (
-                        <span className="text-[10px] text-[#FF7582] flex items-center gap-1">
+                        <span className="text-[10px] text-[#CA1C30] flex items-center gap-1">
                           <Clock size={10} />
                           {formatRemaining(editTimeRemaining(testimonial))}
                         </span>
@@ -1048,7 +1048,7 @@ export default function Avis() {
                   <div className="pt-4 border-t border-white/10 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2.5">
                       {testimonial.user_id && userAvatars[testimonial.user_id] ? (
-                        <div className="w-8 h-8 overflow-hidden border border-[#FF7582]/40">
+                        <div className="w-8 h-8 overflow-hidden border border-[#CA1C30]/40">
                           <img
                             src={userAvatars[testimonial.user_id]}
                             alt={testimonial.name}
@@ -1056,13 +1056,13 @@ export default function Avis() {
                           />
                         </div>
                       ) : (
-                        <div className="w-8 h-8 bg-[#FF7582]/15 border border-[#FF7582]/40 flex items-center justify-center text-[#FF7582] font-bold text-xs font-mono">
+                        <div className="w-8 h-8 bg-[#CA1C30]/15 border border-[#CA1C30]/40 flex items-center justify-center text-[#CA1C30] font-bold text-xs font-mono">
                           {testimonial.name.charAt(0).toUpperCase()}
                         </div>
                       )}
                       <div>
                         <div className="font-bold text-xs text-white tracking-wider">{testimonial.name}</div>
-                        <div className="text-[10px] text-[#8FAFD4] uppercase">{formatGameName(testimonial.game)}</div>
+                        <div className="text-[10px] text-[#00B4A0] uppercase">{formatGameName(testimonial.game)}</div>
                       </div>
                     </div>
 
@@ -1087,15 +1087,15 @@ export default function Avis() {
                         onClick={() => setExpandedResponseId(
                           expandedResponseId === testimonial.id ? null : testimonial.id
                         )}
-                        className="w-full flex items-center justify-between gap-2 px-3 py-2 bg-black/60 border border-[#8FAFD4]/40 text-[#8FAFD4] hover:bg-[#8FAFD4]/10 text-xs font-mono transition-all cursor-pointer"
+                        className="w-full flex items-center justify-between gap-2 px-3 py-2 bg-black/60 border border-[#00B4A0]/40 text-[#00B4A0] hover:bg-[#00B4A0]/10 text-xs font-mono transition-all cursor-pointer"
                       >
                         <span className="flex items-center gap-1.5">
-                          <Shield size={13} className="text-[#8FAFD4]" />
+                          <Shield size={13} className="text-[#00B4A0]" />
                           <span className="uppercase text-[10px] tracking-wider font-bold">RÉPONSE DU COACH POULPY</span>
                         </span>
                         <ChevronDown
                           size={14}
-                          className={`transition-transform duration-200 ${expandedResponseId === testimonial.id ? 'rotate-180 text-[#8FAFD4]' : ''}`}
+                          className={`transition-transform duration-200 ${expandedResponseId === testimonial.id ? 'rotate-180 text-[#00B4A0]' : ''}`}
                         />
                       </button>
 
@@ -1108,7 +1108,7 @@ export default function Avis() {
                             transition={{ duration: 0.2 }}
                             className="overflow-hidden"
                           >
-                            <div className="mt-2 p-3 bg-black/80 border-l-2 border-[#8FAFD4] text-xs font-mono">
+                            <div className="mt-2 p-3 bg-black/80 border-l-2 border-[#00B4A0] text-xs font-mono">
                               <p className="text-white/80 leading-relaxed whitespace-pre-wrap text-[11px]">
                                 {testimonial.admin_response}
                               </p>
@@ -1131,7 +1131,7 @@ export default function Avis() {
                             placeholder="Rédiger votre réponse officielle..."
                             value={responseText}
                             onChange={(e) => setResponseText(e.target.value)}
-                            className="w-full p-2 bg-black border border-white/15 text-white placeholder-white/30 text-xs focus:outline-none focus:border-[#FF7582] mb-2 font-mono"
+                            className="w-full p-2 bg-black border border-white/15 text-white placeholder-white/30 text-xs focus:outline-none focus:border-[#CA1C30] mb-2 font-mono"
                           />
                           <div className="flex items-center justify-end gap-2">
                             <button
@@ -1166,9 +1166,9 @@ export default function Avis() {
 
                   {/* Inline Edit Form */}
                   {editingId === testimonial.id && (
-                    <div className="mt-4 p-4 bg-black/90 border border-[#FF7582]/40">
+                    <div className="mt-4 p-4 bg-black/90 border border-[#CA1C30]/40">
                       <div className="flex items-center justify-between mb-3 pb-2 border-b border-white/10">
-                        <span className="text-[10px] text-[#FF7582] font-bold uppercase tracking-wider">
+                        <span className="text-[10px] text-[#CA1C30] font-bold uppercase tracking-wider">
                           MODIFICATION DE L'AVIS
                         </span>
                         <span className="text-[9px] text-white/40">
@@ -1182,7 +1182,7 @@ export default function Avis() {
                           value={editText}
                           onChange={(e) => setEditText(e.target.value)}
                           maxLength={2000}
-                          className="w-full p-2 bg-black border border-white/15 text-white placeholder-white/30 text-xs focus:outline-none focus:border-[#FF7582] resize-none font-mono"
+                          className="w-full p-2 bg-black border border-white/15 text-white placeholder-white/30 text-xs focus:outline-none focus:border-[#CA1C30] resize-none font-mono"
                         />
 
                         <div className="flex items-center justify-between">
@@ -1200,7 +1200,7 @@ export default function Avis() {
                                   size={16}
                                   className={`${
                                     (editHoverRating || editRating) >= star
-                                      ? 'fill-[#FF7582] text-[#FF7582]'
+                                      ? 'fill-[#CA1C30] text-[#CA1C30]'
                                       : 'text-white/20'
                                   }`}
                                 />
@@ -1238,25 +1238,25 @@ export default function Avis() {
 
         {/* Stats Summary */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16 max-w-5xl mx-auto">
-          <div className="reticle-box p-5 bg-[#090c10] border border-white/10 text-center">
-            <div className="text-3xl sm:text-4xl font-display text-[#FF7582] tracking-wider">
+          <div className="reticle-box p-5 bg-[#121117] border border-white/10 text-center">
+            <div className="text-3xl sm:text-4xl font-display text-[#CA1C30] tracking-wider">
               {reviews.length}+
             </div>
             <div className="text-[10px] text-white/50 uppercase tracking-widest mt-1">Avis Vérifiés</div>
           </div>
-          <div className="reticle-box p-5 bg-[#090c10] border border-white/10 text-center">
-            <div className="text-3xl sm:text-4xl font-display text-[#8FAFD4] tracking-wider">
+          <div className="reticle-box p-5 bg-[#121117] border border-white/10 text-center">
+            <div className="text-3xl sm:text-4xl font-display text-[#00B4A0] tracking-wider">
               {avgRating}/5
             </div>
             <div className="text-[10px] text-white/50 uppercase tracking-widest mt-1">Note Moyenne</div>
           </div>
-          <div className="reticle-box p-5 bg-[#090c10] border border-white/10 text-center">
-            <div className="text-3xl sm:text-4xl font-display text-[#A4DE87] tracking-wider">
+          <div className="reticle-box p-5 bg-[#121117] border border-white/10 text-center">
+            <div className="text-3xl sm:text-4xl font-display text-[#F5F4F0] tracking-wider">
               100%
             </div>
             <div className="text-[10px] text-white/50 uppercase tracking-widest mt-1">Satisfaction</div>
           </div>
-          <div className="reticle-box p-5 bg-[#090c10] border border-white/10 text-center">
+          <div className="reticle-box p-5 bg-[#121117] border border-white/10 text-center">
             <div className="text-3xl sm:text-4xl font-display text-white tracking-wider">
               {distinctGames}
             </div>

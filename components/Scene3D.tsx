@@ -17,7 +17,7 @@ export default function Scene3D() {
 
       // 1. Scene, Fog, Camera, Renderer
       const scene = new THREE.Scene();
-      scene.fog = new THREE.FogExp2(0x06080a, 0.0008);
+      scene.fog = new THREE.FogExp2(0x0A1C1D, 0.0008);
 
       const width = window.innerWidth;
       const height = window.innerHeight;
@@ -32,7 +32,7 @@ export default function Scene3D() {
       });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
       renderer.setSize(width, height);
-      renderer.setClearColor(0x000000, 0);
+      renderer.setClearColor(0x0A1C1D, 0);
       mount.appendChild(renderer.domElement);
 
       // 2. Procedural Soft Glow Droplet Texture (In-memory, 0ms latency)
@@ -51,7 +51,7 @@ export default function Scene3D() {
       }
       const particleTexture = new THREE.CanvasTexture(canvas);
 
-      // 3. Option 2: L'Encre Vivante & Pollen Solaire (Fluid Sumi-e Vortex)
+      // 3. VCT 2026 Champions Shanghai Dragon Vortex
       const PARTICLE_COUNT = 6000;
       const geometry = new THREE.BufferGeometry();
       const positions = new Float32Array(PARTICLE_COUNT * 3);
@@ -64,12 +64,13 @@ export default function Scene3D() {
       const verticalWaves = new Float32Array(PARTICLE_COUNT);
       const isPollen = new Uint8Array(PARTICLE_COUNT);
 
-      // Pastel Palette
-      const cCoral = new THREE.Color(0xff7582);      // Core Pastel Coral
-      const cCoralLight = new THREE.Color(0xffa3ad); // Luminous Coral Spark
-      const cSlate = new THREE.Color(0x8fafd4);      // Pastel Slate / Ink
-      const cMatcha = new THREE.Color(0xa4de87);     // Pastel Bamboo Matcha
-      const cWhiteInk = new THREE.Color(0xf6f6f2);   // Sumi-e Pearl / Pollen
+      // Japanese Koi Vinyl Palette (#CA1C30, #00B4A0, #064E48, #5EEAD4, #0B0A0D)
+      const cKoiRed = new THREE.Color(0xca1c30);      // 1. Japanese Koi Scarlet Red (Center Core)
+      const cKoiRedLight = new THREE.Color(0xff4655); // Luminous Koi Spark
+      const cSeafoam = new THREE.Color(0x00b4a0);     // 2. Aquamarine Seafoam (Vinyl Ripples)
+      const cPetrol = new THREE.Color(0x064e48);      // 3. Deep Petrol Ocean Teal
+      const cWashi = new THREE.Color(0x5eead4);       // 4. Japanese Washi Cream
+      const cWhiteLight = new THREE.Color(0xffffff);  // Pure White Water Spore
 
       for (let i = 0; i < PARTICLE_COUNT; i++) {
         const isAmbient = i > PARTICLE_COUNT * 0.8;
@@ -87,7 +88,6 @@ export default function Scene3D() {
 
           radii[i] = r;
           angles[i] = theta;
-          // Calibrated harmonic rotation: slightly faster base speed
           speeds[i] = (0.00175 + 0.00025 / (r * 0.008 + 1)) * (0.99 + Math.random() * 0.02);
           zOffsets[i] = z;
           verticalWaves[i] = Math.random() * Math.PI * 2;
@@ -96,20 +96,26 @@ export default function Scene3D() {
           positions[i * 3 + 1] = r * Math.sin(theta);
           positions[i * 3 + 2] = z;
 
-          let col = cCoral;
-          if (r < 120) {
-            col = Math.random() > 0.4 ? cCoral : cCoralLight;
+          // Koi Red in center core, Bleu-Vert / Seafoam & Petrol in outer spirals, Washi / Mint in ambient ripples
+          let col = cKoiRed;
+          if (r < 180) {
+            col = Math.random() > 0.25 ? cKoiRed : cKoiRedLight;
           } else if (r < 320) {
-            col = Math.random() > 0.35 ? cSlate : cCoral;
+            const rand = Math.random();
+            col = rand > 0.5 ? cSeafoam : rand > 0.3 ? cPetrol : rand > 0.12 ? cKoiRed : cWashi;
+          } else if (r < 460) {
+            const rand = Math.random();
+            col = rand > 0.5 ? cSeafoam : rand > 0.25 ? cWashi : cPetrol;
           } else {
-            col = Math.random() > 0.5 ? cSlate : cMatcha;
+            const rand = Math.random();
+            col = rand > 0.5 ? cWashi : rand > 0.25 ? cSeafoam : cPetrol;
           }
 
           colors[i * 3] = col.r;
           colors[i * 3 + 1] = col.g;
           colors[i * 3 + 2] = col.b;
         } else {
-          // Ambient Solar Pollen / Floating Spores
+          // Ambient Floating Water & Vinyl Spores
           const r = 100 + Math.random() * 650;
           const theta = Math.random() * Math.PI * 2;
           const z = (Math.random() - 0.5) * 600;
@@ -125,7 +131,7 @@ export default function Scene3D() {
           positions[i * 3 + 2] = z;
 
           const rand = Math.random();
-          const col = rand > 0.5 ? cMatcha : rand > 0.25 ? cWhiteInk : cSlate;
+          const col = rand > 0.5 ? cSeafoam : rand > 0.3 ? cWashi : rand > 0.15 ? cWhiteLight : cKoiRedLight;
           colors[i * 3] = col.r;
           colors[i * 3 + 1] = col.g;
           colors[i * 3 + 2] = col.b;
@@ -242,8 +248,12 @@ export default function Scene3D() {
         cancelAnimationFrame(animId);
         window.removeEventListener("mousemove", onMouseMove);
         window.removeEventListener("resize", onResize);
-        if (mount.contains(renderer.domElement)) {
-          mount.removeChild(renderer.domElement);
+        try {
+          if (mount && renderer.domElement && mount.contains(renderer.domElement)) {
+            mount.removeChild(renderer.domElement);
+          }
+        } catch (err) {
+          // Handled for React Fast Refresh
         }
         geometry.dispose();
         material.dispose();

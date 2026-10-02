@@ -143,15 +143,15 @@ export default function AdminSettings() {
 
   if (authLoading || isLoading) {
     return (
-      <main className="min-h-screen bg-[#07090D] py-24 flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-[#FF7582] border-t-transparent animate-spin" />
+      <main className="min-h-screen bg-[#0B0A0D] py-24 flex items-center justify-center">
+        <div className="w-10 h-10 border-4 border-[#CA1C30] border-t-transparent animate-spin" />
       </main>
     );
   }
 
   if (!user || !user.isAdmin) {
     return (
-      <main className="min-h-screen bg-[#07090D] py-24 flex items-center justify-center">
+      <main className="min-h-screen bg-[#0B0A0D] py-24 flex items-center justify-center">
         <div className="text-center reticle-box p-12 max-w-md mx-auto px-4">
           <Shield size={64} className="mx-auto mb-6 text-gray-500" />
           <h1 className="text-3xl font-bold mb-4">Accès refusé</h1>
@@ -250,7 +250,7 @@ export default function AdminSettings() {
     {
       section: 'Identité du site',
       icon: Type,
-      color: 'text-[#FF7582]',
+      color: 'text-[#CA1C30]',
       items: [
         {
           key: 'siteName' as const,
@@ -282,7 +282,7 @@ export default function AdminSettings() {
     {
       section: 'Réseaux sociaux & médias',
       icon: Globe,
-      color: 'text-[#8FAFD4]',
+      color: 'text-[#00B4A0]',
       items: [
         {
           key: 'discordUrl' as const,
@@ -316,7 +316,7 @@ export default function AdminSettings() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#07090D] py-24">
+    <main className="min-h-screen bg-[#0B0A0D] py-24">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-12">
           <Link href="/admin" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6">
@@ -328,7 +328,7 @@ export default function AdminSettings() {
               <span className="text-sm text-yellow-400 font-medium">PARAMÈTRES</span>
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-              Paramètres <span className="text-[#FF7582]">du site</span>
+              Paramètres <span className="text-[#CA1C30]">du site</span>
             </h1>
             <p className="text-xl text-gray-300 max-w-2xl">
               Configuration globale de la plateforme Poulpy Coaching. Les changements sont sauvegardés en base et s&apos;appliquent immédiatement sur tout le site.
@@ -403,7 +403,7 @@ export default function AdminSettings() {
                             className={`w-full bg-white/5 border text-inherit placeholder-gray-500 focus:outline-none focus:ring-1 transition-all px-4 py-3 ${
                               field.error
                                 ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/50'
-                                : 'border-white/10 focus:border-[#FF7582]/50 focus:ring-[#FF7582]/50'
+                                : 'border-white/10 focus:border-[#CA1C30]/50 focus:ring-[#CA1C30]/50'
                             }`}
                           />
                         ) : (
@@ -415,7 +415,7 @@ export default function AdminSettings() {
                             className={`w-full bg-white/5 border text-inherit placeholder-gray-500 focus:outline-none focus:ring-1 transition-all px-4 py-3 ${
                               field.error
                                 ? 'border-red-500/50 focus:border-red-500 focus:ring-red-500/50'
-                                : 'border-white/10 focus:border-[#FF7582]/50 focus:ring-[#FF7582]/50'
+                                : 'border-white/10 focus:border-[#CA1C30]/50 focus:ring-[#CA1C30]/50'
                             }`}
                           />
                         )}
@@ -488,12 +488,12 @@ export default function AdminSettings() {
                     href={`https://www.twitch.tv/${twitchChannel}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block aspect-video w-full overflow-hidden bg-gradient-to-br from-[#090c10] to-[#141820] relative group"
+                    className="block aspect-video w-full overflow-hidden bg-gradient-to-br from-[#121117] to-[#141820] relative group"
                   >
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                       <TwitchIcon size={48} />
                       <div className="mt-3 text-white font-bold text-lg">@{twitchChannel}</div>
-                      <div className="mt-2 text-xs text-[#FF7582]/60">Ouvrir sur Twitch</div>
+                      <div className="mt-2 text-xs text-[#CA1C30]/60">Ouvrir sur Twitch</div>
                     </div>
                     <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </a>
@@ -519,7 +519,7 @@ export default function AdminSettings() {
             <button
               type="submit"
               disabled={isSaving || hasErrors || tableMissing}
-              className="px-8 py-3 bg-[#FF7582] text-black font-bold font-semibold hover:shadow-lg hover:shadow-[#FF7582]/30 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-8 py-3 bg-[#CA1C30] text-black font-bold font-semibold hover:shadow-lg hover:shadow-[#CA1C30]/30 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSaving ? (
                 <>
