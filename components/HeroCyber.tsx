@@ -72,6 +72,22 @@ export default function HeroCyber({ onOpenBooking }: HeroCyberProps) {
       ref={containerRef}
       className="relative min-h-[100dvh] h-screen flex flex-col justify-between pt-20 pb-6 px-6 sm:px-12 lg:px-16 z-10 overflow-hidden"
     >
+      {/* Subtle Atmospheric Cosmic Blue/Teal Glow Veil */}
+      <div
+        className="hero-veil absolute inset-0 pointer-events-none -z-10"
+        style={{
+          background:
+            "radial-gradient(ellipse 70% 60% at 50% 45%, rgba(0, 180, 160, 0.16) 0%, rgba(6, 78, 72, 0.1) 45%, transparent 75%)",
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Smooth bottom taper into dark obsidian */}
+      <div
+        className="hero-bottom-fade absolute bottom-0 left-0 right-0 h-40 sm:h-56 bg-gradient-to-b from-transparent to-[#0B0A0D] pointer-events-none z-10"
+        aria-hidden="true"
+      />
+
       {/* Spacer top for navbar clearance */}
       <div className="h-4 sm:h-8" aria-hidden="true" />
 

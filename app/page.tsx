@@ -52,14 +52,8 @@ export default function CybercorePoulpyPage() {
         <HeroCyber onOpenBooking={scrollToBooking} />
       </div>
 
-      {/* Solid softer dark background starting strictly below Hero fold */}
+      {/* Solid dark background starting strictly below Hero fold */}
       <div className="bg-[#0B0A0D] relative z-20">
-        {/* Extended smooth fade stretching down from cyan atmosphere to dark obsidian, tapering right above the videos */}
-        <div
-          className="fade-top-gradient absolute top-0 left-0 right-0 h-80 sm:h-[420px] bg-gradient-to-b from-[#0A1C1D] via-[#0A1C1D]/80 via-25% via-[#0A1C1D]/35 via-60% via-[#0B0A0D]/85 via-85% to-[#0B0A0D] pointer-events-none z-30"
-          aria-hidden="true"
-        />
-
         {/* 03. Pourquoi Poulpy (06 piliers avec défilement horizontal fluide) */}
         <WhyPoulpy />
 
