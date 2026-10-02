@@ -462,116 +462,184 @@ html.theme-transition *::after {
 
 html.light {
   color-scheme: light;
-  --black: #F5F4F0;
-  --dark-1: #ECECD4;
-  --dark-2: #D9D9B8;
-  --dark-3: #CBCBA4;
+  --black: #F4EFE6;
+  --dark-1: #EDE5D8;
+  --dark-2: #DFD7C4;
+  --dark-3: #D2C7B1;
   --acid: #CA1C30;
-  --laser: #00B4A0;
-  --grid-line: rgba(6, 78, 72, 0.05);
+  --laser: #00897B;
+  --grid-line: rgba(60, 45, 30, 0.05);
+  background-color: #F4EFE6 !important;
+  color: #1C1917 !important;
 }
 
 html.light body {
-  background-color: #F5F4F0 !important;
-  color: #102627 !important;
+  background-color: #F4EFE6 !important;
+  color: #1C1917 !important;
 }
 
 html.light .scanlines-overlay {
-  opacity: 0.03;
+  opacity: 0.02;
 }
 
-/* Surfaces de sections : papier de riz beige chaud (#F5F4F0) */
-html.light .bg-\[\#0B0A0D\],
-html.light .bg-\[\#0B0A0D\],
-html.light .bg-\[\#060606\],
+/* Surfaces de base et canvas principal : crème doux (#F4EFE6) */
+html.light main,
+html.light .theme-canvas,
+html.light .theme-section-wrapper,
+html.light [class*="bg-[#0A1C1D]"],
+html.light [class*="bg-[#060606]"],
+html.light [class*="bg-[#121417]"],
 html.light .bg-black {
-  background-color: #F5F4F0 !important;
+  background-color: #F4EFE6 !important;
+  color: #1C1917 !important;
 }
 
-/* Cartes principales et panneaux : crème doux (#ECECD4) */
+html.light .fade-top-gradient {
+  background: linear-gradient(to bottom, #F4EFE6 0%, rgba(244, 239, 230, 0.8) 50%, #F4EFE6 100%) !important;
+}
+
+/* Cartes principales et panneaux : crème soyeux (#EDE5D8) */
 html.light .reticle-box,
-html.light .bg-\[\#132426\],
-html.light .bg-\[\#121117\],
+html.light [class*="bg-[#121117]"],
+html.light [class*="bg-[#132426]"],
+html.light [class*="bg-[#13161e]"],
+html.light [class*="bg-[#102A2C]"],
+html.light [class*="bg-[#173B3E]"],
 html.light .bg-black\/95,
 html.light .bg-black\/90 {
-  background-color: #ECECD4 !important;
-  border-color: rgba(6, 78, 72, 0.15) !important;
-  box-shadow: 0 4px 25px rgba(6, 78, 72, 0.06) !important;
+  background-color: #EDE5D8 !important;
+  border-color: rgba(60, 45, 30, 0.12) !important;
+  box-shadow: 0 4px 20px rgba(60, 45, 30, 0.06) !important;
+  color: #1C1917 !important;
 }
 
-/* Vignettes secondaires, métriques, options et cartes internes */
-html.light .bg-\[\#1B3235\],
-html.light .bg-\[\#090C12\],
-html.light .bg-\[\#090C12\]\/95,
-html.light .bg-\[\#0c0f15\],
-html.light .bg-\[\#0d1017\],
+/* Direct Booking Components rules in light mode */
+html.light .booking-card-main {
+  background-color: #EDE5D8 !important;
+  border-color: rgba(60, 45, 30, 0.15) !important;
+}
+
+html.light .booking-plan-card {
+  background-color: #FAF7F2 !important;
+  border-color: rgba(60, 45, 30, 0.12) !important;
+  color: #1C1917 !important;
+}
+html.light .booking-plan-card.plan-active {
+  background-color: #FAF7F2 !important;
+}
+
+html.light .booking-tier-btn {
+  background-color: #EDE5D8 !important;
+  border-color: rgba(60, 45, 30, 0.15) !important;
+  color: #1C1917 !important;
+}
+
+html.light .booking-tier-btn:hover {
+  background-color: #E2DAC8 !important;
+  border-color: rgba(60, 45, 30, 0.25) !important;
+}
+
+html.light .booking-tier-btn.tier-active {
+  background-color: rgba(202, 28, 48, 0.12) !important;
+  border-color: #CA1C30 !important;
+  color: #CA1C30 !important;
+}
+
+html.light .booking-checklist-item {
+  background-color: #EDE5D8 !important;
+  border-color: rgba(60, 45, 30, 0.1) !important;
+  color: #1C1917 !important;
+}
+
+/* Vignettes secondaires, métriques, options, checklists et cartes internes : crème taupe (#DFD7C4) */
+html.light [class*="bg-[#0B0A0D]"],
+html.light [class*="bg-[#1A1822]"],
+html.light [class*="bg-[#1B3235]"],
+html.light [class*="bg-[#090C12]"],
+html.light [class*="bg-[#0c0f15]"],
+html.light [class*="bg-[#0d1017]"],
+html.light [class*="bg-[#000000]"],
+html.light [class*="bg-[#030303]"],
+html.light [class*="bg-[#080808]"],
 html.light .bg-black\/80,
 html.light .bg-black\/70,
 html.light .bg-black\/60,
 html.light .bg-black\/50,
 html.light .bg-black\/40,
 html.light .bg-black\/30 {
-  background-color: #D9D9B8 !important;
+  background-color: #DFD7C4 !important;
+  border-color: rgba(60, 45, 30, 0.12) !important;
+  color: #1C1917 !important;
 }
 
-/* État actif sélectionné pour les options de cartes */
-html.light .bg-\[\#CA1C30\]\/15,
-html.light .bg-\[\#CA1C30\]\/10,
-html.light .bg-\[\#CA1C30\]\/20,
-html.light .bg-\[\#CA1C30\]\/15,
-html.light .bg-\[\#CA1C30\]\/10,
-html.light .bg-\[\#CA1C30\]\/20 {
-  background-color: rgba(202, 28, 48, 0.15) !important;
-}
-html.light .bg-\[\#00B4A0\]\/15,
-html.light .bg-\[\#00B4A0\]\/10,
-html.light .bg-\[\#00B4A0\]\/15,
-html.light .bg-\[\#00B4A0\]\/10,
-html.light .bg-\[\#00B4A0\]\/15,
-html.light .bg-\[\#00B4A0\]\/10 {
-  background-color: rgba(6, 78, 72, 0.14) !important;
-}
-html.light .bg-\[\#F5F4F0\]\/15,
-html.light .bg-\[\#F5F4F0\]\/20,
-html.light .bg-\[\#F5F4F0\]\/15,
-html.light .bg-\[\#F5F4F0\]\/20 {
-  background-color: rgba(0, 180, 160, 0.2) !important;
+/* État actif sélectionné pour les options de cartes (Booking, etc.) */
+html.light [class*="bg-[#CA1C30]/15"],
+html.light [class*="bg-[#CA1C30]/10"],
+html.light [class*="bg-[#CA1C30]/20"] {
+  background-color: rgba(202, 28, 48, 0.14) !important;
 }
 
-/* Textes sombres et lisibles, teal sombre noble */
-html.light .text-white {
-  color: #102627 !important;
+html.light [class*="bg-[#00B4A0]/15"],
+html.light [class*="bg-[#00B4A0]/10"],
+html.light [class*="bg-[#00B4A0]/20"] {
+  background-color: rgba(0, 137, 123, 0.14) !important;
+}
+
+html.light [class*="bg-[#F5F4F0]/15"],
+html.light [class*="bg-[#F5F4F0]/20"] {
+  background-color: rgba(60, 45, 30, 0.1) !important;
+}
+
+/* Textes sombres et lisibles : charbon chaud */
+html.light .text-white,
+html.light .text-\[\#F5F4F0\],
+html.light [class*="text-[#F5F4F0]"],
+html.light [class*="text-white"] {
+  color: #1C1917 !important;
 }
 
 html.light .text-white\/90,
 html.light .text-white\/80,
-html.light .text-white\/70 {
-  color: #1A3E40 !important;
+html.light .text-white\/70,
+html.light .text-\[\#F5F4F0\]\/90,
+html.light .text-\[\#F5F4F0\]\/80,
+html.light .text-\[\#F5F4F0\]\/70 {
+  color: #2E2A27 !important;
 }
 
 html.light .text-white\/60,
-html.light .text-white\/50 {
-  color: #2D585A !important;
+html.light .text-white\/50,
+html.light .text-\[\#F5F4F0\]\/60,
+html.light .text-\[\#F5F4F0\]\/50 {
+  color: #57534E !important;
 }
 
 html.light .text-white\/40,
-html.light .text-white\/30 {
-  color: #486E70 !important;
+html.light .text-white\/30,
+html.light .text-\[\#F5F4F0\]\/40,
+html.light .text-\[\#F5F4F0\]\/30 {
+  color: #78716C !important;
 }
 
-/* Bordures douces couleur teal marin */
-html.light .border-white\/5,
-html.light .border-white\/10,
-html.light .border-white\/15,
-html.light .border-white\/20,
-html.light .border-white\/30,
-html.light .border-\[rgba\(255\,255\,255\,0\.08\)\] {
-  border-color: rgba(6, 78, 72, 0.12) !important;
+/* Accents colorés préservés */
+html.light .text-\[\#CA1C30\],
+html.light [class*="text-[#CA1C30]"] {
+  color: #CA1C30 !important;
+}
+html.light .text-\[\#00B4A0\],
+html.light [class*="text-[#00B4A0]"] {
+  color: #00796B !important;
 }
 
-/* Header scrollé en beige translucide */
+/* Bordures douces ton sépia chaud */
+html.light [class*="border-white"],
+html.light [class*="border-[rgba(255,255,255"] {
+  border-color: rgba(60, 45, 30, 0.12) !important;
+}
+
+/* Header scrollé en crème translucide */
 html.light header {
-  background-color: rgba(245, 244, 240, 0.94) !important;
+  background-color: rgba(244, 239, 230, 0.94) !important;
   border-bottom-color: rgba(202, 28, 48, 0.2) !important;
 }
 
@@ -587,7 +655,7 @@ html.light .btn-cyber-primary span {
 }
 
 html.light .btn-cyber-ghost {
-  border-color: rgba(6, 78, 72, 0.25) !important;
-  color: #102627 !important;
+  border-color: rgba(60, 45, 30, 0.25) !important;
+  color: #1C1917 !important;
 }
 
