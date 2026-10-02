@@ -96,7 +96,7 @@ export default function CyberTestimonials() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-8">
           <div className="space-y-2">
             <h2 className="text-4xl sm:text-6xl font-display text-[#F5F4F0] tracking-wider">
-              RÉSULTATS DES <span className="text-[#CA1C30]">ÉLÈVES</span>
+              RÉSULTATS DES <span className="text-[#00B4A0]">ÉLÈVES</span>
             </h2>
             <p className="text-xs sm:text-sm text-[#F5F4F0]/60 max-w-xl leading-relaxed">
               Retours d&apos;expérience vérifiés d&apos;élèves coachés.
@@ -108,7 +108,7 @@ export default function CyberTestimonials() {
               <button
                 onClick={prevReview}
                 aria-label="Avis précédent"
-                className="w-10 h-10 border border-white/20 bg-[#121117] rounded-full flex items-center justify-center hover:border-[#CA1C30] hover:text-[#CA1C30] transition-colors cursor-pointer"
+                className="w-10 h-10 border border-white/20 bg-[#121117] rounded-full flex items-center justify-center hover:border-[#00B4A0] hover:text-[#00B4A0] transition-colors cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
@@ -118,7 +118,7 @@ export default function CyberTestimonials() {
               <button
                 onClick={nextReview}
                 aria-label="Avis suivant"
-                className="w-10 h-10 border border-white/20 bg-[#121117] rounded-full flex items-center justify-center hover:border-[#CA1C30] hover:text-[#CA1C30] transition-colors cursor-pointer"
+                className="w-10 h-10 border border-white/20 bg-[#121117] rounded-full flex items-center justify-center hover:border-[#00B4A0] hover:text-[#00B4A0] transition-colors cursor-pointer"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>

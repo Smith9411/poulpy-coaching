@@ -125,74 +125,47 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
           </div>
         </div>
 
-        {/* Pure Typographic Game Content (Zero Vignettes / Zero Card Boxes) */}
-        <div className="relative min-h-[380px]">
-          <AnimatePresence mode="wait">
+        {/* Pure Typographic Game Content (Instant buttery transition, zero black gap) */}
+        <div className="relative min-h-[340px]">
+          <AnimatePresence mode="popLayout" initial={false}>
             <motion.div
               key={current.id}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.15, ease: "easeOut" }}
               className="space-y-8"
             >
-              {/* Monumental Animated Title + Rank Directly Below */}
+              {/* Monumental Title + Rank Directly Below */}
               <div className="space-y-2 py-1">
-                <div className="overflow-hidden">
-                  <h3 className="text-5xl sm:text-7xl lg:text-8xl font-display font-bold tracking-tight text-[#F5F4F0] flex flex-wrap">
-                    {current.title.split("").map((letter, i) => (
-                      <motion.span
-                        key={`${current.id}-${i}`}
-                        custom={i}
-                        variants={letterVariants}
-                        initial="hidden"
-                        animate="visible"
-                        exit="exit"
-                        className="inline-block whitespace-pre"
-                      >
-                        {letter}
-                      </motion.span>
-                    ))}
-                  </h3>
-                </div>
+                <h3 className="text-5xl sm:text-7xl lg:text-8xl font-display font-bold tracking-tight text-[#F5F4F0]">
+                  {current.title}
+                </h3>
 
-                {/* Small rank in pure red without contour */}
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  transition={{ delay: 0.08, duration: 0.25 }}
-                  className="text-xs sm:text-sm font-mono font-bold tracking-widest uppercase text-[#CA1C30]"
+                {/* Rank badge aligned with game theme color */}
+                <div
+                  className={`text-xs sm:text-sm font-mono font-bold tracking-widest uppercase ${
+                    isAcid ? "text-[#CA1C30]" : "text-[#00B4A0]"
+                  }`}
                 >
                   {current.badge}
-                </motion.div>
+                </div>
               </div>
 
               {/* Description */}
-              <motion.p
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ delay: 0.1, duration: 0.3 }}
-                className="text-sm sm:text-base text-[#F5F4F0]/70 max-w-3xl leading-relaxed font-sans"
-              >
+              <p className="text-sm sm:text-base text-[#F5F4F0]/70 max-w-3xl leading-relaxed font-sans">
                 {current.desc}
-              </motion.p>
+              </p>
 
-              {/* Typographic Protocols List (Clean Lines, Zero Card Boxes) */}
-              <div className="space-y-4 pt-4">
+              {/* Typographic Protocols List */}
+              <div className="space-y-4 pt-2">
                 <span className="text-xs font-mono text-[#F5F4F0]/40 uppercase tracking-widest block">
                   MODULES D&apos;ENTRAÎNEMENT SPÉCIFIQUES :
                 </span>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {current.protocols.map((p, idx) => (
-                    <motion.div
+                    <div
                       key={`${current.id}-proto-${idx}`}
-                      custom={idx}
-                      variants={lineVariants}
-                      initial="hidden"
-                      animate="visible"
-                      exit="exit"
                       className="flex items-center gap-4 py-3.5 border-b border-white/10 group"
                     >
                       <span
@@ -205,29 +178,31 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
                       <span className="text-xs sm:text-sm text-[#F5F4F0]/90 font-mono tracking-wide group-hover:text-white transition-colors">
                         {p.name}
                       </span>
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               </div>
 
               {/* Action Button */}
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ delay: 0.25, duration: 0.3 }}
-                className="pt-6 flex justify-start"
-              >
+              <div className="pt-4 flex justify-start">
                 <button
                   onClick={onOpenBooking}
-                  className="btn-cyber-primary rounded-full px-8 py-3.5 text-xs font-mono font-bold tracking-wider cursor-pointer"
+                  className={`rounded-full px-8 py-3.5 text-xs font-mono font-bold tracking-wider cursor-pointer flex items-center gap-3 transition-all ${
+                    isAcid
+                      ? "bg-[#CA1C30] hover:bg-[#CA1C30]/90 text-white shadow-[0_0_20px_rgba(202,28,48,0.35)]"
+                      : "bg-[#00B4A0] hover:bg-[#00B4A0]/90 text-black shadow-[0_0_20px_rgba(0,180,160,0.35)]"
+                  }`}
                 >
                   <span>S&apos;ENTRAÎNER SUR {current.title}</span>
-                  <div className="w-5 h-5 rounded-full bg-black/30 flex items-center justify-center">
-                    <ArrowUpRight className="w-3.5 h-3.5 text-black" />
+                  <div
+                    className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                      isAcid ? "bg-white/20 text-white" : "bg-black/20 text-black"
+                    }`}
+                  >
+                    <ArrowUpRight className="w-3.5 h-3.5" />
                   </div>
                 </button>
-              </motion.div>
+              </div>
             </motion.div>
           </AnimatePresence>
         </div>

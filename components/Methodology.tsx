@@ -101,7 +101,7 @@ export default function Methodology() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-8">
           <div className="space-y-2">
             <h2 className="text-3xl sm:text-5xl font-display text-[#F5F4F0] tracking-wider">
-              UNE MÉTHODE. PAS DE <span className="text-[#CA1C30]">RECETTE MAGIQUE.</span>
+              UNE MÉTHODE. PAS DE <span className="text-[#00B4A0]">RECETTE MAGIQUE.</span>
             </h2>
             <p className="text-xs sm:text-sm text-[#F5F4F0]/60 max-w-2xl leading-relaxed">
               Chaque phase s&apos;empile naturellement au scroll pour structurer et verrouiller ton plan de progression.
