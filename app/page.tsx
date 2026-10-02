@@ -40,7 +40,7 @@ export default function CybercorePoulpyPage() {
   };
 
   return (
-    <main className="w-full block text-[#F5F4F0] selection:bg-[#CA1C30] selection:text-[#0A1C1D] relative z-10 overflow-x-clip bg-[#0A1C1D]">
+    <main className="w-full block text-[#F5F4F0] selection:bg-[#CA1C30] selection:text-[#0B0A0D] relative z-10 overflow-x-clip bg-[#0B0A0D]">
       {/* 3D WebGL Background Scene (Asynchronously decoupled, non-blocking) */}
       <Scene3D />
 
@@ -54,9 +54,9 @@ export default function CybercorePoulpyPage() {
 
       {/* Solid softer dark background starting strictly below Hero fold */}
       <div className="bg-[#0B0A0D] relative z-20">
-        {/* Extended smooth fade stretching down from cyan atmosphere to dark obsidian */}
+        {/* Extended smooth fade stretching down from cyan atmosphere to dark obsidian, tapering right above the videos */}
         <div
-          className="fade-top-gradient absolute top-0 left-0 right-0 h-56 sm:h-72 bg-gradient-to-b from-[#0A1C1D] via-[#0A1C1D]/60 via-30% via-[#0B0A0D]/90 via-75% to-[#0B0A0D] pointer-events-none z-30"
+          className="fade-top-gradient absolute top-0 left-0 right-0 h-80 sm:h-[420px] bg-gradient-to-b from-[#0A1C1D] via-[#0A1C1D]/80 via-25% via-[#0A1C1D]/35 via-60% via-[#0B0A0D]/85 via-85% to-[#0B0A0D] pointer-events-none z-30"
           aria-hidden="true"
         />
 
