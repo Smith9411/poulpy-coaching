@@ -328,7 +328,7 @@ export default function CyberNavbar({
             : "py-6 bg-transparent border-b border-transparent shadow-none"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2 xl:gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 flex items-center justify-between gap-4">
           {/* Typographic Brand Logo */}
           <a
             href="#hero"
@@ -343,7 +343,7 @@ export default function CyberNavbar({
           </a>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-1 xl:gap-2 font-mono text-[10.5px] xl:text-[11px] relative shrink-0">
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-2 font-mono text-[11px] relative">
             {navLinks.map((link) => {
               const isActive = activeSection === link.id;
 
@@ -352,20 +352,28 @@ export default function CyberNavbar({
                   key={link.label}
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.href)}
-                  className={`px-2.5 xl:px-3 py-1.5 transition-colors tracking-wider uppercase font-semibold whitespace-nowrap shrink-0 ${
+                  className={`relative px-3 py-1.5 rounded-full transition-colors flex items-center gap-1.5 tracking-wider uppercase font-semibold ${
                     isActive
                       ? "text-[#CA1C30]"
-                      : "text-white/70 hover:text-[#CA1C30]"
+                      : "text-white/70 hover:text-[#CA1C30] hover:bg-white/5"
                   }`}
                 >
-                  {link.label}
+                  {isActive && (
+                    <motion.div
+                      layoutId="cyber-nav-active-pill"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      className="absolute inset-0 border border-[#CA1C30]/60 bg-[#CA1C30]/10 rounded-full shadow-[0_0_12px_rgba(202, 28, 48,0.25)] pointer-events-none"
+                    />
+                  )}
+                  {isActive && <span className="w-1.5 h-1.5 rounded-full bg-[#CA1C30] animate-pulse relative z-10" />}
+                  <span className="relative z-10">{link.label}</span>
                 </a>
               );
             })}
           </nav>
 
           {/* Action Row: Notifications + ThemeToggle + Connexion + Réserver CTA */}
-          <div className="hidden sm:flex items-center gap-2 xl:gap-3 shrink-0">
+          <div className="hidden sm:flex items-center gap-3">
             {/* Theme Toggle (Light / Dark) */}
             <ThemeToggle className="text-white/70 hover:text-white" />
 
