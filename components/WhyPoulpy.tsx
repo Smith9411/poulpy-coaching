@@ -14,8 +14,6 @@ import {
   ArrowRight,
   Play,
   Pause,
-  Volume2,
-  VolumeX,
 } from "lucide-react";
 
 if (typeof window !== "undefined") {
@@ -41,9 +39,6 @@ function PillarLargeVideo({
 }: PillarVideoProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
   const isAcid = accentColor === "acid";
 
   useEffect(() => {
@@ -57,7 +52,6 @@ function PillarLargeVideo({
           .then(() => setIsPlaying(true))
           .catch(() => {
             video.muted = true;
-            setIsMuted(true);
             video.play()
               .then(() => setIsPlaying(true))
               .catch(() => setIsPlaying(false));
@@ -81,35 +75,6 @@ function PillarLargeVideo({
     }
   };
 
-  const toggleMute = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const video = videoRef.current;
-    if (!video) return;
-    video.muted = !video.muted;
-    setIsMuted(video.muted);
-  };
-
-  const handleTimeUpdate = () => {
-    if (videoRef.current) {
-      setCurrentTime(videoRef.current.currentTime);
-    }
-  };
-
-  const handleLoadedMetadata = () => {
-    if (videoRef.current) {
-      setDuration(videoRef.current.duration);
-    }
-  };
-
-  const formatTime = (secs: number) => {
-    if (isNaN(secs)) return "00:00";
-    const m = Math.floor(secs / 60);
-    const s = Math.floor(secs % 60);
-    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
-  };
-
-  const progressPct = duration > 0 ? (currentTime / duration) * 100 : 0;
-
   return (
     <div
       onClick={togglePlay}
@@ -119,44 +84,24 @@ function PillarLargeVideo({
         ref={videoRef}
         src={videoSrc}
         loop
-        muted={isMuted}
+        muted
         playsInline
         preload="metadata"
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
-        onTimeUpdate={handleTimeUpdate}
-        onLoadedMetadata={handleLoadedMetadata}
         className="w-full h-full object-cover"
       />
 
-      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/10 to-transparent pointer-events-none" />
-
-      {/* Top telemetry tag */}
-      <div className="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none z-10">
-        <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1 rounded-full text-[9px] font-mono">
-          <span className={`w-2 h-2 rounded-full ${isAcid ? "bg-[#CA1C30]" : "bg-[#00B4A0]"} animate-pulse`} />
-          <span className="text-white/90 font-bold uppercase tracking-wider">EXTRAIT VOD // 1080P</span>
-        </div>
-
-        {/* Audio Toggle Button */}
-        <button
-          type="button"
-          onClick={toggleMute}
-          className="pointer-events-auto bg-black/60 backdrop-blur-md hover:bg-white/20 px-3 py-1 rounded-full text-white text-[10px] flex items-center gap-1.5 transition-colors cursor-pointer"
-        >
-          {isMuted ? (
-            <>
-              <VolumeX className="w-3 h-3 text-white/60" />
-              <span className="text-[9px] font-mono text-white/60">MUET</span>
-            </>
-          ) : (
-            <>
-              <Volume2 className={`w-3 h-3 ${isAcid ? "text-[#CA1C30]" : "text-[#00B4A0]"}`} />
-              <span className={`text-[9px] font-mono font-bold ${isAcid ? "text-[#CA1C30]" : "text-[#00B4A0]"}`}>SON ACTIF</span>
-            </>
-          )}
-        </button>
-      </div>
+      {/* Subtle CRT Old TV Scanlines Texture Overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none z-[5]"
+        style={{
+          background:
+            "repeating-linear-gradient(to bottom, transparent 0px, transparent 3px, rgba(0, 0, 0, 0.25) 3px, rgba(0, 0, 0, 0.25) 4px)",
+          opacity: 0.45,
+        }}
+        aria-hidden="true"
+      />
 
       {/* Play/Pause center overlay if manually paused */}
       {!isPlaying && (
@@ -170,27 +115,6 @@ function PillarLargeVideo({
           </div>
         </div>
       )}
-
-      {/* Bottom Progress bar & Meta */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 space-y-2 z-10 bg-gradient-to-t from-black/90 to-transparent">
-        <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden">
-          <div
-            className={`h-full ${isAcid ? "bg-[#CA1C30]" : "bg-[#00B4A0]"} transition-all duration-100 ease-linear`}
-            style={{ width: `${progressPct}%` }}
-          />
-        </div>
-        <div className="flex items-center justify-between text-[9px] font-mono text-white/70">
-          <span className="truncate pr-2">
-            <strong className="text-white uppercase">{clipTitle}</strong>
-          </span>
-          <div className="flex items-center gap-2 shrink-0">
-            <span>{formatTime(currentTime)} / {formatTime(duration)}</span>
-            <span className={`font-bold uppercase ${isAcid ? "text-[#CA1C30]" : "text-[#00B4A0]"}`}>
-              {isPlaying ? "LECTURE" : "PAUSE"}
-            </span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
