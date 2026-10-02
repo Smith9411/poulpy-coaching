@@ -125,37 +125,58 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
           </div>
         </div>
 
-        {/* Pure Typographic Game Content (Instant buttery transition, zero black gap) */}
+        {/* Pure Typographic Game Content (Snappy mini blank + crisp letter cascade) */}
         <div className="relative min-h-[340px]">
-          <AnimatePresence mode="popLayout" initial={false}>
+          <AnimatePresence mode="wait">
             <motion.div
               key={current.id}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.15, ease: "easeOut" }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, transition: { duration: 0.08 } }}
+              transition={{ duration: 0.12 }}
               className="space-y-8"
             >
-              {/* Monumental Title + Rank Directly Below */}
+              {/* Monumental Animated Title + Rank Directly Below */}
               <div className="space-y-2 py-1">
-                <h3 className="text-5xl sm:text-7xl lg:text-8xl font-display font-bold tracking-tight text-[#F5F4F0]">
-                  {current.title}
-                </h3>
+                <div className="overflow-hidden">
+                  <h3 className="text-5xl sm:text-7xl lg:text-8xl font-display font-bold tracking-tight text-[#F5F4F0] flex flex-wrap">
+                    {current.title.split("").map((letter, i) => (
+                      <motion.span
+                        key={`${current.id}-${i}`}
+                        custom={i}
+                        variants={letterVariants}
+                        initial="hidden"
+                        animate="visible"
+                        className="inline-block whitespace-pre"
+                      >
+                        {letter}
+                      </motion.span>
+                    ))}
+                  </h3>
+                </div>
 
                 {/* Rank badge aligned with game theme color */}
-                <div
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.08, duration: 0.22 }}
                   className={`text-xs sm:text-sm font-mono font-bold tracking-widest uppercase ${
                     isAcid ? "text-[#CA1C30]" : "text-[#00B4A0]"
                   }`}
                 >
                   {current.badge}
-                </div>
+                </motion.div>
               </div>
 
               {/* Description */}
-              <p className="text-sm sm:text-base text-[#F5F4F0]/70 max-w-3xl leading-relaxed font-sans">
+              <motion.p
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.12, duration: 0.25 }}
+                className="text-sm sm:text-base text-[#F5F4F0]/70 max-w-3xl leading-relaxed font-sans"
+              >
                 {current.desc}
-              </p>
+              </motion.p>
 
               {/* Typographic Protocols List */}
               <div className="space-y-4 pt-2">
@@ -164,8 +185,12 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
                 </span>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {current.protocols.map((p, idx) => (
-                    <div
+                    <motion.div
                       key={`${current.id}-proto-${idx}`}
+                      custom={idx}
+                      variants={lineVariants}
+                      initial="hidden"
+                      animate="visible"
                       className="flex items-center gap-4 py-3.5 border-b border-white/10 group"
                     >
                       <span
@@ -178,13 +203,18 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
                       <span className="text-xs sm:text-sm text-[#F5F4F0]/90 font-mono tracking-wide group-hover:text-white transition-colors">
                         {p.name}
                       </span>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               </div>
 
               {/* Action Button */}
-              <div className="pt-4 flex justify-start">
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.25 }}
+                className="pt-4 flex justify-start"
+              >
                 <button
                   onClick={onOpenBooking}
                   className={`rounded-full px-8 py-3.5 text-xs font-mono font-bold tracking-wider cursor-pointer flex items-center gap-3 transition-all ${
@@ -202,7 +232,7 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
                     <ArrowUpRight className="w-3.5 h-3.5" />
                   </div>
                 </button>
-              </div>
+              </motion.div>
             </motion.div>
           </AnimatePresence>
         </div>

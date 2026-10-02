@@ -96,7 +96,7 @@ const STEPS: StepData[] = [
 export default function Methodology() {
   return (
     <section id="methodology" className="py-16 sm:py-24 px-6 sm:px-12 lg:px-16 bg-transparent font-mono relative">
-      <div className="max-w-5xl mx-auto space-y-12 sm:space-y-16 relative z-10">
+      <div className="max-w-6xl mx-auto space-y-12 sm:space-y-16 relative z-10">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-8">
           <div className="space-y-2">
