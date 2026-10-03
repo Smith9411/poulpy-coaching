@@ -311,7 +311,7 @@ export default function WhyPoulpy() {
             return (
               <div
                 key={item.num}
-                className="w-[92vw] sm:w-[860px] lg:w-[980px] xl:w-[1060px] h-[520px] sm:h-[540px] shrink-0 rounded-3xl bg-[#121117]/85 backdrop-blur-md p-8 sm:p-10 lg:p-12 flex flex-col justify-between transition-colors relative shadow-2xl shadow-black/80 overflow-hidden border border-white/10"
+                className="w-[92vw] sm:w-[860px] lg:w-[980px] xl:w-[1060px] h-[520px] sm:h-[540px] shrink-0 rounded-3xl bg-[#121117]/85 backdrop-blur-md p-8 sm:p-10 lg:p-12 flex flex-col justify-between transition-colors relative shadow-2xl shadow-black/80 overflow-hidden"
               >
                 {/* Header inside module */}
                 <div className="flex items-center justify-between border-b border-white/10 pb-4">
@@ -401,7 +401,7 @@ export default function WhyPoulpy() {
           })}
 
           {/* Closing Action Rectangle */}
-          <div className="w-[85vw] sm:w-[500px] h-[520px] sm:h-[540px] shrink-0 rounded-3xl bg-black/60 backdrop-blur-md p-8 sm:p-12 flex flex-col justify-between relative shadow-2xl shadow-black/90 overflow-hidden border border-white/10">
+          <div className="w-[85vw] sm:w-[500px] h-[520px] sm:h-[540px] shrink-0 rounded-3xl bg-black/60 backdrop-blur-md p-8 sm:p-12 flex flex-col justify-between relative shadow-2xl shadow-black/90 overflow-hidden">
             <div className="space-y-4">
               <span className="text-[#CA1C30] text-xs font-bold font-mono tracking-widest uppercase block">
                 // VALIDATION & ENGAGEMENT
