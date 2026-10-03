@@ -217,20 +217,11 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
               >
                 <button
                   onClick={onOpenBooking}
-                  className={`rounded-full px-8 py-3.5 text-xs font-mono font-bold tracking-wider cursor-pointer flex items-center gap-3 transition-all ${
-                    isAcid
-                      ? "bg-[#CA1C30] hover:bg-[#CA1C30]/90 text-white shadow-[0_0_20px_rgba(202,28,48,0.35)]"
-                      : "bg-[#00B4A0] hover:bg-[#00B4A0]/90 text-black shadow-[0_0_20px_rgba(0,180,160,0.35)]"
-                  }`}
+                  className={`${
+                    isAcid ? "btn-cyber-primary" : "btn-cyber-laser"
+                  } px-8 py-3.5 text-xs font-mono font-bold tracking-wider cursor-pointer`}
                 >
                   <span>S&apos;ENTRAÎNER SUR {current.title}</span>
-                  <div
-                    className={`w-5 h-5 rounded-full flex items-center justify-center ${
-                      isAcid ? "bg-white/20 text-white" : "bg-black/20 text-black"
-                    }`}
-                  >
-                    <ArrowUpRight className="w-3.5 h-3.5" />
-                  </div>
                 </button>
               </motion.div>
             </motion.div>

@@ -160,65 +160,143 @@ button, a {
   background: var(--laser);
 }
 
-/* Magnetic Button State — Sleek rounded pill / asymmetric luxury */
-.btn-cyber-primary {
-  background: var(--acid);
-  color: #F6F3EE;
-  font-family: var(--font-sans);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 12px 28px;
-  border: 1px solid var(--acid);
-  border-radius: 9999px;
+/* =========================================================================
+   Poulpy Cybercore Skew-Reveal Buttons (Adapted from Uiverse.io by adamgiebl)
+   ========================================================================= */
+
+.btn-cyber-primary,
+.btn-cyber-laser,
+.btn-cyber-ghost {
+  position: relative;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 9999px;
   cursor: pointer;
+  text-transform: uppercase;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  z-index: 1;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+}
+
+/* Ensure inner contents (spans, svgs, icons) stay above the pseudo-element slide */
+.btn-cyber-primary > *,
+.btn-cyber-laser > *,
+.btn-cyber-ghost > * {
+  position: relative;
+  z-index: 10;
+  transition: color 0.4s cubic-bezier(0.3, 1, 0.8, 1), transform 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Diagonal Skew Cover Effect */
+.btn-cyber-primary::before,
+.btn-cyber-laser::before,
+.btn-cyber-ghost::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -15%;
+  width: 130%;
+  height: 100%;
+  z-index: 1;
+  transform: skew(30deg);
+  transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
+  pointer-events: none;
+}
+
+/* --- 1. PRIMARY RED BUTTON (Starts Red, Sweeps to Black on Hover) --- */
+.btn-cyber-primary {
+  background: #0B0A0D;
+  color: #FFFFFF;
+  padding: 12px 28px;
+  border: 1px solid rgba(202, 28, 48, 0.6);
   box-shadow: 0 0 20px rgba(202, 28, 48, 0.25);
 }
 
+.btn-cyber-primary::before {
+  background: linear-gradient(to right, #CA1C30, #E82C40);
+  width: 130%;
+  left: -15%;
+  transform: skew(30deg);
+}
+
+.btn-cyber-primary:hover::before {
+  transform: translate3d(100%, 0, 0) skew(30deg);
+}
+
 .btn-cyber-primary:hover {
-  background: #0B0A0D;
-  color: #F6F3EE;
-  border-color: var(--acid);
-  box-shadow: var(--acid-glow);
-  transform: translateY(-2px);
+  border-color: #CA1C30;
+  box-shadow: 0 0 25px rgba(202, 28, 48, 0.45);
 }
 
 .btn-cyber-primary:active {
-  transform: scale(0.97) translateY(0);
-  transition-duration: 120ms;
+  transform: scale(0.95);
 }
 
+/* --- 2. LASER / CYAN BUTTON (Seafoam & Cyan) --- */
+.btn-cyber-laser {
+  background: #0B0A0D;
+  color: #F5F4F0;
+  padding: 12px 28px;
+  border: 1px solid rgba(0, 180, 160, 0.6);
+  box-shadow: 0 0 20px rgba(0, 180, 160, 0.25);
+}
+
+.btn-cyber-laser::before {
+  background: linear-gradient(to right, #00B4A0, #00E5FF);
+  width: 130%;
+  left: -15%;
+  transform: skew(30deg);
+}
+
+.btn-cyber-laser:hover::before {
+  transform: translate3d(100%, 0, 0) skew(30deg);
+}
+
+.btn-cyber-laser:hover {
+  border-color: #00B4A0;
+  box-shadow: 0 0 25px rgba(0, 180, 160, 0.45);
+}
+
+.btn-cyber-laser:active {
+  transform: scale(0.95);
+}
+
+/* --- 3. GHOST / SECONDARY BUTTON ("EXPLORER LA MÉTHODE" - Fine 1px border) --- */
 .btn-cyber-ghost {
-  background: transparent;
-  color: #ffffff;
-  font-family: var(--font-sans);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: rgba(245, 244, 240, 0.85);
   padding: 12px 24px;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 9999px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
-  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn-cyber-ghost::before {
+  background: linear-gradient(to right, rgba(0, 180, 160, 0.25), rgba(0, 229, 255, 0.25));
+  width: 130%;
+  left: -140%;
+  transform: skew(30deg);
+}
+
+.btn-cyber-ghost:hover::before {
+  transform: translate3d(105%, 0, 0) skew(30deg);
 }
 
 .btn-cyber-ghost:hover {
-  border-color: var(--laser);
-  color: var(--laser);
-  background: rgba(0, 180, 160, 0.08);
-  box-shadow: var(--laser-glow);
+  border-color: rgba(0, 180, 160, 0.5);
+  color: #FFFFFF;
+  box-shadow: 0 0 15px rgba(0, 180, 160, 0.2);
 }
 
 .btn-cyber-ghost:active {
-  transform: scale(0.97);
-  transition-duration: 120ms;
+  transform: scale(0.95);
 }
 
 /* Data Pill Badge — Smooth rounded pill */

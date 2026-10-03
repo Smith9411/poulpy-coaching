@@ -105,16 +105,13 @@ export default function HeroCyber({ onOpenBooking }: HeroCyberProps) {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2 w-full max-w-md">
             <button
               onClick={onOpenBooking}
-              className="btn-cyber-primary w-full sm:w-auto rounded-full px-8 py-3.5 shadow-[0_0_30px_rgba(202, 28, 48,0.4)] justify-center font-bold text-xs tracking-wider cursor-pointer"
+              className="btn-cyber-primary w-full sm:w-auto px-8 py-3.5 justify-center font-bold text-xs tracking-wider cursor-pointer"
             >
               <span>ENGAGER LE COACHING</span>
-              <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
-                <ArrowUpRight className="w-3.5 h-3.5 text-white" />
-              </div>
             </button>
             <a
               href="#methodology"
-              className="px-7 py-3.5 border border-white/20 hover:border-[#00B4A0] rounded-full bg-black/40 hover:bg-[#00B4A0]/10 text-white/80 hover:text-white text-xs font-semibold tracking-wider uppercase transition-all duration-200 flex items-center justify-center text-center cursor-pointer backdrop-blur-sm w-full sm:w-auto"
+              className="btn-cyber-ghost w-full sm:w-auto px-7 py-3.5 text-xs font-semibold tracking-wider uppercase justify-center cursor-pointer"
             >
               <span>EXPLORER LA MÉTHODE</span>
             </a>

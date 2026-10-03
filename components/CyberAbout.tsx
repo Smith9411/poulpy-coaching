@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import DecryptedText from "./DecryptedText";
 import CornerBrackets from "./CornerBrackets";
-import { Shield, Award, Terminal, CheckCircle2, ArrowUpRight } from "lucide-react";
+import { Shield, Award, Terminal, CheckCircle2 } from "lucide-react";
 
 interface CyberAboutProps {
   onOpenBooking: () => void;
@@ -107,12 +107,9 @@ export default function CyberAbout({ onOpenBooking }: CyberAboutProps) {
             <div className="pt-4 flex items-center gap-4">
               <button
                 onClick={onOpenBooking}
-                className="btn-cyber-primary rounded-full px-8 py-3.5"
+                className="btn-cyber-primary px-8 py-3.5 text-xs font-bold font-mono tracking-wider cursor-pointer"
               >
                 <span>RÉSERVER UNE SÉANCE</span>
-                <div className="w-5 h-5 rounded-full bg-black/30 flex items-center justify-center">
-                  <ArrowUpRight className="w-3.5 h-3.5 text-black" />
-                </div>
               </button>
             </div>
           </div>

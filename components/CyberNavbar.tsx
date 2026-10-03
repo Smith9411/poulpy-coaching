@@ -537,9 +537,9 @@ export default function CyberNavbar({
             ) : (
               <button
                 onClick={() => setAuthOpen(true)}
-                className="text-xs font-mono text-[#F5F4F0]/80 hover:text-white transition-colors py-2 px-4 rounded-full border border-white/15 hover:border-[#CA1C30]/50 cursor-pointer uppercase tracking-wider"
+                className="btn-cyber-ghost text-xs py-2 px-4 uppercase tracking-wider cursor-pointer"
               >
-                CONNEXION
+                <span>CONNEXION</span>
               </button>
             )}
 
@@ -563,10 +563,9 @@ export default function CyberNavbar({
                   }
                 }
               }}
-              className="btn-cyber-primary rounded-full py-2 px-5 text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer shadow-[0_0_20px_rgba(202, 28, 48,0.3)]"
+              className="btn-cyber-primary rounded-full py-2 px-5 text-[11px] font-bold uppercase tracking-wider flex items-center justify-center cursor-pointer shadow-[0_0_20px_rgba(202, 28, 48,0.3)]"
             >
               <span>RÉSERVER</span>
-              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 

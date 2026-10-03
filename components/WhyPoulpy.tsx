@@ -191,51 +191,11 @@ export default function WhyPoulpy() {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const progressBarRef = useRef<HTMLDivElement | null>(null);
   const scrollPctRef = useRef<HTMLSpanElement | null>(null);
-  const pillBtnsRef = useRef<HTMLButtonElement[]>([]);
   const activeIndexRef = useRef(0);
   const scrollDistanceRef = useRef(2400);
 
   const [activeMediaIndex, setActiveMediaIndex] = useState<number>(0);
   const [isSectionInView, setIsSectionInView] = useState(false);
-
-  const updatePills = (activeIdx: number) => {
-    pillBtnsRef.current.forEach((btn, idx) => {
-      if (!btn) return;
-      if (idx === activeIdx) {
-        btn.className =
-          "px-4 py-1.5 text-[11px] font-mono font-bold rounded-full transition-all cursor-pointer bg-[#CA1C30] text-black shadow-[0_0_15px_rgba(202, 28, 48,0.4)]";
-      } else {
-        btn.className =
-          "px-4 py-1.5 text-[11px] font-mono font-medium rounded-full transition-all cursor-pointer text-white/50 hover:text-white bg-white/5 hover:bg-white/10";
-      }
-    });
-  };
-
-  const goToCard = (index: number) => {
-    const section = sectionRef.current;
-    if (!section) return;
-
-    const targetProgress = index / pillars.length;
-    const st = ScrollTrigger.getById("whypoulpy-scroll");
-    let targetY: number;
-
-    if (st) {
-      targetY = st.start + targetProgress * (st.end - st.start);
-    } else {
-      const pinSpacer = section.closest(".pin-spacer") as HTMLElement | null;
-      const baseTop = pinSpacer
-        ? pinSpacer.getBoundingClientRect().top + window.scrollY
-        : section.getBoundingClientRect().top + window.scrollY;
-      targetY = baseTop + targetProgress * (scrollDistanceRef.current || 2000);
-    }
-
-    gsap.to(window, {
-      scrollTo: { y: targetY, autoKill: false },
-      duration: 0.8,
-      ease: "power2.out",
-      overwrite: "auto",
-    });
-  };
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -251,7 +211,7 @@ export default function WhyPoulpy() {
       }
 
       const maxScroll = Math.max(0, track.scrollWidth - window.innerWidth + 80);
-      const totalScrollDistance = Math.max(2000, maxScroll * 1.6);
+      const totalScrollDistance = Math.max(2000, maxScroll * 1.5);
       scrollDistanceRef.current = totalScrollDistance;
 
       ctx = gsap.context(() => {
@@ -261,7 +221,7 @@ export default function WhyPoulpy() {
           scrollTrigger: {
             id: "whypoulpy-scroll",
             trigger: section,
-            pin: pinnedContainer,
+            pin: true,
             pinSpacing: true,
             start: "top top",
             end: () => `+=${totalScrollDistance}`,
@@ -282,7 +242,6 @@ export default function WhyPoulpy() {
               );
               if (activeIdx !== activeIndexRef.current) {
                 activeIndexRef.current = activeIdx;
-                updatePills(activeIdx);
                 setActiveMediaIndex(activeIdx);
               }
             },
@@ -293,10 +252,6 @@ export default function WhyPoulpy() {
 
     setup();
 
-    const handleResize = () => {
-      ScrollTrigger.refresh();
-    };
-
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsSectionInView(entry.isIntersecting);
@@ -305,10 +260,19 @@ export default function WhyPoulpy() {
     );
     observer.observe(section);
 
+    let resizeTimer: NodeJS.Timeout;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 150);
+    };
+
     window.addEventListener("resize", handleResize, { passive: true });
 
     return () => {
       observer.disconnect();
+      clearTimeout(resizeTimer);
       window.removeEventListener("resize", handleResize);
       try {
         if (ctx) {
@@ -330,157 +294,156 @@ export default function WhyPoulpy() {
         ref={pinnedContainerRef}
         className="relative w-full h-screen overflow-hidden flex flex-col justify-between pt-8 sm:pt-12 pb-6 sm:pb-8"
       >
-      {/* Large Rectangular Horizontal Sliding Track */}
-      <div
-        ref={trackRef}
-        className="flex items-center w-max pl-4 sm:pl-10 pr-24 my-auto select-none will-change-transform transform-gpu space-x-8 sm:space-x-12"
-        style={{
-          willChange: "transform",
-          transform: "translate3d(0, 0, 0)",
-        }}
-      >
-        {pillars.map((item, idx) => {
-          const Icon = item.icon;
-          const isAcid = item.color === "acid";
-          const isMediaActive = activeMediaIndex === idx;
+        {/* Large Rectangular Horizontal Sliding Track */}
+        <div
+          ref={trackRef}
+          className="flex items-center w-max pl-4 sm:pl-10 pr-24 my-auto select-none space-x-8 sm:space-x-12"
+          style={{
+            willChange: "transform",
+            transform: "translate3d(0, 0, 0)",
+          }}
+        >
+          {pillars.map((item, idx) => {
+            const Icon = item.icon;
+            const isAcid = item.color === "acid";
+            const isMediaActive = activeMediaIndex === idx;
 
-          return (
-            <div
-              key={item.num}
-              className="w-[92vw] sm:w-[860px] lg:w-[980px] xl:w-[1060px] h-[520px] sm:h-[540px] shrink-0 rounded-3xl bg-[#121117]/70 backdrop-blur-md p-8 sm:p-10 lg:p-12 flex flex-col justify-between transition-colors relative shadow-2xl shadow-black/80 overflow-hidden"
-            >
-              {/* Header inside module */}
-              <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-[11px] font-mono text-white/40 tracking-widest uppercase">
-                    {item.code}
-                  </span>
-                  <span className="text-white/20 font-mono">|</span>
-                  <span
-                    className={`text-xs font-mono font-bold tracking-wider uppercase px-3 py-1 rounded-full ${
-                      isAcid ? "text-[#CA1C30] bg-[#CA1C30]/10" : "text-[#00B4A0] bg-[#00B4A0]/10"
-                    }`}
-                  >
-                    {item.badge}
-                  </span>
+            return (
+              <div
+                key={item.num}
+                className="w-[92vw] sm:w-[860px] lg:w-[980px] xl:w-[1060px] h-[520px] sm:h-[540px] shrink-0 rounded-3xl bg-[#121117]/85 backdrop-blur-md p-8 sm:p-10 lg:p-12 flex flex-col justify-between transition-colors relative shadow-2xl shadow-black/80 overflow-hidden border border-white/10"
+              >
+                {/* Header inside module */}
+                <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                  <div className="flex items-center gap-3">
+                    <span className="text-[11px] font-mono text-white/40 tracking-widest uppercase">
+                      {item.code}
+                    </span>
+                    <span className="text-white/20 font-mono">|</span>
+                    <span
+                      className={`text-xs font-mono font-bold tracking-wider uppercase px-3 py-1 rounded-full ${
+                        isAcid ? "text-[#CA1C30] bg-[#CA1C30]/10" : "text-[#00B4A0] bg-[#00B4A0]/10"
+                      }`}
+                    >
+                      {item.badge}
+                    </span>
+                  </div>
+
+                  {/* Ghost number badge */}
+                  <div className="flex items-center gap-2">
+                    <Icon className={`w-4 h-4 ${isAcid ? "text-[#CA1C30]" : "text-[#00B4A0]"}`} />
+                    <span className="font-display text-2xl sm:text-3xl font-bold tracking-tighter text-white/30">
+                      {item.num}
+                    </span>
+                  </div>
                 </div>
 
-                {/* Ghost number badge */}
-                <div className="flex items-center gap-2">
-                  <Icon className={`w-4 h-4 ${isAcid ? "text-[#CA1C30]" : "text-[#00B4A0]"}`} />
-                  <span className="font-display text-2xl sm:text-3xl font-bold tracking-tighter text-white/30">
-                    {item.num}
-                  </span>
-                </div>
-              </div>
+                {/* Main 2-Column Split inside the wide rectangle */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center my-auto py-2">
+                  {/* Left Column (Text & Telemetry) */}
+                  <div className="lg:col-span-5 space-y-4">
+                    <div className="space-y-1.5">
+                      <h3 className="text-2xl sm:text-3xl font-display font-bold text-[#F5F4F0] tracking-tight">
+                        {item.title}
+                      </h3>
+                      <div className="text-xs font-mono text-white/60 tracking-wider">
+                        {item.subtitle}
+                      </div>
+                    </div>
 
-              {/* Main 2-Column Split inside the wide rectangle */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center my-auto py-2">
-                {/* Left Column (Text & Telemetry) */}
-                <div className="lg:col-span-5 space-y-4">
-                  <div className="space-y-1.5">
-                    <h3 className="text-2xl sm:text-3xl font-display font-bold text-[#F5F4F0] tracking-tight">
-                      {item.title}
-                    </h3>
-                    <div className="text-xs font-mono text-white/60 tracking-wider">
-                      {item.subtitle}
+                    <p className="text-xs sm:text-sm text-white/70 font-sans leading-relaxed">
+                      {item.description}
+                    </p>
+
+                    {/* Swiss Telemetry Spec Readout with internal lines */}
+                    <div className="space-y-2 pt-3 border-t border-white/10 font-mono text-xs">
+                      {item.specs.map((s, sIdx) => (
+                        <div key={sIdx} className="flex items-center justify-between gap-3 text-[11px]">
+                          <span className="text-white/45 uppercase tracking-wider flex items-center gap-1.5 truncate">
+                            <span className="w-1 h-1 bg-white/20 rounded-full shrink-0" />
+                            {s.label}
+                          </span>
+                          <span className="text-white/15 flex-1 border-b border-dotted border-white/15" />
+                          <span
+                            className={`font-bold tracking-wide shrink-0 ${
+                              isAcid ? "text-[#CA1C30]" : "text-[#00B4A0]"
+                            }`}
+                          >
+                            {s.val}
+                          </span>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
-                  <p className="text-xs sm:text-sm text-white/70 font-sans leading-relaxed">
-                    {item.description}
-                  </p>
-
-                  {/* Swiss Telemetry Spec Readout with internal lines */}
-                  <div className="space-y-2 pt-3 border-t border-white/10 font-mono text-xs">
-                    {item.specs.map((s, sIdx) => (
-                      <div key={sIdx} className="flex items-center justify-between gap-3 text-[11px]">
-                        <span className="text-white/45 uppercase tracking-wider flex items-center gap-1.5 truncate">
-                          <span className="w-1 h-1 bg-white/20 rounded-full shrink-0" />
-                          {s.label}
-                        </span>
-                        <span className="text-white/15 flex-1 border-b border-dotted border-white/15" />
-                        <span
-                          className={`font-bold tracking-wide shrink-0 ${
-                            isAcid ? "text-[#CA1C30]" : "text-[#00B4A0]"
-                          }`}
-                        >
-                          {s.val}
-                        </span>
-                      </div>
-                    ))}
+                  {/* Right Column (Cinematic Video Stage) */}
+                  <div className="lg:col-span-7">
+                    <PillarLargeVideo
+                      videoSrc={item.videoSrc}
+                      clipTitle={item.clipTitle}
+                      clipSubtitle={item.clipSubtitle}
+                      isActive={isMediaActive}
+                      isSectionInView={isSectionInView}
+                      accentColor={item.color}
+                    />
                   </div>
                 </div>
 
-                {/* Right Column (Cinematic Video Stage) */}
-                <div className="lg:col-span-7">
-                  <PillarLargeVideo
-                    videoSrc={item.videoSrc}
-                    clipTitle={item.clipTitle}
-                    clipSubtitle={item.clipSubtitle}
-                    isActive={isMediaActive}
-                    isSectionInView={isSectionInView}
-                    accentColor={item.color}
-                  />
+                {/* Bottom Footer Info */}
+                <div className="flex items-center justify-between text-[10px] text-white/40 font-mono pt-3 border-t border-white/10">
+                  <span>DÉMONSTRATION COMPÉTITIVE // ARCHIVE POULPY</span>
+                  <span className={`font-bold uppercase ${isAcid ? "text-[#CA1C30]" : "text-[#00B4A0]"}`}>
+                    STATUT : VIDÉO ACTIVE
+                  </span>
                 </div>
               </div>
+            );
+          })}
 
-              {/* Bottom Footer Info */}
-              <div className="flex items-center justify-between text-[10px] text-white/40 font-mono pt-3 border-t border-white/10">
-                <span>DÉMONSTRATION COMPÉTITIVE // ARCHIVE POULPY</span>
-                <span className={`font-bold uppercase ${isAcid ? "text-[#CA1C30]" : "text-[#00B4A0]"}`}>
-                  STATUT : VIDÉO ACTIVE
-                </span>
+          {/* Closing Action Rectangle */}
+          <div className="w-[85vw] sm:w-[500px] h-[520px] sm:h-[540px] shrink-0 rounded-3xl bg-black/60 backdrop-blur-md p-8 sm:p-12 flex flex-col justify-between relative shadow-2xl shadow-black/90 overflow-hidden border border-white/10">
+            <div className="space-y-4">
+              <span className="text-[#CA1C30] text-xs font-bold font-mono tracking-widest uppercase block">
+                // VALIDATION & ENGAGEMENT
+              </span>
+              <h3 className="text-3xl sm:text-4xl font-display font-bold text-white tracking-tight leading-tight">
+                PRÊT À PASSER LE PALIER ?
+              </h3>
+              <p className="text-xs sm:text-sm text-white/70 font-sans leading-relaxed">
+                Ne perdez plus des mois à tourner en rond en ranked. Réservez votre premier audit et progressez immédiatement avec une méthode testée au plus haut niveau.
+              </p>
+            </div>
+
+            <div className="space-y-4 pt-4 border-t border-white/10">
+              <a
+                href="#booking"
+                className="btn-cyber-primary w-full justify-center text-xs py-4 rounded-full cursor-pointer font-bold tracking-wider"
+              >
+                <span>ENGAGER LE COACHING</span>
+              </a>
+              <div className="text-center text-[10px] text-white/40 font-mono">
+                VALORANT (IMMORTAL 2 #5000) &bull; APEX (3x PICK #450)
               </div>
             </div>
-          );
-        })}
-
-        {/* Closing Action Rectangle */}
-        <div className="w-[85vw] sm:w-[500px] h-[520px] sm:h-[540px] shrink-0 rounded-3xl bg-black/60 backdrop-blur-md p-8 sm:p-12 flex flex-col justify-between relative shadow-2xl shadow-black/90 overflow-hidden">
-          <div className="space-y-4">
-            <span className="text-[#CA1C30] text-xs font-bold font-mono tracking-widest uppercase block">
-              // VALIDATION & ENGAGEMENT
-            </span>
-            <h3 className="text-3xl sm:text-4xl font-display font-bold text-white tracking-tight leading-tight">
-              PRÊT À PASSER LE PALIER ?
-            </h3>
-            <p className="text-xs sm:text-sm text-white/70 font-sans leading-relaxed">
-              Ne perdez plus des mois à tourner en rond en ranked. Réservez votre premier audit et progressez immédiatement avec une méthode testée au plus haut niveau.
-            </p>
           </div>
+        </div>
 
-          <div className="space-y-4 pt-4 border-t border-white/10">
-            <a
-              href="#booking"
-              className="btn-cyber-primary w-full justify-center text-xs py-4 rounded-full cursor-pointer font-bold tracking-wider"
-            >
-              <span>ENGAGER LE COACHING</span>
-              <ArrowRight className="w-4 h-4 ml-1" />
-            </a>
-            <div className="text-center text-[10px] text-white/40 font-mono">
-              VALORANT (IMMORTAL 2 #5000) &bull; APEX (3x PICK #450)
+        {/* Bottom Progress Bar */}
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 flex items-center justify-end text-[10px] font-mono text-white/40 pt-2 z-20">
+          <div className="flex items-center gap-3">
+            <span>PROGRESSION :</span>
+            <div className="w-28 sm:w-40 h-1 bg-white/10 rounded-full overflow-hidden">
+              <div
+                ref={progressBarRef}
+                className="h-full bg-[#CA1C30] origin-left transition-transform duration-75"
+                style={{ transform: "scaleX(0)" }}
+              />
             </div>
+            <span ref={scrollPctRef} className="text-white/80 font-bold min-w-[2.5rem]">
+              0%
+            </span>
           </div>
         </div>
-      </div>
-
-      {/* Bottom Progress Bar */}
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 flex items-center justify-end text-[10px] font-mono text-white/40 pt-2 z-20">
-        <div className="flex items-center gap-3">
-          <span>PROGRESSION :</span>
-          <div className="w-28 sm:w-40 h-1 bg-white/10 rounded-full overflow-hidden">
-            <div
-              ref={progressBarRef}
-              className="h-full bg-[#CA1C30] origin-left transition-transform duration-75"
-              style={{ transform: "scaleX(0)" }}
-            />
-          </div>
-          <span ref={scrollPctRef} className="text-white/80 font-bold min-w-[2.5rem]">
-            0%
-          </span>
-        </div>
-      </div>
       </div>
     </section>
   );

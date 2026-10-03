@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import DecryptedText from "./DecryptedText";
-import { Tv, ExternalLink, MessageCircle, Play, Radio } from "lucide-react";
+import { Tv, ExternalLink, MessageCircle } from "lucide-react";
 
 export function YoutubeIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
@@ -22,10 +23,18 @@ export function TwitchIcon({ className = "w-4 h-4" }: { className?: string }) {
 
 export default function CyberMedia() {
   const [platform, setPlatform] = useState<"youtube" | "twitch">("youtube");
+  const [transitionKey, setTransitionKey] = useState(0);
 
   const youtubeUrl = "https://www.youtube.com/@Poulpy_C";
   const youtubeEmbed = "https://www.youtube-nocookie.com/embed/4gfWbGCA5q0";
   const twitchUrl = "https://www.twitch.tv/poulpy_coaching";
+  const twitchEmbed = "https://player.twitch.tv/?channel=poulpy_coaching&parent=localhost&parent=127.0.0.1&parent=poulpy-coaching.vercel.app";
+
+  const handleSwitchPlatform = (target: "youtube" | "twitch") => {
+    if (target === platform) return;
+    setPlatform(target);
+    setTransitionKey((prev) => prev + 1);
+  };
 
   return (
     <section id="media" className="py-14 sm:py-16 px-6 sm:px-12 lg:px-16 bg-transparent font-mono">
@@ -44,7 +53,7 @@ export default function CyberMedia() {
           {/* Platform Switcher Buttons */}
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setPlatform("youtube")}
+              onClick={() => handleSwitchPlatform("youtube")}
               className={`px-6 py-2.5 text-xs font-bold uppercase rounded-full border transition-all flex items-center gap-2 cursor-pointer ${
                 platform === "youtube"
                   ? "bg-[#CA1C30] text-black border-[#CA1C30] shadow-[0_0_20px_rgba(202, 28, 48,0.4)]"
@@ -56,7 +65,7 @@ export default function CyberMedia() {
             </button>
 
             <button
-              onClick={() => setPlatform("twitch")}
+              onClick={() => handleSwitchPlatform("twitch")}
               className={`px-6 py-2.5 text-xs font-bold uppercase rounded-full border transition-all flex items-center gap-2 cursor-pointer ${
                 platform === "twitch"
                   ? "bg-[#9146FF] text-white border-[#9146FF] shadow-[0_0_20px_rgba(145,70,255,0.4)]"
@@ -69,26 +78,75 @@ export default function CyberMedia() {
           </div>
         </div>
 
-        {/* Video Player Frame with Cybercore Reticles */}
+        {/* Video Player Frame with Diagonal Slash Reveal Transition */}
         <div className="reticle-box p-3 sm:p-4 bg-[#121117] rounded-3xl border border-white/15 relative shadow-[0_10px_40px_rgba(0,0,0,0.8)] overflow-hidden">
           {/* Video Container (16:9 Aspect Ratio) */}
-          <div className="relative w-full aspect-video bg-black rounded-2xl border border-white/10 overflow-hidden">
-            {platform === "youtube" ? (
+          <div className="relative w-full aspect-video bg-black rounded-2xl border border-white/10 overflow-hidden select-none">
+            {/* Base Layer: YouTube Player */}
+            <div className="absolute inset-0 w-full h-full">
               <iframe
                 src={youtubeEmbed}
                 title="Poulpy YouTube"
-                className="absolute inset-0 w-full h-full border-0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
               />
-            ) : (
+            </div>
+
+            {/* Top Animated Layer: Twitch Player with Diagonal Slash Wipe */}
+            <motion.div
+              initial={false}
+              animate={{
+                clipPath:
+                  platform === "twitch"
+                    ? "polygon(-25% 0%, 130% 0%, 105% 100%, -25% 100%)"
+                    : "polygon(0% 0%, 0% 0%, -25% 100%, -25% 100%)",
+              }}
+              transition={{
+                duration: 0.65,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              className="absolute inset-0 w-full h-full z-10 bg-black"
+            >
               <iframe
-                src="https://player.twitch.tv/?channel=poulpy_coaching&parent=localhost&parent=127.0.0.1&parent=poulpy-coaching.vercel.app"
+                src={twitchEmbed}
                 title="Poulpy Twitch"
-                className="absolute inset-0 w-full h-full border-0"
+                className="w-full h-full border-0"
                 allowFullScreen
               />
-            )}
+            </motion.div>
+
+            {/* Glowing Diagonal Laser Slash Beam traveling across during transition */}
+            <AnimatePresence>
+              {transitionKey > 0 && (
+                <motion.div
+                  key={transitionKey}
+                  initial={{
+                    left: platform === "twitch" ? "-15%" : "115%",
+                    opacity: 1,
+                  }}
+                  animate={{
+                    left: platform === "twitch" ? "115%" : "-15%",
+                    opacity: [0, 1, 1, 0],
+                  }}
+                  transition={{
+                    duration: 0.65,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                  className="absolute top-[-20%] bottom-[-20%] w-[3px] sm:w-[4px] z-30 pointer-events-none -skew-x-[20deg]"
+                  style={{
+                    background:
+                      platform === "twitch"
+                        ? "linear-gradient(to bottom, #9146FF, #00B4A0, #9146FF)"
+                        : "linear-gradient(to bottom, #CA1C30, #00B4A0, #CA1C30)",
+                    boxShadow:
+                      platform === "twitch"
+                        ? "0 0 20px #9146FF, 0 0 40px #9146FF, 0 0 60px #00B4A0"
+                        : "0 0 20px #CA1C30, 0 0 40px #CA1C30, 0 0 60px #00B4A0",
+                  }}
+                />
+              )}
+            </AnimatePresence>
           </div>
 
           {/* Bottom Action / Links Row */}
@@ -107,7 +165,7 @@ export default function CyberMedia() {
                   href={youtubeUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-5 py-2.5 rounded-full bg-[#CA1C30]/10 border border-[#CA1C30]/40 hover:bg-[#CA1C30]/20 text-[#CA1C30] hover:text-white transition-all flex items-center gap-1.5 font-bold text-[11px]"
+                  className="btn-cyber-primary px-5 py-2.5 text-[11px] font-bold tracking-wider uppercase cursor-pointer"
                 >
                   <YoutubeIcon className="w-3.5 h-3.5" />
                   <span>OUVRIR SUR YOUTUBE</span>
@@ -118,7 +176,7 @@ export default function CyberMedia() {
                   href={twitchUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-5 py-2.5 rounded-full bg-purple-600/10 border border-purple-500/40 hover:bg-purple-600/20 text-purple-400 hover:text-white transition-all flex items-center gap-1.5 font-bold text-[11px]"
+                  className="px-5 py-2.5 rounded-full bg-purple-600/20 border border-purple-500/50 hover:bg-purple-600/35 text-purple-300 hover:text-white transition-all flex items-center gap-1.5 font-bold text-[11px]"
                 >
                   <TwitchIcon className="w-3.5 h-3.5" />
                   <span>OUVRIR SUR TWITCH</span>
@@ -130,7 +188,7 @@ export default function CyberMedia() {
                 href="https://discord.gg/rJMg3ZZRkp"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-5 py-2.5 rounded-full bg-white/5 border border-white/10 hover:border-white/30 text-[#F5F4F0]/70 hover:text-white transition-all flex items-center gap-1.5 font-medium text-[11px]"
+                className="btn-cyber-ghost px-5 py-2.5 text-[11px] font-medium tracking-wider uppercase cursor-pointer"
               >
                 <MessageCircle className="w-3.5 h-3.5 text-[#5865F2]" />
                 <span>DISCORD</span>

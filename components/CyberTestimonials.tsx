@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import DecryptedText from "./DecryptedText";
-import { Star, ChevronLeft, ChevronRight, ArrowUpRight, MessageSquare, Loader2 } from "lucide-react";
+import { Star, ChevronLeft, ChevronRight, MessageSquare, Loader2 } from "lucide-react";
 
 interface RealReview {
   id: string;
@@ -220,10 +220,9 @@ export default function CyberTestimonials() {
         <div className="text-center pt-2">
           <Link
             href="/avis"
-            className="inline-flex items-center justify-center gap-2 text-xs py-3.5 px-8 bg-[#121117] border border-white/15 hover:border-[#CA1C30] rounded-full text-[#F5F4F0] hover:text-white transition-all font-mono tracking-widest uppercase shadow-md group w-full sm:w-auto"
+            className="btn-cyber-primary px-8 py-3.5 text-xs font-bold font-mono tracking-wider cursor-pointer"
           >
             <span>CONSULTER LES AVIS</span>
-            <ArrowUpRight className="w-4 h-4 text-[#CA1C30] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform shrink-0" />
           </Link>
         </div>
       </div>

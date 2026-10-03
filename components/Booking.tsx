@@ -346,9 +346,8 @@ export default function Booking() {
                   onClick={() => {
                     if (isDone) setStep(s.id);
                   }}
-                  disabled={!isDone && !isActive}
                   className={`transition-colors font-bold tracking-wider uppercase flex items-center gap-1.5 ${
-                    isDone ? "cursor-pointer" : ""
+                    isDone ? "cursor-pointer" : "cursor-default"
                   } ${
                     isActive
                       ? "text-[#CA1C30]"
