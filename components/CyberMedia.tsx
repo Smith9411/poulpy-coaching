@@ -78,122 +78,119 @@ export default function CyberMedia() {
           </div>
         </div>
 
-        {/* Video Player Frame with Diagonal Slash Reveal Transition */}
-        <div className="reticle-box p-3 sm:p-4 bg-[#121117] rounded-3xl border border-white/15 relative shadow-[0_10px_40px_rgba(0,0,0,0.8)] overflow-hidden">
-          {/* Video Container (16:9 Aspect Ratio) */}
-          <div className="relative w-full aspect-video bg-black rounded-2xl border border-white/10 overflow-hidden select-none">
-            {/* Base Layer: YouTube Player */}
-            <div className="absolute inset-0 w-full h-full">
-              <iframe
-                src={youtubeEmbed}
-                title="Poulpy YouTube"
-                className="w-full h-full border-0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              />
-            </div>
-
-            {/* Top Animated Layer: Twitch Player with Diagonal Slash Wipe */}
-            <motion.div
-              initial={false}
-              animate={{
-                clipPath:
-                  platform === "twitch"
-                    ? "polygon(-25% 0%, 130% 0%, 105% 100%, -25% 100%)"
-                    : "polygon(0% 0%, 0% 0%, -25% 100%, -25% 100%)",
-              }}
-              transition={{
-                duration: 0.65,
-                ease: [0.16, 1, 0.3, 1],
-              }}
-              className="absolute inset-0 w-full h-full z-10 bg-black"
-            >
-              <iframe
-                src={twitchEmbed}
-                title="Poulpy Twitch"
-                className="w-full h-full border-0"
-                allowFullScreen
-              />
-            </motion.div>
-
-            {/* Glowing Diagonal Laser Slash Beam traveling across during transition */}
-            <AnimatePresence>
-              {transitionKey > 0 && (
-                <motion.div
-                  key={transitionKey}
-                  initial={{
-                    left: platform === "twitch" ? "-15%" : "115%",
-                    opacity: 1,
-                  }}
-                  animate={{
-                    left: platform === "twitch" ? "115%" : "-15%",
-                    opacity: [0, 1, 1, 0],
-                  }}
-                  transition={{
-                    duration: 0.65,
-                    ease: [0.16, 1, 0.3, 1],
-                  }}
-                  className="absolute top-[-20%] bottom-[-20%] w-[3px] sm:w-[4px] z-30 pointer-events-none -skew-x-[20deg]"
-                  style={{
-                    background:
-                      platform === "twitch"
-                        ? "linear-gradient(to bottom, #9146FF, #00B4A0, #9146FF)"
-                        : "linear-gradient(to bottom, #CA1C30, #00B4A0, #CA1C30)",
-                    boxShadow:
-                      platform === "twitch"
-                        ? "0 0 20px #9146FF, 0 0 40px #9146FF, 0 0 60px #00B4A0"
-                        : "0 0 20px #CA1C30, 0 0 40px #CA1C30, 0 0 60px #00B4A0",
-                  }}
-                />
-              )}
-            </AnimatePresence>
+        {/* Video Player Frame without background vignette */}
+        <div className="relative w-full aspect-video bg-black rounded-2xl sm:rounded-3xl border border-white/10 overflow-hidden select-none shadow-2xl">
+          {/* Base Layer: YouTube Player */}
+          <div className="absolute inset-0 w-full h-full">
+            <iframe
+              src={youtubeEmbed}
+              title="Poulpy YouTube"
+              className="w-full h-full border-0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+            />
           </div>
 
-          {/* Bottom Action / Links Row */}
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/10 text-xs">
-            <div className="text-[#F5F4F0]/60 text-[11px]">
-              {platform === "youtube" ? (
-                <span>Chaîne officielle YouTube de Poulpy — VOD reviews, guides et démonstrations.</span>
-              ) : (
-                <span>Lives réguliers de coaching, questions-réponses et gameplay compétitif.</span>
-              )}
-            </div>
+          {/* Top Animated Layer: Twitch Player with Diagonal Slash Wipe */}
+          <motion.div
+            initial={false}
+            animate={{
+              clipPath:
+                platform === "twitch"
+                  ? "polygon(-25% 0%, 130% 0%, 105% 100%, -25% 100%)"
+                  : "polygon(0% 0%, 0% 0%, -25% 100%, -25% 100%)",
+            }}
+            transition={{
+              duration: 0.65,
+              ease: [0.16, 1, 0.3, 1],
+            }}
+            className="absolute inset-0 w-full h-full z-10 bg-black"
+          >
+            <iframe
+              src={twitchEmbed}
+              title="Poulpy Twitch"
+              className="w-full h-full border-0"
+              allowFullScreen
+            />
+          </motion.div>
 
-            <div className="flex items-center gap-2">
-              {platform === "youtube" ? (
-                <a
-                  href={youtubeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-cyber-primary px-5 py-2.5 text-[11px] font-bold tracking-wider uppercase cursor-pointer"
-                >
-                  <YoutubeIcon className="w-3.5 h-3.5" />
-                  <span>OUVRIR SUR YOUTUBE</span>
-                  <ExternalLink className="w-3 h-3 ml-1" />
-                </a>
-              ) : (
-                <a
-                  href={twitchUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-5 py-2.5 rounded-full bg-purple-600/20 border border-purple-500/50 hover:bg-purple-600/35 text-purple-300 hover:text-white transition-all flex items-center gap-1.5 font-bold text-[11px]"
-                >
-                  <TwitchIcon className="w-3.5 h-3.5" />
-                  <span>OUVRIR SUR TWITCH</span>
-                  <ExternalLink className="w-3 h-3 ml-1" />
-                </a>
-              )}
+          {/* Glowing Diagonal Laser Slash Beam traveling across during transition */}
+          <AnimatePresence>
+            {transitionKey > 0 && (
+              <motion.div
+                key={transitionKey}
+                initial={{
+                  left: platform === "twitch" ? "-15%" : "115%",
+                  opacity: 1,
+                }}
+                animate={{
+                  left: platform === "twitch" ? "115%" : "-15%",
+                  opacity: [0, 1, 1, 0],
+                }}
+                transition={{
+                  duration: 0.65,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
+                className="absolute top-[-20%] bottom-[-20%] w-[3px] sm:w-[4px] z-30 pointer-events-none -skew-x-[20deg]"
+                style={{
+                  background:
+                    platform === "twitch"
+                      ? "linear-gradient(to bottom, #9146FF, #00B4A0, #9146FF)"
+                      : "linear-gradient(to bottom, #CA1C30, #00B4A0, #CA1C30)",
+                  boxShadow:
+                    platform === "twitch"
+                      ? "0 0 20px #9146FF, 0 0 40px #9146FF, 0 0 60px #00B4A0"
+                      : "0 0 20px #CA1C30, 0 0 40px #CA1C30, 0 0 60px #00B4A0",
+                }}
+              />
+            )}
+          </AnimatePresence>
+        </div>
 
+        {/* Bottom Action / Links Row */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-2 text-xs">
+          <div className="text-[#F5F4F0]/60 text-[11px]">
+            {platform === "youtube" ? (
+              <span>Chaîne officielle YouTube de Poulpy — VOD reviews, guides et démonstrations.</span>
+            ) : (
+              <span>Lives réguliers de coaching, questions-réponses et gameplay compétitif.</span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-2">
+            {platform === "youtube" ? (
               <a
-                href="https://discord.gg/rJMg3ZZRkp"
+                href={youtubeUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-cyber-ghost px-5 py-2.5 text-[11px] font-medium tracking-wider uppercase cursor-pointer"
+                className="btn-cyber-primary px-5 py-2.5 text-[11px] font-bold tracking-wider uppercase cursor-pointer"
               >
-                <MessageCircle className="w-3.5 h-3.5 text-[#5865F2]" />
-                <span>DISCORD</span>
+                <YoutubeIcon className="w-3.5 h-3.5" />
+                <span>OUVRIR SUR YOUTUBE</span>
+                <ExternalLink className="w-3 h-3 ml-1" />
               </a>
-            </div>
+            ) : (
+              <a
+                href={twitchUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-5 py-2.5 rounded-full bg-purple-600/20 border border-purple-500/50 hover:bg-purple-600/35 text-purple-300 hover:text-white transition-all flex items-center gap-1.5 font-bold text-[11px]"
+              >
+                <TwitchIcon className="w-3.5 h-3.5" />
+                <span>OUVRIR SUR TWITCH</span>
+                <ExternalLink className="w-3 h-3 ml-1" />
+              </a>
+            )}
+
+            <a
+              href="https://discord.gg/rJMg3ZZRkp"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-cyber-ghost px-5 py-2.5 text-[11px] font-medium tracking-wider uppercase cursor-pointer"
+            >
+              <MessageCircle className="w-3.5 h-3.5 text-[#5865F2]" />
+              <span>DISCORD</span>
+            </a>
           </div>
         </div>
       </div>
