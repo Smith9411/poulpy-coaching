@@ -377,7 +377,7 @@ export default function WhyPoulpy() {
                             <span className="w-1.5 h-1.5 bg-[#CA1C30] rounded-full shrink-0" />
                             {s.label}
                           </span>
-                          {s.val ? (
+                          {s.val && (
                             <>
                               <span className="text-white/15 flex-1 border-b border-dotted border-white/15" />
                               <span
@@ -388,10 +388,6 @@ export default function WhyPoulpy() {
                                 {s.val}
                               </span>
                             </>
-                          ) : (
-                            <span className="text-[#00B4A0] text-[10px] font-mono tracking-wider shrink-0 uppercase">
-                              ✓ INCLUS
-                            </span>
                           )}
                         </div>
                       ))}
@@ -409,14 +405,6 @@ export default function WhyPoulpy() {
                       accentColor={item.color}
                     />
                   </div>
-                </div>
-
-                {/* Bottom Footer Info */}
-                <div className="flex items-center justify-between text-[10px] text-white/40 font-mono pt-3 border-t border-white/10">
-                  <span>DÉMONSTRATION COMPÉTITIVE // ARCHIVE POULPY</span>
-                  <span className={`font-bold uppercase ${isAcid ? "text-[#CA1C30]" : "text-[#00B4A0]"}`}>
-                    STATUT : VIDÉO ACTIVE
-                  </span>
                 </div>
               </div>
             );
