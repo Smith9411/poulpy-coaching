@@ -4,7 +4,6 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Calendar, Clock, User, Shield, ChevronRight, ChevronLeft, ArrowRight, Send, Loader2, AlertCircle, Crosshair, MessageCircle, ExternalLink } from "lucide-react";
 import DecryptedText from "./DecryptedText";
-import CornerBrackets from "./CornerBrackets";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 import AuthModal from "./AuthModal";
@@ -40,24 +39,20 @@ const MONTHS_FULL = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Jui
 
 const STANDARD_HOURS = ["10:00", "11:30", "14:00", "15:30", "17:00", "18:30", "20:00", "21:30"];
 
-// Custom hook for 3D card tilt & spotlight
+// Optimized 3D tilt hook that preserves sharp text rendering
 function useCardTilt() {
   const [rotate, setRotate] = useState({ x: 0, y: 0 });
-  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
   const [isHovered, setIsHovered] = useState(false);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    const percentX = (x / rect.width) * 100;
-    const percentY = (y / rect.height) * 100;
 
-    const rotX = ((y - rect.height / 2) / (rect.height / 2)) * -4.5;
-    const rotY = ((x - rect.width / 2) / (rect.width / 2)) * 4.5;
+    const rotX = ((y - rect.height / 2) / (rect.height / 2)) * -3.5;
+    const rotY = ((x - rect.width / 2) / (rect.width / 2)) * 3.5;
 
     setRotate({ x: rotX, y: rotY });
-    setMousePos({ x: percentX, y: percentY });
   };
 
   const handleMouseEnter = () => setIsHovered(true);
@@ -66,7 +61,7 @@ function useCardTilt() {
     setRotate({ x: 0, y: 0 });
   };
 
-  return { rotate, mousePos, isHovered, handleMouseMove, handleMouseEnter, handleMouseLeave };
+  return { rotate, isHovered, handleMouseMove, handleMouseEnter, handleMouseLeave };
 }
 
 export default function Booking() {
@@ -364,11 +359,11 @@ export default function Booking() {
           </div>
         </div>
 
-        {/* Dynamic Step Container */}
-        <div className="reticle-box p-6 sm:p-8 bg-[#121117] rounded-3xl border border-white/20 relative shadow-[0_0_50px_rgba(0,0,0,0.9)]">
+        {/* Dynamic Step Container (Seamless & Clean without outer background box) */}
+        <div className="relative w-full">
           <AnimatePresence mode="wait" initial={false}>
             {/* ======================================================== */}
-            {/* STEP 1: EXACT PNG LAYOUT + DYNAMIC 3D TILT MOTION */}
+            {/* STEP 1: 3D INTERACTIVE PRICING CARDS */}
             {/* ======================================================== */}
             {step === 1 && (
               <motion.div
@@ -379,15 +374,6 @@ export default function Booking() {
                 transition={{ duration: 0.15 }}
                 className="space-y-6"
               >
-                {/* Step Subheader matching PNG */}
-                <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                  <div className="text-xs text-[#F5F4F0]/80 uppercase tracking-wider font-bold flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-[#CA1C30]" />
-                    ÉTAPE 01 : SÉLECTION DU PROTOCOLE D&apos;ENTRAÎNEMENT
-                  </div>
-                  <span className="text-xs text-[#CA1C30] font-bold tracking-wider">3 FORMULES DISPONIBLES</span>
-                </div>
-
                 {/* Main Grid: Left Pro (7 cols) + Right Stacked Satellite cards (5 cols) */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
                   {/* ========================================= */}
@@ -405,26 +391,29 @@ export default function Booking() {
                       animate={{
                         rotateX: proTilt.rotate.x,
                         rotateY: proTilt.rotate.y,
-                        scale: proTilt.isHovered ? 1.004 : 1,
                       }}
                       transition={{
                         type: "spring",
-                        stiffness: 280,
-                        damping: 22,
+                        stiffness: 260,
+                        damping: 24,
+                        mass: 0.5,
                       }}
-                      style={{ transformStyle: "preserve-3d" }}
-                      className={`relative h-full p-7 flex flex-col justify-between transition-colors duration-200 border rounded-2xl overflow-hidden select-none ${
+                      style={{
+                        WebkitBackfaceVisibility: "hidden",
+                        backfaceVisibility: "hidden",
+                        transform: "translate3d(0, 0, 0)",
+                        transformStyle: "flat",
+                        contain: "paint",
+                      }}
+                      className={`relative h-full p-6 sm:p-8 flex flex-col justify-between select-none rounded-2xl transition-shadow duration-150 ${
                         selectedPlan === "pro"
-                          ? "bg-[#1A1822] border-[#CA1C30] shadow-[0_0_35px_rgba(202, 28, 48,0.25)] ring-1 ring-[#CA1C30]"
+                          ? "bg-[#1A1822] shadow-[inset_0_0_0_1px_#CA1C30,0_0_35px_rgba(202,28,48,0.25)]"
                           : proTilt.isHovered
-                          ? "bg-[#1A1822] border-[#CA1C30]/60 shadow-[0_0_25px_rgba(202, 28, 48,0.15)]"
-                          : "bg-[#121117] border-white/15 hover:border-white/30"
+                          ? "bg-[#1A1822] shadow-[inset_0_0_0_1px_rgba(202,28,48,0.6),0_0_25px_rgba(202,28,48,0.15)]"
+                          : "bg-[#121117] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.15)] hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.3)]"
                       }`}
                     >
-                      {/* Corner Brackets */}
-                      <CornerBrackets color="coral" />
-
-                      <div className="space-y-5 relative z-10" style={{ transform: "translateZ(8px)" }}>
+                      <div className="space-y-5 relative z-10">
                         {/* Top Badges */}
                         <div className="flex items-center justify-between border-b border-white/10 pb-4">
                           <span className="bg-[#CA1C30] text-black text-[10px] font-bold px-3 py-1 uppercase tracking-widest">
@@ -456,7 +445,7 @@ export default function Booking() {
                               }}
                               className={`p-3 border rounded-xl text-left transition-all relative cursor-pointer ${
                                 !proIsPack && selectedPlan === "pro"
-                                  ? "border-[#CA1C30] bg-[#CA1C30]/15 text-white shadow-[0_0_15px_rgba(202, 28, 48,0.25)] ring-1 ring-[#CA1C30]"
+                                  ? "border-[#CA1C30] bg-[#CA1C30]/15 text-white shadow-[0_0_15px_rgba(202,28,48,0.25)]"
                                   : "border-white/10 bg-[#0B0A0D]/80 text-[#F5F4F0]/60 hover:border-white/30 hover:text-white"
                               }`}
                             >
@@ -487,7 +476,7 @@ export default function Booking() {
                               }}
                               className={`p-3 border rounded-xl text-left transition-all relative overflow-hidden cursor-pointer ${
                                 proIsPack && selectedPlan === "pro"
-                                  ? "border-[#CA1C30] bg-[#CA1C30]/15 text-white shadow-[0_0_15px_rgba(202, 28, 48,0.25)] ring-1 ring-[#CA1C30]"
+                                  ? "border-[#CA1C30] bg-[#CA1C30]/15 text-white shadow-[0_0_15px_rgba(202,28,48,0.25)]"
                                   : "border-white/10 bg-[#0B0A0D]/80 text-[#F5F4F0]/60 hover:border-white/30 hover:text-white"
                               }`}
                             >
@@ -568,23 +557,29 @@ export default function Booking() {
                         animate={{
                           rotateX: sessionTilt.rotate.x,
                           rotateY: sessionTilt.rotate.y,
-                          scale: sessionTilt.isHovered ? 1.004 : 1,
                         }}
                         transition={{
                           type: "spring",
-                          stiffness: 280,
-                          damping: 22,
+                          stiffness: 260,
+                          damping: 24,
+                          mass: 0.5,
                         }}
-                        style={{ transformStyle: "preserve-3d" }}
-                        className={`relative h-full p-5 flex flex-col justify-between transition-colors duration-200 border rounded-2xl overflow-hidden select-none ${
+                        style={{
+                          WebkitBackfaceVisibility: "hidden",
+                          backfaceVisibility: "hidden",
+                          transform: "translate3d(0, 0, 0)",
+                          transformStyle: "flat",
+                          contain: "paint",
+                        }}
+                        className={`relative h-full p-5 flex flex-col justify-between select-none rounded-2xl transition-shadow duration-150 ${
                           selectedPlan === "session"
-                            ? "bg-[#1A1822] border-[#F5F4F0] shadow-[0_0_25px_rgba(245, 244, 240,0.2)] ring-1 ring-[#F5F4F0]"
+                            ? "bg-[#1A1822] shadow-[inset_0_0_0_1px_#F5F4F0,0_0_25px_rgba(245,244,240,0.2)]"
                             : sessionTilt.isHovered
-                            ? "bg-[#1A1822] border-[#F5F4F0]/50 shadow-[0_0_20px_rgba(245, 244, 240,0.1)]"
-                            : "bg-[#121117] border-white/15 hover:border-white/30"
+                            ? "bg-[#1A1822] shadow-[inset_0_0_0_1px_rgba(245,244,240,0.5),0_0_20px_rgba(245,244,240,0.1)]"
+                            : "bg-[#121117] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.15)] hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.3)]"
                         }`}
                       >
-                        <div className="space-y-3 relative z-10" style={{ transform: "translateZ(6px)" }}>
+                        <div className="space-y-3 relative z-10">
                           <div className="flex items-center justify-between border-b border-white/10 pb-2">
                             <span className="bg-[#F5F4F0]/15 text-[#F5F4F0] text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest border border-[#F5F4F0]/30">
                               OFFRE UNIQUE (1X)
@@ -651,23 +646,29 @@ export default function Booking() {
                         animate={{
                           rotateX: perfTilt.rotate.x,
                           rotateY: perfTilt.rotate.y,
-                          scale: perfTilt.isHovered ? 1.004 : 1,
                         }}
                         transition={{
                           type: "spring",
-                          stiffness: 280,
-                          damping: 22,
+                          stiffness: 260,
+                          damping: 24,
+                          mass: 0.5,
                         }}
-                        style={{ transformStyle: "preserve-3d" }}
-                        className={`relative h-full p-5 flex flex-col justify-between transition-colors duration-200 border rounded-2xl overflow-hidden select-none ${
+                        style={{
+                          WebkitBackfaceVisibility: "hidden",
+                          backfaceVisibility: "hidden",
+                          transform: "translate3d(0, 0, 0)",
+                          transformStyle: "flat",
+                          contain: "paint",
+                        }}
+                        className={`relative h-full p-5 flex flex-col justify-between select-none rounded-2xl transition-shadow duration-150 ${
                           selectedPlan === "performance"
-                            ? "bg-[#1A1822] border-[#00B4A0] shadow-[0_0_25px_rgba(0, 180, 160,0.25)] ring-1 ring-[#00B4A0]"
+                            ? "bg-[#1A1822] shadow-[inset_0_0_0_1px_#00B4A0,0_0_25px_rgba(0,180,160,0.25)]"
                             : perfTilt.isHovered
-                            ? "bg-[#1A1822] border-[#00B4A0]/60 shadow-[0_0_20px_rgba(0, 180, 160,0.15)]"
-                            : "bg-[#121117] border-white/15 hover:border-white/30"
+                            ? "bg-[#1A1822] shadow-[inset_0_0_0_1px_rgba(0,180,160,0.6),0_0_20px_rgba(0,180,160,0.15)]"
+                            : "bg-[#121117] shadow-[inset_0_0_0_1px_rgba(255,255,255,0.15)] hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.3)]"
                         }`}
                       >
-                        <div className="space-y-3 relative z-10" style={{ transform: "translateZ(6px)" }}>
+                        <div className="space-y-3 relative z-10">
                           <div className="flex items-center justify-between border-b border-white/10 pb-2">
                             <span className="bg-[#00B4A0]/20 text-[#00B4A0] text-[9px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-widest">
                               AXE COMPÉTITION & TEAM
@@ -694,7 +695,7 @@ export default function Booking() {
                                 }}
                                 className={`p-2 border rounded-xl text-left transition-all cursor-pointer ${
                                   !perfIsPack && selectedPlan === "performance"
-                                    ? "border-[#00B4A0] bg-[#00B4A0]/15 text-white shadow-[0_0_12px_rgba(0, 180, 160,0.25)] ring-1 ring-[#00B4A0]"
+                                    ? "border-[#00B4A0] bg-[#00B4A0]/15 text-white shadow-[0_0_12px_rgba(0,180,160,0.25)]"
                                     : "border-white/10 bg-[#0B0A0D]/80 text-[#F5F4F0]/60 hover:border-white/30 hover:text-white"
                                 }`}
                               >
@@ -717,7 +718,7 @@ export default function Booking() {
                                 }}
                                 className={`p-2 border rounded-xl text-left transition-all relative overflow-hidden cursor-pointer ${
                                   perfIsPack && selectedPlan === "performance"
-                                    ? "border-[#00B4A0] bg-[#00B4A0]/15 text-white shadow-[0_0_12px_rgba(0, 180, 160,0.25)] ring-1 ring-[#00B4A0]"
+                                    ? "border-[#00B4A0] bg-[#00B4A0]/15 text-white shadow-[0_0_12px_rgba(0,180,160,0.25)]"
                                     : "border-white/10 bg-[#0B0A0D]/80 text-[#F5F4F0]/60 hover:border-white/30 hover:text-white"
                                 }`}
                               >

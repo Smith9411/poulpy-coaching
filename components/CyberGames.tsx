@@ -106,12 +106,12 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
           </div>
 
           {/* Minimal Game Selector Tabs */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0 flex-wrap sm:flex-nowrap">
             {games.map((g) => (
               <button
                 key={g.id}
                 onClick={() => setActiveGame(g.id)}
-                className={`px-6 py-2.5 text-xs font-mono font-bold uppercase rounded-full transition-all cursor-pointer ${
+                className={`px-5 sm:px-6 py-2.5 text-xs font-mono font-bold uppercase rounded-full transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                   activeGame === g.id
                     ? g.id === "val"
                       ? "bg-[#CA1C30] text-black shadow-[0_0_25px_rgba(202,28,48,0.5)]"
