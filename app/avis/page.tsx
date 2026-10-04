@@ -43,6 +43,11 @@ function formatGameName(game: string): string {
   return GAME_LABELS[game?.toLowerCase()] ?? game ?? '';
 }
 
+function formatRank(rankStr?: string): string {
+  if (!rankStr) return '';
+  return rankStr.replace(/->/g, '➔').replace(/→/g, '➔');
+}
+
 const VALORANT_RANKS = [
   'Iron 1', 'Iron 2', 'Iron 3',
   'Bronze 1', 'Bronze 2', 'Bronze 3',
@@ -111,7 +116,6 @@ export default function Avis() {
     return () => clearInterval(interval);
   }, []);
 
-  // Helper : peut-on encore éditer cet avis (owner + < 5 min) ?
   const canEdit = (review: Review): boolean => {
     if (!user) return false;
     if (user.isAdmin) return true;
@@ -250,32 +254,27 @@ export default function Avis() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          name: user.username,
-          game: gameNormalized,
-          rank: finalRank,
+          text: trimmedText,
           rating,
-          text: text.trim(),
+          rank: finalRank,
+          game: gameNormalized,
         }),
       });
 
       const data = await res.json();
-      if (!res.ok || data.error) throw new Error(data.error || "Erreur lors de l'envoi");
+      if (!res.ok || data.error) {
+        throw new Error(data.error || `Erreur serveur (${res.status})`);
+      }
 
       setReviews((prev) => [data.review, ...prev]);
-
       setText('');
       setRank('');
       setRankFrom('');
       setRankTo('');
       setCustomRank('');
       setRating(5);
-      setHoverRating(0);
-
-      showStatus('success', 'Ton avis a été publié avec succès ! Merci pour ton retour.');
-
-      requestAnimationFrame(() => {
-        setIsFormOpen(false);
-      });
+      setIsFormOpen(false);
+      showStatus('success', 'Ton avis a été publié avec succès !');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Erreur lors de la publication';
       showStatus('error', msg);
@@ -284,36 +283,31 @@ export default function Avis() {
     }
   };
 
-  const handleDeleteReview = async (id: string) => {
-    setIsSubmitting(true);
+  const handleDeleteReview = async (reviewId: string) => {
     try {
       let { data: { session } } = await supabase.auth.getSession();
-
       if (!session?.access_token) {
-        const { data: refreshData, error: refreshErr } = await supabase.auth.refreshSession();
-        if (refreshErr || !refreshData.session) {
-          throw new Error('Session expirée, reconnectez-vous.');
-        }
-        session = refreshData.session;
+        const { data: r } = await supabase.auth.refreshSession();
+        session = r.session;
       }
-      const token = session.access_token;
-      if (!token) throw new Error('Session expirée, reconnectez-vous.');
+      if (!session?.access_token) throw new Error('Session expirée.');
 
-      const res = await fetch(`/api/reviews?id=${id}`, {
+      const res = await fetch(`/api/reviews?id=${encodeURIComponent(reviewId)}`, {
         method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
       });
-      const data = await res.json();
-      if (!res.ok || data.error) throw new Error(data.error || 'Erreur');
 
-      setReviews((prev) => prev.filter((r) => r.id !== id));
-      showStatus('success', "L'avis a été supprimé.");
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Erreur de suppression';
-      showStatus('error', msg);
-    } finally {
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || 'Erreur lors de la suppression');
+
+      setReviews((prev) => prev.filter((r) => r.id !== reviewId));
       setConfirmDeleteId(null);
-      setIsSubmitting(false);
+      showStatus('success', 'Avis supprimé avec succès.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erreur lors de la suppression';
+      showStatus('error', msg);
     }
   };
 
@@ -322,80 +316,52 @@ export default function Avis() {
     setEditText(review.text);
     setEditRating(review.rating);
     setEditHoverRating(0);
-    setEditGame(
-      review.game === 'valorant' ? 'Valorant' :
-      review.game === 'apex' ? 'Apex Legends' : 'Autre'
-    );
 
-    setEditRank('');
-    setEditRankFrom('');
-    setEditRankTo('');
-    setEditCustomRank('');
+    const gameMapped = review.game === 'valorant' ? 'Valorant' : review.game === 'apex' ? 'Apex Legends' : 'Autre';
+    setEditGame(gameMapped);
 
-    if (review.game === 'aim' || review.game === 'Autre') {
-      setEditCustomRank(review.rank);
-      setEditRankType('rank');
-    } else if (review.rank.includes('→')) {
+    if (review.rank.includes('→')) {
       const parts = review.rank.split('→').map((s) => s.trim());
+      setEditRankType('progression');
       setEditRankFrom(parts[0] || '');
       setEditRankTo(parts[1] || '');
-      setEditRankType('progression');
-    } else {
-      setEditRank(review.rank);
+      setEditRank('');
+      setEditCustomRank('');
+    } else if (gameMapped === 'Autre') {
       setEditRankType('rank');
+      setEditCustomRank(review.rank);
+      setEditRank('');
+    } else {
+      setEditRankType('rank');
+      setEditRank(review.rank);
+      setEditCustomRank('');
     }
-
-    if (editScrollTimeoutRef.current) {
-      clearTimeout(editScrollTimeoutRef.current);
-    }
-    editScrollTimeoutRef.current = setTimeout(() => {
-      const el = document.getElementById(`review-${review.id}`);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      editScrollTimeoutRef.current = null;
-    }, 100);
   };
 
   const handleCancelEdit = () => {
     setEditingId(null);
     setEditText('');
     setEditRating(5);
-    setEditHoverRating(0);
-    setEditRank('');
-    setEditGame('Valorant');
-    setEditRankType('rank');
-    setEditRankFrom('');
-    setEditRankTo('');
-    setEditCustomRank('');
   };
 
   const handleSubmitEdit = async (reviewId: string) => {
     const trimmedText = editText.trim();
     if (!trimmedText) {
-      showStatus('error', "Merci d'écrire un message pour ton avis.");
-      return;
-    }
-    if (trimmedText.length > 2000) {
-      showStatus('error', "L'avis ne doit pas dépasser 2000 caractères.");
+      showStatus('error', "Merci d'écrire un message.");
       return;
     }
 
     setIsSubmittingEdit(true);
     try {
       let { data: { session } } = await supabase.auth.getSession();
-
       if (!session?.access_token) {
-        const { data: refreshData, error: refreshErr } = await supabase.auth.refreshSession();
-        if (refreshErr || !refreshData.session) {
-          throw new Error('Session expirée, reconnectez-vous.');
-        }
-        session = refreshData.session;
+        const { data: r } = await supabase.auth.refreshSession();
+        session = r.session;
       }
-      const token = session.access_token;
-      if (!token) throw new Error('Session expirée, reconnectez-vous.');
+      const token = session?.access_token;
+      if (!token) throw new Error('Session expirée.');
 
-      const gameNormalized =
-        editGame === 'Valorant' ? 'valorant' :
-        editGame === 'Apex Legends' ? 'apex' : 'aim';
+      const gameNormalized = editGame === 'Valorant' ? 'valorant' : editGame === 'Apex Legends' ? 'apex' : 'aim';
 
       let finalRank = 'Membre Poulpy';
       if (editGame === 'Autre') {
@@ -457,16 +423,11 @@ export default function Avis() {
     setIsSubmittingResponse(true);
     try {
       let { data: { session } } = await supabase.auth.getSession();
-
       if (!session?.access_token) {
-        const { data: refreshData, error: refreshErr } = await supabase.auth.refreshSession();
-        if (refreshErr || !refreshData.session) {
-          throw new Error('Session expirée, reconnectez-vous.');
-        }
-        session = refreshData.session;
+        const { data: r } = await supabase.auth.refreshSession();
+        session = r.session;
       }
-
-      const token = session.access_token;
+      const token = session?.access_token;
       if (!token) throw new Error('Session expirée, reconnectez-vous.');
 
       const res = await fetch('/api/reviews/respond', {
@@ -552,44 +513,42 @@ export default function Avis() {
       ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
       : '5.0';
 
-  const distinctGames = new Set(reviews.map((r) => r.game)).size;
-
   return (
-    <main className="min-h-screen bg-[#0B0A0D] text-white selection:bg-[#CA1C30] selection:text-black pt-28 pb-20 font-mono relative z-10">
+    <main className="min-h-screen bg-[#0A1C1D] text-[#F5F4F0] selection:bg-[#CA1C30] selection:text-[#0A1C1D] pt-28 pb-24 font-mono relative z-10 overflow-x-hidden">
       <CyberNavbar />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
 
-        {/* Back navigation & Header */}
-        <div className="mb-12">
-          <div className="flex items-center gap-3 mb-4">
+        {/* Header with Navigation & Section Title */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-3">
             <Link
               href="/"
               className="inline-flex items-center gap-2 text-xs font-mono text-[#00B4A0] hover:text-white transition-colors uppercase tracking-wider"
             >
               <ArrowLeft size={14} />
-              <span>RETOUR À L'ACCUEIL</span>
+              <span>RETOUR À L&apos;ACCUEIL</span>
             </Link>
             <span className="text-white/20">/</span>
-            <span className="data-badge data-badge-acid">REGISTRE DE RETOURS</span>
+            <span className="text-xs text-[#F5F4F0]/40 uppercase tracking-wider">REGISTRE DES AVIS</span>
           </div>
 
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-white/10">
-            <div>
-              <h1 className="text-4xl sm:text-6xl font-display uppercase tracking-wider text-white">
-                ILS ONT JOUÉ. <span className="text-[#CA1C30]">ILS ONT PROGRESSÉ.</span>
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-8 border-b border-white/10">
+            <div className="space-y-2">
+              <h1 className="text-4xl sm:text-6xl font-display uppercase tracking-wider text-[#F5F4F0]">
+                RÉSULTATS DES <span className="text-[#00B4A0]">ÉLÈVES</span>
               </h1>
-              <p className="text-xs sm:text-sm text-white/60 max-w-2xl mt-2 tracking-wide">
-                Retours vérifiés et statistiques de progression des élèves coachés par Poulpy.
+              <p className="text-xs sm:text-sm text-[#F5F4F0]/60 max-w-2xl leading-relaxed font-sans">
+                Retours d&apos;expérience vérifiés et progression de rang après accompagnement par Coach Poulpy.
               </p>
             </div>
 
-            {/* Action CTA */}
+            {/* Action CTA Button */}
             <div>
               {user ? (
                 <button
                   onClick={() => setIsFormOpen(!isFormOpen)}
-                  className="btn-cyber-primary text-xs cursor-pointer"
+                  className="btn-cyber-primary text-xs py-3 px-6 cursor-pointer inline-flex items-center gap-2 shadow-[0_0_20px_rgba(202,28,48,0.25)]"
                 >
                   <MessageSquarePlus size={16} />
                   <span>{isFormOpen ? 'FERMER LE FORMULAIRE' : 'RÉDIGER UN AVIS'}</span>
@@ -597,43 +556,43 @@ export default function Avis() {
               ) : (
                 <button
                   onClick={() => setAuthModalOpen(true)}
-                  className="btn-cyber-primary text-xs cursor-pointer"
+                  className="btn-cyber-primary text-xs py-3 px-6 cursor-pointer inline-flex items-center gap-2 shadow-[0_0_20px_rgba(202,28,48,0.25)]"
                 >
                   <UserIcon size={16} />
-                  <span>SE CONNECTER POUR LAISSER UN AVIS</span>
+                  <span>SE CONNECTER POUR DÉPOSER UN AVIS</span>
                 </button>
               )}
             </div>
           </div>
         </div>
 
-        {/* Status toast */}
+        {/* Status Toast */}
         {statusMsg && (
           <div
-            className={`max-w-2xl mx-auto mb-8 p-3 text-xs font-mono flex items-center gap-2 border ${
+            className={`max-w-2xl mx-auto p-4 text-xs font-mono flex items-center gap-3 rounded-2xl border ${
               statusMsg.type === 'success'
-                ? 'bg-[#F5F4F0]/10 border-[#F5F4F0]/40 text-[#F5F4F0]'
+                ? 'bg-[#00B4A0]/10 border-[#00B4A0]/40 text-[#00B4A0]'
                 : 'bg-[#CA1C30]/10 border-[#CA1C30]/40 text-[#CA1C30]'
             }`}
           >
             {statusMsg.type === 'success' ? <Check size={16} /> : <X size={16} />}
-            <span>{statusMsg.text}</span>
+            <span className="font-bold">{statusMsg.text}</span>
           </div>
         )}
 
         {/* Admin Moderation Notice */}
         {user?.isAdmin && (
-          <div className="max-w-7xl mx-auto mb-8 p-3 bg-[#CA1C30]/10 border border-[#CA1C30]/30 text-white text-xs flex items-center justify-between gap-4 font-mono">
-            <div className="flex items-center gap-2">
+          <div className="p-4 bg-[#CA1C30]/10 border border-[#CA1C30]/30 rounded-2xl text-white text-xs flex items-center justify-between gap-4 font-mono">
+            <div className="flex items-center gap-2.5">
               <Shield size={16} className="text-[#CA1C30] flex-shrink-0" />
               <span>
-                <strong className="text-[#CA1C30]">MODE MODÉRATION ADMIN ACTIF :</strong> Vous pouvez éditer ou supprimer n&apos;importe quel avis et publier des réponses officielles.
+                <strong className="text-[#CA1C30]">MODE MODÉRATION ADMIN ACTIF :</strong> Vous pouvez épingler les avis sur l&apos;accueil, éditer, supprimer ou publier une réponse officielle.
               </span>
             </div>
           </div>
         )}
 
-        {/* Add Review Form */}
+        {/* Add Review Form (With fully rounded corners and seamless bottom) */}
         <AnimatePresence>
           {isFormOpen && user && (
             <motion.div
@@ -641,37 +600,35 @@ export default function Avis() {
               animate={{ opacity: 1, height: 'auto', y: 0 }}
               exit={{ opacity: 0, height: 0, y: -20 }}
               transition={{ duration: 0.35 }}
-              className="overflow-hidden max-w-3xl mx-auto mb-16"
+              className="max-w-3xl mx-auto rounded-3xl overflow-hidden"
             >
-              <form onSubmit={handleSubmitReview} className="reticle-box p-6 sm:p-8 bg-[#121117] border border-[#CA1C30]/40">
-                <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-6">
+              <form onSubmit={handleSubmitReview} className="p-8 sm:p-10 bg-[#121417]/95 backdrop-blur-xl rounded-3xl space-y-6 shadow-[0_20px_50px_rgba(0,0,0,0.9)] overflow-hidden">
+                <div className="flex items-center justify-between border-b border-white/10 pb-4">
                   <div className="flex items-center gap-2.5">
-                    <span className="w-2 h-2 bg-[#CA1C30] animate-pulse" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#CA1C30] shadow-[0_0_10px_#CA1C30]" />
                     <h3 className="text-xl font-display uppercase tracking-wider text-white">
-                      RÉDIGER TON RETOUR D'EXPÉRIENCE
+                      RÉDIGER TON RETOUR D&apos;EXPÉRIENCE
                     </h3>
                   </div>
-                  <span className="text-[10px] text-white/40 uppercase">FORMULAIRE ÉLÈVE</span>
+                  <span className="text-[10px] text-[#00B4A0] uppercase font-bold tracking-wider">FORMULAIRE ÉLÈVE</span>
                 </div>
 
                 <div className="space-y-5 text-xs">
-                  {/* Pseudo */}
                   <div>
-                    <label className="block text-[11px] font-bold text-white/70 uppercase tracking-wider mb-2">
+                    <label className="block text-[11px] font-bold text-[#F5F4F0]/70 uppercase tracking-wider mb-2">
                       PSEUDO AFFICHÉ
                     </label>
                     <input
                       type="text"
                       value={user.username}
                       disabled
-                      className="w-full px-4 py-2.5 bg-black/60 border border-white/10 text-white/40 cursor-not-allowed text-xs font-mono"
+                      className="w-full px-4 py-3 bg-[#1A1822] rounded-xl text-white/40 cursor-not-allowed text-xs font-mono border border-white/5"
                     />
                   </div>
 
                   <div className="grid sm:grid-cols-2 gap-4">
-                    {/* Game selection */}
                     <div className="space-y-2">
-                      <label className="block text-[11px] font-bold text-white/70 uppercase tracking-wider">
+                      <label className="block text-[11px] font-bold text-[#F5F4F0]/70 uppercase tracking-wider">
                         DISCIPLINE / JEU
                       </label>
                       <Select
@@ -684,24 +641,23 @@ export default function Avis() {
                           setCustomRank('');
                         }}
                         options={GAME_OPTIONS.map((g) => ({ value: g, label: g }))}
-                        accent="purple"
+                        accent="red"
                       />
                     </div>
 
-                    {/* Rank Type Selector */}
                     {game !== 'Autre' && (
                       <div>
-                        <label className="block text-[11px] font-bold text-white/70 uppercase tracking-wider mb-2">
-                          TYPE D'INDICATION
+                        <label className="block text-[11px] font-bold text-[#F5F4F0]/70 uppercase tracking-wider mb-2">
+                          TYPE D&apos;INDICATION
                         </label>
                         <div className="flex gap-2">
                           <button
                             type="button"
                             onClick={() => setRankType('rank')}
-                            className={`flex-1 px-3 py-2 text-xs font-bold uppercase transition-all cursor-pointer ${
+                            className={`flex-1 px-3 py-2.5 text-xs font-bold uppercase transition-all cursor-pointer rounded-xl ${
                               rankType === 'rank'
-                                ? 'bg-[#CA1C30] text-black'
-                                : 'bg-black/60 text-white/60 hover:text-white border border-white/10'
+                                ? 'bg-[#CA1C30] text-black shadow-[0_0_10px_rgba(202,28,48,0.4)]'
+                                : 'bg-[#1A1822] text-[#F5F4F0]/60 hover:text-white border border-white/5'
                             }`}
                           >
                             Rang Actuel
@@ -709,10 +665,10 @@ export default function Avis() {
                           <button
                             type="button"
                             onClick={() => setRankType('progression')}
-                            className={`flex-1 px-3 py-2 text-xs font-bold uppercase transition-all cursor-pointer ${
+                            className={`flex-1 px-3 py-2.5 text-xs font-bold uppercase transition-all cursor-pointer rounded-xl ${
                               rankType === 'progression'
-                                ? 'bg-[#CA1C30] text-black'
-                                : 'bg-black/60 text-white/60 hover:text-white border border-white/10'
+                                ? 'bg-[#CA1C30] text-black shadow-[0_0_10px_rgba(202,28,48,0.4)]'
+                                : 'bg-[#1A1822] text-[#F5F4F0]/60 hover:text-white border border-white/5'
                             }`}
                           >
                             Progression
@@ -722,10 +678,9 @@ export default function Avis() {
                     )}
                   </div>
 
-                  {/* Custom rank input */}
                   {game === 'Autre' && (
                     <div>
-                      <label className="block text-[11px] font-bold text-white/70 uppercase tracking-wider mb-2">
+                      <label className="block text-[11px] font-bold text-[#F5F4F0]/70 uppercase tracking-wider mb-2">
                         RANG / NIVEAU ATTEINT
                       </label>
                       <input
@@ -733,15 +688,14 @@ export default function Avis() {
                         placeholder="Ex: Top 500 Aimlab / Master 1200 LP"
                         value={customRank}
                         onChange={(e) => setCustomRank(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-black/60 border border-white/15 text-white placeholder-white/30 focus:outline-none focus:border-[#CA1C30]"
+                        className="w-full px-4 py-3 bg-[#1A1822] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#CA1C30]"
                       />
                     </div>
                   )}
 
-                  {/* Rank Input - Single field */}
                   {game !== 'Autre' && rankType === 'rank' && (
                     <div className="space-y-2">
-                      <label className="block text-[11px] font-bold text-white/70 uppercase tracking-wider">
+                      <label className="block text-[11px] font-bold text-[#F5F4F0]/70 uppercase tracking-wider">
                         RANG ACTUEL
                       </label>
                       <Select
@@ -759,11 +713,10 @@ export default function Avis() {
                     </div>
                   )}
 
-                  {/* Progression Inputs */}
                   {game !== 'Autre' && rankType === 'progression' && (
                     <div className="grid sm:grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="block text-[11px] font-bold text-white/70 uppercase tracking-wider">
+                        <label className="block text-[11px] font-bold text-[#F5F4F0]/70 uppercase tracking-wider">
                           RANG INITIAL (DÉPART)
                         </label>
                         <Select
@@ -780,7 +733,7 @@ export default function Avis() {
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="block text-[11px] font-bold text-white/70 uppercase tracking-wider">
+                        <label className="block text-[11px] font-bold text-[#F5F4F0]/70 uppercase tracking-wider">
                           RANG ATTEINT (ARRIVÉE)
                         </label>
                         <Select
@@ -799,9 +752,8 @@ export default function Avis() {
                     </div>
                   )}
 
-                  {/* Rating with clickable stars */}
                   <div>
-                    <label className="block text-[11px] font-bold text-white/70 uppercase tracking-wider mb-2">
+                    <label className="block text-[11px] font-bold text-[#F5F4F0]/70 uppercase tracking-wider mb-2">
                       NOTE GLOBALE ({rating}/5 ÉTOILES)
                     </label>
                     <div className="flex items-center gap-2">
@@ -818,7 +770,7 @@ export default function Avis() {
                             size={24}
                             className={`${
                               (hoverRating || rating) >= star
-                                ? 'fill-[#CA1C30] text-[#CA1C30]'
+                                ? 'fill-[#00B4A0] text-[#00B4A0]'
                                 : 'text-white/20'
                             } transition-colors`}
                           />
@@ -827,10 +779,9 @@ export default function Avis() {
                     </div>
                   </div>
 
-                  {/* Comment Textarea */}
                   <div className="space-y-2">
-                    <label className="block text-[11px] font-bold text-white/70 uppercase tracking-wider">
-                      DÉBRIEF DU COACHING & RÉSULTATS
+                    <label className="block text-[11px] font-bold text-[#F5F4F0]/70 uppercase tracking-wider">
+                      DÉBRIEF DU COACHING &amp; RÉSULTATS
                     </label>
                     <textarea
                       rows={4}
@@ -839,7 +790,7 @@ export default function Avis() {
                       value={text}
                       onChange={(e) => setText(e.target.value)}
                       maxLength={2000}
-                      className="w-full px-4 py-3 bg-black/60 border border-white/15 text-white placeholder-white/30 focus:outline-none focus:border-[#CA1C30] resize-none font-mono"
+                      className="w-full px-4 py-3 bg-[#1A1822] border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#CA1C30] resize-none font-sans"
                     />
                     <div className="flex items-center justify-between text-[10px] text-white/40">
                       <span>TEXTE BRUT</span>
@@ -847,12 +798,12 @@ export default function Avis() {
                     </div>
                   </div>
 
-                  {/* Submit buttons */}
+                  {/* Submit buttons area fully rounded */}
                   <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
                     <button
                       type="button"
                       onClick={() => setIsFormOpen(false)}
-                      className="btn-cyber-ghost text-xs py-2 px-4"
+                      className="btn-cyber-ghost text-xs py-2.5 px-5"
                     >
                       <X size={14} />
                       <span>ANNULER</span>
@@ -860,7 +811,7 @@ export default function Avis() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="btn-cyber-primary text-xs py-2 px-5 disabled:opacity-50"
+                      className="btn-cyber-primary text-xs py-2.5 px-6 disabled:opacity-50"
                     >
                       {isSubmitting ? (
                         <>
@@ -881,112 +832,94 @@ export default function Avis() {
           )}
         </AnimatePresence>
 
-        {/* Sort Controls */}
+        {/* Clean Sort Controls (Épuré, sans conteneur lourd ni boutons de jeux) */}
         {!isLoading && reviews.length > 0 && (
-          <div className="mb-8 flex flex-wrap items-center justify-between gap-4 py-3 px-4 bg-[#121117] border border-white/10 text-xs font-mono">
-            <div className="flex items-center gap-3">
-              <span className="text-white/40 uppercase tracking-wider">TRIER PAR :</span>
-              <div className="flex gap-1.5">
-                <button
-                  onClick={() => setSortBy('date')}
-                  className={`px-3 py-1 text-xs font-bold uppercase transition-all cursor-pointer ${
-                    sortBy === 'date'
-                      ? 'bg-[#CA1C30] text-black'
-                      : 'bg-black/60 text-white/60 hover:text-white border border-white/10'
-                  }`}
-                >
-                  Date
-                </button>
-                <button
-                  onClick={() => setSortBy('name')}
-                  className={`px-3 py-1 text-xs font-bold uppercase transition-all cursor-pointer ${
-                    sortBy === 'name'
-                      ? 'bg-[#CA1C30] text-black'
-                      : 'bg-black/60 text-white/60 hover:text-white border border-white/10'
-                  }`}
-                >
-                  Nom
-                </button>
-                <button
-                  onClick={() => setSortBy('rating')}
-                  className={`px-3 py-1 text-xs font-bold uppercase transition-all cursor-pointer ${
-                    sortBy === 'rating'
-                      ? 'bg-[#CA1C30] text-black'
-                      : 'bg-black/60 text-white/60 hover:text-white border border-white/10'
-                  }`}
-                >
-                  Note
-                </button>
-              </div>
+          <div className="flex items-center justify-end gap-3 text-xs pt-2">
+            <span className="text-[#F5F4F0]/40 uppercase text-[11px] font-bold tracking-wider">TRIER PAR :</span>
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setSortBy('date')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  sortBy === 'date'
+                    ? 'bg-[#CA1C30] text-black shadow-[0_0_10px_rgba(202,28,48,0.4)]'
+                    : 'bg-[#121417] text-white/50 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                Date
+              </button>
+              <button
+                onClick={() => setSortBy('rating')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                  sortBy === 'rating'
+                    ? 'bg-[#CA1C30] text-black shadow-[0_0_10px_rgba(202,28,48,0.4)]'
+                    : 'bg-[#121417] text-white/50 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                Note
+              </button>
+              <button
+                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                className="px-3 py-1.5 bg-[#121417] text-xs text-[#00B4A0] hover:text-[#CA1C30] font-bold rounded-xl cursor-pointer hover:bg-white/10 transition-colors ml-1"
+              >
+                {sortOrder === 'asc' ? '↑ CROISSANT' : '↓ DÉCROISSANT'}
+              </button>
             </div>
-
-            <button
-              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="px-3 py-1 bg-black/60 border border-white/10 text-white/70 hover:text-white text-xs font-mono transition-all cursor-pointer flex items-center gap-1.5"
-            >
-              <span>ORDRE :</span>
-              <span className="text-[#CA1C30] font-bold">{sortOrder === 'asc' ? '↑ CROISSANT' : '↓ DÉCROISSANT'}</span>
-            </button>
           </div>
         )}
 
-        {/* Testimonials Grid */}
+        {/* Testimonials Grid (Sans pastilles rouges à côté des jeux) */}
         {isLoading ? (
           <div className="py-24 text-center">
             <div className="w-8 h-8 border-2 border-[#CA1C30] border-t-transparent animate-spin mx-auto mb-4" />
-            <p className="text-xs text-white/50 tracking-wider">CHARGEMENT DE LA BASE D'AVIS...</p>
+            <p className="text-xs text-white/50 tracking-wider">CHARGEMENT DES AVIS ÉLÈVES...</p>
           </div>
         ) : (
-          <div className="grid sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {reviews.map((testimonial) => (
               <article
                 id={`review-${testimonial.id}`}
                 key={testimonial.id}
-                className="reticle-box bg-[#121117] border border-white/10 hover:border-[#CA1C30]/40 p-6 flex flex-col justify-between transition-colors relative"
+                className="p-7 sm:p-8 bg-[#121417]/95 backdrop-blur-xl rounded-3xl flex flex-col justify-between space-y-6 shadow-[0_15px_40px_rgba(0,0,0,0.7)] select-none group"
               >
-                <div>
-                  {/* Top: Stars + Owner/Admin Actions */}
-                  <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/5">
+                <div className="space-y-5">
+                  
+                  {/* Top Header inside Card (Clean, Sans pastille rouge à côté du nom de jeu) */}
+                  <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                    <span className="text-[11px] font-mono tracking-wider text-[#F5F4F0]/60 uppercase font-bold">
+                      {formatGameName(testimonial.game)}
+                    </span>
+
                     <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-1">
+                      <div className="flex items-center gap-0.5 text-[#00B4A0]">
                         {[...Array(testimonial.rating)].map((_, i) => (
-                          <Star key={i} size={15} className="fill-[#CA1C30] text-[#CA1C30]" />
+                          <Star key={i} size={14} className="fill-current" />
                         ))}
                       </div>
-                      {testimonial.featured && (
-                        <span className="data-badge data-badge-acid text-[9px]">
-                          ★ SUR L&apos;ACCUEIL
-                        </span>
-                      )}
-                    </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center gap-1.5">
-                      {/* Admin Toggle Featured Button */}
-                      {user?.isAdmin && (
-                        <button
-                          onClick={() => handleToggleFeatured(testimonial.id, !testimonial.featured)}
-                          disabled={togglingFeaturedId === testimonial.id}
-                          title={testimonial.featured ? "Retirer de la page d'accueil" : "Afficher sur la page d'accueil (défilement en direct)"}
-                          className={`px-2 py-0.5 text-[10px] font-bold font-mono border transition-all cursor-pointer ${
-                            testimonial.featured
-                              ? "bg-[#CA1C30] text-black border-[#CA1C30] shadow-[0_0_10px_rgba(202, 28, 48,0.4)]"
-                              : "bg-black/80 text-white/60 hover:text-white border-white/20 hover:border-[#CA1C30]/60 hover:bg-[#CA1C30]/10"
-                          }`}
-                        >
-                          <span>{testimonial.featured ? "★ SUR L'ACCUEIL" : "+ ACCUEIL"}</span>
-                        </button>
-                      )}
-
+                      {/* Admin/Owner Actions */}
                       {user && (user.id === testimonial.user_id || user.isAdmin) && (
-                        <>
+                        <div className="flex items-center gap-1 ml-2">
+                          {user.isAdmin && (
+                            <button
+                              onClick={() => handleToggleFeatured(testimonial.id, !testimonial.featured)}
+                              disabled={togglingFeaturedId === testimonial.id}
+                              title={testimonial.featured ? "Retirer de l'accueil" : "Mettre à l'accueil"}
+                              className={`px-2 py-0.5 text-[9px] font-bold rounded-md transition-all cursor-pointer ${
+                                testimonial.featured
+                                  ? 'bg-[#CA1C30] text-black shadow-[0_0_8px_rgba(202,28,48,0.5)]'
+                                  : 'bg-[#1A1822] text-white/50 hover:text-white'
+                              }`}
+                            >
+                              ★
+                            </button>
+                          )}
+
                           {editingId !== testimonial.id && canEdit(testimonial) && (
                             <button
                               onClick={() => handleStartEdit(testimonial)}
-                              title={user.isAdmin && testimonial.user_id !== user.id ? 'Modifier (Admin)' : 'Modifier (5 min)'}
                               className="p-1 text-white/40 hover:text-[#00B4A0] transition-colors cursor-pointer"
                             >
-                              <Edit3 size={14} />
+                              <Edit3 size={13} />
                             </button>
                           )}
 
@@ -994,13 +927,13 @@ export default function Avis() {
                             <div className="flex items-center gap-1">
                               <button
                                 onClick={() => handleDeleteReview(testimonial.id)}
-                                className="px-2 py-0.5 text-[10px] bg-red-500/20 text-red-400 border border-red-500/40 hover:bg-red-500/40 font-bold"
+                                className="px-1.5 py-0.5 text-[9px] bg-red-500/20 text-red-400 font-bold rounded"
                               >
-                                SUPPRIMER
+                                SUPPR
                               </button>
                               <button
                                 onClick={() => setConfirmDeleteId(null)}
-                                className="px-1.5 py-0.5 text-[10px] bg-white/5 text-white/50 hover:text-white"
+                                className="px-1 text-[9px] text-white/50"
                               >
                                 ✕
                               </button>
@@ -1008,130 +941,67 @@ export default function Avis() {
                           ) : (
                             <button
                               onClick={() => setConfirmDeleteId(testimonial.id)}
-                              title={user.isAdmin && testimonial.user_id !== user.id ? 'Supprimer (Admin)' : 'Supprimer votre avis'}
                               className="p-1 text-white/40 hover:text-red-400 transition-colors cursor-pointer"
                             >
-                              <Trash2 size={14} />
+                              <Trash2 size={13} />
                             </button>
                           )}
-                        </>
+                        </div>
                       )}
                     </div>
                   </div>
 
-                  {/* Owner badge + countdown */}
-                  {user && testimonial.user_id === user.id && !user.isAdmin && (
-                    <div className="flex items-center gap-2 mb-3">
-                      <span className="data-badge data-badge-laser text-[9px]">
-                        VOTRE AVIS
-                      </span>
-                      {canEdit(testimonial) && (
-                        <span className="text-[10px] text-[#CA1C30] flex items-center gap-1">
-                          <Clock size={10} />
-                          {formatRemaining(editTimeRemaining(testimonial))}
+                  {/* Student Name & Rank */}
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <h4 className="text-xl font-display font-bold text-[#F5F4F0] tracking-wider">{testimonial.name}</h4>
+                      {testimonial.featured && (
+                        <span className="px-2 py-0.5 bg-[#CA1C30]/15 text-[#CA1C30] border border-[#CA1C30]/30 rounded-md text-[9px] font-bold">
+                          ACCUEIL
                         </span>
                       )}
-                      {testimonial.updated_at && testimonial.updated_at !== testimonial.created_at && (
-                        <span className="text-[9px] text-white/30 italic">modifié</span>
-                      )}
                     </div>
-                  )}
+                    {testimonial.rank && (
+                      <p className="text-xs font-mono font-bold text-[#00B4A0]">
+                        {formatRank(testimonial.rank)}
+                      </p>
+                    )}
+                  </div>
 
-                  {/* Quote */}
-                  <blockquote className="text-xs text-white/80 leading-relaxed tracking-wide mb-6">
+                  {/* Testimonial Quote */}
+                  <p className="text-sm text-[#F5F4F0]/85 leading-relaxed font-sans italic whitespace-pre-wrap">
                     &ldquo;{testimonial.text}&rdquo;
-                  </blockquote>
+                  </p>
                 </div>
 
-                {/* Author Info */}
-                <div>
-                  <div className="pt-4 border-t border-white/10 flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2.5">
-                      {testimonial.user_id && userAvatars[testimonial.user_id] ? (
-                        <div className="w-8 h-8 overflow-hidden border border-[#CA1C30]/40">
-                          <img
-                            src={userAvatars[testimonial.user_id]}
-                            alt={testimonial.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      ) : (
-                        <div className="w-8 h-8 bg-[#CA1C30]/15 border border-[#CA1C30]/40 flex items-center justify-center text-[#CA1C30] font-bold text-xs font-mono">
-                          {testimonial.name.charAt(0).toUpperCase()}
-                        </div>
-                      )}
-                      <div>
-                        <div className="font-bold text-xs text-white tracking-wider">{testimonial.name}</div>
-                        <div className="text-[10px] text-[#00B4A0] uppercase">{formatGameName(testimonial.game)}</div>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col items-end gap-1">
-                      <div className="text-[10px] px-2 py-0.5 bg-black/60 border border-white/15 text-white/70 font-mono">
-                        {testimonial.rank}
-                      </div>
-                      <div className="text-[9px] text-white/40">
-                        {new Date(testimonial.created_at).toLocaleDateString('fr-FR', {
-                          day: 'numeric',
-                          month: 'short',
-                          year: 'numeric'
-                        })}
-                      </div>
-                    </div>
+                {/* Footer Section: Date & Coach debrief */}
+                <div className="space-y-3 pt-4">
+                  <div className="text-[10px] text-[#F5F4F0]/30 font-mono">
+                    Publié le {new Date(testimonial.created_at).toLocaleDateString('fr-FR', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric'
+                    })}
                   </div>
 
-                  {/* Admin Response Section */}
+                  {/* Admin Response */}
                   {testimonial.admin_response ? (
-                    <div className="mt-4 pt-3 border-t border-white/10">
-                      <button
-                        onClick={() => setExpandedResponseId(
-                          expandedResponseId === testimonial.id ? null : testimonial.id
-                        )}
-                        className="w-full flex items-center justify-between gap-2 px-3 py-2 bg-black/60 border border-[#00B4A0]/40 text-[#00B4A0] hover:bg-[#00B4A0]/10 text-xs font-mono transition-all cursor-pointer"
-                      >
-                        <span className="flex items-center gap-1.5">
-                          <Shield size={13} className="text-[#00B4A0]" />
-                          <span className="uppercase text-[10px] tracking-wider font-bold">RÉPONSE DU COACH POULPY</span>
-                        </span>
-                        <ChevronDown
-                          size={14}
-                          className={`transition-transform duration-200 ${expandedResponseId === testimonial.id ? 'rotate-180 text-[#00B4A0]' : ''}`}
-                        />
-                      </button>
-
-                      <AnimatePresence initial={false}>
-                        {expandedResponseId === testimonial.id && (
-                          <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            exit={{ opacity: 0, height: 0 }}
-                            transition={{ duration: 0.2 }}
-                            className="overflow-hidden"
-                          >
-                            <div className="mt-2 p-3 bg-black/80 border-l-2 border-[#00B4A0] text-xs font-mono">
-                              <p className="text-white/80 leading-relaxed whitespace-pre-wrap text-[11px]">
-                                {testimonial.admin_response}
-                              </p>
-                              {testimonial.admin_response_at && (
-                                <div className="text-[9px] text-white/30 mt-2">
-                                  Publié le {new Date(testimonial.admin_response_at).toLocaleDateString('fr-FR')}
-                                </div>
-                              )}
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
+                    <div className="p-3.5 bg-[#181622] border-l-2 border-[#CA1C30] rounded-r-2xl">
+                      <p className="text-xs text-[#F5F4F0]/90 font-sans italic leading-relaxed">
+                        <strong className="text-[#CA1C30] font-bold not-italic font-mono mr-1.5">Poulpy :</strong>
+                        &ldquo;{testimonial.admin_response}&rdquo;
+                      </p>
                     </div>
                   ) : user?.isAdmin && (
-                    <div className="mt-4 pt-3 border-t border-white/10">
+                    <div>
                       {respondingToId === testimonial.id ? (
-                        <div className="p-3 bg-black/80 border border-white/15">
+                        <div className="p-3 bg-[#181622] rounded-xl space-y-2">
                           <textarea
-                            rows={3}
-                            placeholder="Rédiger votre réponse officielle..."
+                            rows={2}
+                            placeholder="Rédiger la réponse officielle..."
                             value={responseText}
                             onChange={(e) => setResponseText(e.target.value)}
-                            className="w-full p-2 bg-black border border-white/15 text-white placeholder-white/30 text-xs focus:outline-none focus:border-[#CA1C30] mb-2 font-mono"
+                            className="w-full p-2 bg-black/60 rounded-lg text-xs text-white focus:outline-none focus:border-[#CA1C30] font-sans"
                           />
                           <div className="flex items-center justify-end gap-2">
                             <button
@@ -1139,7 +1009,7 @@ export default function Avis() {
                                 setRespondingToId(null);
                                 setResponseText('');
                               }}
-                              className="px-2.5 py-1 bg-white/5 hover:bg-white/10 text-white/60 text-xs"
+                              className="px-2 py-1 text-xs text-white/50"
                             >
                               Annuler
                             </button>
@@ -1148,17 +1018,16 @@ export default function Avis() {
                               disabled={isSubmittingResponse}
                               className="btn-cyber-primary text-xs py-1 px-3"
                             >
-                              {isSubmittingResponse ? 'Envoi...' : 'Publier'}
+                              Publier
                             </button>
                           </div>
                         </div>
                       ) : (
                         <button
                           onClick={() => setRespondingToId(testimonial.id)}
-                          className="w-full flex items-center justify-center gap-1.5 py-1.5 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white text-[10px] uppercase font-mono tracking-wider transition-colors cursor-pointer border border-white/10"
+                          className="text-[10px] text-[#00B4A0] hover:text-white uppercase font-bold tracking-wider cursor-pointer"
                         >
-                          <MessageSquare size={13} />
-                          <span>Répondre à cet avis (Admin)</span>
+                          + Répondre à cet avis (Admin)
                         </button>
                       )}
                     </div>
@@ -1166,66 +1035,50 @@ export default function Avis() {
 
                   {/* Inline Edit Form */}
                   {editingId === testimonial.id && (
-                    <div className="mt-4 p-4 bg-black/90 border border-[#CA1C30]/40">
-                      <div className="flex items-center justify-between mb-3 pb-2 border-b border-white/10">
-                        <span className="text-[10px] text-[#CA1C30] font-bold uppercase tracking-wider">
-                          MODIFICATION DE L'AVIS
-                        </span>
-                        <span className="text-[9px] text-white/40">
-                          {formatRemaining(editTimeRemaining(testimonial))} restants
-                        </span>
+                    <div className="p-4 bg-black/90 border border-[#CA1C30]/40 rounded-2xl space-y-3">
+                      <div className="flex items-center justify-between text-[10px] text-[#CA1C30] font-bold uppercase">
+                        <span>Modification</span>
+                        <span>{formatRemaining(editTimeRemaining(testimonial))} restants</span>
                       </div>
-
-                      <div className="space-y-3 text-xs">
-                        <textarea
-                          rows={3}
-                          value={editText}
-                          onChange={(e) => setEditText(e.target.value)}
-                          maxLength={2000}
-                          className="w-full p-2 bg-black border border-white/15 text-white placeholder-white/30 text-xs focus:outline-none focus:border-[#CA1C30] resize-none font-mono"
-                        />
-
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <button
-                                key={star}
-                                type="button"
-                                onClick={() => setEditRating(star)}
-                                onMouseEnter={() => setEditHoverRating(star)}
-                                onMouseLeave={() => setEditHoverRating(0)}
-                                className="p-0.5 cursor-pointer"
-                              >
-                                <Star
-                                  size={16}
-                                  className={`${
-                                    (editHoverRating || editRating) >= star
-                                      ? 'fill-[#CA1C30] text-[#CA1C30]'
-                                      : 'text-white/20'
-                                  }`}
-                                />
-                              </button>
-                            ))}
-                          </div>
-
-                          <div className="flex items-center gap-2">
+                      <textarea
+                        rows={3}
+                        value={editText}
+                        onChange={(e) => setEditText(e.target.value)}
+                        maxLength={2000}
+                        className="w-full p-2 bg-[#1A1822] rounded-lg text-xs text-white focus:outline-none focus:border-[#CA1C30] font-sans"
+                      />
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
                             <button
+                              key={star}
                               type="button"
-                              onClick={handleCancelEdit}
-                              disabled={isSubmittingEdit}
-                              className="px-2.5 py-1 bg-white/5 hover:bg-white/10 text-white/60 text-xs"
+                              onClick={() => setEditRating(star)}
+                              className="p-0.5 cursor-pointer text-[#00B4A0]"
                             >
-                              Annuler
+                              <Star
+                                size={14}
+                                className={editRating >= star ? 'fill-current' : 'text-white/20'}
+                              />
                             </button>
-                            <button
-                              type="button"
-                              onClick={() => handleSubmitEdit(testimonial.id)}
-                              disabled={isSubmittingEdit || !editText.trim()}
-                              className="btn-cyber-primary text-xs py-1 px-3"
-                            >
-                              {isSubmittingEdit ? 'Enregistrement...' : 'Sauvegarder'}
-                            </button>
-                          </div>
+                          ))}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={handleCancelEdit}
+                            className="px-2.5 py-1 text-xs text-white/50"
+                          >
+                            Annuler
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleSubmitEdit(testimonial.id)}
+                            disabled={isSubmittingEdit || !editText.trim()}
+                            className="btn-cyber-primary text-xs py-1 px-3"
+                          >
+                            Enregistrer
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -1236,47 +1089,20 @@ export default function Avis() {
           </div>
         )}
 
-        {/* Stats Summary */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16 max-w-5xl mx-auto">
-          <div className="reticle-box p-5 bg-[#121117] border border-white/10 text-center">
-            <div className="text-3xl sm:text-4xl font-display text-[#CA1C30] tracking-wider">
-              {reviews.length}+
-            </div>
-            <div className="text-[10px] text-white/50 uppercase tracking-widest mt-1">Avis Vérifiés</div>
-          </div>
-          <div className="reticle-box p-5 bg-[#121117] border border-white/10 text-center">
-            <div className="text-3xl sm:text-4xl font-display text-[#00B4A0] tracking-wider">
-              {avgRating}/5
-            </div>
-            <div className="text-[10px] text-white/50 uppercase tracking-widest mt-1">Note Moyenne</div>
-          </div>
-          <div className="reticle-box p-5 bg-[#121117] border border-white/10 text-center">
-            <div className="text-3xl sm:text-4xl font-display text-[#F5F4F0] tracking-wider">
-              100%
-            </div>
-            <div className="text-[10px] text-white/50 uppercase tracking-widest mt-1">Satisfaction</div>
-          </div>
-          <div className="reticle-box p-5 bg-[#121117] border border-white/10 text-center">
-            <div className="text-3xl sm:text-4xl font-display text-white tracking-wider">
-              {distinctGames}
-            </div>
-            <div className="text-[10px] text-white/50 uppercase tracking-widest mt-1">Disciplines</div>
-          </div>
-        </div>
-
-        {/* Back to home / CTA */}
-        <div className="text-center pt-8 border-t border-white/10">
+        {/* Bottom CTA to return to Home or Book */}
+        <div className="text-center pt-8 border-t border-white/10 space-y-4">
           <Link
             href="/"
-            className="btn-cyber-ghost text-xs"
+            className="btn-cyber-primary px-8 py-3.5 text-xs font-bold font-mono tracking-wider cursor-pointer inline-flex items-center gap-2"
           >
-            <ArrowRight size={16} className="-rotate-90" />
-            <span>RETOUR À L'ACCUEIL POULPY</span>
+            <span>RETOUR À L&apos;ACCUEIL &amp; RÉSERVER UN COACHING</span>
+            <ArrowRight size={14} className="text-black" />
           </Link>
-          <p className="text-xs text-white/40 mt-3 font-mono">
-            Prêt à faire bondir ton rang ? Réserve ta session d'analyse et de coaching.
+          <p className="text-xs text-[#F5F4F0]/40 font-mono">
+            Analyse chirurgicale, VOD review et progression de rang garantie avec Coach Poulpy.
           </p>
         </div>
+
       </div>
 
       <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />

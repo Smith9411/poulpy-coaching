@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import DecryptedText from "./DecryptedText";
-import { Star, ChevronLeft, ChevronRight, MessageSquare, Loader2 } from "lucide-react";
+import { Star, ChevronLeft, ChevronRight, MessageSquare, Loader2, ArrowRight } from "lucide-react";
 
 interface RealReview {
   id: string;
@@ -60,29 +59,13 @@ export default function CyberTestimonials() {
     setActiveIdx((prev) => (prev - 1 + reviews.length) % reviews.length);
   };
 
-  // Helper to parse rank progression
-  const parseRank = (rankStr?: string) => {
-    if (!rankStr) {
-      return { before: "DÉBUT DE PROTOCOLE", after: "CERTIFIÉ POULPY", gain: "+ RÉSULTAT VALIDÉ" };
-    }
-    if (rankStr.includes("→") || rankStr.includes("->")) {
-      const parts = rankStr.split(/→|->/).map((s) => s.trim());
-      return {
-        before: parts[0] || "INITIAL",
-        after: parts[1] || parts[0],
-        gain: "+ GAIN VALIDÉ",
-      };
-    }
-    return {
-      before: "MEMBRE ATELIER",
-      after: rankStr,
-      gain: "+ PALIER CERTIFIÉ",
-    };
+  // Helper to format rank cleanly
+  const formatRank = (rankStr?: string) => {
+    if (!rankStr) return "";
+    return rankStr.replace(/->/g, "➔").replace(/→/g, "➔");
   };
 
-  const currentParsed = parseRank(current?.rank);
-
-  // Repeat reviews for infinite smooth marquee ticker
+  // Repeat reviews for smooth ticker
   const marqueeItems =
     reviews.length > 0
       ? reviews.length < 5
@@ -91,15 +74,17 @@ export default function CyberTestimonials() {
       : [];
 
   return (
-    <section id="avis" className="py-14 sm:py-16 px-6 sm:px-12 lg:px-16 bg-transparent font-mono">
-      <div className="max-w-7xl mx-auto space-y-8 sm:space-y-10">
+    <section id="avis" className="py-20 sm:py-24 px-6 sm:px-12 lg:px-16 bg-transparent font-mono relative z-10">
+      <div className="max-w-7xl mx-auto space-y-10 sm:space-y-12">
+        
+        {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-8">
           <div className="space-y-2">
             <h2 className="text-4xl sm:text-6xl font-display text-[#F5F4F0] tracking-wider">
               RÉSULTATS DES <span className="text-[#00B4A0]">ÉLÈVES</span>
             </h2>
             <p className="text-xs sm:text-sm text-[#F5F4F0]/60 max-w-xl leading-relaxed">
-              Retours d&apos;expérience vérifiés d&apos;élèves coachés.
+              Retours d&apos;expérience d&apos;élèves coachés.
             </p>
           </div>
 
@@ -108,17 +93,17 @@ export default function CyberTestimonials() {
               <button
                 onClick={prevReview}
                 aria-label="Avis précédent"
-                className="w-10 h-10 border border-white/20 bg-[#121117] rounded-full flex items-center justify-center hover:border-[#00B4A0] hover:text-[#00B4A0] transition-colors cursor-pointer"
+                className="w-11 h-11 border border-white/15 bg-[#121117] rounded-2xl flex items-center justify-center text-white hover:border-[#CA1C30] hover:text-[#CA1C30] transition-colors cursor-pointer"
               >
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <span className="text-xs text-[#F5F4F0]/60 font-bold tracking-widest px-2">
-                {String(activeIdx + 1).padStart(2, "0")} / {String(reviews.length).padStart(2, "0")}
+                <span className="text-[#CA1C30]">{String(activeIdx + 1).padStart(2, "0")}</span> / {String(reviews.length).padStart(2, "0")}
               </span>
               <button
                 onClick={nextReview}
                 aria-label="Avis suivant"
-                className="w-10 h-10 border border-white/20 bg-[#121117] rounded-full flex items-center justify-center hover:border-[#00B4A0] hover:text-[#00B4A0] transition-colors cursor-pointer"
+                className="w-11 h-11 border border-white/15 bg-[#121117] rounded-2xl flex items-center justify-center text-white hover:border-[#CA1C30] hover:text-[#CA1C30] transition-colors cursor-pointer"
               >
                 <ChevronRight className="w-4 h-4" />
               </button>
@@ -126,103 +111,83 @@ export default function CyberTestimonials() {
           )}
         </div>
 
-        {/* Infinite Live Ticker Bar (Never pauses on hover) */}
+        {/* Live Ticker Bar */}
         {marqueeItems.length > 0 && (
           <div className="overflow-hidden border-y border-white/10 py-3.5 bg-[#121117]/80 relative rounded-full">
             <div className="animate-marquee gap-8 text-xs font-mono tracking-wider">
-              {marqueeItems.map((r, i) => {
-                const parsed = parseRank(r.rank);
-                return (
-                  <div key={`${r.id}-${i}`} className="flex items-center gap-3 shrink-0">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#00B4A0] animate-ping" />
-                    <span className="text-[#F5F4F0] font-bold">{r.name}</span>
-                    <span className="text-[#F5F4F0]/40">[{r.game.toUpperCase()}]</span>
-                    <span className="text-[#F5F4F0]/60">{parsed.before}</span>
-                    <span className="text-[#00B4A0]">➔ {parsed.after}</span>
-                    <span className="data-badge data-badge-acid text-[9px] rounded-full">{parsed.gain}</span>
-                    <span className="text-white/20 ml-4">//</span>
-                  </div>
-                );
-              })}
+              {marqueeItems.map((r, i) => (
+                <div key={`${r.id}-${i}`} className="flex items-center gap-3 shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#CA1C30]" />
+                  <span className="text-[#F5F4F0] font-bold">{r.name}</span>
+                  <span className="text-[#F5F4F0]/40">[{r.game.toUpperCase()}]</span>
+                  {r.rank && <span className="text-[#00B4A0]">{formatRank(r.rank)}</span>}
+                  <span className="text-white/20 ml-4">//</span>
+                </div>
+              ))}
             </div>
           </div>
         )}
 
-        {/* Active Testimonial Card */}
+        {/* Clean Vignette (Même DA : un haut avec point rouge, pas de bord extérieur, non cliquable) */}
         {isLoading ? (
           <div className="py-20 text-center text-[#F5F4F0]/40 flex flex-col items-center justify-center gap-3">
             <Loader2 className="w-6 h-6 animate-spin text-[#CA1C30]" />
-            <span className="text-xs">Chargement des avis vérifiés...</span>
+            <span className="text-xs">Chargement des avis...</span>
           </div>
         ) : reviews.length === 0 ? (
-          <div className="py-16 text-center text-[#F5F4F0]/40 space-y-3 bg-[#121117] border border-white/10 rounded-2xl p-8">
+          <div className="py-16 text-center text-[#F5F4F0]/40 space-y-3 bg-[#121417]/95 rounded-3xl p-8">
             <MessageSquare className="w-8 h-8 text-white/20 mx-auto" />
             <p className="text-sm text-[#F5F4F0]/70 font-bold">AUCUN AVIS SÉLECTIONNÉ</p>
-            <p className="text-xs text-[#F5F4F0]/40">
-              Les administrateurs peuvent ajouter des avis à l&apos;accueil depuis la page des avis.
-            </p>
           </div>
         ) : current ? (
-          <div className="relative min-h-[340px]">
+          <div className="relative">
             <div
               key={current.id}
-              className="reticle-box p-8 sm:p-12 bg-[#121117]/95 border border-white/10 rounded-3xl space-y-8 relative overflow-hidden transition-all duration-300 shadow-[0_0_30px_rgba(0,0,0,0.8)]"
+              className="p-8 sm:p-12 bg-[#121417]/95 backdrop-blur-xl rounded-3xl space-y-8 relative overflow-hidden transition-all duration-300 shadow-[0_20px_50px_rgba(0,0,0,0.85)] select-none"
             >
-              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-6 relative z-10">
+              {/* Top Header Row (Épuré comme les autres vignettes : point rouge, label & étoiles) */}
+              <div className="flex items-center justify-between border-b border-white/10 pb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-full bg-[#CA1C30] text-black font-bold flex items-center justify-center text-sm shadow-[0_0_15px_rgba(202, 28, 48,0.35)]">
-                    {current.name.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-[#F5F4F0] tracking-wider">{current.name}</h3>
-                    <span className="text-xs text-[#00B4A0] uppercase font-bold">{current.game}</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1 text-[#00B4A0]">
-                    {[...Array(current.rating || 5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-current" />
-                    ))}
-                  </div>
-                  <span className="data-badge data-badge-acid text-[10px] rounded-full">
-                    {current.game.toUpperCase()}
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#CA1C30] shadow-[0_0_10px_#CA1C30]" />
+                  <span className="text-xs font-mono tracking-widest text-[#F5F4F0]/60 uppercase">
+                    TÉMOIGNAGE ÉLÈVE · {current.game.toUpperCase()}
                   </span>
                 </div>
+                <div className="flex items-center gap-1 text-[#00B4A0]">
+                  {[...Array(current.rating || 5)].map((_, i) => (
+                    <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                  ))}
+                </div>
               </div>
 
-              <p className="text-sm sm:text-lg text-[#F5F4F0]/90 leading-relaxed italic relative z-10 whitespace-pre-wrap">
+              {/* Student Identity */}
+              <div className="space-y-1">
+                <h3 className="text-2xl sm:text-3xl font-display font-bold tracking-tight text-[#F5F4F0]">
+                  {current.name}
+                </h3>
+                {current.rank && (
+                  <p className="text-xs sm:text-sm font-mono font-semibold text-[#00B4A0]">
+                    {formatRank(current.rank)}
+                  </p>
+                )}
+              </div>
+
+              {/* Testimonial Quote */}
+              <p className="text-base sm:text-lg text-[#F5F4F0]/85 max-w-4xl leading-relaxed font-sans italic whitespace-pre-wrap">
                 &ldquo;{current.text}&rdquo;
               </p>
-
-              {/* Progression Badges */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-white/10 relative z-10">
-                <div className="p-3.5 bg-[#1A1822] border border-white/5 rounded-2xl space-y-1">
-                  <span className="text-[10px] text-[#F5F4F0]/50 block">RANG INITIAL</span>
-                  <span className="text-base font-bold text-[#F5F4F0]/60">{currentParsed.before}</span>
-                </div>
-
-                <div className="p-3.5 bg-[#1A1822] border border-white/5 rounded-2xl space-y-1">
-                  <span className="text-[10px] text-[#F5F4F0]/50 block">RANG ATTEINT / ACTUEL</span>
-                  <span className="text-base font-bold text-[#00B4A0]">{currentParsed.after}</span>
-                </div>
-
-                <div className="p-3.5 bg-[#1A1822] border border-white/5 rounded-2xl space-y-1">
-                  <span className="text-[10px] text-[#F5F4F0]/50 block">STATUT DE VALIDATION</span>
-                  <span className="text-base font-bold text-[#CA1C30]">{currentParsed.gain}</span>
-                </div>
-              </div>
             </div>
           </div>
         ) : null}
 
-        {/* Action button to open full /avis page */}
+        {/* Action button */}
         <div className="text-center pt-2">
           <Link
             href="/avis"
-            className="btn-cyber-primary px-8 py-3.5 text-xs font-bold font-mono tracking-wider cursor-pointer"
+            className="btn-cyber-primary px-8 py-3.5 text-xs font-bold font-mono tracking-wider cursor-pointer inline-flex items-center gap-2"
           >
             <span>CONSULTER LES AVIS</span>
+            <ArrowRight className="w-3.5 h-3.5 text-black" />
           </Link>
         </div>
       </div>
