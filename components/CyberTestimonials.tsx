@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import { Star, ChevronLeft, ChevronRight, MessageSquare, Loader2, ArrowRight } from "lucide-react";
 
 interface RealReview {
@@ -20,6 +21,7 @@ export default function CyberTestimonials() {
   const [reviews, setReviews] = useState<RealReview[]>([]);
   const [activeIdx, setActiveIdx] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [direction, setDirection] = useState<1 | -1>(1);
 
   const fetchFeaturedReviews = useCallback(async () => {
     try {
@@ -51,11 +53,13 @@ export default function CyberTestimonials() {
 
   const nextReview = () => {
     if (reviews.length === 0) return;
+    setDirection(1);
     setActiveIdx((prev) => (prev + 1) % reviews.length);
   };
 
   const prevReview = () => {
     if (reviews.length === 0) return;
+    setDirection(-1);
     setActiveIdx((prev) => (prev - 1 + reviews.length) % reviews.length);
   };
 
@@ -77,7 +81,7 @@ export default function CyberTestimonials() {
     <section id="avis" className="py-20 sm:py-24 px-6 sm:px-12 lg:px-16 bg-transparent font-mono relative z-10">
       <div className="max-w-7xl mx-auto space-y-10 sm:space-y-12">
         
-        {/* Section Header */}
+        {/* Section Header with Sleek Minimalist Navigation Controls */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-8">
           <div className="space-y-2">
             <h2 className="text-4xl sm:text-6xl font-display text-[#F5F4F0] tracking-wider">
@@ -89,35 +93,52 @@ export default function CyberTestimonials() {
           </div>
 
           {reviews.length > 0 && (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-6 select-none">
               <button
                 onClick={prevReview}
                 aria-label="Avis précédent"
-                className="w-11 h-11 border border-white/15 bg-[#121117] rounded-2xl flex items-center justify-center text-white hover:border-[#CA1C30] hover:text-[#CA1C30] transition-colors cursor-pointer"
+                className="group flex items-center gap-1.5 text-xs text-[#F5F4F0]/50 hover:text-white transition-colors cursor-pointer font-bold tracking-wider py-1"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+                <span className="hidden sm:inline">PRÉCÉDENT</span>
               </button>
-              <span className="text-xs text-[#F5F4F0]/60 font-bold tracking-widest px-2">
-                <span className="text-[#CA1C30]">{String(activeIdx + 1).padStart(2, "0")}</span> / {String(reviews.length).padStart(2, "0")}
-              </span>
+
+              <div className="flex items-center gap-2">
+                {reviews.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      setDirection(i > activeIdx ? 1 : -1);
+                      setActiveIdx(i);
+                    }}
+                    aria-label={`Avis ${i + 1}`}
+                    className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                      i === activeIdx
+                        ? "w-6 bg-[#00B4A0] shadow-[0_0_8px_rgba(0,180,160,0.6)]"
+                        : "w-1.5 bg-white/20 hover:bg-white/50"
+                    }`}
+                  />
+                ))}
+              </div>
+
               <button
                 onClick={nextReview}
                 aria-label="Avis suivant"
-                className="w-11 h-11 border border-white/15 bg-[#121117] rounded-2xl flex items-center justify-center text-white hover:border-[#CA1C30] hover:text-[#CA1C30] transition-colors cursor-pointer"
+                className="group flex items-center gap-1.5 text-xs text-[#F5F4F0]/50 hover:text-white transition-colors cursor-pointer font-bold tracking-wider py-1"
               >
-                <ChevronRight className="w-4 h-4" />
+                <span className="hidden sm:inline">SUIVANT</span>
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           )}
         </div>
 
-        {/* Live Ticker Bar */}
+        {/* Live Ticker Bar (Sans pastilles) */}
         {marqueeItems.length > 0 && (
           <div className="overflow-hidden border-y border-white/10 py-3.5 bg-[#121117]/80 relative rounded-full">
             <div className="animate-marquee gap-8 text-xs font-mono tracking-wider">
               {marqueeItems.map((r, i) => (
                 <div key={`${r.id}-${i}`} className="flex items-center gap-3 shrink-0">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#CA1C30]" />
                   <span className="text-[#F5F4F0] font-bold">{r.name}</span>
                   <span className="text-[#F5F4F0]/40">[{r.game.toUpperCase()}]</span>
                   {r.rank && <span className="text-[#00B4A0]">{formatRank(r.rank)}</span>}
@@ -128,7 +149,7 @@ export default function CyberTestimonials() {
           </div>
         )}
 
-        {/* Clean Vignette (Même DA : un haut avec point rouge, pas de bord extérieur, non cliquable) */}
+        {/* Clean Vignette with Smooth Framer Motion Transition */}
         {isLoading ? (
           <div className="py-20 text-center text-[#F5F4F0]/40 flex flex-col items-center justify-center gap-3">
             <Loader2 className="w-6 h-6 animate-spin text-[#CA1C30]" />
@@ -140,43 +161,46 @@ export default function CyberTestimonials() {
             <p className="text-sm text-[#F5F4F0]/70 font-bold">AUCUN AVIS SÉLECTIONNÉ</p>
           </div>
         ) : current ? (
-          <div className="relative">
-            <div
-              key={current.id}
-              className="p-8 sm:p-12 bg-[#121417]/95 backdrop-blur-xl rounded-3xl space-y-8 relative overflow-hidden transition-all duration-300 shadow-[0_20px_50px_rgba(0,0,0,0.85)] select-none"
-            >
-              {/* Top Header Row (Épuré comme les autres vignettes : point rouge, label & étoiles) */}
-              <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                <div className="flex items-center gap-3">
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#CA1C30] shadow-[0_0_10px_#CA1C30]" />
-                  <span className="text-xs font-mono tracking-widest text-[#F5F4F0]/60 uppercase">
-                    TÉMOIGNAGE ÉLÈVE · {current.game.toUpperCase()}
+          <div className="relative min-h-[300px]">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={current.id}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+                className="p-8 sm:p-12 bg-[#121417]/95 backdrop-blur-xl rounded-3xl space-y-8 relative overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.85)] select-none"
+              >
+                {/* Top Header Row (Sans pastille, juste le jeu) */}
+                <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                  <span className="text-xs font-mono tracking-widest text-[#F5F4F0]/60 uppercase font-bold">
+                    {current.game.toUpperCase()}
                   </span>
+                  <div className="flex items-center gap-1 text-[#00B4A0]">
+                    {[...Array(current.rating || 5)].map((_, i) => (
+                      <Star key={i} className="w-3.5 h-3.5 fill-current" />
+                    ))}
+                  </div>
                 </div>
-                <div className="flex items-center gap-1 text-[#00B4A0]">
-                  {[...Array(current.rating || 5)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-current" />
-                  ))}
+
+                {/* Student Identity */}
+                <div className="space-y-1">
+                  <h3 className="text-2xl sm:text-3xl font-display font-bold tracking-tight text-[#F5F4F0]">
+                    {current.name}
+                  </h3>
+                  {current.rank && (
+                    <p className="text-xs sm:text-sm font-mono font-semibold text-[#00B4A0]">
+                      {formatRank(current.rank)}
+                    </p>
+                  )}
                 </div>
-              </div>
 
-              {/* Student Identity */}
-              <div className="space-y-1">
-                <h3 className="text-2xl sm:text-3xl font-display font-bold tracking-tight text-[#F5F4F0]">
-                  {current.name}
-                </h3>
-                {current.rank && (
-                  <p className="text-xs sm:text-sm font-mono font-semibold text-[#00B4A0]">
-                    {formatRank(current.rank)}
-                  </p>
-                )}
-              </div>
-
-              {/* Testimonial Quote */}
-              <p className="text-base sm:text-lg text-[#F5F4F0]/85 max-w-4xl leading-relaxed font-sans italic whitespace-pre-wrap">
-                &ldquo;{current.text}&rdquo;
-              </p>
-            </div>
+                {/* Testimonial Quote */}
+                <p className="text-base sm:text-lg text-[#F5F4F0]/85 max-w-4xl leading-relaxed font-sans italic whitespace-pre-wrap">
+                  &ldquo;{current.text}&rdquo;
+                </p>
+              </motion.div>
+            </AnimatePresence>
           </div>
         ) : null}
 
