@@ -114,22 +114,22 @@ export default function CybercorePoulpyPage() {
         {/* 03. Pourquoi Poulpy (06 piliers avec défilement horizontal fluide) */}
         <WhyPoulpy />
 
-        {/* 04. Disciplines & Jeux (Valorant & Apex Legends) */}
+        {/* 04. À Propos de Coach Poulpy (Atheris Esport) */}
+        <CyberAbout onOpenBooking={scrollToBooking} />
+
+        {/* 05. Disciplines & Jeux (Valorant & Apex Legends) */}
         <CyberGames onOpenBooking={scrollToBooking} />
 
-        {/* 05. Méthodologie en 4 étapes clés */}
+        {/* 06. Méthodologie en 4 étapes clés */}
         <Methodology />
 
-        {/* 06. Module de Réservation & Tarifs Officiels en 4 étapes */}
+        {/* 07. Module de Réservation & Tarifs Officiels en 4 étapes */}
         <Booking />
 
         {/* 08. Témoignages & Avis d'Élèves Vérifiés */}
         <CyberTestimonials />
 
-        {/* 09. À Propos de Coach Poulpy (Atheris Esport) */}
-        <CyberAbout onOpenBooking={scrollToBooking} />
-
-        {/* 10. Médias Officiels : Diffusions YouTube & Twitch */}
+        {/* 09. Médias Officiels : Diffusions YouTube & Twitch (VOD) */}
         <CyberMedia />
 
         {/* 11. FAQ Tactique */}

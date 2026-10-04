@@ -190,12 +190,12 @@ export default function CyberNavbar({
 
       const sections = [
         { id: "coaching", linkId: "coaching" },
+        { id: "apropos", linkId: "apropos" },
         { id: "games", linkId: "games" },
         { id: "methodology", linkId: "methodology" },
         { id: "booking", linkId: "booking" },
         { id: "avis", linkId: "avis" },
-        { id: "apropos", linkId: "apropos" },
-        { id: "media", linkId: "apropos" },
+        { id: "media", linkId: "media" },
         { id: "faq", linkId: "faq" },
       ];
 
@@ -311,11 +311,12 @@ export default function CyberNavbar({
 
   const navLinks = [
     { label: "POURQUOI POULPY", href: "#coaching", id: "coaching" },
+    { label: "À PROPOS", href: "#apropos", id: "apropos" },
     { label: "JEUX & RANKS", href: "#games", id: "games" },
     { label: "MÉTHODE", href: "#methodology", id: "methodology" },
     { label: "RÉSERVER", href: "#booking", id: "booking" },
     { label: "AVIS", href: "#avis", id: "avis" },
-    { label: "À PROPOS", href: "#apropos", id: "apropos" },
+    { label: "VOD", href: "#media", id: "media" },
     { label: "FAQ", href: "#faq", id: "faq" },
   ];
 
@@ -343,7 +344,7 @@ export default function CyberNavbar({
           </a>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-1 xl:gap-2 font-mono text-[11px] relative">
+          <nav className="hidden lg:flex items-center gap-0.5 xl:gap-2 font-mono text-[10.5px] xl:text-[11px] relative">
             {navLinks.map((link) => {
               const isActive = activeSection === link.id;
 
@@ -352,7 +353,7 @@ export default function CyberNavbar({
                   key={link.label}
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.href)}
-                  className={`relative px-2.5 py-1.5 transition-colors tracking-wider uppercase font-semibold ${
+                  className={`relative px-2 xl:px-2.5 py-1.5 transition-colors tracking-wider uppercase font-semibold ${
                     isActive
                       ? "text-[#CA1C30]"
                       : "text-white/70 hover:text-[#CA1C30]"
