@@ -311,7 +311,6 @@ export default function WhyPoulpy() {
           }}
         >
           {pillars.map((item, idx) => {
-            const Icon = item.icon;
             const isAcid = item.color === "acid";
             const isMediaActive = activeMediaIndex === idx;
 
@@ -337,8 +336,7 @@ export default function WhyPoulpy() {
                   </div>
 
                   {/* Ghost number badge */}
-                  <div className="flex items-center gap-2">
-                    <Icon className={`w-4 h-4 ${isAcid ? "text-[#CA1C30]" : "text-[#00B4A0]"}`} />
+                  <div className="flex items-center">
                     <span className="font-display text-2xl sm:text-3xl font-bold tracking-tighter text-white/30">
                       {item.num}
                     </span>
@@ -406,9 +404,6 @@ export default function WhyPoulpy() {
           {/* Closing Action Rectangle */}
           <div className="w-[85vw] sm:w-[500px] h-[520px] sm:h-[540px] shrink-0 rounded-3xl bg-black/60 backdrop-blur-md p-8 sm:p-12 flex flex-col justify-between relative shadow-2xl shadow-black/90 overflow-hidden">
             <div className="space-y-4">
-              <span className="text-[#CA1C30] text-xs font-bold font-mono tracking-widest uppercase block">
-                // VALIDATION & ENGAGEMENT
-              </span>
               <h3 className="text-3xl sm:text-4xl font-display font-bold text-white tracking-tight leading-tight">
                 PRÊT À PASSER LE PALIER ?
               </h3>
