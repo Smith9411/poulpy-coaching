@@ -134,7 +134,7 @@ const PLANS: Record<MethodPlan, PlanConfig> = {
     bookingTarget: "#booking",
     accentColor: "#CA1C30",
     intro:
-      "Une session ayant pour objectif le pur gain de RR. On analyse votre gameplay, vos habitudes et votre mentalité afin de rédiger votre fiche de suivi personnalisée. Cette session se base sur le travail fait lors de la session diagnostic : elle permettra de mettre en place des routines d'échauffement et d'entraînement pour pallier aux problèmes relevés dans celle-ci. L'objectif est de vous donner les outils pour accélérer votre progression et vous permettre de sky rocket dans le leaderboard. La session prend entre 1h et 1h30.",
+      "Une session ayant pour objectif le pur gain de RR. On analyse votre gameplay, vos habitudes et votre mentalité afin de rédiger votre fiche de suivi personnalisée. Cette session se base sur le travail fait lors de la session diagnostic : elle permettra de mettre en place des routines d'échauffement et d'entraînement pour pallier aux problèmes relevés dans celle-ci. L'objectif est de vous donner les outils pour accélérer votre progression et vous permettre de sky rocket dans le leaderboard. À la fin de la session vous aurez accès à votre fiche de suivi. La session prend entre 1h et 1h30, au programme :",
     steps: [
       {
         num: "01",
@@ -161,10 +161,10 @@ const PLANS: Record<MethodPlan, PlanConfig> = {
         title: "ANALYSE GAME-SENS & MENTAL",
         subtitle: "Review d'une game au choix & compréhension des axes de grind",
         description:
-          "Review d'une game de votre choix. Objectifs : pas forcément pointer les erreurs mais comprendre fondamentalement les axes de jeu qui vous empêchent de grind.",
+          "Review d'une game de votre choix. Objectifs : pas forcément pointer les erreurs mais comprendre fondamentalement les axes de jeu qui vous empêchent de grind : Mental · Mécanique · Micro · Macro.",
         metrics: [
           { label: "VOD Review", val: "1 game complète de votre choix" },
-          { label: "Compréhension", val: "Axes fondamentaux de gameplay" },
+          { label: "Axes d'analyse", val: "Mental · Mécanique · Micro · Macro" },
           { label: "Facteur mental", val: "Résilience & gestion des rounds sous stress" },
           { label: "Déblocage", val: "Suppression des blocages de progression" },
         ],
@@ -282,6 +282,18 @@ export default function Methodology() {
   const [activePlan, setActivePlan] = useState<MethodPlan>("ranked");
 
   const currentPlan = PLANS[activePlan];
+
+  const handleBookingScroll = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
+    e.preventDefault();
+    const id = targetId.replace("#", "");
+    const targetElement = document.getElementById(id);
+    if (targetElement) {
+      targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
+      window.history.pushState(null, "", targetId);
+    } else {
+      window.location.hash = targetId;
+    }
+  };
 
   return (
     <section id="methodology" className="pt-24 sm:pt-36 pb-16 sm:pb-24 px-6 sm:px-12 lg:px-16 bg-transparent font-mono relative">
@@ -421,6 +433,7 @@ export default function Methodology() {
                         </span>
                         <a
                           href={currentPlan.bookingTarget}
+                          onClick={(e) => handleBookingScroll(e, currentPlan.bookingTarget)}
                           className="btn-cyber-primary rounded-full px-7 py-3 text-xs font-mono font-bold tracking-wider inline-flex items-center gap-2 cursor-pointer"
                         >
                           <span>RÉSERVER CETTE MÉTHODE</span>
