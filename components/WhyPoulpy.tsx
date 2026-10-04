@@ -294,8 +294,8 @@ export default function WhyPoulpy() {
         ref={pinnedContainerRef}
         className="relative w-full h-screen overflow-hidden flex flex-col justify-center pt-2 sm:pt-4 pb-2 sm:pb-4"
       >
-        {/* Grand Titre de Catégorie — centré en hauteur au-dessus des vignettes */}
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 mb-6 sm:mb-8 md:mb-10 shrink-0 z-20">
+        {/* Grand Titre de Catégorie — monté pour centrer la lettre */}
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 mb-6 sm:mb-8 md:mb-10 -translate-y-6 sm:-translate-y-7 md:-translate-y-8 shrink-0 z-20">
           <h2 className="text-3xl sm:text-5xl md:text-6xl font-display text-[#F5F4F0] tracking-wider uppercase">
             UNE APPROCHE EN <span className="text-[#CA1C30]">3 PILIERS</span>
           </h2>
@@ -431,8 +431,8 @@ export default function WhyPoulpy() {
           </div>
         </div>
 
-        {/* Bottom Progress Bar */}
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 flex items-center justify-end text-[10px] font-mono text-white/40 pt-2 z-20">
+        {/* Bottom Progress Bar — En bas de l'écran */}
+        <div className="absolute bottom-6 sm:bottom-8 left-0 right-0 w-full max-w-7xl mx-auto px-4 sm:px-10 flex items-center justify-end text-[10px] font-mono text-white/40 pointer-events-none z-20">
           <div className="flex items-center gap-3">
             <span>PROGRESSION :</span>
             <div className="w-28 sm:w-40 h-1 bg-white/10 rounded-full overflow-hidden">
