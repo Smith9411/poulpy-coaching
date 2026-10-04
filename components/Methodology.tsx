@@ -60,7 +60,7 @@ const PLANS: Record<MethodPlan, PlanConfig> = {
         title: "1H DE VOD REVIEW EN LIVE",
         subtitle: "Session découverte & diagnostic en direct sur Twitch",
         description:
-          "Le coaching sera fait en live afin de partager mon analyse à la communauté. Vous pourrez retrouver les VODs sur ma chaîne Twitch et des vidéos sur mon YouTube des coachings.",
+          "Le coaching sera fait en live afin de partager mon analyse à la communauté. Vous pourrez retrouver les VODs et des vidéos des coachings sur mon YouTube.",
         metrics: [
           { label: "Format", val: "1h en direct sur Twitch" },
           { label: "Rediffusion", val: "VODs Twitch & Best-of YouTube" },
@@ -98,7 +98,7 @@ const PLANS: Record<MethodPlan, PlanConfig> = {
         description:
           "Le tracker me permettra d'identifier les problèmes globaux dans votre gameplay et de vous donner des pistes sur comment les corriger. Il me sert aussi à rédiger la fiche de suivi perso si vous décidez de me faire confiance et de continuer les séances.",
         metrics: [
-          { label: "Audit stats", val: "Tracker Valorant / Apex complet" },
+          { label: "Analyse stats", val: "Tracker Valorant / Apex complet" },
           { label: "Diagnostic", val: "Détection des faiblesses récurrentes" },
           { label: "Pistes d'action", val: "Recommandations correctives ciblées" },
           { label: "Préparation", val: "Fondation de la fiche de suivi perso" },
@@ -133,77 +133,60 @@ const PLANS: Record<MethodPlan, PlanConfig> = {
     priceTag: "10 €",
     bookingTarget: "#booking",
     accentColor: "#CA1C30",
-    intro: "",
+    intro:
+      "Une session ayant pour objectif le pur gain de RR. On analyse votre gameplay, vos habitudes et votre mentalité afin de rédiger votre fiche de suivi personnalisée. Cette session se base sur le travail fait lors de la session diagnostic : elle permettra de mettre en place des routines d'échauffement et d'entraînement pour pallier aux problèmes relevés dans celle-ci. L'objectif est de vous donner les outils pour accélérer votre progression et vous permettre de sky rocket dans le leaderboard. La session prend entre 1h et 1h30.",
     steps: [
       {
         num: "01",
-        code: "TARGET // PHASE_01",
-        icon: Search,
-        title: "ANALYSE CLINIQUE",
-        subtitle: "Diagnostic complet & audit de gameplay",
+        code: "AIM // DRILLS_AND_CLIPS",
+        icon: Dumbbell,
+        title: "ANALYSES MÉCANIQUES",
+        subtitle: "Range, deathmatch & analyse de clips",
         description:
-          "Audit chirurgical de ta sensibilité (cm/360), analyse biomécanique de ta posture, inspection matérielle et décryptage VOD frame par frame.",
+          "Range, deathmatch et analyse de clips. Objectifs : trouver vos points faibles et vos points forts mécaniques pour adapter la routine d'aim training mise en place.",
         metrics: [
-          { label: "Analyse VOD", val: "Frame par frame & timing de tir" },
-          { label: "Sensibilité & Grip", val: "Calibration cm/360 exacte" },
-          { label: "Placement de viseur", val: "Mesure de micro-ajustement" },
-          { label: "Bilan", val: "Rapport d'audit complet remis" },
+          { label: "Range & DM", val: "Tests in-game & calibrage moteur" },
+          { label: "Analyse clips", val: "Audit de micro-ajustements & crosshair" },
+          { label: "Diagnostic", val: "Points faibles & points forts ciblés" },
+          { label: "Livrable", val: "Routine d'aim training sur-mesure" },
         ],
-        tag: "AUDIT GLOBAL // 01",
+        tag: "MÉCANIQUE PURE // 01",
         accent: "laser",
         color: "#00B4A0",
       },
       {
         num: "02",
-        code: "TARGET // PHASE_02",
+        code: "MINDSET // GAME_BREAKDOWN",
         icon: Target,
-        title: "IDENTIFICATION DES BLOCAGES",
-        subtitle: "Ciblage précis des 3 freins majeurs",
+        title: "ANALYSE GAME-SENS & MENTAL",
+        subtitle: "Review d'une game au choix & compréhension des axes de grind",
         description:
-          "Mise en lumière immédiate des 2 à 3 habitudes inconscientes et faiblesses structurelles qui plafonnent ton rang et coûtent tes duels clés.",
+          "Review d'une game de votre choix. Objectifs : pas forcément pointer les erreurs mais comprendre fondamentalement les axes de jeu qui vous empêchent de grind.",
         metrics: [
-          { label: "Axes prioritaires", val: "3 blocages critiques identifiés" },
-          { label: "Diagnostic d'erreur", val: "Immédiat en session" },
-          { label: "Arbre de décision", val: "Cartographie des mauvais choix" },
-          { label: "Plan d'action", val: "Ordre de priorité chirurgical" },
+          { label: "VOD Review", val: "1 game complète de votre choix" },
+          { label: "Compréhension", val: "Axes fondamentaux de gameplay" },
+          { label: "Facteur mental", val: "Résilience & gestion des rounds sous stress" },
+          { label: "Déblocage", val: "Suppression des blocages de progression" },
         ],
-        tag: "CIBLAGE CHIRURGICAL // 02",
+        tag: "GAME-SENS // 02",
         accent: "acid",
         color: "#CA1C30",
       },
       {
         num: "03",
-        code: "TARGET // PHASE_03",
-        icon: Dumbbell,
-        title: "TRAVAIL & ROUTINES",
-        subtitle: "Entraînement guidé & Exercices pratiques",
-        description:
-          "Création d'une playlist d'entraînement dédiée (KovaaK's / Aimlabs) et exercices in-game sur-mesure pour intégrer les automatismes moteurs.",
-        metrics: [
-          { label: "Routine quotidienne", val: "15 à 20 min / jour calibrées" },
-          { label: "Playlists Aim", val: "Scénarios personnalisés KovaaK's" },
-          { label: "Exercices In-game", val: "Drills de crosshair & deadzone" },
-          { label: "Conditionnement", val: "Répétition neuromusculaire" },
-        ],
-        tag: "MÉCANIQUE PURE // 03",
-        accent: "laser",
-        color: "#00B4A0",
-      },
-      {
-        num: "04",
-        code: "TARGET // PHASE_04",
+        code: "COCKPIT // TRACKING_SHEET",
         icon: TrendingUp,
-        title: "PROGRESSION & SUIVI",
-        subtitle: "Mesure continue & Montée en rang",
+        title: "RÉDACTION DE VOTRE FICHE DE SUIVI",
+        subtitle: "Outils concrets, routines & garantie de montée en rank",
         description:
-          "Évaluation continue de ton évolution après chaque séance, ajustement dynamique des exercices et suivi direct sur Discord 7j/7.",
+          "Retour sur les points abordés pendant la session et explication des choses mises en place. Vous ressortez du coaching avec des outils vous permettant de progresser et vous assurant une montée en rank.",
         metrics: [
-          { label: "Accompagnement", val: "Discord direct 7j/7" },
-          { label: "Suivi statistique", val: "Courbe de progression RR" },
-          { label: "Ajustements", val: "Mise à jour hebdo de la routine" },
-          { label: "Objectif", val: "Passage de palier mesurable" },
+          { label: "Fiche perso", val: "Rédigée & accessible sur le site" },
+          { label: "Process", val: "Explication claire des outils mis en place" },
+          { label: "Autonomie", val: "Routines d'entraînement applicables" },
+          { label: "Objectif RR", val: "Montée en rank mesurable & assurée" },
         ],
-        tag: "RÉSULTAT GARANTI // 04",
+        tag: "RÉSULTAT GARANTI // 03",
         accent: "acid",
         color: "#CA1C30",
       },
@@ -411,9 +394,6 @@ export default function Methodology() {
 
                     {/* Typographic Metrics / Actions Grid */}
                     <div className="pt-2">
-                      <span className="text-[10px] font-mono text-[#F5F4F0]/40 uppercase tracking-widest block pb-3">
-                        LIVRABLES &amp; ACTIONS CLÉS :
-                      </span>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {step.metrics.map((m, idx) => (
                           <div
