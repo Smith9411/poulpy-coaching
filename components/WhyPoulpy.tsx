@@ -294,10 +294,10 @@ export default function WhyPoulpy() {
         ref={pinnedContainerRef}
         className="relative w-full h-screen overflow-hidden flex flex-col justify-center pt-2 sm:pt-4 pb-2 sm:pb-4"
       >
-        {/* Grand Titre de Catégorie — Collé aux vignettes */}
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 mb-3 sm:mb-4 shrink-0 z-20">
+        {/* Grand Titre de Catégorie — centré en hauteur au-dessus des vignettes */}
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 mb-6 sm:mb-8 md:mb-10 shrink-0 z-20">
           <h2 className="text-3xl sm:text-5xl md:text-6xl font-display text-[#F5F4F0] tracking-wider uppercase">
-            UNE APPROCHE EN <span className="text-[#CA1C30]">3 PILIERS :</span>
+            UNE APPROCHE EN <span className="text-[#CA1C30]">3 PILIERS</span>
           </h2>
         </div>
 
