@@ -47,10 +47,6 @@ export default function CyberFAQ() {
               Tout ce qu&apos;il faut savoir avant de réserver ta première session.
             </p>
           </div>
-          <div className="text-xs font-mono text-[#F5F4F0]/40 flex items-center gap-2">
-            <span className="text-[#CA1C30] font-bold">//</span>
-            <span>05 RÉPONSES TACTIQUES</span>
-          </div>
         </div>
 
         {/* Liste Accordéon — Éditorial Minimaliste & Lignes Fines */}
