@@ -2,8 +2,6 @@
 
 import React from "react";
 import Image from "next/image";
-import DecryptedText from "./DecryptedText";
-import { Shield, Award, Terminal, CheckCircle2 } from "lucide-react";
 
 interface CyberAboutProps {
   onOpenBooking: () => void;
@@ -22,32 +20,25 @@ export default function CyberAbout({ onOpenBooking }: CyberAboutProps) {
               Coach officiel Atheris Esport, joueur de haut niveau et formateur.
             </p>
           </div>
-          <div className="text-xs text-[#F5F4F0]/40">
-            DISCIPLINE : FPS MNK
-          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-          {/* Left: Photo Frame with Cyber Reticles */}
-          <div className="lg:col-span-5 relative">
-            <div className="group reticle-box p-3 bg-[#121117] rounded-3xl border border-white/10 relative overflow-hidden">
-              <div className="relative aspect-square w-full bg-[#0B0A0D] rounded-2xl overflow-hidden flex items-center justify-center">
-                <Image
-                  src="/poulpy-profile.png"
-                  alt="Coach Poulpy"
-                  width={400}
-                  height={400}
-                  style={{ width: "100%", height: "100%" }}
-                  className="object-cover filter contrast-125 transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0B0A0D] via-transparent to-transparent" />
-                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-[11px] bg-[#1A1822]/90 backdrop-blur-md p-2.5 rounded-xl border border-white/10">
-                  <span className="text-[#F5F4F0] font-bold flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#CA1C30] animate-ping" />
-                    <span className="glitch-text">STATUS: COACH EN LIGNE</span>
-                  </span>
-                  <span className="text-[#F5F4F0]/60">ID: POULPY_01</span>
-                </div>
+          {/* Left: Photo sans vignette arrière-plan */}
+          <div className="lg:col-span-5 relative group">
+            <div className="relative aspect-square w-full rounded-2xl sm:rounded-3xl overflow-hidden flex items-center justify-center shadow-2xl">
+              <Image
+                src="/poulpy-profile.png"
+                alt="Coach Poulpy"
+                width={400}
+                height={400}
+                style={{ width: "100%", height: "100%" }}
+                className="object-cover filter contrast-125 transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0B0A0D]/90 via-transparent to-transparent pointer-events-none" />
+              <div className="absolute bottom-5 left-5 z-10 pointer-events-none">
+                <span className="glitch-text font-bold text-xs uppercase tracking-wider text-[#F5F4F0]">
+                  COACH EN LIGNE
+                </span>
               </div>
             </div>
           </div>
@@ -63,46 +54,46 @@ export default function CyberAbout({ onOpenBooking }: CyberAboutProps) {
               </p>
             </div>
 
-            {/* Achievements Grid */}
-            <div className="grid grid-cols-2 gap-3 pt-2">
-              <div className="p-4 bg-[#1A1822] border border-white/10 rounded-2xl space-y-1">
-                <div className="text-[#CA1C30] font-bold text-xs uppercase">
+            {/* Achievements - Version épurée alignée à la DA */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-5 border-y border-white/10">
+              <div className="space-y-1 sm:pr-4">
+                <div className="text-[#CA1C30] font-display font-bold text-sm tracking-wider uppercase">
                   ATHERIS ESPORT
                 </div>
-                <div className="text-[11px] text-[#F5F4F0]/50">
+                <div className="text-[11px] text-[#F5F4F0]/50 font-mono">
                   Coach officiel
                 </div>
               </div>
 
-              <div className="p-4 bg-[#1A1822] border border-white/10 rounded-2xl space-y-1">
-                <div className="text-[#00B4A0] font-bold text-xs uppercase">
+              <div className="space-y-1 sm:pl-4 sm:border-l sm:border-white/10">
+                <div className="text-[#00B4A0] font-display font-bold text-sm tracking-wider uppercase">
                   +120 ÉLÈVES
                 </div>
-                <div className="text-[11px] text-[#F5F4F0]/50">
+                <div className="text-[11px] text-[#F5F4F0]/50 font-mono">
                   98.4% satisfaction
                 </div>
               </div>
 
-              <div className="p-4 bg-[#1A1822] border border-white/10 rounded-2xl space-y-1">
-                <div className="text-[#F5F4F0] font-bold text-xs uppercase">
+              <div className="space-y-1 sm:pl-4 sm:border-l sm:border-white/10">
+                <div className="text-[#F5F4F0] font-display font-bold text-sm tracking-wider uppercase">
                   VOLTAIC JADE
                 </div>
-                <div className="text-[11px] text-[#F5F4F0]/50">
+                <div className="text-[11px] text-[#F5F4F0]/50 font-mono">
                   Top 0.1% visée pure
                 </div>
               </div>
 
-              <div className="p-4 bg-[#1A1822] border border-white/10 rounded-2xl space-y-1">
-                <div className="text-[#00B4A0] font-bold text-xs uppercase">
+              <div className="space-y-1 sm:pl-4 sm:border-l sm:border-white/10">
+                <div className="text-[#00B4A0] font-display font-bold text-sm tracking-wider uppercase">
                   IMMO 2 / PREDATOR
                 </div>
-                <div className="text-[11px] text-[#F5F4F0]/50">
+                <div className="text-[11px] text-[#F5F4F0]/50 font-mono">
                   Top rank atteint
                 </div>
               </div>
             </div>
 
-            <div className="pt-4 flex items-center gap-4">
+            <div className="pt-2 flex items-center gap-4">
               <button
                 onClick={onOpenBooking}
                 className="btn-cyber-primary px-8 py-3.5 text-xs font-bold font-mono tracking-wider cursor-pointer"
