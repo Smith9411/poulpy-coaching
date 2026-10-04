@@ -196,7 +196,7 @@ export default function Booking() {
       : { name: "COACHING RANKED (RÉFÉRENCE)", price: "10 €", duration: "1H - 1H30" },
     session: { name: "SESSION DIAGNOSTIC (VOD STREAM)", price: "0 € (GRATUIT)", duration: "45 MIN - 1H" },
     performance: perfIsPack
-      ? { name: "COACHING PRO (PACK 3 SÉANCES + 1 OFFERTE)", price: "60 €", duration: "4 SÉANCES (1H30-2H / SÉANCE)" }
+      ? { name: "COACHING PRO (PACK 3 SÉANCES + 1 GRATUITE)", price: "60 €", duration: "4 SÉANCES (1H30-2H / SÉANCE)" }
       : { name: "COACHING PRO (COMPÉTITION & TEAM)", price: "20 €", duration: "1H30 - 2H" },
   };
 
@@ -674,7 +674,7 @@ export default function Booking() {
                               AXE COMPÉTITION & TEAM
                             </span>
                             <span className="text-[11px] text-[#00B4A0] tracking-wider font-mono">
-                              {perfIsPack ? "PACK 3 + 1 OFFERTE" : "1H30 - 2H"}
+                              {perfIsPack ? "PACK 3 + 1 GRATUITE" : "1H30 - 2H"}
                             </span>
                           </div>
 
@@ -723,7 +723,7 @@ export default function Booking() {
                                 }`}
                               >
                                 <div className="absolute top-0.5 right-1 px-1.5 py-0.5 text-[7px] font-bold rounded-full bg-[#00B4A0] text-black uppercase tracking-wider">
-                                  +1 OFFERTE
+                                  +1 GRATUITE
                                 </div>
                                 <div className="flex items-baseline justify-between">
                                   <span className={`text-xl font-display ${perfIsPack && selectedPlan === "performance" ? "text-[#00B4A0]" : "text-[#F5F4F0]"}`}>
