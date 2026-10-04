@@ -192,12 +192,12 @@ export default function Booking() {
 
   const planDetails: Record<string, { name: string; price: string; duration: string }> = {
     pro: proIsPack
-      ? { name: "COACHING PRO (PACK 5 SÉANCES + 2 OFFERTES)", price: "50 €", duration: "7 SÉANCES (1H-1H30 / SÉANCE)" }
-      : { name: "COACHING PRO (RÉFÉRENCE)", price: "10 €", duration: "1H - 1H30" },
+      ? { name: "COACHING RANKED (PACK 5 SÉANCES + 2 OFFERTES)", price: "50 €", duration: "7 SÉANCES (1H-1H30 / SÉANCE)" }
+      : { name: "COACHING RANKED (RÉFÉRENCE)", price: "10 €", duration: "1H - 1H30" },
     session: { name: "SESSION DIAGNOSTIC (VOD STREAM)", price: "0 € (GRATUIT)", duration: "45 MIN - 1H" },
     performance: perfIsPack
-      ? { name: "COACHING COMPÉTITION (PACK 3 SÉANCES + 1 OFFERTE)", price: "60 €", duration: "4 SÉANCES (1H30-2H / SÉANCE)" }
-      : { name: "COACHING COMPÉTITION & TEAM", price: "20 €", duration: "1H30 - 2H" },
+      ? { name: "COACHING PRO (PACK 3 SÉANCES + 1 OFFERTE)", price: "60 €", duration: "4 SÉANCES (1H30-2H / SÉANCE)" }
+      : { name: "COACHING PRO (COMPÉTITION & TEAM)", price: "20 €", duration: "1H30 - 2H" },
   };
 
   const activePlan = planDetails[selectedPlan] || planDetails["pro"];
@@ -430,7 +430,7 @@ export default function Booking() {
                             COACHING INDIVIDUEL COMPLET
                           </span>
                           <h3 className="text-3xl sm:text-4xl font-display text-[#F5F4F0] tracking-wider mt-1">
-                            COACHING PRO
+                            COACHING RANKED
                           </h3>
 
                           {/* Single vs Pack interactive selector */}
@@ -680,7 +680,7 @@ export default function Booking() {
 
                           <div>
                             <h4 className="text-xl font-display text-[#F5F4F0] tracking-wider">
-                              COACHING COMPÉTITION
+                              COACHING PRO
                             </h4>
 
                             {/* Single vs Pack interactive selector */}
