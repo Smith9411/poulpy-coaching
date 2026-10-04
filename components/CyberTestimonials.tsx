@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { Star, ChevronLeft, ChevronRight, MessageSquare, Loader2, ArrowRight } from "lucide-react";
 
 interface RealReview {
@@ -15,7 +15,34 @@ interface RealReview {
   user_id?: string;
   created_at: string;
   featured?: boolean;
+  admin_response?: string | null;
 }
+
+const slideVariants: Variants = {
+  enter: (dir: number) => ({
+    x: dir > 0 ? 28 : -28,
+    opacity: 0,
+    filter: "blur(4px)",
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+    filter: "blur(0px)",
+    transition: {
+      duration: 0.28,
+      ease: [0.23, 1, 0.32, 1] as [number, number, number, number],
+    },
+  },
+  exit: (dir: number) => ({
+    x: dir > 0 ? -28 : 28,
+    opacity: 0,
+    filter: "blur(4px)",
+    transition: {
+      duration: 0.22,
+      ease: [0.23, 1, 0.32, 1] as [number, number, number, number],
+    },
+  }),
+};
 
 export default function CyberTestimonials() {
   const [reviews, setReviews] = useState<RealReview[]>([]);
@@ -93,11 +120,11 @@ export default function CyberTestimonials() {
           </div>
 
           {reviews.length > 0 && (
-            <div className="flex items-center gap-6 select-none">
+            <div className="flex items-center gap-5 sm:gap-6 select-none">
               <button
                 onClick={prevReview}
                 aria-label="Avis précédent"
-                className="group flex items-center gap-1.5 text-xs text-[#F5F4F0]/50 hover:text-white transition-colors cursor-pointer font-bold tracking-wider py-1"
+                className="group flex items-center gap-1.5 text-xs text-[#F5F4F0]/50 hover:text-white transition-colors cursor-pointer font-bold tracking-wider py-1.5"
               >
                 <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                 <span className="hidden sm:inline">PRÉCÉDENT</span>
@@ -112,10 +139,10 @@ export default function CyberTestimonials() {
                       setActiveIdx(i);
                     }}
                     aria-label={`Avis ${i + 1}`}
-                    className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                    className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
                       i === activeIdx
-                        ? "w-6 bg-[#00B4A0] shadow-[0_0_8px_rgba(0,180,160,0.6)]"
-                        : "w-1.5 bg-white/20 hover:bg-white/50"
+                        ? "w-7 bg-[#00B4A0] shadow-[0_0_10px_rgba(0,180,160,0.5)]"
+                        : "w-2 bg-white/15 hover:bg-white/40"
                     }`}
                   />
                 ))}
@@ -124,7 +151,7 @@ export default function CyberTestimonials() {
               <button
                 onClick={nextReview}
                 aria-label="Avis suivant"
-                className="group flex items-center gap-1.5 text-xs text-[#F5F4F0]/50 hover:text-white transition-colors cursor-pointer font-bold tracking-wider py-1"
+                className="group flex items-center gap-1.5 text-xs text-[#F5F4F0]/50 hover:text-white transition-colors cursor-pointer font-bold tracking-wider py-1.5"
               >
                 <span className="hidden sm:inline">SUIVANT</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -133,23 +160,23 @@ export default function CyberTestimonials() {
           )}
         </div>
 
-        {/* Live Ticker Bar (Sans pastilles) */}
+        {/* Live Ticker Bar with subtle edge gradient mask */}
         {marqueeItems.length > 0 && (
-          <div className="overflow-hidden border-y border-white/10 py-3.5 bg-[#121117]/80 relative rounded-full">
+          <div className="overflow-hidden border-y border-white/10 py-3.5 bg-[#121117]/80 relative rounded-full [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
             <div className="animate-marquee gap-8 text-xs font-mono tracking-wider">
               {marqueeItems.map((r, i) => (
                 <div key={`${r.id}-${i}`} className="flex items-center gap-3 shrink-0">
                   <span className="text-[#F5F4F0] font-bold">{r.name}</span>
                   <span className="text-[#F5F4F0]/40">[{r.game.toUpperCase()}]</span>
                   {r.rank && <span className="text-[#00B4A0]">{formatRank(r.rank)}</span>}
-                  <span className="text-white/20 ml-4">//</span>
+                  <span className="text-[#CA1C30]/40 ml-4 font-bold select-none">//</span>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* Clean Vignette with Smooth Framer Motion Transition */}
+        {/* Clean Vignette with Silky Directional Motion Transition */}
         {isLoading ? (
           <div className="py-20 text-center text-[#F5F4F0]/40 flex flex-col items-center justify-center gap-3">
             <Loader2 className="w-6 h-6 animate-spin text-[#CA1C30]" />
@@ -161,30 +188,55 @@ export default function CyberTestimonials() {
             <p className="text-sm text-[#F5F4F0]/70 font-bold">AUCUN AVIS SÉLECTIONNÉ</p>
           </div>
         ) : current ? (
-          <div className="relative min-h-[300px]">
-            <AnimatePresence mode="wait">
+          <div className="relative min-h-[280px]">
+            <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={current.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
+                custom={direction}
+                variants={slideVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
                 className="p-8 sm:p-12 bg-[#121417]/95 backdrop-blur-xl rounded-3xl space-y-8 relative overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.85)] select-none"
               >
-                {/* Top Header Row (Sans pastille, juste le jeu) */}
-                <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                {/* Subtle Ambient Glows */}
+                <div className="absolute top-0 right-0 w-72 h-72 bg-[#CA1C30]/[0.035] rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute bottom-0 left-0 w-72 h-72 bg-[#00B4A0]/[0.025] rounded-full blur-3xl pointer-events-none" />
+
+                {/* Editorial Watermark Quote */}
+                <span className="absolute right-8 -bottom-6 text-8xl font-serif text-white/[0.03] select-none pointer-events-none leading-none">
+                  &rdquo;
+                </span>
+
+                {/* Top Header Row (Sans pastille, nom du jeu & 5 étoiles fixes) */}
+                <div className="flex items-center justify-between border-b border-white/10 pb-4 relative z-10">
                   <span className="text-xs font-mono tracking-widest text-[#F5F4F0]/60 uppercase font-bold">
                     {current.game.toUpperCase()}
                   </span>
-                  <div className="flex items-center gap-1 text-[#00B4A0]">
-                    {[...Array(current.rating || 5)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 fill-current" />
-                    ))}
+                  
+                  {/* Fixed 5-star container: prevents star shifting/bugging when rating varies */}
+                  <div
+                    className="flex items-center gap-1.5 shrink-0"
+                    aria-label={`${current.rating || 5} étoiles sur 5`}
+                  >
+                    {[1, 2, 3, 4, 5].map((starVal) => {
+                      const isFilled = starVal <= (current.rating || 5);
+                      return (
+                        <Star
+                          key={starVal}
+                          className={`w-3.5 h-3.5 shrink-0 transition-colors duration-200 ${
+                            isFilled
+                              ? "fill-[#00B4A0] text-[#00B4A0]"
+                              : "fill-transparent text-white/15"
+                          }`}
+                        />
+                      );
+                    })}
                   </div>
                 </div>
 
                 {/* Student Identity */}
-                <div className="space-y-1">
+                <div className="space-y-1 relative z-10">
                   <h3 className="text-2xl sm:text-3xl font-display font-bold tracking-tight text-[#F5F4F0]">
                     {current.name}
                   </h3>
@@ -196,9 +248,19 @@ export default function CyberTestimonials() {
                 </div>
 
                 {/* Testimonial Quote */}
-                <p className="text-base sm:text-lg text-[#F5F4F0]/85 max-w-4xl leading-relaxed font-sans italic whitespace-pre-wrap">
+                <p className="text-base sm:text-lg text-[#F5F4F0]/85 max-w-4xl leading-relaxed font-sans italic whitespace-pre-wrap relative z-10">
                   &ldquo;{current.text}&rdquo;
                 </p>
+
+                {/* Coach debrief if available */}
+                {current.admin_response && (
+                  <div className="pt-4 border-t border-white/5 flex items-start gap-2 relative z-10">
+                    <span className="text-xs font-mono font-bold text-[#CA1C30] shrink-0">Poulpy :</span>
+                    <p className="text-xs sm:text-sm text-[#F5F4F0]/70 font-sans italic leading-relaxed">
+                      &ldquo;{current.admin_response}&rdquo;
+                    </p>
+                  </div>
+                )}
               </motion.div>
             </AnimatePresence>
           </div>
