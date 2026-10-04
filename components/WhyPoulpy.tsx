@@ -413,20 +413,17 @@ export default function WhyPoulpy() {
                 PRÊT À PASSER LE PALIER ?
               </h3>
               <p className="text-xs sm:text-sm text-white/70 font-sans leading-relaxed">
-                Ne perdez plus des mois à tourner en rond en ranked. Réservez votre premier audit et progressez immédiatement avec une méthode testée au plus haut niveau.
+                Ne perdez plus des mois à tourner en rond en ranked. Réservez votre premier audit et progressez immédiatement avec une méthode construite pour vous !
               </p>
             </div>
 
-            <div className="space-y-4 pt-4 border-t border-white/10">
+            <div className="pt-4 border-t border-white/10">
               <a
                 href="#booking"
                 className="btn-cyber-primary w-full justify-center text-xs py-4 rounded-full cursor-pointer font-bold tracking-wider"
               >
                 <span>ENGAGER LE COACHING</span>
               </a>
-              <div className="text-center text-[10px] text-white/40 font-mono">
-                VALORANT (IMMORTAL 2 #5000) &bull; APEX (3x PICK PRED #450)
-              </div>
             </div>
           </div>
         </div>
