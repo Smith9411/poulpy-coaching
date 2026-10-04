@@ -321,9 +321,7 @@ export default function Methodology() {
                 onClick={() => setActivePlan(planKey)}
                 className={`px-6 sm:px-8 py-3 sm:py-3.5 text-xs sm:text-sm font-mono font-bold uppercase rounded-full transition-all duration-200 cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-2.5 ${
                   isActive
-                    ? plan.id === "pro"
-                      ? "bg-[#00B4A0] text-black shadow-[0_0_25px_rgba(0,180,160,0.5)]"
-                      : "bg-[#CA1C30] text-black shadow-[0_0_25px_rgba(202,28,48,0.5)]"
+                    ? "bg-[#00B4A0] text-black shadow-[0_0_25px_rgba(0,180,160,0.5)]"
                     : "bg-white/5 text-[#F5F4F0]/60 hover:text-white hover:bg-white/10"
                 }`}
               >
@@ -371,7 +369,7 @@ export default function Methodology() {
             className="relative pt-4 pb-12 space-y-8"
           >
             {currentPlan.steps.map((step, index) => {
-              const isAcid = step.accent === "acid";
+              const isRed = index % 2 === 0;
               const isLast = index === currentPlan.steps.length - 1;
               const stickyTop = `calc(85px + ${index * 26}px)`;
 
@@ -392,7 +390,7 @@ export default function Methodology() {
                       </h3>
                       <p
                         className={`text-xs sm:text-sm font-mono font-semibold ${
-                          isAcid ? "text-[#CA1C30]" : "text-[#00B4A0]"
+                          isRed ? "text-[#CA1C30]" : "text-[#00B4A0]"
                         }`}
                       >
                         {step.subtitle}
@@ -415,7 +413,13 @@ export default function Methodology() {
                             <span className="text-xs text-[#F5F4F0]/50 font-mono uppercase tracking-wide">
                               {m.label}
                             </span>
-                            <span className="text-xs text-[#F5F4F0] font-mono font-bold group-hover:text-[#CA1C30] transition-colors text-right">
+                            <span
+                              className={`text-xs text-[#F5F4F0] font-mono font-bold transition-colors text-right ${
+                                isRed
+                                  ? "group-hover:text-[#CA1C30]"
+                                  : "group-hover:text-[#00B4A0]"
+                              }`}
+                            >
                               {m.val}
                             </span>
                           </div>
