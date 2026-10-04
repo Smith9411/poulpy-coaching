@@ -17,14 +17,14 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
       id: "val" as const,
       title: "VALORANT",
       subtitle: "FPS TACTIQUE 5V5 · RIOT GAMES",
-      badge: "IMMORTAL 2 #5000 PEAK",
+      badge: "HEAD COACH ÉQUIPE VRC — IMMORTAL 2 #5000",
       badgeColor: "acid" as const,
-      desc: "Crosshair placement chirurgical, micro-flicks, gestion rigoureuse des utilitaires et prise de décision sous haute pression.",
+      desc: "Une approche personnalisée, aiguillée par une expérience professionnelle et une étude des meilleurs joueurs/équipes de la scène.",
       protocols: [
-        { num: "01", name: "Aim, Micro-flicks & Crosshair placement" },
-        { num: "02", name: "Movement & Peeking (deadzoning, jiggle)" },
-        { num: "03", name: "Game Sense & Arbre de décision" },
-        { num: "04", name: "Gestion d'économie & Scénarios clutch" },
+        { num: "01", name: "Raw aim : Click timing, micro-flicks, réflexes..." },
+        { num: "02", name: "Mouvements : Deadzoning, strafes, peaks..." },
+        { num: "03", name: "Game sens : Lecture de round, win-condition, analyse de composition" },
+        { num: "04", name: "Communication : Connaissance des maps, vocabulaire spécifique à Valorant" },
       ],
     },
     {
@@ -98,7 +98,7 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-8">
           <div className="space-y-2">
             <h2 className="text-3xl sm:text-5xl font-display text-[#F5F4F0] tracking-wider">
-              JEUX &amp; <span className="text-[#CA1C30]">PÔLES D&apos;EXCELLENCE</span>
+              PÔLES D&apos;<span className="text-[#CA1C30]">EXCELLENCE</span>
             </h2>
             <p className="text-xs sm:text-sm text-[#F5F4F0]/60 max-w-xl leading-relaxed">
               Protocoles d&apos;entraînement dédiés et calibrés par discipline.

@@ -312,7 +312,7 @@ export default function CyberNavbar({
   const navLinks = [
     { label: "POURQUOI POULPY", href: "#coaching", id: "coaching" },
     { label: "À PROPOS", href: "#apropos", id: "apropos" },
-    { label: "JEUX & RANKS", href: "#games", id: "games" },
+    { label: "PÔLES D'EXCELLENCE", href: "#games", id: "games" },
     { label: "MÉTHODE", href: "#methodology", id: "methodology" },
     { label: "RÉSERVER", href: "#booking", id: "booking" },
     { label: "AVIS", href: "#avis", id: "avis" },
