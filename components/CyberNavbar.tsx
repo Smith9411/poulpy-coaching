@@ -329,7 +329,7 @@ export default function CyberNavbar({
             : "py-6 bg-transparent border-b border-transparent shadow-none"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 xl:gap-4 flex-nowrap">
           {/* Typographic Brand Logo */}
           <a
             href="#hero"
@@ -343,8 +343,8 @@ export default function CyberNavbar({
             </div>
           </a>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-0.5 xl:gap-2 font-mono text-[10.5px] xl:text-[11px] relative">
+          {/* Desktop Navigation Links — strictly on a single line */}
+          <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1.5 2xl:gap-2 font-mono text-[9.5px] xl:text-[10.5px] 2xl:text-[11px] relative flex-shrink-0 whitespace-nowrap">
             {navLinks.map((link) => {
               const isActive = activeSection === link.id;
 
@@ -353,20 +353,20 @@ export default function CyberNavbar({
                   key={link.label}
                   href={link.href}
                   onClick={(e) => handleNavClick(e, link.href)}
-                  className={`relative px-2 xl:px-2.5 py-1.5 transition-colors tracking-wider uppercase font-semibold ${
+                  className={`relative px-1.5 xl:px-2 py-1 transition-colors tracking-wider uppercase font-semibold whitespace-nowrap ${
                     isActive
                       ? "text-[#CA1C30]"
                       : "text-white/70 hover:text-[#CA1C30]"
                   }`}
                 >
-                  <span className="relative z-10">{link.label}</span>
+                  <span className="relative z-10 whitespace-nowrap">{link.label}</span>
                 </a>
               );
             })}
           </nav>
 
           {/* Action Row: Notifications + ThemeToggle + Connexion + Réserver CTA */}
-          <div className="hidden sm:flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-2 xl:gap-2.5 flex-shrink-0">
             {/* Theme Toggle (Light / Dark) */}
             <ThemeToggle className="text-white/70 hover:text-white" />
 
@@ -564,7 +564,7 @@ export default function CyberNavbar({
                   }
                 }
               }}
-              className="btn-cyber-primary rounded-full py-2 px-5 text-[11px] font-bold uppercase tracking-wider flex items-center justify-center cursor-pointer shadow-[0_0_20px_rgba(202,28,48,0.3)]"
+              className="btn-cyber-primary rounded-full py-2 px-4 xl:px-5 text-[10.5px] xl:text-[11px] font-bold uppercase tracking-wider flex items-center justify-center cursor-pointer shadow-[0_0_20px_rgba(202,28,48,0.3)] whitespace-nowrap shrink-0"
             >
               <span>RÉSERVER</span>
             </button>
