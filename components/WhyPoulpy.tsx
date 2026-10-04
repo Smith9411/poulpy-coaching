@@ -292,26 +292,19 @@ export default function WhyPoulpy() {
     >
       <div
         ref={pinnedContainerRef}
-        className="relative w-full h-screen overflow-hidden flex flex-col justify-between pt-6 sm:pt-8 pb-4 sm:pb-6"
+        className="relative w-full h-screen overflow-hidden flex flex-col justify-center pt-2 sm:pt-4 pb-2 sm:pb-4"
       >
-        {/* Top Header */}
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 flex items-center justify-between pb-1 z-20">
-          <div className="flex items-center gap-3">
-            <span className="text-[#CA1C30] text-xs font-bold font-mono tracking-widest">// MÉTHODOLOGIE</span>
-            <span className="text-white/20">|</span>
-            <h2 className="text-lg sm:text-2xl md:text-3xl font-display font-bold uppercase tracking-wider text-white">
-              UNE APPROCHE EN 3 PILIERS :
-            </h2>
-          </div>
-          <span className="text-[11px] text-white/40 font-mono hidden md:inline-block">
-            VALORANT &bull; APEX LEGENDS &bull; AIM
-          </span>
+        {/* Grand Titre de Catégorie — Collé aux vignettes */}
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 mb-3 sm:mb-4 shrink-0 z-20">
+          <h2 className="text-3xl sm:text-5xl md:text-6xl font-display text-[#F5F4F0] tracking-wider uppercase">
+            UNE APPROCHE EN <span className="text-[#CA1C30]">3 PILIERS :</span>
+          </h2>
         </div>
 
         {/* Large Rectangular Horizontal Sliding Track */}
         <div
           ref={trackRef}
-          className="flex items-center w-max pl-4 sm:pl-10 pr-24 my-auto select-none space-x-8 sm:space-x-12"
+          className="flex items-center w-max pl-4 sm:pl-10 pr-24 select-none space-x-8 sm:space-x-12 shrink-0"
           style={{
             willChange: "transform",
             transform: "translate3d(0, 0, 0)",
