@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import DecryptedText from "./DecryptedText";
-import { Plus, Minus, HelpCircle } from "lucide-react";
+import { Plus } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function CyberFAQ() {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
@@ -35,58 +35,77 @@ export default function CyberFAQ() {
   };
 
   return (
-    <section id="faq" className="py-14 sm:py-16 px-6 sm:px-12 lg:px-16 bg-transparent font-mono">
-      <div className="max-w-4xl mx-auto space-y-8 sm:space-y-10">
-        <div className="space-y-3 text-center">
-          <h2 className="text-4xl sm:text-6xl font-display text-[#F5F4F0] tracking-wider">
-            FOIRE AUX <span className="text-[#CA1C30]">QUESTIONS</span>
-          </h2>
-          <p className="text-xs sm:text-sm text-[#F5F4F0]/60 max-w-lg mx-auto leading-relaxed">
-            Tout ce qu&apos;il faut savoir avant de réserver ta session.
-          </p>
+    <section id="faq" className="py-16 sm:py-20 px-6 sm:px-12 lg:px-16 bg-transparent font-mono">
+      <div className="max-w-6xl mx-auto space-y-10 sm:space-y-12">
+        {/* Section Header aligné avec la DA (Pôles d'excellence, À Propos, Média) */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-8">
+          <div className="space-y-2">
+            <h2 className="text-3xl sm:text-5xl font-display text-[#F5F4F0] tracking-wider uppercase">
+              FOIRE AUX <span className="text-[#CA1C30]">QUESTIONS</span>
+            </h2>
+            <p className="text-xs sm:text-sm text-[#F5F4F0]/60 max-w-xl leading-relaxed">
+              Tout ce qu&apos;il faut savoir avant de réserver ta première session.
+            </p>
+          </div>
+          <div className="text-xs font-mono text-[#F5F4F0]/40 flex items-center gap-2">
+            <span className="text-[#CA1C30] font-bold">//</span>
+            <span>05 RÉPONSES TACTIQUES</span>
+          </div>
         </div>
 
-        <div className="space-y-3">
+        {/* Liste Accordéon — Éditorial Minimaliste & Lignes Fines */}
+        <div className="divide-y divide-white/10 border-b border-white/10">
           {faqs.map((faq, idx) => {
             const isOpen = openIdx === idx;
             return (
-              <div
-                key={idx}
-                className={`reticle-box rounded-2xl transition-all duration-200 overflow-hidden ${
-                  isOpen
-                    ? "border-[#CA1C30]/50 bg-[#121117]"
-                    : "border-white/10 bg-[#1A1822] hover:border-white/20"
-                }`}
-              >
+              <div key={idx} className="group transition-colors">
                 <button
+                  type="button"
                   onClick={() => toggle(idx)}
-                  className="w-full p-6 text-left flex items-center justify-between gap-4 select-none cursor-pointer"
+                  className="w-full py-6 sm:py-7 text-left flex items-start justify-between gap-6 select-none cursor-pointer"
+                  aria-expanded={isOpen}
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-bold text-[#00B4A0]">
-                      0{idx + 1} ·
+                  <div className="flex items-baseline gap-4 sm:gap-6">
+                    <span className="text-xs sm:text-sm font-mono font-bold text-[#CA1C30] shrink-0 tracking-widest">
+                      0{idx + 1}
                     </span>
-                    <span className="text-sm sm:text-base font-bold text-[#F5F4F0] tracking-tight">
+                    <span
+                      className={`text-base sm:text-lg md:text-xl font-display font-medium tracking-wide transition-colors ${
+                        isOpen
+                          ? "text-[#F5F4F0]"
+                          : "text-[#F5F4F0]/80 group-hover:text-white"
+                      }`}
+                    >
                       {faq.q}
                     </span>
                   </div>
 
-                  <div className="w-7 h-7 rounded-full border border-white/20 flex items-center justify-center shrink-0 text-[#F5F4F0] bg-black/40">
-                    {isOpen ? <Minus className="w-3.5 h-3.5 text-[#CA1C30]" /> : <Plus className="w-3.5 h-3.5" />}
+                  <div className="pt-1 shrink-0">
+                    <Plus
+                      className={`w-5 h-5 transition-transform duration-300 ease-out ${
+                        isOpen
+                          ? "rotate-45 text-[#CA1C30]"
+                          : "text-white/40 group-hover:text-white"
+                      }`}
+                    />
                   </div>
                 </button>
 
-                {/* Animated Accordion Content with CSS transform & opacity */}
-                <div
-                  className={`overflow-hidden transition-all duration-300 ${
-                    isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-                  }`}
-                  style={{ transitionTimingFunction: "var(--ease-out)" }}
-                >
-                  <div className="p-6 pt-0 border-t border-white/5 text-xs sm:text-sm text-[#F5F4F0]/70 leading-relaxed">
-                    {faq.a}
-                  </div>
-                </div>
+                <AnimatePresence initial={false}>
+                  {isOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pl-8 sm:pl-12 pr-6 pb-6 sm:pb-7 text-xs sm:text-sm text-[#F5F4F0]/70 font-sans leading-relaxed max-w-3xl">
+                        {faq.a}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             );
           })}
