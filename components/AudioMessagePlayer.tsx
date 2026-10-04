@@ -85,10 +85,10 @@ export default function AudioMessagePlayer({ src, isMine }: AudioMessagePlayerPr
       <button
         type="button"
         onClick={togglePlay}
-        className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-95 shadow-md ${
+        className={`w-10 h-10 flex items-center justify-center shrink-0 transition-transform active:scale-95 cursor-pointer ${
           isMine
-            ? 'bg-white text-purple-600 hover:bg-gray-100'
-            : 'bg-gradient-to-br from-purple-600 to-cyan-500 text-white hover:opacity-95'
+            ? 'bg-black text-[#CA1C30] hover:bg-black/80 border border-[#CA1C30]/40'
+            : 'bg-[#CA1C30] text-black hover:bg-[#CA1C30]/90 font-bold'
         }`}
         aria-label={isPlaying ? 'Pause' : 'Lecture'}
       >
@@ -105,10 +105,10 @@ export default function AudioMessagePlayer({ src, isMine }: AudioMessagePlayerPr
             return (
               <div
                 key={i}
-                className={`flex-1 rounded-full transition-all duration-150 ${
+                className={`flex-1 transition-all duration-150 ${
                   isPassed
-                    ? isMine ? 'bg-white' : 'bg-purple-400'
-                    : isMine ? 'bg-white/30' : 'bg-white/15'
+                    ? isMine ? 'bg-[#CA1C30]' : 'bg-[#00B4A0]'
+                    : isMine ? 'bg-[#CA1C30]/30' : 'bg-white/15'
                 } ${isPlaying ? 'animate-pulse' : ''}`}
                 style={{
                   height: `${h}%`,

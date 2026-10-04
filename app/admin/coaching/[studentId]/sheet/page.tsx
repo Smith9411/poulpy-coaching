@@ -843,8 +843,8 @@ USING (student_id = auth.uid());`;
                 onClick={() => {
                   setShowTemplatesMenu(!showTemplatesMenu);
                 }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-colors ${
-                  showTemplatesMenu ? 'bg-indigo-600 text-white' : 'bg-white/5 hover:bg-white/10 text-gray-300'
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold transition-colors cursor-pointer ${
+                  showTemplatesMenu ? 'bg-[#CA1C30] text-black font-bold' : 'bg-white/5 hover:bg-white/10 text-gray-300'
                 }`}
                 title="Modèles pré-conçus"
               >
@@ -858,7 +858,7 @@ USING (student_id = auth.uid());`;
                     className="fixed inset-0 z-40 cursor-default"
                     onClick={() => setShowTemplatesMenu(false)}
                   />
-                  <div className="absolute left-0 mt-2 w-72 bg-[#13111C] border border-indigo-500/40 shadow-[0_12px_40px_rgba(0,0,0,0.85)] p-2 z-50 animate-fade-in space-y-1">
+                  <div className="absolute left-0 mt-2 w-72 bg-[#121117] border border-[#CA1C30]/40 shadow-[0_12px_40px_rgba(0,0,0,0.85)] p-2 z-50 animate-fade-in space-y-1">
                     <button
                       onClick={() => {
                         applyTemplate('complet');

@@ -648,17 +648,17 @@ export default function StudentCoachingPage() {
                 return (
                   <div key={msg.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
                     <div
-                      className={`max-w-[75%] px-4 py-3 shadow-lg ${
+                      className={`max-w-[75%] px-4 py-3 shadow-lg font-mono ${
                         isMine
-                          ? 'bg-gradient-to-br from-[#CA1C30] to-[#00B4A0] text-black font-bold'
-                          : 'bg-white/5 border border-white/10 text-gray-200'
+                          ? 'bg-[#00B4A0]/15 border border-[#00B4A0]/40 text-white shadow-[0_0_15px_rgba(0,180,160,0.15)]'
+                          : 'bg-[#CA1C30]/15 border border-[#CA1C30]/40 text-white'
                       }`}
                     >
                       {!isMine && (
-                        <div className="text-xs font-semibold text-[#CA1C30] mb-1">{student?.username}</div>
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-[#CA1C30] mb-1">{student?.username}</div>
                       )}
                       {isMine && msg.message_type !== 'student' && (
-                        <div className="text-xs font-semibold text-white/80 mb-1">{msg.message_type}</div>
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-[#00B4A0] mb-1">COACH // {msg.message_type}</div>
                       )}
 
                       {/* Pièce jointe */}
@@ -669,7 +669,7 @@ export default function StudentCoachingPage() {
                               src={msg.attachment_url}
                               alt="Capture"
                               onClick={() => setZoomedImage(msg.attachment_url!)}
-                              className="max-h-72 max-w-full object-contain cursor-pointer hover:opacity-95 transition-opacity"
+                              className="max-h-72 max-w-full object-contain cursor-pointer hover:opacity-95 transition-opacity border border-white/10"
                             />
                           )}
                           {msg.attachment_type === 'video' && (
@@ -677,7 +677,7 @@ export default function StudentCoachingPage() {
                               src={msg.attachment_url}
                               controls
                               playsInline
-                              className="max-h-80 max-w-full bg-black"
+                              className="max-h-80 max-w-full bg-black border border-white/10"
                             />
                           )}
                           {msg.attachment_type === 'audio' && (
@@ -688,10 +688,10 @@ export default function StudentCoachingPage() {
 
                       {/* Texte du message */}
                       {msg.message && (!msg.attachment_url || !['🎙️ Note vocale', '🎬 Extrait vidéo', '📷 Photo / Capture'].includes(msg.message)) && (
-                        <p className="whitespace-pre-wrap break-words text-sm leading-relaxed">{msg.message}</p>
+                        <p className="whitespace-pre-wrap break-words text-xs sm:text-sm leading-relaxed">{msg.message}</p>
                       )}
 
-                      <div className={`text-[10px] mt-1.5 flex items-center gap-1 ${isMine ? 'text-white/70' : 'text-gray-500'}`}>
+                      <div className={`text-[10px] mt-1.5 flex items-center gap-1 border-t pt-1 ${isMine ? 'border-[#00B4A0]/20 text-white/50' : 'border-[#CA1C30]/20 text-white/50'}`}>
                         <span>
                           {new Date(msg.created_at).toLocaleString('fr-FR', {
                             day: '2-digit',
@@ -701,7 +701,7 @@ export default function StudentCoachingPage() {
                           })}
                         </span>
                         {isMine && (
-                          <span className="ml-1 opacity-80">
+                          <span className="ml-1 opacity-80 font-bold">
                             {msg.read_at ? '· Lu' : '· Envoyé'}
                           </span>
                         )}
@@ -714,20 +714,20 @@ export default function StudentCoachingPage() {
           </div>
 
           {/* Formulaire d'envoi */}
-          <div className="border-t border-white/10 p-3 bg-white/[0.02]">
+          <div className="border-t border-white/10 p-3 bg-black/60 font-mono">
             {/* Type selector (Admin only) */}
             <div className="flex items-center gap-2 mb-2 px-1">
-              <span className="text-[11px] text-gray-400 font-medium">Type de retour :</span>
+              <span className="text-[11px] text-white/50 font-bold uppercase tracking-wider">Type de retour :</span>
               <div className="flex gap-1">
                 {(['progression', 'feedback', 'tip'] as const).map((t) => (
                   <button
                     key={t}
                     type="button"
                     onClick={() => setMessageType(t)}
-                    className={`px-2.5 py-0.5 text-xs font-semibold capitalize transition-all ${
+                    className={`px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
                       messageType === t
-                        ? 'bg-[#CA1C30]/20 text-[#CA1C30] border border-[#CA1C30]/50'
-                        : 'bg-white/5 text-gray-400 hover:text-white border border-transparent'
+                        ? 'bg-[#00B4A0] text-black shadow-[0_0_10px_rgba(0,180,160,0.3)]'
+                        : 'bg-white/5 text-white/50 hover:text-white border border-transparent'
                     }`}
                   >
                     {t}
@@ -738,22 +738,22 @@ export default function StudentCoachingPage() {
 
             {/* Prévisualisation média attaché */}
             {selectedFile && (
-              <div className="mb-2 p-2 bg-white/5 border border-white/10 flex items-center justify-between gap-3">
+              <div className="mb-2 p-2 bg-[#121117] border border-white/15 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2 min-w-0">
                   {selectedFile.type === 'image' ? (
-                    <img src={selectedFile.previewUrl} alt="Preview" className="w-12 h-12 object-cover" />
+                    <img src={selectedFile.previewUrl} alt="Preview" className="w-12 h-12 object-cover border border-white/10" />
                   ) : (
-                    <video src={selectedFile.previewUrl} className="w-12 h-12 object-cover bg-black" />
+                    <video src={selectedFile.previewUrl} className="w-12 h-12 object-cover bg-black border border-white/10" />
                   )}
                   <div className="min-w-0">
-                    <p className="text-xs font-semibold text-white truncate">{selectedFile.file.name}</p>
-                    <p className="text-[10px] text-gray-400">{Math.round(selectedFile.file.size / 1024)} Ko · {selectedFile.type}</p>
+                    <p className="text-xs font-bold text-white truncate">{selectedFile.file.name}</p>
+                    <p className="text-[10px] text-white/50">{Math.round(selectedFile.file.size / 1024)} Ko · {selectedFile.type}</p>
                   </div>
                 </div>
                 <button
                   type="button"
                   onClick={removeSelectedFile}
-                  className="p-1.5 bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white transition-colors"
+                  className="p-1.5 bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-colors cursor-pointer"
                 >
                   <X size={14} />
                 </button>
@@ -764,9 +764,9 @@ export default function StudentCoachingPage() {
             {isRecording ? (
               <div className="flex items-center justify-between gap-3 px-3 py-2 bg-red-500/10 border border-red-500/30">
                 <div className="flex items-center gap-2.5">
-                  <span className="w-3 h-3 bg-red-500 animate-ping" />
-                  <span className="text-sm font-semibold text-red-300">Enregistrement note vocale...</span>
-                  <span className="text-xs font-mono text-red-400 bg-red-500/20 px-2 py-0.5 rounded">
+                  <span className="w-2.5 h-2.5 bg-red-500 animate-ping" />
+                  <span className="text-xs font-bold text-red-400">ENREGISTREMENT NOTE VOCALE...</span>
+                  <span className="text-xs font-mono text-red-300">
                     {formatRecordTime(recordingSeconds)}
                   </span>
                 </div>
@@ -774,14 +774,14 @@ export default function StudentCoachingPage() {
                   <button
                     type="button"
                     onClick={cancelRecording}
-                    className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-medium transition-colors"
+                    className="btn-cyber-ghost text-xs py-1 px-3"
                   >
                     Annuler
                   </button>
                   <button
                     type="button"
                     onClick={stopAndSendRecording}
-                    className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-[#CA1C30] text-black font-bold text-white text-xs font-semibold hover:shadow-md transition-all"
+                    className="btn-cyber-primary text-xs py-1 px-3 flex items-center gap-1.5"
                   >
                     <Send size={12} />
                     Envoyer le vocal
@@ -790,7 +790,6 @@ export default function StudentCoachingPage() {
               </div>
             ) : (
               <form onSubmit={handleSendMessage} className="flex items-center gap-2">
-                {/* Input file caché */}
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -805,9 +804,9 @@ export default function StudentCoachingPage() {
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isSending}
                   title="Joindre une image ou un extrait vidéo"
-                  className="p-3 bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors border border-white/10 disabled:opacity-50"
+                  className="p-2.5 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors border border-white/10 disabled:opacity-50 cursor-pointer"
                 >
-                  <Paperclip size={18} />
+                  <Paperclip size={16} />
                 </button>
 
                 {/* Bouton micro note vocale */}
@@ -816,9 +815,9 @@ export default function StudentCoachingPage() {
                   onClick={startRecording}
                   disabled={isSending}
                   title="Enregistrer une note vocale"
-                  className="p-3 bg-white/5 hover:bg-white/10 text-[#CA1C30] hover:text-[#CA1C30]/80 transition-colors border border-white/10 disabled:opacity-50"
+                  className="p-2.5 bg-[#00B4A0]/15 hover:bg-[#00B4A0]/25 text-[#00B4A0] border border-[#00B4A0]/30 transition-colors disabled:opacity-50 cursor-pointer"
                 >
-                  <Mic size={18} />
+                  <Mic size={16} />
                 </button>
 
                 {/* Champ texte */}
@@ -826,19 +825,20 @@ export default function StudentCoachingPage() {
                   type="text"
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder={selectedFile ? "Ajoute un commentaire (optionnel)..." : "Écris un message à l'élève..."}
+                  placeholder={selectedFile ? "Ajoute un commentaire (optionnel)..." : "Transmettre un axe d'amélioration ou une consigne..."}
                   disabled={isSending}
                   maxLength={2000}
-                  className="flex-1 px-4 py-3 bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-[#CA1C30] disabled:opacity-50 text-sm"
+                  className="flex-1 px-3.5 py-2.5 bg-black border border-white/20 text-white placeholder-white/30 focus:outline-none focus:border-[#00B4A0] disabled:opacity-50 text-xs font-mono"
                 />
 
                 {/* Bouton envoyer */}
                 <button
                   type="submit"
                   disabled={isSending || (!newMessage.trim() && !selectedFile)}
-                  className="px-5 py-3 bg-[#CA1C30] text-black font-bold font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40 transition-all disabled:opacity-40 flex items-center gap-2 shrink-0"
+                  className="btn-cyber-primary text-xs py-2.5 px-5 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 shrink-0 cursor-pointer"
                 >
-                  {isSending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                  {isSending ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
+                  <span>ENVOYER</span>
                 </button>
               </form>
             )}

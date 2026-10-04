@@ -10,6 +10,7 @@ import FavoriteGames from '@/components/FavoriteGames';
 import SocialLinks from '@/components/SocialLinks';
 import { CoachingBooking } from '@/components/booking/types';
 import CyberNavbar from '@/components/CyberNavbar';
+import CyberFooter from '@/components/CyberFooter';
 
 interface RawSlot {
   id: string;
@@ -1139,6 +1140,8 @@ export default function Profile() {
           </Link>
         </div>
       </div>
+
+      <CyberFooter />
     </main>
   );
 }

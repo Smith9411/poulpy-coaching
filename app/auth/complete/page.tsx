@@ -1,10 +1,12 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
-import { User, Check, X, AtSign, Sparkles, Loader2 } from 'lucide-react';
+import { User, Check, X, AtSign, Loader2, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
+import CyberNavbar from '@/components/CyberNavbar';
+import CyberFooter from '@/components/CyberFooter';
+import CornerBrackets from '@/components/CornerBrackets';
 
 const USERNAME_MIN = 2;
 const USERNAME_MAX = 20;
@@ -59,12 +61,10 @@ export default function CompleteProfile() {
   }, [user]);
 
   // Vérification de dispo du pseudo (debounce) — fetch annulable.
-  // Les setState vivent dans le timer : jamais sur le chemin synchrone de l'effet.
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
     if (abortRef.current) abortRef.current.abort();
 
-    // invalide → retour à idle immédiat (timer 0) ; valide → debounce avant le fetch
     const delay = isFormatValid && user ? 450 : 0;
     debounceRef.current = setTimeout(async () => {
       if (!isFormatValid || !user) {
@@ -86,7 +86,6 @@ export default function CompleteProfile() {
         setAvailability(result.available ? 'available' : 'taken');
       } catch (err) {
         if ((err as Error).name !== 'AbortError') {
-          // API indisponible : on ne bloque pas l'inscription
           setAvailability('available');
         }
       }
@@ -98,7 +97,6 @@ export default function CompleteProfile() {
     };
   }, [trimmed, isFormatValid, user]);
 
-  // Cleanup du timer de redirection
   useEffect(() => {
     return () => {
       if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
@@ -107,223 +105,195 @@ export default function CompleteProfile() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    setSuccess('');
-    if (!isFormatValid) {
-      setError(`Le pseudo doit faire entre ${USERNAME_MIN} et ${USERNAME_MAX} caractères.`);
-      return;
-    }
-    if (availability === 'taken') {
-      setError('Ce pseudo est déjà pris, choisis-en un autre.');
-      return;
-    }
+    if (!isFormatValid || availability !== 'available' || isSubmitting) return;
 
+    setError('');
     setIsSubmitting(true);
     try {
       await updateUsername(trimmed);
-      setSuccess('Pseudo enregistré ! Redirection...');
-      redirectTimerRef.current = setTimeout(() => window.location.replace('/'), 900);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue');
+      setSuccess('Pseudo enregistré ! Redirection vers le QG...');
+      redirectTimerRef.current = setTimeout(() => {
+        window.location.replace('/');
+      }, 700);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erreur lors de la mise à jour';
+      setError(msg);
       setIsSubmitting(false);
     }
   };
 
   if (authLoading || !user) {
     return (
-      <main className="min-h-screen page-bg py-24 flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      <main className="min-h-screen bg-[#0B0A0D] py-24 flex items-center justify-center font-mono">
+        <Loader2 className="w-10 h-10 animate-spin text-[#CA1C30]" />
       </main>
     );
   }
 
   const statusIcon =
     availability === 'checking' ? (
-      <Loader2 size={18} className="animate-spin text-gray-500" />
+      <Loader2 size={16} className="animate-spin text-white/40" />
     ) : availability === 'available' ? (
-      <Check size={18} className="text-green-400" />
+      <Check size={16} className="text-[#00B4A0]" />
     ) : availability === 'taken' ? (
-      <X size={18} className="text-red-400" />
+      <X size={16} className="text-[#CA1C30]" />
     ) : null;
 
   const statusText: Record<Availability, string> = {
-    idle: isFormatValid ? '' : `${USERNAME_MIN} à ${USERNAME_MAX} caractères — lettres, chiffres, - _ .`,
+    idle: isFormatValid ? '' : `${USERNAME_MIN} à ${USERNAME_MAX} car. — lettres, chiffres, - _ .`,
     checking: 'Vérification de la disponibilité...',
     available: 'Pseudo disponible !',
     taken: 'Ce pseudo est déjà pris.',
   };
 
-  const canSubmit =
-    isFormatValid && availability === 'available' && !isSubmitting && !success;
+  const canSubmit = isFormatValid && availability === 'available' && !isSubmitting && !success;
 
   return (
-    <main className="min-h-screen page-bg py-24 relative overflow-hidden">
-      {/* Halos décoratifs aux couleurs de la marque */}
-      <div className="absolute -top-24 left-1/4 w-96 h-96 bg-purple-500/15 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen bg-[#0B0A0D] text-white selection:bg-[#CA1C30] selection:text-black font-mono flex flex-col justify-between">
+      <CyberNavbar />
 
-      <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 relative">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-8"
-        >
-          <div className="inline-block glass px-4 py-2 rounded-full mb-6">
-            <span className="text-sm text-purple-400 font-medium flex items-center gap-2">
-              <Sparkles size={14} />
-              DERNIÈRE ÉTAPE
-            </span>
-          </div>
+      <main className="flex-1 flex items-center justify-center px-4 py-28 relative">
+        <div className="max-w-md w-full">
+          <div className="reticle-box p-6 sm:p-10 bg-[#121117] border border-[#CA1C30]/40 relative shadow-[0_0_60px_rgba(0,0,0,0.95)]">
+            <CornerBrackets color="coral" />
 
-          {/* Avatar Google avec anneau dégradé */}
-          <div className="inline-block p-[3px] rounded-full bg-gradient-to-r from-purple-500 to-cyan-500 mb-5">
-            <div className="w-20 h-20 rounded-full bg-[#13161e] flex items-center justify-center overflow-hidden">
-              {user.avatarUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={user.avatarUrl} alt="" className="w-full h-full object-cover rounded-full" />
-              ) : (
-                <span className="text-3xl font-bold text-gradient">{user.initial}</span>
-              )}
-            </div>
-          </div>
-
-          <h1 className="text-4xl font-bold mb-3">Bienvenue !</h1>
-          <p className="text-gray-400">
-            Ton compte Google est connecté. Choisis ton pseudo pour rejoindre la communauté.
-          </p>
-          <p className="text-sm text-gray-500 mt-2 flex items-center justify-center gap-1.5">
-            <AtSign size={14} />
-            {user.email}
-          </p>
-        </motion.div>
-
-        {/* Card */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.15 }}
-          className="card rounded-2xl p-8"
-        >
-          {error && (
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="mb-6 p-4 rounded-xl bg-red-500/20 border border-red-500/30 text-red-400 text-sm"
-            >
-              {error}
-            </motion.div>
-          )}
-
-          {success && (
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="mb-6 p-4 rounded-xl bg-green-500/20 border border-green-500/30 text-green-400 text-sm flex items-center gap-2"
-            >
-              <Check size={16} />
-              <span>{success}</span>
-            </motion.div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-300 mb-2">
-                Ton pseudo de joueur
-              </label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
-                <input
-                  type="text"
-                  id="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  autoFocus
-                  required
-                  maxLength={USERNAME_MAX + 10}
-                  className="w-full pl-10 pr-11 py-3.5 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all"
-                  placeholder="Ton pseudo (ex: Poulpy)"
-                  autoComplete="username"
-                  disabled={isSubmitting}
-                />
-                {statusIcon && (
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2">{statusIcon}</span>
-                )}
+            {/* Header */}
+            <div className="border-b border-white/10 pb-5 mb-6 text-center space-y-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/10 text-[10px] text-[#00B4A0] tracking-widest uppercase">
+                <span className="w-1.5 h-1.5 bg-[#00B4A0] animate-pulse" />
+                DERNIÈRE ÉTAPE // INITIALISATION DU JOUEUR
               </div>
-              <p
-                className={`mt-2 text-xs ${
-                  availability === 'taken'
-                    ? 'text-red-400'
-                    : availability === 'available'
-                      ? 'text-green-400'
-                      : 'text-gray-500'
-                }`}
-                aria-live="polite"
-              >
-                {statusText[availability]}
+
+              {/* Avatar Google */}
+              <div className="w-20 h-20 mx-auto border-2 border-[#CA1C30]/40 p-1 bg-black/60 relative">
+                <div className="w-full h-full bg-[#121117] flex items-center justify-center overflow-hidden">
+                  {user.avatarUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={user.avatarUrl} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-2xl font-bold font-display text-white">{user.initial}</span>
+                  )}
+                </div>
+              </div>
+
+              <h1 className="text-2xl sm:text-3xl font-display uppercase tracking-wider text-white">
+                CHOISIS TON <span className="text-[#CA1C30]">PSEUDO</span>
+              </h1>
+              <p className="text-xs text-white/60 leading-relaxed">
+                Ton compte Google est validé. Définis ton identifiant pour tes fiches et tes sessions.
+              </p>
+              <p className="text-[11px] text-white/40 flex items-center justify-center gap-1.5 font-mono">
+                <AtSign size={13} />
+                {user.email}
               </p>
             </div>
 
-            {/* Suggestions */}
-            {suggestions.length > 0 && (
-              <div>
-                <p className="text-xs text-gray-500 mb-2">Suggestions :</p>
-                <div className="flex flex-wrap gap-2">
-                  {suggestions.map((s) => (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={() => setUsername(s)}
-                      disabled={isSubmitting}
-                      className="px-3 py-1.5 rounded-full glass text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all disabled:opacity-50"
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
+            {/* Alerts */}
+            {error && (
+              <div className="mb-6 p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-xs">
+                {error}
               </div>
             )}
 
-            <button
-              type="submit"
-              disabled={!canSubmit}
-              className="w-full py-4 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold text-lg hover:shadow-lg hover:shadow-purple-500/50 transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
-            >
-              {isSubmitting ? (
-                <>
-                  <svg className="animate-spin h-6 w-6" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Enregistrement...
-                </>
-              ) : (
-                'Confirmer mon pseudo'
+            {success && (
+              <div className="mb-6 p-3 bg-[#00B4A0]/10 border border-[#00B4A0]/30 text-[#00B4A0] text-xs flex items-center gap-2">
+                <Check size={15} />
+                <span>{success}</span>
+              </div>
+            )}
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label htmlFor="username" className="block text-xs font-bold uppercase tracking-wider text-white/70 mb-2">
+                  PSEUDO DE JOUEUR
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40" size={16} />
+                  <input
+                    type="text"
+                    id="username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    autoFocus
+                    required
+                    maxLength={USERNAME_MAX + 10}
+                    className="w-full pl-9 pr-9 py-3 bg-black/60 border border-white/15 text-white placeholder-white/30 text-xs focus:outline-none focus:border-[#CA1C30] transition-colors"
+                    placeholder="Ex: Poulpy, Neo, Valkyrie"
+                    autoComplete="username"
+                    disabled={isSubmitting}
+                  />
+                  {statusIcon && (
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2">{statusIcon}</span>
+                  )}
+                </div>
+                <p
+                  className={`mt-1.5 text-[11px] ${
+                    availability === 'taken'
+                      ? 'text-[#CA1C30]'
+                      : availability === 'available'
+                        ? 'text-[#00B4A0]'
+                        : 'text-white/40'
+                  }`}
+                  aria-live="polite"
+                >
+                  {statusText[availability]}
+                </p>
+              </div>
+
+              {/* Suggestions */}
+              {suggestions.length > 0 && (
+                <div>
+                  <p className="text-[10px] text-white/50 uppercase tracking-wider mb-2">Suggestions :</p>
+                  <div className="flex flex-wrap gap-2">
+                    {suggestions.map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => setUsername(s)}
+                        disabled={isSubmitting}
+                        className="px-2.5 py-1 bg-white/5 border border-white/15 hover:border-white/40 hover:bg-white/10 text-xs text-white/80 transition-colors disabled:opacity-50 cursor-pointer"
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               )}
-            </button>
-          </form>
 
-          <p className="mt-6 text-center text-xs text-gray-500">
-            Ce pseudo identifie ton profil auprès de ton coach.
-          </p>
-        </motion.div>
+              <button
+                type="submit"
+                disabled={!canSubmit}
+                className="btn-cyber-primary w-full py-3.5 flex items-center justify-center gap-2 text-xs uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>ENREGISTREMENT...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>CONFIRMER MON IDENTITÉ</span>
+                    <ArrowRight size={14} />
+                  </>
+                )}
+              </button>
+            </form>
 
-        {/* Changer de compte */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="text-center mt-6"
-        >
-          <button
-            onClick={() => logout().then(() => window.location.replace('/auth'))}
-            className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
-          >
-            Ce n&apos;est pas le bon compte ? Se déconnecter
-          </button>
-        </motion.div>
-      </div>
-    </main>
+            {/* Logout button */}
+            <div className="text-center mt-6 pt-4 border-t border-white/10">
+              <button
+                onClick={() => logout().then(() => window.location.replace('/auth'))}
+                className="text-[11px] text-white/40 hover:text-white transition-colors cursor-pointer uppercase tracking-wider"
+              >
+                Ce n'est pas le bon compte ? Se déconnecter
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <CyberFooter />
+    </div>
   );
 }

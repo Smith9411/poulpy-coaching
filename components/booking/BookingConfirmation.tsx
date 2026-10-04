@@ -1,9 +1,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Calendar, CheckCircle2, Gamepad2, MessageSquare, Shield, Sparkles, User } from 'lucide-react';
+import { Calendar, CheckCircle2, Gamepad2, MessageSquare, Shield, Sparkles, User, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { BookingFormData, Plan } from './types';
+import CornerBrackets from '@/components/CornerBrackets';
 
 interface BookingConfirmationProps {
   plan: Plan;
@@ -20,102 +21,100 @@ export default function BookingConfirmation({
 }: BookingConfirmationProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.96 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.96 }}
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 15 }}
       transition={{ duration: 0.3 }}
-      className="max-w-2xl mx-auto"
+      className="max-w-2xl mx-auto font-mono"
     >
-      <div className="glass-dark border border-purple-500/30 rounded-3xl p-6 sm:p-10 text-center">
-        {/* Animated badge */}
-        <motion.div
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: 'spring', damping: 14, stiffness: 220, delay: 0.15 }}
-          className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl mx-auto mb-5 flex items-center justify-center shadow-lg shadow-cyan-500/30"
-          style={{ background: 'linear-gradient(135deg, #7c3aed, #06b6d4)' }}
-        >
-          <CheckCircle2 size={36} className="text-white" />
-        </motion.div>
+      <div className="reticle-box bg-[#121117] border border-white/10 p-6 sm:p-10 relative text-center shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+        <CornerBrackets color="coral" />
 
-        <h3 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">
-          Réservation validée, {formData.name} !
+        {/* Animated Badge */}
+        <div className="w-16 h-16 mx-auto mb-5 border-2 border-[#00B4A0] bg-[#00B4A0]/10 flex items-center justify-center text-[#00B4A0] shadow-[0_0_20px_rgba(0,180,160,0.3)]">
+          <CheckCircle2 size={32} />
+        </div>
+
+        <div className="inline-block px-3 py-1 bg-white/5 border border-white/10 text-[10px] text-[#00B4A0] tracking-widest uppercase mb-3">
+          SESSION CONFIRMÉE // STATUS_OK
+        </div>
+
+        <h3 className="text-2xl sm:text-4xl font-display uppercase tracking-wider text-white mb-2">
+          RÉSERVATION VALIDÉE, <span className="text-[#CA1C30]">{formData.name}</span>
         </h3>
-        <p className="text-gray-300 text-sm sm:text-base max-w-md mx-auto mb-6">
-          Ton créneau de coaching avec Poulpy est bien enregistré. On se retrouve très vite en session !
+        <p className="text-white/60 text-xs sm:text-sm max-w-md mx-auto mb-8 leading-relaxed">
+          Ton créneau de coaching avec Poulpy est bien synchronisé. Prépare-toi pour ta session d'entraînement.
         </p>
 
         {/* Recap Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6 text-left">
-          <div className="glass p-3.5 rounded-xl flex items-center gap-3 border border-white/10">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-gradient-to-br from-purple-600 to-cyan-500">
-              <User size={18} className="text-white" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8 text-left">
+          <div className="p-3.5 bg-black/40 border border-white/10 flex items-center gap-3">
+            <div className="w-9 h-9 flex items-center justify-center shrink-0 bg-[#CA1C30]/20 border border-[#CA1C30]/40 text-[#CA1C30]">
+              <User size={16} />
             </div>
             <div className="min-w-0">
-              <div className="font-bold text-white text-sm truncate">{plan.name}</div>
-              <div className="text-xs text-gray-400">
+              <div className="font-bold text-white text-xs truncate uppercase tracking-wider">{plan.name}</div>
+              <div className="text-[11px] text-white/50">
                 {plan.duration} • {plan.price}
               </div>
             </div>
           </div>
 
-          <div className="glass p-3.5 rounded-xl flex items-center gap-3 border border-white/10">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-purple-500/20 text-purple-400">
-              <Calendar size={18} />
+          <div className="p-3.5 bg-black/40 border border-white/10 flex items-center gap-3">
+            <div className="w-9 h-9 flex items-center justify-center shrink-0 bg-[#00B4A0]/20 border border-[#00B4A0]/40 text-[#00B4A0]">
+              <Calendar size={16} />
             </div>
             <div className="min-w-0">
-              <div className="font-bold text-white text-sm truncate">{slotLabel}</div>
-              <div className="text-xs text-gray-400">Heure de Paris (CET)</div>
+              <div className="font-bold text-white text-xs truncate uppercase tracking-wider">{slotLabel}</div>
+              <div className="text-[11px] text-white/50">Heure de Paris (CET)</div>
             </div>
           </div>
 
-          <div className="glass p-3.5 rounded-xl flex items-center gap-3 border border-white/10">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-cyan-500/20 text-cyan-400">
-              <Gamepad2 size={18} />
+          <div className="p-3.5 bg-black/40 border border-white/10 flex items-center gap-3">
+            <div className="w-9 h-9 flex items-center justify-center shrink-0 bg-white/5 border border-white/10 text-white">
+              <Gamepad2 size={16} />
             </div>
             <div className="min-w-0">
-              <div className="font-bold text-white text-sm truncate">{formData.game}</div>
-              <div className="text-xs text-gray-400">Jeu sélectionné</div>
+              <div className="font-bold text-white text-xs truncate uppercase tracking-wider">{formData.game}</div>
+              <div className="text-[11px] text-white/50">Jeu sélectionné</div>
             </div>
           </div>
 
-          <div className="glass p-3.5 rounded-xl flex items-center gap-3 border border-white/10">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 bg-indigo-500/20 text-indigo-400">
-              <MessageSquare size={18} />
+          <div className="p-3.5 bg-black/40 border border-white/10 flex items-center gap-3">
+            <div className="w-9 h-9 flex items-center justify-center shrink-0 bg-[#5865F2]/20 border border-[#5865F2]/40 text-[#5865F2]">
+              <MessageSquare size={16} />
             </div>
             <div className="min-w-0">
-              <div className="font-bold text-white text-sm truncate">{formData.discord}</div>
-              <div className="text-xs text-gray-400">Identifiant Discord</div>
+              <div className="font-bold text-white text-xs truncate uppercase tracking-wider">{formData.discord}</div>
+              <div className="text-[11px] text-white/50">Identifiant Discord</div>
             </div>
           </div>
         </div>
 
         {/* Steps roadmap */}
-        <div className="glass p-5 rounded-2xl mb-6 text-left border border-white/10">
-          <h4 className="font-bold text-white text-sm mb-3 flex items-center gap-2">
-            <Shield size={16} className="text-green-400" />
-            Ce qui se passe maintenant :
+        <div className="p-5 bg-black/40 border border-white/10 mb-8 text-left">
+          <h4 className="font-bold text-white text-xs uppercase tracking-wider mb-4 flex items-center gap-2">
+            <Shield size={14} className="text-[#00B4A0]" />
+            PROTOCOLE POST-RÉSERVATION :
           </h4>
-          <div className="space-y-2.5 text-xs sm:text-sm text-gray-300">
-            <div className="flex items-start gap-2.5">
-              <span className="w-5 h-5 rounded-full bg-purple-500/20 text-purple-400 font-bold flex items-center justify-center flex-shrink-0 text-xs">
-                1
+          <div className="space-y-3 text-xs text-white/70">
+            <div className="flex items-start gap-3">
+              <span className="w-5 h-5 bg-[#CA1C30]/20 border border-[#CA1C30]/40 text-[#CA1C30] font-bold flex items-center justify-center shrink-0 text-[10px]">
+                01
               </span>
-              <span>Rejoins le serveur Discord si ce n'est pas encore fait.</span>
+              <span>Rejoins le serveur Discord officiel pour la communication vocale.</span>
             </div>
-            <div className="flex items-start gap-2.5">
-              <span className="w-5 h-5 rounded-full bg-cyan-500/20 text-cyan-400 font-bold flex items-center justify-center flex-shrink-0 text-xs">
-                2
+            <div className="flex items-start gap-3">
+              <span className="w-5 h-5 bg-[#00B4A0]/20 border border-[#00B4A0]/40 text-[#00B4A0] font-bold flex items-center justify-center shrink-0 text-[10px]">
+                02
               </span>
-              <span>Tu recevras une confirmation par message de Poulpy avant la session.</span>
+              <span>Tu recevras un briefing direct de Poulpy avant le début de la session.</span>
             </div>
-            <div className="flex items-start gap-2.5">
-              <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold flex items-center justify-center flex-shrink-0 text-xs">
-                3
+            <div className="flex items-start gap-3">
+              <span className="w-5 h-5 bg-white/10 border border-white/20 text-white font-bold flex items-center justify-center shrink-0 text-[10px]">
+                03
               </span>
-              <span>
-                Prépare un clip ou une VOD si tu le souhaites pour maximiser ton heure d'entraînement !
-              </span>
+              <span>Dépose un clip ou une VOD dans ton espace élève pour une analyse millimétrée.</span>
             </div>
           </div>
         </div>
@@ -126,26 +125,27 @@ export default function BookingConfirmation({
             href="https://discord.gg/rJMg3ZZRkp"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 font-bold text-sm text-white shadow-lg hover:shadow-purple-500/30 flex items-center justify-center gap-2 transition-all"
+            className="btn-cyber-primary w-full sm:w-auto py-3 px-6 text-xs inline-flex items-center justify-center gap-2"
           >
-            <MessageSquare size={16} />
-            <span>Rejoindre le Discord</span>
+            <MessageSquare size={14} />
+            <span>REJOINDRE LE DISCORD</span>
           </a>
 
           <Link
-            href="/coaching"
-            className="w-full sm:w-auto px-6 py-3 rounded-xl glass hover:bg-white/10 font-bold text-sm text-white border border-white/10 flex items-center justify-center gap-2 transition-all"
+            href="/profile/coaching"
+            className="btn-cyber-ghost w-full sm:w-auto py-3 px-6 text-xs inline-flex items-center justify-center gap-2"
           >
-            <Sparkles size={16} className="text-cyan-400" />
-            <span>Espace Coaching & Suivi</span>
+            <Sparkles size={14} className="text-[#00B4A0]" />
+            <span>ESPACE SUIVI COACHING</span>
           </Link>
+        </div>
 
+        <div className="mt-6 pt-4 border-t border-white/10">
           <button
-            type="button"
             onClick={onReset}
-            className="w-full sm:w-auto px-5 py-3 rounded-xl glass text-xs sm:text-sm text-gray-400 hover:text-white transition-all"
+            className="text-[11px] text-white/40 hover:text-white transition-colors cursor-pointer uppercase tracking-wider"
           >
-            Nouvelle réservation
+            Réserver un autre créneau
           </button>
         </div>
       </div>

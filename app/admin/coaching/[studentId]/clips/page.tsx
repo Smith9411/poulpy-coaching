@@ -423,7 +423,7 @@ function ClipCard({
               <button
                 type="submit"
                 disabled={isSending || !newContent.trim()}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-[#CA1C30] text-black font-bold text-sm font-semibold text-white hover:shadow-lg hover:shadow-purple-500/30 transition-all disabled:opacity-50"
+                className="btn-cyber-primary text-xs py-2 px-4 inline-flex items-center gap-2 disabled:opacity-50"
               >
                 {isSending ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
                 Envoyer

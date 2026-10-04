@@ -9,6 +9,8 @@ import { supabase } from '@/lib/supabase';
 import { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import AudioMessagePlayer from '@/components/AudioMessagePlayer';
+import CyberNavbar from '@/components/CyberNavbar';
+import CyberFooter from '@/components/CyberFooter';
 
 interface Message {
   id: string;
@@ -61,138 +63,60 @@ export default function StudentCoachingPage() {
       }
 
       if (session.expires_at && new Date(session.expires_at * 1000) <= new Date()) {
-        const { data: refreshed } = await supabase.auth.refreshSession();
-        session = refreshed.session ?? session;
-        if (!session?.access_token || (session.expires_at && new Date(session.expires_at * 1000) <= new Date())) {
+        const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession();
+        if (refreshError || !refreshed?.session?.access_token) {
           setSessionExpired(true);
           throw new Error('Session expirée, reconnecte-toi.');
         }
+        session = refreshed.session;
       }
 
-      const res = await fetch('/api/student/messages', {
+      const res = await fetch(`/api/coaching/messages?studentId=${user.id}`, {
         headers: { Authorization: `Bearer ${session.access_token}` },
+        cache: 'no-store',
       });
-      const data = await res.json();
-      if (!res.ok || data.error) throw new Error(data.error || 'Erreur de chargement');
 
-      const adminIds = (data.messages || []).map((m: Message) => m.sender_id).filter(Boolean);
-      const uniqueAdminIds = Array.from(new Set(adminIds));
-      const adminMap = new Map<string, string>();
-
-      if (uniqueAdminIds.length > 0) {
-        const { data: admins } = await supabase
-          .from('profiles')
-          .select('id, username')
-          .in('id', uniqueAdminIds);
-        admins?.forEach((a) => adminMap.set(a.id, a.username));
+      if (res.status === 401) {
+        setSessionExpired(true);
+        throw new Error('Session expirée, reconnecte-toi.');
       }
 
-      const formatted = (data.messages || []).map((m: Message) => ({
-        ...m,
-        admin_name: adminMap.get(m.sender_id) || 'Coach',
-      }));
-      setMessages(formatted);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erreur lors du chargement des messages');
+
+      setMessages(data.messages || []);
+      setError('');
+      setSessionExpired(false);
 
       if (markAsRead) {
-        const unread = formatted.filter((m: Message) => !m.read_at && m.sender_id !== user.id);
-        if (unread.length > 0) {
-          const { data: { session: s } } = await supabase.auth.getSession();
-          if (s?.access_token) {
-            await fetch('/api/coaching/mark-read', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${s.access_token}`,
-              },
-              body: JSON.stringify({ studentId: user.id }),
-            });
-          }
-        }
+        fetch('/api/coaching/mark-read', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ studentId: user.id }),
+        }).catch((err) => console.error('Erreur mark-read:', err));
       }
     } catch (err) {
-      console.error('Erreur chargement messages:', err);
-      setError(err instanceof Error ? err.message : 'Erreur lors du chargement');
+      console.error('Erreur fetch messages:', err);
+      setError(err instanceof Error ? err.message : 'Erreur de connexion');
     } finally {
       setIsLoading(false);
     }
   }, [user?.id]);
 
   useEffect(() => {
-    if (user) fetchMessages();
-  }, [user, fetchMessages]);
-
-  // Supabase Realtime : réception instantanée des messages du coach
-  useEffect(() => {
     if (!user?.id) return;
+    setIsLoading(true);
+    fetchMessages(true);
 
-    const channel = supabase
-      .channel(`coaching_student_chat_${user.id}`)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'coaching_messages',
-          filter: `student_id=eq.${user.id}`,
-        },
-        (payload) => {
-          const newMsg = payload.new as Message;
-          setMessages((prev) => {
-            if (prev.some((m) => m.id === newMsg.id)) return prev;
-            return [...prev, { ...newMsg, admin_name: 'Coach' }];
-          });
+    const interval = setInterval(() => {
+      fetchMessages(false);
+    }, 5000);
 
-          // Si le message vient du coach, marquer lu
-          if (newMsg.sender_id !== user.id) {
-            supabase.auth.getSession().then(({ data }) => {
-              if (data.session?.access_token) {
-                fetch('/api/coaching/mark-read', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${data.session.access_token}`,
-                  },
-                  body: JSON.stringify({ studentId: user.id }),
-                }).catch(() => {});
-              }
-            });
-          }
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [user?.id]);
-
-  // Polling de secours discret (toutes les 25s)
-  useEffect(() => {
-    if (!user?.id || sessionExpired) return;
-    const interval = setInterval(() => fetchMessages(false), 25000);
     return () => clearInterval(interval);
-  }, [user?.id, fetchMessages, sessionExpired]);
-
-  // Marque les messages comme lus en quittant la page
-  useEffect(() => {
-    return () => {
-      if (!user?.id) return;
-      supabase.auth.getSession().then(({ data }) => {
-        const token = data.session?.access_token;
-        const uid = data.session?.user.id;
-        if (!token || !uid) return;
-        fetch('/api/coaching/mark-read', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ studentId: uid }),
-          keepalive: true,
-        }).catch(() => {});
-      });
-    };
-  }, [user?.id]);
+  }, [user?.id, fetchMessages]);
 
   useLayoutEffect(() => {
     if (scrollRef.current) {
@@ -208,7 +132,6 @@ export default function StudentCoachingPage() {
     }
   }, [isLoading]);
 
-  // Gestion sélection média (image / clip)
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -236,7 +159,6 @@ export default function StudentCoachingPage() {
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  // Enregistrement vocal
   const startRecording = async () => {
     setError('');
     try {
@@ -260,7 +182,13 @@ export default function StudentCoachingPage() {
       setRecordingSeconds(0);
 
       recordingTimerRef.current = setInterval(() => {
-        setRecordingSeconds((prev) => prev + 1);
+        setRecordingSeconds((s) => {
+          if (s >= 300) {
+            stopAndSendRecording();
+            return 300;
+          }
+          return s + 1;
+        });
       }, 1000);
     } catch (err) {
       console.error('Erreur accès micro:', err);
@@ -271,7 +199,6 @@ export default function StudentCoachingPage() {
   const cancelRecording = () => {
     if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
-      mediaRecorderRef.current.onstop = null;
       mediaRecorderRef.current.stop();
     }
     setIsRecording(false);
@@ -283,20 +210,28 @@ export default function StudentCoachingPage() {
     if (!mediaRecorderRef.current || mediaRecorderRef.current.state === 'inactive') return;
     if (recordingTimerRef.current) clearInterval(recordingTimerRef.current);
 
-    setIsSending(true);
+    mediaRecorderRef.current.stop();
     setIsRecording(false);
+    setIsSending(true);
 
-    mediaRecorderRef.current.onstop = async () => {
+    setTimeout(async () => {
       try {
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-        const file = new File([audioBlob], `vocal-${Date.now()}.webm`, { type: 'audio/webm' });
+        audioChunksRef.current = [];
+
+        if (audioBlob.size < 1000) {
+          setError('Enregistrement trop court.');
+          setIsSending(false);
+          return;
+        }
 
         const { data: { session } } = await supabase.auth.getSession();
-        const token = session?.access_token;
+        let token = session?.access_token;
         if (!token) throw new Error('Non authentifié');
 
+        const audioFile = new File([audioBlob], `vocal_${Date.now()}.webm`, { type: 'audio/webm' });
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append('file', audioFile);
 
         const uploadRes = await fetch('/api/coaching/upload', {
           method: 'POST',
@@ -306,7 +241,7 @@ export default function StudentCoachingPage() {
 
         const uploadData = await uploadRes.json();
         if (!uploadRes.ok || uploadData.error) {
-          throw new Error(uploadData.error || 'Erreur upload note vocale');
+          throw new Error(uploadData.error || 'Erreur upload vocal');
         }
 
         const res = await fetch('/api/coaching/send', {
@@ -317,36 +252,29 @@ export default function StudentCoachingPage() {
           },
           body: JSON.stringify({
             studentId: user!.id,
-            message: '',
+            message: '🎙️ Note vocale',
             attachmentUrl: uploadData.url,
             attachmentType: 'audio',
           }),
         });
 
         const data = await res.json();
-        if (!res.ok || data.error) throw new Error(data.error || 'Erreur envoi note vocale');
+        if (!res.ok || data.error) throw new Error(data.error || 'Erreur envoi');
+
+        fetchMessages(false);
       } catch (err) {
-        console.error('Erreur envoi note vocale:', err);
-        setError(err instanceof Error ? err.message : 'Erreur lors de l\'envoi de la note vocale');
+        console.error('Erreur envoi vocal:', err);
+        setError(err instanceof Error ? err.message : 'Erreur envoi du vocal');
       } finally {
         setIsSending(false);
-        setRecordingSeconds(0);
-        audioChunksRef.current = [];
       }
-    };
-
-    mediaRecorderRef.current.stop();
+    }, 300);
   };
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = newMessage.trim();
     if (!trimmed && !selectedFile) return;
-
-    if (trimmed.length > 2000) {
-      setError('Le message ne doit pas dépasser 2000 caractères.');
-      return;
-    }
 
     setIsSending(true);
     setError('');
@@ -406,6 +334,7 @@ export default function StudentCoachingPage() {
 
       setNewMessage('');
       removeSelectedFile();
+      fetchMessages(false);
     } catch (err) {
       console.error('Erreur envoi:', err);
       setError(err instanceof Error ? err.message : 'Erreur envoi');
@@ -422,281 +351,303 @@ export default function StudentCoachingPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen page-bg flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
+      <div className="min-h-screen bg-[#0B0A0D] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#CA1C30]" />
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="min-h-screen page-bg flex items-center justify-center">
-        <div className="text-center">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold mb-2">Non connecté</h1>
-          <p className="text-gray-400">Connecte-toi pour discuter avec ton coach.</p>
+      <div className="min-h-screen bg-[#0B0A0D] flex items-center justify-center px-4 font-mono">
+        <div className="text-center reticle-box bg-[#121117] border border-white/10 p-8 max-w-md">
+          <AlertCircle className="w-12 h-12 text-[#CA1C30] mx-auto mb-4" />
+          <h1 className="text-xl font-bold font-display uppercase tracking-wider mb-2 text-white">CONNEXION REQUISE</h1>
+          <p className="text-xs text-white/50 mb-6">Connecte-toi pour échanger en direct avec ton coach.</p>
+          <Link href="/auth" className="btn-cyber-primary text-xs py-2.5 px-6">
+            SE CONNECTER
+          </Link>
         </div>
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen page-bg py-24">
+    <div className="min-h-screen bg-[#0B0A0D] text-white flex flex-col font-mono">
+      <CyberNavbar />
+
       {/* Lightbox zoom image */}
       {zoomedImage && (
         <div
-          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex items-center justify-center p-4"
           onClick={() => setZoomedImage(null)}
         >
           <button
             onClick={() => setZoomedImage(null)}
-            className="absolute top-6 right-6 p-3 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+            className="absolute top-6 right-6 p-3 bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
           >
             <X size={24} />
           </button>
           <img
             src={zoomedImage}
             alt="Plein écran"
-            className="max-h-[90vh] max-w-[90vw] object-contain rounded-xl"
+            className="max-h-[90vh] max-w-[90vw] object-contain border border-white/20"
             onClick={(e) => e.stopPropagation()}
           />
         </div>
       )}
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-            <Link href="/profile" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
-              <ArrowLeft size={20} />
-              Retour au profil
-            </Link>
-            <div className="flex items-center gap-2 flex-wrap">
-              <Link
-                href="/profile/sheet"
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 border border-indigo-500/20 text-xs font-semibold transition-colors"
-              >
-                📋 Ma fiche de suivi
+      <main className="flex-1 py-28 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto">
+          {/* Header Bar */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+              <Link href="/profile" className="btn-cyber-ghost text-xs py-1.5 px-3 flex items-center gap-2">
+                <ArrowLeft size={14} />
+                <span>RETOUR AU PROFIL</span>
               </Link>
-              <Link
-                href="/profile/vod"
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20 text-xs font-semibold transition-colors"
-              >
-                🎬 Voir mes clips VOD
-              </Link>
+              <div className="flex items-center gap-2 flex-wrap">
+                <Link
+                  href="/profile/sheet"
+                  className="px-3 py-1.5 bg-[#00B4A0]/15 hover:bg-[#00B4A0]/25 text-[#00B4A0] border border-[#00B4A0]/30 text-xs font-bold uppercase transition-colors"
+                >
+                  📋 FICHE DE SUIVI
+                </Link>
+                <Link
+                  href="/profile/vod"
+                  className="px-3 py-1.5 bg-[#CA1C30]/15 hover:bg-[#CA1C30]/25 text-[#CA1C30] border border-[#CA1C30]/30 text-xs font-bold uppercase transition-colors"
+                >
+                  🎬 MES CLIPS VOD
+                </Link>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-[#CA1C30]/15 border border-[#CA1C30]/30 flex items-center justify-center text-[#CA1C30]">
+                <MessageSquare size={20} />
+              </div>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold font-display uppercase tracking-wider text-white">
+                  CANAL DIRECT // <span className="text-[#CA1C30]">COACH POULPY</span>
+                </h1>
+                <p className="text-xs text-white/50">Échange technique, analyses et suivi de progression</p>
+              </div>
             </div>
           </div>
-          <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
-            <MessageSquare className="text-purple-400" />
-            Chat avec ton coach
-          </h1>
-          <p className="text-gray-400">Échange en direct avec ton coach Poulpy</p>
-        </div>
 
-        {error && (
-          <div className="mb-4 p-3 rounded-xl bg-red-500/20 border border-red-500/30 text-red-400 text-sm flex items-center gap-2">
-            <AlertCircle size={16} />
-            <span>{error}</span>
-          </div>
-        )}
+          {error && (
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-2">
+              <AlertCircle size={15} />
+              <span>{error}</span>
+            </div>
+          )}
 
-        <div className="card rounded-2xl overflow-hidden flex flex-col h-[70vh]">
-          {/* Zone des messages */}
-          <div
-            ref={scrollRef}
-            role="log"
-            aria-live="polite"
-            aria-relevant="additions"
-            aria-label="Messages du chat"
-            className="flex-1 overflow-y-auto p-6 space-y-4"
-          >
-            {isLoading ? (
-              <div className="flex items-center justify-center h-full">
-                <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
-              </div>
-            ) : messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                <MessageSquare size={48} className="mb-4 opacity-30" />
-                <p>Aucun message. Pose une question à ton coach !</p>
-              </div>
-            ) : (
-              messages.map((msg) => {
-                const isMine = msg.sender_id === user.id;
-                return (
-                  <div key={msg.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
-                    <div
-                      className={`max-w-[75%] rounded-2xl px-4 py-3 shadow-lg ${
-                        isMine
-                          ? 'bg-gradient-to-br from-purple-600 to-cyan-500 text-white'
-                          : 'bg-white/5 border border-white/10 text-gray-200'
-                      }`}
-                    >
-                      {!isMine && (
-                        <div className="text-xs font-semibold text-purple-400 mb-1">{msg.admin_name}</div>
-                      )}
+          {/* Chat Container */}
+          <div className="reticle-box bg-[#121117] border border-white/10 flex flex-col h-[70vh] shadow-[0_10px_30px_rgba(0,0,0,0.5)]">
+            {/* Messages Area */}
+            <div
+              ref={scrollRef}
+              role="log"
+              aria-live="polite"
+              aria-relevant="additions"
+              aria-label="Messages du chat"
+              className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4"
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center h-full">
+                  <Loader2 className="w-8 h-8 animate-spin text-[#CA1C30]" />
+                </div>
+              ) : messages.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-white/40 text-center">
+                  <MessageSquare size={44} className="mb-3 opacity-20 text-[#CA1C30]" />
+                  <p className="text-xs uppercase tracking-wider font-bold">AUCUN MESSAGE ACTUELLEMENT</p>
+                  <p className="text-[11px] text-white/30 mt-1">Pose tes questions ou partage tes axes de travail à ton coach !</p>
+                </div>
+              ) : (
+                messages.map((msg) => {
+                  const isMine = msg.sender_id === user.id;
+                  return (
+                    <div key={msg.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
+                      <div
+                        className={`max-w-[85%] sm:max-w-[75%] p-4 border transition-all ${
+                          isMine
+                            ? 'bg-[#CA1C30]/15 border-[#CA1C30]/40 text-white shadow-[0_0_15px_rgba(202, 28, 48,0.1)]'
+                            : 'bg-black/60 border-[#00B4A0]/30 text-white shadow-[0_0_15px_rgba(0, 180, 160,0.1)]'
+                        }`}
+                      >
+                        {!isMine && (
+                          <div className="text-[10px] font-bold text-[#00B4A0] uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 bg-[#00B4A0]" />
+                            <span>{msg.admin_name || 'COACH POULPY'}</span>
+                          </div>
+                        )}
 
-                      {/* Pièce jointe */}
-                      {msg.attachment_url && (
-                        <div className="mb-2">
-                          {msg.attachment_type === 'image' && (
-                            <img
-                              src={msg.attachment_url}
-                              alt="Capture"
-                              onClick={() => setZoomedImage(msg.attachment_url!)}
-                              className="max-h-72 max-w-full rounded-xl object-contain cursor-pointer hover:opacity-95 transition-opacity"
-                            />
-                          )}
-                          {msg.attachment_type === 'video' && (
-                            <video
-                              src={msg.attachment_url}
-                              controls
-                              playsInline
-                              className="max-h-80 max-w-full rounded-xl bg-black"
-                            />
-                          )}
-                          {msg.attachment_type === 'audio' && (
-                            <AudioMessagePlayer src={msg.attachment_url} isMine={isMine} />
+                        {/* Media attachment */}
+                        {msg.attachment_url && (
+                          <div className="mb-2">
+                            {msg.attachment_type === 'image' && (
+                              <img
+                                src={msg.attachment_url}
+                                alt="Capture"
+                                onClick={() => setZoomedImage(msg.attachment_url!)}
+                                className="max-h-72 max-w-full object-contain cursor-pointer border border-white/10 hover:border-white/40 transition-colors"
+                              />
+                            )}
+                            {msg.attachment_type === 'video' && (
+                              <video
+                                src={msg.attachment_url}
+                                controls
+                                playsInline
+                                className="max-h-80 max-w-full bg-black border border-white/10"
+                              />
+                            )}
+                            {msg.attachment_type === 'audio' && (
+                              <AudioMessagePlayer src={msg.attachment_url} isMine={isMine} />
+                            )}
+                          </div>
+                        )}
+
+                        {/* Text */}
+                        {msg.message && (!msg.attachment_url || !['🎙️ Note vocale', '🎬 Extrait vidéo', '📷 Photo / Capture'].includes(msg.message)) && (
+                          <p className="whitespace-pre-wrap break-words text-xs sm:text-sm leading-relaxed">{msg.message}</p>
+                        )}
+
+                        <div className={`text-[9px] mt-2 flex items-center justify-between gap-2 border-t pt-1.5 ${isMine ? 'border-[#CA1C30]/20 text-white/50' : 'border-white/10 text-white/40'}`}>
+                          <span>
+                            {new Date(msg.created_at).toLocaleString('fr-FR', {
+                              day: '2-digit',
+                              month: 'short',
+                              hour: '2-digit',
+                              minute: '2-digit',
+                            })}
+                          </span>
+                          {isMine && (
+                            <span className="font-bold">
+                              {msg.read_at ? '✓ LU' : '• ENVOYÉ'}
+                            </span>
                           )}
                         </div>
-                      )}
-
-                      {/* Texte */}
-                      {msg.message && (!msg.attachment_url || !['🎙️ Note vocale', '🎬 Extrait vidéo', '📷 Photo / Capture'].includes(msg.message)) && (
-                        <p className="whitespace-pre-wrap break-words text-sm leading-relaxed">{msg.message}</p>
-                      )}
-
-                      <div className={`text-[10px] mt-1.5 flex items-center gap-1 ${isMine ? 'text-white/70' : 'text-gray-500'}`}>
-                        <span>
-                          {new Date(msg.created_at).toLocaleString('fr-FR', {
-                            day: '2-digit',
-                            month: 'short',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          })}
-                        </span>
-                        {isMine && (
-                          <span className="ml-1 opacity-80">
-                            {msg.read_at ? '· Lu par le coach' : '· Envoyé'}
-                          </span>
-                        )}
                       </div>
                     </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
+                  );
+                })
+              )}
+            </div>
 
-          {/* Formulaire d'envoi */}
-          <div className="border-t border-white/10 p-3 bg-white/[0.02]">
-            {/* Aperçu média sélectionné */}
-            {selectedFile && (
-              <div className="mb-2 p-2 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 min-w-0">
-                  {selectedFile.type === 'image' ? (
-                    <img src={selectedFile.previewUrl} alt="Preview" className="w-12 h-12 rounded-lg object-cover" />
-                  ) : (
-                    <video src={selectedFile.previewUrl} className="w-12 h-12 rounded-lg object-cover bg-black" />
-                  )}
-                  <div className="min-w-0">
-                    <p className="text-xs font-semibold text-white truncate">{selectedFile.file.name}</p>
-                    <p className="text-[10px] text-gray-400">{Math.round(selectedFile.file.size / 1024)} Ko · {selectedFile.type}</p>
+            {/* Input Bar */}
+            <div className="border-t border-white/10 p-3 bg-black/60">
+              {/* Selected Media Preview */}
+              {selectedFile && (
+                <div className="mb-2 p-2 bg-[#121117] border border-white/15 flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2 min-w-0">
+                    {selectedFile.type === 'image' ? (
+                      <img src={selectedFile.previewUrl} alt="Preview" className="w-10 h-10 object-cover border border-white/10" />
+                    ) : (
+                      <video src={selectedFile.previewUrl} className="w-10 h-10 object-cover bg-black border border-white/10" />
+                    )}
+                    <div className="min-w-0 font-mono">
+                      <p className="text-xs font-bold text-white truncate">{selectedFile.file.name}</p>
+                      <p className="text-[10px] text-white/50">{Math.round(selectedFile.file.size / 1024)} Ko · {selectedFile.type}</p>
+                    </div>
                   </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={removeSelectedFile}
-                  className="p-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white transition-colors"
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            )}
-
-            {/* Enregistrement vocal en cours */}
-            {isRecording ? (
-              <div className="flex items-center justify-between gap-3 px-3 py-2 rounded-xl bg-red-500/10 border border-red-500/30">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-3 h-3 rounded-full bg-red-500 animate-ping" />
-                  <span className="text-sm font-semibold text-red-300">Enregistrement note vocale...</span>
-                  <span className="text-xs font-mono text-red-400 bg-red-500/20 px-2 py-0.5 rounded">
-                    {formatRecordTime(recordingSeconds)}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={cancelRecording}
-                    className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-medium transition-colors"
+                    onClick={removeSelectedFile}
+                    className="p-1.5 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white transition-colors"
                   >
-                    Annuler
-                  </button>
-                  <button
-                    type="button"
-                    onClick={stopAndSendRecording}
-                    className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-500 text-white text-xs font-semibold hover:shadow-md transition-all"
-                  >
-                    <Send size={12} />
-                    Envoyer le vocal
+                    <X size={14} />
                   </button>
                 </div>
-              </div>
-            ) : (
-              <form onSubmit={handleSend} className="flex items-center gap-2">
-                {/* Input file caché */}
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*,video/*"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
+              )}
 
-                {/* Bouton trombone Média */}
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isSending || sessionExpired}
-                  title="Joindre une image ou un extrait vidéo"
-                  className="p-3 rounded-xl bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors border border-white/10 disabled:opacity-50"
-                >
-                  <Paperclip size={18} />
-                </button>
+              {/* Recording State */}
+              {isRecording ? (
+                <div className="flex items-center justify-between gap-3 px-3 py-2 bg-red-500/10 border border-red-500/30">
+                  <div className="flex items-center gap-2.5">
+                    <span className="w-2.5 h-2.5 bg-red-500 animate-ping" />
+                    <span className="text-xs font-bold text-red-400">ENREGISTREMENT VOCAL...</span>
+                    <span className="text-xs text-red-300 font-mono">
+                      {formatRecordTime(recordingSeconds)}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={cancelRecording}
+                      className="btn-cyber-ghost text-xs py-1 px-3"
+                    >
+                      ANNULER
+                    </button>
+                    <button
+                      type="button"
+                      onClick={stopAndSendRecording}
+                      className="btn-cyber-primary text-xs py-1 px-3 flex items-center gap-1.5"
+                    >
+                      <Send size={12} />
+                      <span>ENVOYER</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <form onSubmit={handleSend} className="flex items-center gap-2">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*,video/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
 
-                {/* Bouton micro note vocale */}
-                <button
-                  type="button"
-                  onClick={startRecording}
-                  disabled={isSending || sessionExpired}
-                  title="Enregistrer une note vocale"
-                  className="p-3 rounded-xl bg-white/5 hover:bg-white/10 text-purple-400 hover:text-purple-300 transition-colors border border-white/10 disabled:opacity-50"
-                >
-                  <Mic size={18} />
-                </button>
+                  {/* Attachment button */}
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isSending || sessionExpired}
+                    title="Joindre une image ou un extrait vidéo"
+                    className="p-2.5 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 disabled:opacity-50 transition-colors cursor-pointer"
+                  >
+                    <Paperclip size={16} />
+                  </button>
 
-                {/* Champ texte */}
-                <input
-                  type="text"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder={sessionExpired ? 'Session expirée — reconnecte-toi pour envoyer un message' : selectedFile ? "Ajoute un commentaire (optionnel)..." : 'Écris un message à ton coach...'}
-                  disabled={isSending || sessionExpired}
-                  maxLength={2000}
-                  className="flex-1 px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-500 focus:outline-none focus:border-purple-500 disabled:opacity-50 text-sm"
-                />
+                  {/* Voice recording button */}
+                  <button
+                    type="button"
+                    onClick={startRecording}
+                    disabled={isSending || sessionExpired}
+                    title="Enregistrer une note vocale"
+                    className="p-2.5 bg-[#CA1C30]/10 hover:bg-[#CA1C30]/20 text-[#CA1C30] border border-[#CA1C30]/30 disabled:opacity-50 transition-colors cursor-pointer"
+                  >
+                    <Mic size={16} />
+                  </button>
 
-                {/* Bouton envoyer */}
-                <button
-                  type="submit"
-                  disabled={isSending || (!newMessage.trim() && !selectedFile) || sessionExpired}
-                  className="px-5 py-3 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40 transition-all disabled:opacity-40 flex items-center gap-2 shrink-0"
-                >
-                  {isSending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-                </button>
-              </form>
-            )}
+                  {/* Text input */}
+                  <input
+                    type="text"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    placeholder={sessionExpired ? 'Session expirée — reconnecte-toi pour envoyer un message' : selectedFile ? "Ajoute un commentaire (optionnel)..." : 'Transmettre une consigne ou une question...'}
+                    disabled={isSending || sessionExpired}
+                    maxLength={2000}
+                    className="flex-1 px-3.5 py-2.5 bg-black border border-white/20 text-white placeholder-white/30 focus:outline-none focus:border-[#CA1C30] disabled:opacity-50 text-xs font-mono"
+                  />
+
+                  {/* Submit button */}
+                  <button
+                    type="submit"
+                    disabled={isSending || (!newMessage.trim() && !selectedFile) || sessionExpired}
+                    className="btn-cyber-primary text-xs py-2.5 px-4 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 shrink-0 cursor-pointer"
+                  >
+                    {isSending ? <Loader2 size={15} className="animate-spin" /> : <Send size={15} />}
+                    <span className="hidden sm:inline">ENVOYER</span>
+                  </button>
+                </form>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </main>
+      </main>
+
+      <CyberFooter />
+    </div>
   );
 }

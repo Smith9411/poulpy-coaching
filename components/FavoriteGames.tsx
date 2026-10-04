@@ -103,8 +103,8 @@ export default function FavoriteGames() {
 
   if (isLoading) {
     return (
-      <div className="card rounded-2xl p-8 flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
+      <div className="reticle-box bg-[#121117] border border-white/10 p-8 flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-[#CA1C30]" />
       </div>
     );
   }
@@ -118,44 +118,50 @@ export default function FavoriteGames() {
   const apexTierOptions = APEX_TIERS.map((t) => ({ value: t, label: t }));
 
   return (
-    <div className="card rounded-2xl p-8 relative z-30">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center">
-          <Gamepad2 size={22} className="text-white" />
+    <div className="reticle-box bg-[#121117] border border-white/10 p-6 sm:p-8 relative z-30">
+      <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/10">
+        <div className="w-10 h-10 bg-[#CA1C30]/15 border border-[#CA1C30]/30 flex items-center justify-center text-[#CA1C30]">
+          <Gamepad2 size={20} />
         </div>
         <div>
-          <h3 className="text-xl font-bold">Mes jeux</h3>
-          <p className="text-sm text-gray-400">Choisis ton jeu principal et ton rang</p>
+          <h3 className="text-lg font-bold font-display uppercase tracking-wider text-white">MES DISCIPLINES // RANGS</h3>
+          <p className="text-xs text-white/50 font-mono">Définis ton jeu principal et ton rang actuel pour tes sessions</p>
         </div>
       </div>
 
       <div className="grid sm:grid-cols-2 gap-3 mb-6">
-        {(['valorant', 'apex'] as Game[]).map((g) => (
-          <button
-            key={g}
-            type="button"
-            onClick={() => setFavorite(g)}
-            className={`p-4 rounded-xl border-2 text-left transition-all ${
-              favorite === g
-                ? g === 'valorant'
-                  ? 'border-red-500 bg-red-500/10'
-                  : 'border-orange-500 bg-orange-500/10'
-                : 'border-white/10 bg-white/5 hover:bg-white/10'
-            }`}
-          >
-            <div className="text-2xl mb-1">{g === 'valorant' ? '🔫' : '⚡'}</div>
-            <div className="font-semibold">{g === 'valorant' ? 'Valorant' : 'Apex Legends'}</div>
-            <div className="text-xs text-gray-400">
-              {g === 'valorant' ? 'FPS tactique 5v5' : 'Battle Royale'}
-            </div>
-          </button>
-        ))}
+        {(['valorant', 'apex'] as Game[]).map((g) => {
+          const isVal = g === 'valorant';
+          const isSelected = favorite === g;
+          return (
+            <button
+              key={g}
+              type="button"
+              onClick={() => setFavorite(g)}
+              className={`p-4 border text-left transition-all cursor-pointer font-mono ${
+                isSelected
+                  ? isVal
+                    ? 'border-[#CA1C30] bg-[#CA1C30]/15 text-white ring-1 ring-[#CA1C30] shadow-[0_0_15px_rgba(202, 28, 48,0.25)]'
+                    : 'border-[#00B4A0] bg-[#00B4A0]/15 text-white ring-1 ring-[#00B4A0] shadow-[0_0_15px_rgba(0, 180, 160,0.25)]'
+                  : 'border-white/10 bg-black/40 hover:border-white/20 text-white/70'
+              }`}
+            >
+              <div className="text-2xl mb-1">{isVal ? '🔫' : '⚡'}</div>
+              <div className="font-bold text-sm tracking-wide text-white uppercase">
+                {isVal ? 'VALORANT' : 'APEX LEGENDS'}
+              </div>
+              <div className="text-[11px] text-white/50">
+                {isVal ? 'FPS tactique 5v5' : 'Fast-paced Battle Royale'}
+              </div>
+            </button>
+          );
+        })}
       </div>
 
       {favorite === 'valorant' && (
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          <div className="space-y-2 col-span-2">
-            <label className="block text-sm font-medium text-gray-300">Rang</label>
+        <div className="grid grid-cols-3 gap-3 mb-6 p-4 bg-black/40 border border-[#CA1C30]/30 font-mono">
+          <div className="space-y-1.5 col-span-2">
+            <label className="block text-[11px] font-bold text-white/70 uppercase tracking-wider">Rang Valorant</label>
             <Select
               value={valorantRank}
               onChange={setValorantRank}
@@ -163,8 +169,8 @@ export default function FavoriteGames() {
               accent="red"
             />
           </div>
-          <div className="space-y-2 col-span-1">
-            <label className="block text-sm font-medium text-gray-300">Tier</label>
+          <div className="space-y-1.5 col-span-1">
+            <label className="block text-[11px] font-bold text-white/70 uppercase tracking-wider">Tier</label>
             <Select
               value={valorantTier}
               onChange={setValorantTier}
@@ -177,23 +183,23 @@ export default function FavoriteGames() {
       )}
 
       {favorite === 'apex' && (
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          <div className="space-y-2 col-span-2">
-            <label className="block text-sm font-medium text-gray-300">Rang</label>
+        <div className="grid grid-cols-3 gap-3 mb-6 p-4 bg-black/40 border border-[#00B4A0]/30 font-mono">
+          <div className="space-y-1.5 col-span-2">
+            <label className="block text-[11px] font-bold text-white/70 uppercase tracking-wider">Rang Apex</label>
             <Select
               value={apexRank}
               onChange={setApexRank}
               options={apexRankOptions}
-              accent="orange"
+              accent="cyan"
             />
           </div>
-          <div className="space-y-2 col-span-1">
-            <label className="block text-sm font-medium text-gray-300">Tier</label>
+          <div className="space-y-1.5 col-span-1">
+            <label className="block text-[11px] font-bold text-white/70 uppercase tracking-wider">Tier</label>
             <Select
               value={apexTier}
               onChange={setApexTier}
               options={apexTierOptions}
-              accent="orange"
+              accent="cyan"
             />
           </div>
         </div>
@@ -203,16 +209,16 @@ export default function FavoriteGames() {
         type="button"
         onClick={handleSave}
         disabled={isSaving || !favorite}
-        className="inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold text-white hover:shadow-lg hover:shadow-purple-500/40 transition-all disabled:opacity-50"
+        className="btn-cyber-primary text-xs py-2.5 px-6 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
       >
         {isSaving ? (
-          <Loader2 size={18} className="animate-spin" />
+          <Loader2 size={14} className="animate-spin" />
         ) : saved ? (
-          <Check size={18} />
+          <Check size={14} />
         ) : (
-          <Save size={18} />
+          <Save size={14} />
         )}
-        {saved ? 'Enregistré !' : 'Enregistrer'}
+        <span>{saved ? 'RANG ENREGISTRÉ !' : 'ENREGISTRER MES RANGS'}</span>
       </button>
     </div>
   );

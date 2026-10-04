@@ -1,71 +1,76 @@
 'use client';
 
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, ChevronLeft, Clock, Sun, Moon, ArrowRight, Loader2, Sparkles } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
-import { CoachingSlot, DaySchedule, Plan } from './types';
+import {
+  Calendar,
+  ChevronLeft,
+  Clock,
+  Sun,
+  Moon,
+  Loader2,
+  ArrowRight,
+  ShieldAlert,
+} from 'lucide-react';
+import { Plan } from './types';
 
 export interface SelectedSlotDetails {
   slotId?: string;
-  bookingDate: string; // 'YYYY-MM-DD'
-  bookingTime: string; // 'HH:MM'
+  bookingDate: string;
+  bookingTime: string;
   slotLabel: string;
 }
+
+export type SelectedSlot = SelectedSlotDetails;
 
 interface BookingSlotsStepProps {
   plan: Plan;
   selectedSlot: string | null;
-  onSelectSlot: (details: SelectedSlotDetails) => void;
+  onSelectSlot: (slot: SelectedSlotDetails) => void;
   onBack: () => void;
+  adminSlots?: Array<{
+    date: string;
+    start_time: string;
+    is_active: boolean;
+    is_booked: boolean;
+    id?: string;
+  }>;
+  isLoadingSlots?: boolean;
 }
 
-const DAYS_SHORT = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-const MONTHS_SHORT = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
+interface DaySchedule {
+  fullDate: string; // YYYY-MM-DD
+  dateStr: string; // "Lun 24 Oct"
+  dayName: string;
+  dayNumber: number;
+  slots: Array<{
+    id: string;
+    slotId?: string;
+    time: string;
+    available: boolean;
+  }>;
+}
+
+const DAYS_SHORT = ['DIM', 'LUN', 'MAR', 'MER', 'JEU', 'VEN', 'SAM'];
+const MONTHS_SHORT = ['JANV', 'FÉVR', 'MARS', 'AVR', 'MAI', 'JUIN', 'JUIL', 'AOÛT', 'SEPT', 'OCT', 'NOV', 'DÉC'];
 
 export default function BookingSlotsStep({
   plan,
   selectedSlot,
   onSelectSlot,
   onBack,
+  adminSlots = [],
+  isLoadingSlots = false,
 }: BookingSlotsStepProps) {
-  const [dbSlots, setDbSlots] = useState<CoachingSlot[]>([]);
-  const [isLoadingSlots, setIsLoadingSlots] = useState(true);
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
 
-  // Charger les créneaux réels configurés par le coach
-  useEffect(() => {
-    let cancelled = false;
-
-    const fetchOpenSlots = async () => {
-      setIsLoadingSlots(true);
-      try {
-        const res = await fetch('/api/bookings/slots', { cache: 'no-store' });
-        if (!res.ok) return;
-        const data = await res.json();
-        if (!cancelled) {
-          setDbSlots(data.slots || []);
-        }
-      } catch (err) {
-        console.error('Erreur récupération créneaux coach:', err);
-      } finally {
-        if (!cancelled) setIsLoadingSlots(false);
-      }
-    };
-
-    fetchOpenSlots();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  // Génération des 14 prochains jours avec les créneaux réels ouverts par l'admin
+  // Generate 14 upcoming days
   const schedules: DaySchedule[] = useMemo(() => {
     const list: DaySchedule[] = [];
     const baseDate = new Date();
 
-    // Groupement des dbSlots par date
-    const slotsByDate = new Map<string, CoachingSlot[]>();
-    dbSlots.forEach((s) => {
+    const slotsByDate = new Map<string, Array<{ id?: string; start_time: string; is_booked: boolean }>>();
+    adminSlots.forEach((s) => {
       const arr = slotsByDate.get(s.date) || [];
       arr.push(s);
       slotsByDate.set(s.date, arr);
@@ -75,120 +80,136 @@ export default function BookingSlotsStep({
       const d = new Date(baseDate);
       d.setDate(baseDate.getDate() + i);
 
-      const dateIso = d.toISOString().split('T')[0];
-      const dayOfWeek = d.getDay();
-      const dayName = DAYS_SHORT[dayOfWeek];
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      const isoDate = `${year}-${month}-${day}`;
+
+      const dayName = DAYS_SHORT[d.getDay()];
       const monthName = MONTHS_SHORT[d.getMonth()];
-      const dateStr = `${dayName} ${d.getDate()} ${monthName}`;
+      const dayNum = d.getDate();
+      const dateStr = `${dayName} ${dayNum} ${monthName}`;
 
-      const openSlotsForDay = slotsByDate.get(dateIso) || [];
-
-      // Si le coach a configuré des créneaux dans la DB pour ce jour
-      const slots = openSlotsForDay.map((s) => ({
-        id: `${dateIso}-${s.start_time}`,
-        slotId: s.id,
-        time: s.start_time,
-        available: s.is_active && !s.is_booked,
-        isBooked: s.is_booked,
-      }));
-
-      // Trier par heure
-      slots.sort((a, b) => a.time.localeCompare(b.time));
+      const dayAdminSlots = slotsByDate.get(isoDate) || [];
+      const slots = dayAdminSlots
+        .sort((a, b) => a.start_time.localeCompare(b.start_time))
+        .map((s) => ({
+          id: `${isoDate}_${s.start_time}`,
+          slotId: s.id,
+          time: s.start_time,
+          available: !s.is_booked,
+        }));
 
       list.push({
+        fullDate: isoDate,
         dateStr,
-        fullDate: dateIso,
-        isToday: i === 0,
+        dayName,
+        dayNumber: dayNum,
         slots,
       });
     }
 
     return list;
-  }, [dbSlots]);
+  }, [adminSlots]);
 
   const currentDay = schedules[selectedDayIndex] || schedules[0];
-  const afternoonSlots = (currentDay?.slots || []).filter((s) => parseInt(s.time.split(':')[0], 10) < 18);
-  const eveningSlots = (currentDay?.slots || []).filter((s) => parseInt(s.time.split(':')[0], 10) >= 18);
+
+  // Group slots by afternoon and evening
+  const { afternoonSlots, eveningSlots } = useMemo(() => {
+    if (!currentDay) return { afternoonSlots: [], eveningSlots: [] };
+    const afternoon = currentDay.slots.filter((s) => {
+      const hour = parseInt(s.time.split(':')[0], 10);
+      return hour < 18;
+    });
+    const evening = currentDay.slots.filter((s) => {
+      const hour = parseInt(s.time.split(':')[0], 10);
+      return hour >= 18;
+    });
+    return { afternoonSlots: afternoon, eveningSlots: evening };
+  }, [currentDay]);
 
   const currentSelectedSlotObj = useMemo(() => {
-    for (const day of schedules) {
-      const found = day.slots.find((s) => s.id === selectedSlot);
-      if (found) return { slot: found, day };
+    if (!selectedSlot) return null;
+    for (const d of schedules) {
+      const found = d.slots.find((s) => s.id === selectedSlot);
+      if (found) return { day: d, slot: found };
     }
     return null;
-  }, [schedules, selectedSlot]);
+  }, [selectedSlot, schedules]);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -15 }}
-      className="max-w-4xl mx-auto space-y-6"
+      className="max-w-4xl mx-auto space-y-6 font-mono"
     >
       {/* Plan summary badge */}
-      <div className="glass-dark rounded-2xl p-4 sm:p-5 flex items-center justify-between flex-wrap gap-4 border border-white/10">
+      <div className="reticle-box bg-[#121117] border border-white/10 p-4 sm:p-5 flex items-center justify-between flex-wrap gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center font-bold text-white text-xs text-center shadow-md bg-gradient-to-br from-purple-600 to-cyan-500">
+          <div className="w-12 h-12 bg-[#CA1C30] text-black font-bold text-xs flex items-center justify-center shrink-0 uppercase tracking-wider font-display">
             {plan.duration}
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="font-bold text-white text-base sm:text-lg">{plan.name}</h3>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 text-purple-300 font-semibold">
+              <h3 className="font-bold text-white text-sm sm:text-base font-display uppercase tracking-wider">{plan.name}</h3>
+              <span className="text-xs px-2 py-0.5 bg-[#CA1C30]/20 border border-[#CA1C30]/40 text-[#CA1C30] font-bold">
                 {plan.price}
               </span>
             </div>
-            <p className="text-gray-400 text-xs sm:text-sm">{plan.description}</p>
+            <p className="text-white/50 text-xs sm:text-sm mt-0.5">{plan.description}</p>
           </div>
         </div>
         <button
           type="button"
           onClick={onBack}
-          className="glass px-3.5 py-1.5 rounded-xl text-xs sm:text-sm text-gray-300 hover:text-white hover:bg-white/10 transition-all flex items-center gap-1.5"
+          className="btn-cyber-ghost text-xs py-1.5 px-3 flex items-center gap-1.5 cursor-pointer uppercase tracking-wider"
         >
-          <ChevronLeft size={16} />
-          Changer de formule
+          <ChevronLeft size={14} />
+          <span>Changer de formule</span>
         </button>
       </div>
 
-      {/* Horizontal Day Selector for Mobile and Desktop */}
-      <div className="glass-dark rounded-2xl p-4 sm:p-6 border border-white/10">
-        <div className="flex items-center justify-between mb-4">
+      {/* Horizontal Day Selector */}
+      <div className="reticle-box bg-[#121117] border border-white/10 p-4 sm:p-6">
+        <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
           <div className="flex items-center gap-2">
-            <Calendar size={18} className="text-purple-400" />
-            <h4 className="font-bold text-white text-sm sm:text-base">1. Choisis la date</h4>
+            <Calendar size={16} className="text-[#CA1C30]" />
+            <h4 className="font-bold text-white text-xs uppercase tracking-wider">01 // CHOISIS LA DATE</h4>
           </div>
-          <span className="text-xs text-gray-400 hidden sm:inline">14 prochains jours</span>
+          <span className="text-[10px] text-white/40 uppercase tracking-widest hidden sm:inline">14 prochains jours</span>
         </div>
 
         {/* Scrollable Day Pills */}
-        <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-white/20 -mx-2 px-2">
+        <div className="flex gap-2.5 overflow-x-auto pb-2 scrollbar-thin -mx-1 px-1">
           {schedules.map((day, idx) => {
             const isDaySelected = idx === selectedDayIndex;
             const availableCount = day.slots.filter((s) => s.available).length;
-            const [weekday, dayNum, month] = day.dateStr.split(' ');
 
             return (
               <button
                 key={day.fullDate}
                 type="button"
                 onClick={() => setSelectedDayIndex(idx)}
-                className={`flex-shrink-0 flex flex-col items-center justify-center w-20 sm:w-24 py-3 px-2 rounded-xl transition-all border ${
+                className={`shrink-0 flex flex-col items-center justify-center w-20 sm:w-24 py-3 px-2 transition-all border cursor-pointer ${
                   isDaySelected
-                    ? 'bg-gradient-to-b from-purple-600/40 to-cyan-500/20 border-cyan-400 text-white shadow-md shadow-purple-500/20'
-                    : 'glass hover:bg-white/10 border-white/5 text-gray-300'
+                    ? 'bg-[#CA1C30] text-black border-[#CA1C30] shadow-[0_0_15px_rgba(202,28,48,0.4)] font-bold'
+                    : 'bg-black/40 hover:bg-white/5 border-white/10 text-white/70 hover:text-white'
                 }`}
               >
-                <span className="text-[11px] uppercase tracking-wider font-semibold opacity-75">
-                  {weekday}
+                <span className={`text-[10px] uppercase tracking-wider ${isDaySelected ? 'text-black/80 font-bold' : 'text-white/40'}`}>
+                  {day.dayName}
                 </span>
-                <span className="text-lg sm:text-xl font-extrabold my-0.5">{dayNum}</span>
-                <span className="text-[10px] text-gray-400">{month}</span>
+                <span className="text-lg font-bold font-display my-0.5">{day.dayNumber}</span>
                 <span
-                  className={`mt-1.5 text-[9px] px-1.5 py-0.5 rounded-full font-medium ${
+                  className={`text-[9px] px-1.5 py-0.2 mt-0.5 border ${
                     availableCount > 0
-                      ? 'bg-green-500/20 text-green-300'
-                      : 'bg-white/5 text-gray-500'
+                      ? isDaySelected
+                        ? 'bg-black/30 border-black/40 text-black font-bold'
+                        : 'bg-[#00B4A0]/20 border-[#00B4A0]/40 text-[#00B4A0]'
+                      : isDaySelected
+                        ? 'bg-black/20 text-black/50 border-black/20'
+                        : 'bg-white/5 border-white/10 text-white/30'
                   }`}
                 >
                   {availableCount > 0 ? `${availableCount} dispo` : 'Complet'}
@@ -201,18 +222,18 @@ export default function BookingSlotsStep({
         {/* Time slots for selected day */}
         <div className="mt-6 pt-5 border-t border-white/10 space-y-6">
           <div className="flex items-center justify-between">
-            <h4 className="font-bold text-white text-sm sm:text-base flex items-center gap-2">
-              <Clock size={18} className="text-cyan-400" />
-              <span>2. Créneaux ouverts pour le {currentDay.dateStr}</span>
+            <h4 className="font-bold text-white text-xs uppercase tracking-wider flex items-center gap-2">
+              <Clock size={15} className="text-[#00B4A0]" />
+              <span>02 // CRÉNEAUX OUVERTS POUR LE {currentDay.dateStr}</span>
             </h4>
-            {isLoadingSlots && <Loader2 size={16} className="animate-spin text-purple-400" />}
+            {isLoadingSlots && <Loader2 size={15} className="animate-spin text-[#CA1C30]" />}
           </div>
 
           {currentDay.slots.length === 0 ? (
-            <div className="py-8 text-center glass rounded-2xl p-6 border border-white/5">
-              <Clock size={32} className="mx-auto text-gray-500 mb-2 opacity-40" />
-              <p className="text-sm font-semibold text-gray-300">Aucun créneau ouvert pour cette date</p>
-              <p className="text-xs text-gray-500 mt-1">
+            <div className="py-8 text-center bg-black/40 p-6 border border-white/10">
+              <Clock size={28} className="mx-auto text-white/20 mb-2" />
+              <p className="text-xs font-bold uppercase tracking-wider text-white/80">Aucun créneau ouvert pour cette date</p>
+              <p className="text-[11px] text-white/40 mt-1">
                 Le coach n'a pas encore ouvert de disponibilités pour ce jour. Sélectionne un autre jour ci-dessus !
               </p>
             </div>
@@ -221,11 +242,11 @@ export default function BookingSlotsStep({
               {/* Afternoon section */}
               {afternoonSlots.length > 0 && (
                 <div>
-                  <div className="flex items-center gap-2 text-xs font-semibold text-amber-300 mb-3">
-                    <Sun size={15} />
-                    <span>APRÈS-MIDI</span>
+                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-[#00B4A0] mb-2.5">
+                    <Sun size={13} />
+                    <span>SESSION APRÈS-MIDI</span>
                   </div>
-                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5">
+                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
                     {afternoonSlots.map((slot) => {
                       const isSelected = selectedSlot === slot.id;
                       return (
@@ -241,12 +262,12 @@ export default function BookingSlotsStep({
                               slotLabel: `${currentDay.dateStr} à ${slot.time}`,
                             })
                           }
-                          className={`py-3 px-2 rounded-xl text-sm font-semibold transition-all border text-center ${
+                          className={`py-2.5 px-2 text-xs font-bold transition-all border text-center cursor-pointer ${
                             isSelected
-                              ? 'bg-gradient-to-r from-purple-600 to-cyan-500 text-white border-transparent shadow-lg shadow-purple-500/40 scale-105'
+                              ? 'bg-[#CA1C30] text-black border-[#CA1C30] shadow-[0_0_12px_rgba(202,28,48,0.5)] scale-105'
                               : slot.available
-                              ? 'glass hover:bg-white/10 hover:border-purple-400 text-white border-white/10'
-                              : 'bg-white/5 text-gray-600 border-white/5 cursor-not-allowed line-through opacity-50'
+                              ? 'bg-black/50 hover:bg-white/10 hover:border-[#CA1C30] text-white border-white/15'
+                              : 'bg-white/5 text-white/20 border-white/5 cursor-not-allowed line-through'
                           }`}
                         >
                           {slot.time}
@@ -260,11 +281,11 @@ export default function BookingSlotsStep({
               {/* Evening section */}
               {eveningSlots.length > 0 && (
                 <div>
-                  <div className="flex items-center gap-2 text-xs font-semibold text-indigo-300 mb-3">
-                    <Moon size={15} />
-                    <span>SOIRÉE</span>
+                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-[#CA1C30] mb-2.5">
+                    <Moon size={13} />
+                    <span>SESSION SOIRÉE</span>
                   </div>
-                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5">
+                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
                     {eveningSlots.map((slot) => {
                       const isSelected = selectedSlot === slot.id;
                       return (
@@ -280,12 +301,12 @@ export default function BookingSlotsStep({
                               slotLabel: `${currentDay.dateStr} à ${slot.time}`,
                             })
                           }
-                          className={`py-3 px-2 rounded-xl text-sm font-semibold transition-all border text-center ${
+                          className={`py-2.5 px-2 text-xs font-bold transition-all border text-center cursor-pointer ${
                             isSelected
-                              ? 'bg-gradient-to-r from-purple-600 to-cyan-500 text-white border-transparent shadow-lg shadow-purple-500/40 scale-105'
+                              ? 'bg-[#CA1C30] text-black border-[#CA1C30] shadow-[0_0_12px_rgba(202,28,48,0.5)] scale-105'
                               : slot.available
-                              ? 'glass hover:bg-white/10 hover:border-purple-400 text-white border-white/10'
-                              : 'bg-white/5 text-gray-600 border-white/5 cursor-not-allowed line-through opacity-50'
+                              ? 'bg-black/50 hover:bg-white/10 hover:border-[#CA1C30] text-white border-white/15'
+                              : 'bg-white/5 text-white/20 border-white/5 cursor-not-allowed line-through'
                           }`}
                         >
                           {slot.time}
@@ -300,18 +321,18 @@ export default function BookingSlotsStep({
         </div>
 
         {/* Legend */}
-        <div className="flex items-center justify-center gap-5 mt-6 pt-4 border-t border-white/5 text-xs text-gray-400">
+        <div className="flex items-center justify-center gap-5 mt-6 pt-4 border-t border-white/10 text-[10px] text-white/40 uppercase tracking-wider">
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded glass border border-white/20" />
-            <span>Dispo</span>
+            <div className="w-2.5 h-2.5 border border-white/30 bg-black/40" />
+            <span>DISPO</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded bg-gradient-to-r from-purple-600 to-cyan-500" />
-            <span>Sélectionné</span>
+            <div className="w-2.5 h-2.5 bg-[#CA1C30]" />
+            <span className="text-[#CA1C30] font-bold">SÉLECTIONNÉ</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-3 h-3 rounded bg-white/10 opacity-50" />
-            <span>Indisponible</span>
+            <div className="w-2.5 h-2.5 bg-white/10 opacity-50" />
+            <span>INDISPONIBLE</span>
           </div>
         </div>
       </div>
@@ -321,11 +342,11 @@ export default function BookingSlotsStep({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-dark border border-purple-500/40 p-4 rounded-2xl flex items-center justify-between gap-4 flex-wrap"
+          className="reticle-box bg-[#121117] border border-[#CA1C30]/50 p-4 flex items-center justify-between gap-4 flex-wrap shadow-[0_0_25px_rgba(202,28,48,0.25)]"
         >
-          <div className="text-sm">
-            <span className="text-gray-400">Créneau sélectionné : </span>
-            <span className="font-bold text-white">
+          <div className="text-xs">
+            <span className="text-white/50 uppercase tracking-wider">CRÉNEAU SÉLECTIONNÉ : </span>
+            <span className="font-bold text-white uppercase tracking-wider ml-1">
               {currentSelectedSlotObj.day.dateStr} à {currentSelectedSlotObj.slot.time}
             </span>
           </div>
@@ -339,10 +360,10 @@ export default function BookingSlotsStep({
                 slotLabel: `${currentSelectedSlotObj.day.dateStr} à ${currentSelectedSlotObj.slot.time}`,
               })
             }
-            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-cyan-500 text-white font-bold text-sm shadow-md hover:shadow-purple-500/30 flex items-center gap-2"
+            className="btn-cyber-primary text-xs py-2.5 px-5 inline-flex items-center gap-2 cursor-pointer uppercase tracking-wider"
           >
-            <span>Passer aux informations</span>
-            <ArrowRight size={16} />
+            <span>CONTINUER VERS MES INFORMATIONS</span>
+            <ArrowRight size={14} />
           </button>
         </motion.div>
       )}

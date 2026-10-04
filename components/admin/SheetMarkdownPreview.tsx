@@ -211,7 +211,7 @@ export default function SheetMarkdownPreview({
         } else if (level === 2) {
           blocks.push(
             <h2 key={`h2-${i}`} className="text-xl sm:text-2xl font-bold text-white mt-5 mb-2 flex items-center gap-2">
-              <span className="w-1.5 h-4 bg-purple-400 inline-block flex-shrink-0" />
+              <span className="w-1.5 h-4 bg-[#CA1C30] inline-block flex-shrink-0" />
               <span>{renderInline(titleText)}</span>
             </h2>
           );
@@ -244,7 +244,7 @@ export default function SheetMarkdownPreview({
       blocks.push(
         <blockquote
           key={`quote-${i}`}
-          className="my-4 p-4 bg-[#CA1C30]/5 border-l-4 border-purple-500 text-gray-200 text-sm leading-relaxed bg-black/40 border border-white/10 backdrop-blur-md shadow-sm"
+          className="my-4 p-4 bg-[#121117] border-l-2 border-[#CA1C30] text-[#F5F4F0] text-sm leading-relaxed border border-white/10 shadow-sm"
         >
           {quoteLines.map((ql, qIdx) => (
             <div key={qIdx} className={qIdx > 0 ? 'mt-1' : ''}>
@@ -303,7 +303,7 @@ export default function SheetMarkdownPreview({
                   <button
                     type="button"
                     onClick={() => onAddRowToTable?.(thisTableIndex)}
-                    className="px-2.5 py-1 bg-[#CA1C30]/15 hover:bg-purple-500/25 text-[#CA1C30]/80 border border-[#CA1C30]/30 text-xs font-semibold flex items-center gap-1 transition-all hover:scale-105"
+                    className="px-2.5 py-1 bg-[#CA1C30]/15 hover:bg-[#CA1C30]/25 text-[#CA1C30] border border-[#CA1C30]/30 text-xs font-semibold flex items-center gap-1 transition-colors cursor-pointer"
                     title="Ajouter une ligne en bas"
                   >
                     <Plus size={13} />

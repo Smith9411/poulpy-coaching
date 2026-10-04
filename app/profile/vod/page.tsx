@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import {
   Film, ArrowLeft, Plus, ExternalLink, Loader2, X,
-  ChevronDown, ChevronUp, Clock, AlertCircle, Check,
+  ChevronDown, ChevronUp, Clock, AlertCircle, Check, MessageSquare, FileText
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -13,12 +13,21 @@ import {
   annotationStyle, formatTimestamp,
   type AnnotationCategory,
 } from '@/lib/vod-utils';
+import CyberNavbar from '@/components/CyberNavbar';
+import CyberFooter from '@/components/CyberFooter';
 
 const VALID_GAMES = [
   { value: 'valorant', label: '🔫 Valorant' },
   { value: 'apex',     label: '⚡ Apex Legends' },
   { value: 'aim',      label: '🎯 Aim Training' },
 ];
+
+const CATEGORY_BADGE_CLASSES: Record<string, string> = {
+  green: 'bg-[#00B4A0]/10 border-[#00B4A0]/40 text-[#00B4A0]',
+  red: 'bg-[#CA1C30]/10 border-[#CA1C30]/40 text-[#CA1C30]',
+  orange: 'bg-amber-500/10 border-amber-500/40 text-amber-400',
+  blue: 'bg-white/10 border-white/20 text-white',
+};
 
 interface VodClip {
   id: string;
@@ -46,14 +55,14 @@ function ClipEmbed({ url }: { url: string }) {
   if (!parsed) {
     return (
       <a href={url} target="_blank" rel="noopener noreferrer"
-        className="flex items-center gap-2 text-blue-400 hover:underline text-sm">
-        <ExternalLink size={14} />
-        Ouvrir le lien
+        className="flex items-center gap-2 text-[#00B4A0] hover:underline text-xs font-mono">
+        <ExternalLink size={13} />
+        Ouvrir le flux vidéo externe
       </a>
     );
   }
   return (
-    <div className="rounded-xl overflow-hidden border border-white/10 aspect-video w-full">
+    <div className="border border-white/10 aspect-video w-full bg-black">
       <iframe
         src={parsed.embedUrl}
         className="w-full h-full"
@@ -75,16 +84,9 @@ function ClipCard({ clip, token }: { clip: VodClip; token: string }) {
 
   const parsed = parseVideoUrl(clip.url);
   const gameLabel: Record<string, string> = {
-    valorant: '🔫 Valorant',
-    apex: '⚡ Apex',
-    aim: '🎯 Aim',
-  };
-
-  const colorBadge: Record<string, string> = {
-    red: 'bg-red-500/10 border-red-500/30 text-red-400',
-    purple: 'bg-purple-500/10 border-purple-500/30 text-purple-400',
-    yellow: 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400',
-    gray: 'bg-white/5 border-white/10 text-gray-400',
+    valorant: 'VALORANT',
+    apex: 'APEX LEGENDS',
+    aim: 'AIM LAB / KOVAAKS',
   };
 
   const fetchAnnotations = useCallback(async () => {
@@ -110,25 +112,25 @@ function ClipCard({ clip, token }: { clip: VodClip; token: string }) {
   const hasAnnotations = annotations.length > 0;
 
   return (
-    <div className="card rounded-2xl overflow-hidden border border-white/5">
+    <div className="reticle-box bg-[#121117] border border-white/10 overflow-hidden font-mono">
       <div className="p-5">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-2 mb-1">
-              <span className="font-bold text-white truncate">{clip.title}</span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-gray-400">
-                {gameLabel[clip.game] || clip.game}
+            <div className="flex flex-wrap items-center gap-2 mb-1.5">
+              <span className="font-bold text-sm text-white truncate uppercase tracking-wider">{clip.title}</span>
+              <span className="text-[10px] font-bold px-2 py-0.5 bg-[#CA1C30]/15 border border-[#CA1C30]/30 text-[#CA1C30]">
+                {gameLabel[clip.game] || clip.game.toUpperCase()}
               </span>
               {parsed && (
-                <span className={`text-xs px-2 py-0.5 rounded-full border ${colorBadge[providerColor(parsed.provider)]}`}>
-                  {providerLabel(parsed.provider)}
+                <span className="text-[10px] font-bold px-2 py-0.5 bg-[#00B4A0]/15 border border-[#00B4A0]/30 text-[#00B4A0]">
+                  {providerLabel(parsed.provider).toUpperCase()}
                 </span>
               )}
             </div>
             {clip.description && (
-              <p className="text-sm text-gray-400 mt-1">{clip.description}</p>
+              <p className="text-xs text-white/70 mt-1 leading-relaxed">{clip.description}</p>
             )}
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-[10px] text-white/40 mt-1.5">
               Soumis le {new Date(clip.submitted_at).toLocaleDateString('fr-FR', {
                 day: '2-digit', month: 'short', year: 'numeric',
               })}
@@ -138,33 +140,33 @@ function ClipCard({ clip, token }: { clip: VodClip; token: string }) {
             href={clip.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+            className="p-2 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white border border-white/10 transition-colors"
             title="Ouvrir dans un nouvel onglet"
           >
-            <ExternalLink size={15} />
+            <ExternalLink size={14} />
           </a>
         </div>
 
-        <div className="flex gap-2 mt-3">
+        <div className="flex gap-2 mt-4">
           <button
             onClick={() => setShowEmbed(v => !v)}
-            className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20 text-sm font-medium transition-colors"
+            className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-[#CA1C30]/15 hover:bg-[#CA1C30]/25 text-[#CA1C30] border border-[#CA1C30]/30 text-xs font-bold uppercase transition-colors cursor-pointer"
           >
-            <Film size={14} />
-            {showEmbed ? 'Masquer' : 'Voir la vidéo'}
+            <Film size={13} />
+            <span>{showEmbed ? 'MASQUER' : 'VOIR LE CLIP'}</span>
           </button>
           <button
             onClick={() => setExpanded(v => !v)}
-            className={`flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors border ${
+            className={`flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold uppercase transition-colors border cursor-pointer ${
               hasAnnotations || expanded
-                ? 'bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border-purple-500/20'
-                : 'bg-white/5 hover:bg-white/10 text-gray-400 border-white/10'
+                ? 'bg-[#00B4A0]/15 hover:bg-[#00B4A0]/25 text-[#00B4A0] border-[#00B4A0]/30'
+                : 'bg-white/5 hover:bg-white/10 text-white/50 border-white/10'
             }`}
           >
-            {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-            Feedback coach
+            {expanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+            <span>FEEDBACK COACH</span>
             {hasAnnotations && !expanded && (
-              <span className="ml-1 inline-flex items-center justify-center w-5 h-5 rounded-full bg-purple-500 text-white text-[10px] font-bold">
+              <span className="ml-1 inline-flex items-center justify-center px-1.5 py-0.2 bg-[#00B4A0] text-black text-[9px] font-bold">
                 {annotations.length}
               </span>
             )}
@@ -173,56 +175,57 @@ function ClipCard({ clip, token }: { clip: VodClip; token: string }) {
       </div>
 
       {showEmbed && (
-        <div className="px-5 pb-4">
+        <div className="px-5 pb-5">
           <ClipEmbed url={clip.url} />
         </div>
       )}
 
+      {/* Annotations déroulées */}
       {expanded && (
-        <div className="border-t border-white/5 p-5">
-          <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide mb-3">
-            Commentaires de ton coach
-          </p>
+        <div className="border-t border-white/10 p-5 bg-black/40 space-y-3">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider text-white flex items-center gap-2">
+              <span className="w-2 h-2 bg-[#00B4A0]" />
+              <span>NOTES DU COACH ({annotations.length})</span>
+            </span>
+          </div>
+
           {loading ? (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
+            <div className="flex items-center justify-center py-6 text-[#00B4A0]">
+              <Loader2 size={20} className="animate-spin" />
             </div>
           ) : annotations.length === 0 ? (
-            <div className="text-center py-8">
-              <AlertCircle className="w-10 h-10 text-gray-600 mx-auto mb-2" />
-              <p className="text-sm text-gray-500">
-                Ton coach n&apos;a pas encore laissé de commentaire sur ce clip.
-              </p>
-            </div>
+            <p className="text-xs text-white/40 italic py-2">
+              Pas encore d&apos;annotations sur ce clip. Ton coach va bientôt l&apos;examiner !
+            </p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {annotations.map(ann => {
                 const style = annotationStyle(ann.category);
-                const colorStyles: Record<string, string> = {
-                  green: 'border-green-500/30 bg-green-500/5',
-                  red: 'border-red-500/30 bg-red-500/5',
-                  orange: 'border-orange-500/30 bg-orange-500/5',
-                  blue: 'border-blue-500/30 bg-blue-500/5',
-                };
-                const borderBg = colorStyles[style.color] ?? 'border-white/10 bg-white/5';
                 return (
-                  <div key={ann.id} className={`rounded-xl p-4 border ${borderBg}`}>
-                    <div className="flex flex-wrap items-center gap-2 mb-2">
-                      <span className="text-sm font-semibold">{style.label}</span>
-                      {ann.timestamp_sec !== null && (
-                        <span className="inline-flex items-center gap-1 text-xs text-gray-400 bg-white/5 px-2 py-0.5 rounded-full">
-                          <Clock size={10} />
-                          {formatTimestamp(ann.timestamp_sec)}
+                  <div
+                    key={ann.id}
+                    className="p-3 bg-[#121117] border border-white/10 flex items-start gap-3"
+                  >
+                    {ann.timestamp_sec !== null && (
+                      <span className="text-[10px] font-mono font-bold text-white bg-white/10 border border-white/20 px-2 py-0.5 shrink-0 flex items-center gap-1">
+                        <Clock size={10} />
+                        {formatTimestamp(ann.timestamp_sec)}
+                      </span>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`text-[9px] font-bold px-2 py-0.5 uppercase border ${CATEGORY_BADGE_CLASSES[style.color] || 'bg-white/10 border-white/20 text-white'}`}>
+                          {style.label}
                         </span>
-                      )}
+                        <span className="text-[10px] text-white/40">
+                          {new Date(ann.created_at).toLocaleDateString('fr-FR', {
+                            day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+                          })}
+                        </span>
+                      </div>
+                      <p className="text-xs text-white/90 whitespace-pre-wrap leading-relaxed">{ann.content}</p>
                     </div>
-                    <p className="text-sm text-gray-200 whitespace-pre-wrap leading-relaxed">{ann.content}</p>
-                    <p className="text-xs text-gray-500 mt-2">
-                      {new Date(ann.created_at).toLocaleDateString('fr-FR', {
-                        day: '2-digit', month: 'short', year: 'numeric',
-                        hour: '2-digit', minute: '2-digit',
-                      })}
-                    </p>
                   </div>
                 );
               })}
@@ -234,10 +237,8 @@ function ClipCard({ clip, token }: { clip: VodClip; token: string }) {
   );
 }
 
-// ─── Page principale ──────────────────────────────────────────────────────────
-export default function ProfileVodPage() {
+export default function StudentVodPage() {
   const { user, isLoading: authLoading } = useAuth();
-
   const [clips, setClips] = useState<VodClip[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [token, setToken] = useState('');
@@ -254,7 +255,6 @@ export default function ProfileVodPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [urlPreview, setUrlPreview] = useState<ReturnType<typeof parseVideoUrl>>(null);
 
-  // Preview live de l'URL
   useEffect(() => {
     if (formUrl.trim()) {
       setUrlPreview(parseVideoUrl(formUrl));
@@ -278,7 +278,6 @@ export default function ProfileVodPage() {
       const data = await res.json();
       setClips(data.clips || []);
 
-      // Marquer les annotations sur ses clips comme lues
       fetch('/api/vod/annotations/mark-read', {
         method: 'POST',
         headers: {
@@ -340,8 +339,8 @@ export default function ProfileVodPage() {
       setFormGame('valorant');
       setFormDesc('');
       setShowForm(false);
-      setSuccessMsg('Clip soumis avec succès !');
-      setTimeout(() => setSuccessMsg(''), 3500);
+      setSuccessMsg('Clip soumis avec succès ! Ton coach recevra une notification.');
+      setTimeout(() => setSuccessMsg(''), 5000);
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Erreur lors de la soumission');
     } finally {
@@ -349,211 +348,232 @@ export default function ProfileVodPage() {
     }
   };
 
-  const colorBadge: Record<string, string> = {
-    red: 'bg-red-500/10 border-red-500/30 text-red-400',
-    purple: 'bg-purple-500/10 border-purple-500/30 text-purple-400',
-    yellow: 'bg-yellow-500/10 border-yellow-500/30 text-yellow-400',
-    gray: 'bg-white/5 border-white/10 text-gray-400',
-  };
-
   if (authLoading || isLoading) {
     return (
-      <main className="min-h-screen page-bg flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-purple-500" />
-      </main>
+      <div className="min-h-screen bg-[#0B0A0D] flex items-center justify-center font-mono">
+        <Loader2 className="w-8 h-8 animate-spin text-[#CA1C30]" />
+      </div>
     );
   }
 
   if (!user) {
     return (
-      <main className="min-h-screen page-bg flex items-center justify-center">
-        <div className="text-center card rounded-2xl p-12 max-w-md mx-auto">
-          <Film size={48} className="mx-auto mb-4 text-gray-500" />
-          <h1 className="text-2xl font-bold mb-2">Connexion requise</h1>
-          <p className="text-gray-400 mb-6">Connecte-toi pour accéder à tes clips VOD.</p>
-          <Link href="/auth" className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold hover:shadow-lg transition-all">
-            Se connecter
+      <div className="min-h-screen bg-[#0B0A0D] flex items-center justify-center px-4 font-mono">
+        <div className="reticle-box bg-[#121117] border border-white/10 p-8 max-w-md text-center">
+          <Film className="w-12 h-12 text-[#CA1C30] mx-auto mb-4" />
+          <h1 className="text-xl font-bold font-display uppercase tracking-wider mb-2 text-white">CONNEXION REQUISE</h1>
+          <p className="text-xs text-white/50 mb-6">Connecte-toi pour soumettre tes clips et consulter les retours.</p>
+          <Link href="/auth" className="btn-cyber-primary text-xs py-2.5 px-6">
+            SE CONNECTER
           </Link>
         </div>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="min-h-screen page-bg py-24">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#0B0A0D] text-white flex flex-col font-mono">
+      <CyberNavbar />
 
-        {/* Header */}
-        <div className="mb-8">
-          <Link
-            href="/profile"
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-white mb-4 transition-colors"
-          >
-            <ArrowLeft size={20} />
-            Retour au profil
-          </Link>
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <div>
-              <h1 className="text-3xl font-bold flex items-center gap-3">
-                <Film className="text-orange-400" size={28} />
-                Mes clips VOD
-              </h1>
-              <p className="text-gray-400 mt-1">
-                Soumets tes clips pour que ton coach les analyse et laisse des annotations.
-              </p>
+      <main className="flex-1 py-28 pb-32 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto">
+          {/* Header */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
+              <Link href="/profile" className="btn-cyber-ghost text-xs py-1.5 px-3 flex items-center gap-2">
+                <ArrowLeft size={14} />
+                <span>RETOUR AU PROFIL</span>
+              </Link>
+              <div className="flex items-center gap-2 flex-wrap">
+                <Link
+                  href="/profile/coaching"
+                  className="px-3 py-1.5 bg-[#00B4A0]/15 hover:bg-[#00B4A0]/25 text-[#00B4A0] border border-[#00B4A0]/30 text-xs font-bold uppercase transition-colors flex items-center gap-1.5"
+                >
+                  <MessageSquare size={13} />
+                  <span>CHAT AVEC LE COACH</span>
+                </Link>
+                <Link
+                  href="/profile/sheet"
+                  className="px-3 py-1.5 bg-[#CA1C30]/15 hover:bg-[#CA1C30]/25 text-[#CA1C30] border border-[#CA1C30]/30 text-xs font-bold uppercase transition-colors flex items-center gap-1.5"
+                >
+                  <FileText size={13} />
+                  <span>FICHE DE SUIVI</span>
+                </Link>
+              </div>
             </div>
-            <button
-              onClick={() => { setShowForm(v => !v); setFormError(''); }}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-xl font-semibold text-white hover:shadow-lg hover:shadow-orange-500/30 transition-all text-sm"
-            >
-              {showForm ? <X size={16} /> : <Plus size={16} />}
-              {showForm ? 'Annuler' : 'Ajouter un clip'}
-            </button>
-          </div>
-        </div>
 
-        {/* Toast succès */}
-        {successMsg && (
-          <div className="mb-6 p-4 rounded-xl bg-green-500/20 border border-green-500/30 text-green-400 text-sm flex items-center gap-2">
-            <Check size={16} />
-            {successMsg}
-          </div>
-        )}
-
-        {/* Formulaire de soumission */}
-        {showForm && (
-          <div className="card rounded-2xl p-6 mb-8 border border-orange-500/20">
-            <h2 className="font-bold text-lg mb-4 flex items-center gap-2">
-              <Plus size={18} className="text-orange-400" />
-              Soumettre un clip
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* URL */}
-              <div>
-                <label className="block text-sm text-gray-300 mb-1.5 font-medium">
-                  Lien de la vidéo <span className="text-red-400">*</span>
-                </label>
-                <input
-                  type="url"
-                  value={formUrl}
-                  onChange={e => setFormUrl(e.target.value)}
-                  placeholder="https://youtube.com/watch?v=... ou clips.twitch.tv/... ou medal.tv/..."
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-600 focus:outline-none focus:border-orange-500 text-sm"
-                />
-                {/* Feedback URL */}
-                {formUrl.trim() && (
-                  <div className="mt-2 flex items-center gap-2">
-                    {urlPreview ? (
-                      <span className={`text-xs px-2 py-0.5 rounded-full border ${colorBadge[providerColor(urlPreview.provider)]}`}>
-                        ✓ {providerLabel(urlPreview.provider)} détecté
-                      </span>
-                    ) : (
-                      <span className="text-xs text-red-400">
-                        ✗ URL non reconnue (YouTube, Twitch clip/VOD, Medal.tv uniquement)
-                      </span>
-                    )}
-                  </div>
-                )}
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#CA1C30]/15 border border-[#CA1C30]/30 flex items-center justify-center text-[#CA1C30]">
+                  <Film size={20} />
+                </div>
+                <div>
+                  <h1 className="text-xl sm:text-2xl font-bold font-display uppercase tracking-wider text-white">
+                    MES CLIPS VOD // <span className="text-[#CA1C30]">ANALYSES</span>
+                  </h1>
+                  <p className="text-xs text-white/50">Soumets tes actions clés pour un débriefing frame par frame</p>
+                </div>
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-4">
-                {/* Titre */}
+              <button
+                onClick={() => { setShowForm(v => !v); setFormError(''); }}
+                className="btn-cyber-primary text-xs py-2.5 px-5 flex items-center gap-2 cursor-pointer"
+              >
+                {showForm ? <X size={15} /> : <Plus size={15} />}
+                <span>{showForm ? 'ANNULER' : 'SOUMETTRE UN CLIP'}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Success toast */}
+          {successMsg && (
+            <div className="mb-6 p-3 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-2">
+              <Check size={15} />
+              <span>{successMsg}</span>
+            </div>
+          )}
+
+          {/* Submission Form */}
+          {showForm && (
+            <div className="reticle-box bg-[#121117] border border-[#CA1C30]/40 p-6 mb-8 shadow-[0_0_20px_rgba(202, 28, 48,0.15)]">
+              <h2 className="font-bold text-sm uppercase tracking-wider mb-4 flex items-center gap-2 text-white">
+                <Plus size={16} className="text-[#CA1C30]" />
+                <span>NOUVEAU CLIP POUR ANALYSE</span>
+              </h2>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {/* URL */}
                 <div>
-                  <label className="block text-sm text-gray-300 mb-1.5 font-medium">
-                    Titre <span className="text-red-400">*</span>
+                  <label className="block text-[11px] font-bold text-white/70 mb-1 uppercase tracking-wider">
+                    Lien de la vidéo <span className="text-[#CA1C30]">*</span>
                   </label>
                   <input
-                    type="text"
-                    value={formTitle}
-                    onChange={e => setFormTitle(e.target.value.slice(0, 120))}
-                    placeholder="Ex: Game winning ace sur Ascent"
-                    maxLength={120}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-600 focus:outline-none focus:border-orange-500 text-sm"
+                    type="url"
+                    value={formUrl}
+                    onChange={e => setFormUrl(e.target.value)}
+                    placeholder="https://youtube.com/watch?v=... ou clips.twitch.tv/... ou medal.tv/..."
+                    className="w-full px-3.5 py-2.5 bg-black border border-white/20 text-white placeholder-white/30 text-xs focus:border-[#CA1C30] focus:outline-none"
                   />
+                  {formUrl.trim() && (
+                    <div className="mt-2 flex items-center gap-2">
+                      {urlPreview ? (
+                        <span className="text-[10px] font-bold px-2 py-0.5 bg-[#00B4A0]/15 border border-[#00B4A0]/30 text-[#00B4A0]">
+                          ✓ {providerLabel(urlPreview.provider).toUpperCase()} DÉTECTÉ
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold text-red-400">
+                          ✗ URL non reconnue (YouTube, Twitch clip/VOD, Medal.tv uniquement)
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
 
-                {/* Jeu */}
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {/* Titre */}
+                  <div>
+                    <label className="block text-[11px] font-bold text-white/70 mb-1 uppercase tracking-wider">
+                      Titre du clip <span className="text-[#CA1C30]">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formTitle}
+                      onChange={e => setFormTitle(e.target.value.slice(0, 120))}
+                      placeholder="Ex: Clutch 1v3 sur Bind A Site"
+                      maxLength={120}
+                      className="w-full px-3.5 py-2.5 bg-black border border-white/20 text-white placeholder-white/30 text-xs focus:border-[#CA1C30] focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Jeu */}
+                  <div>
+                    <label className="block text-[11px] font-bold text-white/70 mb-1 uppercase tracking-wider">
+                      Discipline
+                    </label>
+                    <select
+                      value={formGame}
+                      onChange={e => setFormGame(e.target.value)}
+                      className="w-full px-3.5 py-2.5 bg-black border border-white/20 text-white text-xs focus:border-[#CA1C30] focus:outline-none"
+                    >
+                      {VALID_GAMES.map(g => (
+                        <option key={g.value} value={g.value}>{g.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Description */}
                 <div>
-                  <label className="block text-sm text-gray-300 mb-1.5 font-medium">Jeu</label>
-                  <select
-                    value={formGame}
-                    onChange={e => setFormGame(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit focus:outline-none focus:border-orange-500 text-sm"
-                  >
-                    {VALID_GAMES.map(g => (
-                      <option key={g.value} value={g.value}>{g.label}</option>
-                    ))}
-                  </select>
+                  <label className="block text-[11px] font-bold text-white/70 mb-1 uppercase tracking-wider">
+                    Contexte & Question au coach <span className="text-white/40">(optionnel)</span>
+                  </label>
+                  <textarea
+                    value={formDesc}
+                    onChange={e => setFormDesc(e.target.value.slice(0, 500))}
+                    placeholder="Explique la situation, ton hésitation ou le point précis sur lequel tu souhaites un retour..."
+                    rows={3}
+                    maxLength={500}
+                    className="w-full px-3.5 py-2.5 bg-black border border-white/20 text-white placeholder-white/30 text-xs focus:border-[#CA1C30] focus:outline-none resize-none"
+                  />
+                  <div className="text-right text-[10px] text-white/40 mt-1">{formDesc.length} / 500</div>
                 </div>
+
+                {formError && (
+                  <p className="text-xs text-red-400 font-bold">{formError}</p>
+                )}
+
+                <div className="flex justify-end gap-2 pt-2">
+                  <button
+                    type="submit"
+                    disabled={isSubmitting || !formUrl.trim() || !formTitle.trim() || !urlPreview}
+                    className="btn-cyber-primary text-xs py-2.5 px-6 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
+                  >
+                    {isSubmitting ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                    <span>ENVOYER LE CLIP AU COACH</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {error && (
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 text-red-400 text-xs">
+              {error}
+            </div>
+          )}
+
+          {/* Clips List */}
+          {clips.length === 0 ? (
+            <div className="reticle-box bg-[#121117] border border-white/10 p-16 text-center">
+              <Film className="w-14 h-14 text-white/20 mx-auto mb-4" />
+              <h2 className="text-lg font-bold font-display uppercase tracking-wider text-white mb-2">AUCUN CLIP SOUMIS</h2>
+              <p className="text-white/40 text-xs max-w-md mx-auto mb-6">
+                Partage un clip YouTube, Twitch ou Medal.tv pour que ton coach analyse ton placement, ton crosshair placement et tes prises de décision.
+              </p>
+              <button
+                onClick={() => setShowForm(true)}
+                className="btn-cyber-primary text-xs py-2.5 px-6 inline-flex items-center gap-2 cursor-pointer"
+              >
+                <Plus size={14} />
+                <span>SOUMETTRE MON PREMIER CLIP</span>
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between pb-2 border-b border-white/10">
+                <span className="text-xs font-bold text-white uppercase tracking-wider">
+                  {clips.length} CLIP{clips.length > 1 ? 'S' : ''} RÉPERTORIÉ{clips.length > 1 ? 'S' : ''}
+                </span>
               </div>
+              {clips.map(clip => (
+                <ClipCard key={clip.id} clip={clip} token={token} />
+              ))}
+            </div>
+          )}
+        </div>
+      </main>
 
-              {/* Description */}
-              <div>
-                <label className="block text-sm text-gray-300 mb-1.5 font-medium">
-                  Description <span className="text-gray-500">(optionnel)</span>
-                </label>
-                <textarea
-                  value={formDesc}
-                  onChange={e => setFormDesc(e.target.value.slice(0, 500))}
-                  placeholder="Décris la situation, ce que tu voudrais que ton coach analyse..."
-                  rows={3}
-                  maxLength={500}
-                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-inherit placeholder-gray-600 focus:outline-none focus:border-orange-500 resize-none text-sm"
-                />
-                <div className="text-right text-xs text-gray-500 mt-1">{formDesc.length} / 500</div>
-              </div>
-
-              {formError && (
-                <p className="text-sm text-red-400">{formError}</p>
-              )}
-
-              <div className="flex justify-end">
-                <button
-                  type="submit"
-                  disabled={isSubmitting || !formUrl.trim() || !formTitle.trim() || !urlPreview}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-xl font-semibold text-white hover:shadow-lg hover:shadow-orange-500/30 transition-all disabled:opacity-50 text-sm"
-                >
-                  {isSubmitting ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
-                  Soumettre le clip
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
-
-        {error && (
-          <div className="mb-6 p-4 rounded-xl bg-red-500/20 border border-red-500/30 text-red-400 text-sm">
-            {error}
-          </div>
-        )}
-
-        {/* Liste des clips */}
-        {clips.length === 0 ? (
-          <div className="card rounded-2xl p-16 text-center">
-            <Film className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2">Aucun clip soumis</h2>
-            <p className="text-gray-400 text-sm mb-6">
-              Soumet un clip YouTube, Twitch ou Medal.tv pour que ton coach puisse l&apos;analyser.
-            </p>
-            <button
-              onClick={() => setShowForm(true)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-xl font-semibold text-white hover:shadow-lg transition-all text-sm"
-            >
-              <Plus size={16} />
-              Ajouter mon premier clip
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            <p className="text-gray-400 text-sm">
-              {clips.length} clip{clips.length > 1 ? 's' : ''} soumis
-            </p>
-            {clips.map(clip => (
-              <ClipCard key={clip.id} clip={clip} token={token} />
-            ))}
-          </div>
-        )}
-      </div>
-    </main>
+      <CyberFooter />
+    </div>
   );
 }

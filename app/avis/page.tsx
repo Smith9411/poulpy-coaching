@@ -8,6 +8,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/lib/supabase';
 import Select from '@/components/Select';
 import CyberNavbar from '@/components/CyberNavbar';
+import CyberFooter from '@/components/CyberFooter';
 import AuthModal from '@/components/AuthModal';
 
 interface Review {
@@ -1105,6 +1106,7 @@ export default function Avis() {
 
       </div>
 
+      <CyberFooter />
       <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
     </main>
   );

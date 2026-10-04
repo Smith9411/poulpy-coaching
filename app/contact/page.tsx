@@ -2,163 +2,171 @@
 
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { MessageCircle, ArrowRight, Mail, Globe, MapPin } from 'lucide-react';
+import { MessageCircle, ArrowRight, Mail, Globe, MapPin, ArrowLeft, Shield } from 'lucide-react';
+import CyberNavbar from '@/components/CyberNavbar';
+import CyberFooter from '@/components/CyberFooter';
 
 export default function Contact() {
   return (
-    <main className="min-h-screen page-bg py-24">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16"
-        >
-          <div className="inline-block glass px-4 py-2 rounded-full mb-4">
-            <span className="text-sm text-purple-400 font-medium">CONTACT</span>
-          </div>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6">
-            On en <span className="text-gradient">discute ?</span>
-          </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            La meilleure façon de me rejoindre pour parler coaching, c&apos;est par là.
-          </p>
-        </motion.div>
+    <div className="min-h-screen bg-[#0B0A0D] text-white flex flex-col font-mono">
+      <CyberNavbar />
 
-        {/* Discord CTA - Main */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mb-16"
-        >
-          <div className="card rounded-3xl p-8 sm:p-12 relative overflow-hidden border border-purple-500/30">
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-600/10 to-cyan-500/10 pointer-events-none" />
-            <div className="absolute top-0 right-0 w-72 h-72 bg-gradient-to-bl from-purple-600/20 to-transparent rounded-full blur-3xl pointer-events-none" />
+      <main className="flex-1 py-28 pb-32 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-12"
+          >
+            <div className="inline-block px-3 py-1 mb-4 border border-[#CA1C30]/40 bg-[#CA1C30]/10 text-[#CA1C30] text-[11px] font-bold tracking-widest uppercase">
+              // CANAUX OFFICIELS & CONTACT
+            </div>
+            <h1 className="text-3xl sm:text-5xl font-display font-black tracking-tight text-white mb-4 uppercase">
+              ENTRER EN <span className="text-[#CA1C30]">CONTACT</span>
+            </h1>
+            <p className="text-xs sm:text-sm text-white/50 max-w-xl mx-auto leading-relaxed">
+              Pour préparer ton accompagnement, planifier un coaching sur-mesure ou poser tes questions directement à Poulpy.
+            </p>
+          </motion.div>
 
-            <div className="relative z-10 flex flex-col items-center text-center gap-6">
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center">
-                <MessageCircle size={32} className="text-white" />
-              </div>
+          {/* Discord CTA - Main Priority */}
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.15 }}
+            className="mb-10"
+          >
+            <div className="reticle-box bg-[#121117] border border-[#5865F2]/40 p-8 sm:p-12 relative overflow-hidden shadow-[0_0_30px_rgba(88,101,242,0.15)] text-center">
+              <div className="relative z-10 flex flex-col items-center gap-5">
+                <div className="w-16 h-16 bg-[#5865F2]/15 border border-[#5865F2]/40 flex items-center justify-center text-[#7289da]">
+                  <MessageCircle size={32} />
+                </div>
 
-              <div>
-                <h2 className="text-2xl sm:text-3xl font-bold mb-2">Rejoins le Discord</h2>
-                <p className="text-gray-400 text-lg">
-                  C&apos;est là que tout se passe : réservation, questions, suivi, communauté.
+                <div>
+                  <div className="text-[10px] text-[#00B4A0] uppercase font-bold tracking-widest mb-1">
+                    CANAL DE RÉFÉRENCE
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-display font-bold uppercase tracking-wider text-white mb-2">
+                    SERVEUR DISCORD POULPY
+                  </h2>
+                  <p className="text-xs sm:text-sm text-white/60 max-w-md mx-auto">
+                    Le hub central : réservations en direct, annonces des créneaux, salons d'entraînement et échanges élèves.
+                  </p>
+                </div>
+
+                <a
+                  href="https://discord.gg/rJMg3ZZRkp"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-cyber-primary text-xs sm:text-sm py-3.5 px-8 inline-flex items-center gap-3 cursor-pointer shadow-[0_0_20px_rgba(202,28,48,0.3)]"
+                >
+                  <MessageCircle size={18} />
+                  <span>REJOINDRE LE DISCORD OFFICIEL</span>
+                  <ArrowRight size={18} />
+                </a>
+
+                <p className="text-[10px] text-white/40 tracking-wider uppercase">
+                  Invitation permanente active • Communauté compétitive Valorant & Apex
                 </p>
               </div>
-
-              <a
-                href="https://discord.gg/rJMg3ZZRkp"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-600 to-cyan-500 rounded-xl font-semibold text-lg hover:shadow-lg hover:shadow-purple-500/50 transition-all hover:scale-105"
-              >
-                <MessageCircle size={24} />
-                Rejoindre le serveur Discord
-                <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
-              </a>
-
-              <p className="text-sm text-gray-500">
-                Invitation permanente • <span className="text-green-400">+100 membres</span>
-              </p>
             </div>
-          </div>
-        </motion.div>
+          </motion.div>
 
-        {/* Other contact methods */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
-          className="grid sm:grid-cols-3 gap-6 mb-16"
-        >
-          <div className="card rounded-2xl p-6 text-center hover:bg-white/5 transition-all group">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-              <Mail size={24} className="text-white" />
-            </div>
-            <h3 className="font-bold text-lg mb-2">Email</h3>
-            <p className="text-gray-400 text-sm">
-              Pour les demandes pro / partenariats
-            </p>
-            <a
-              href="mailto:poulpy.coaching@gmail.com"
-              className="mt-3 inline-block text-purple-400 hover:text-purple-300 text-sm font-medium"
-            >
-              poulpy.coaching@gmail.com
-            </a>
-          </div>
-
-          <div className="card rounded-2xl p-6 text-center hover:bg-white/5 transition-all group">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-              <Globe size={24} className="text-white" />
-            </div>
-            <h3 className="font-bold text-lg mb-2">Réseaux</h3>
-            <p className="text-gray-400 text-sm">
-              Suis l&apos;actu et les tips gratuits
-            </p>
-            <div className="mt-3 flex items-center justify-center gap-4">
-              <a
-                href="https://www.twitch.tv/ccs_poulpy"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-purple-400 transition-colors"
-                aria-label="Twitch"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M21 1.71v20.58c0 .94-.76 1.71-1.7 1.71H4.7c-.94 0-1.71-.76-1.71-1.71V1.71C3 0.77 3.76 0 4.7 0h14.6c.94 0 1.7.77 1.7 1.71zM8.79 17.74l8.5-6.37c.51-.38.51-1.25 0-1.63l-8.5-6.37c-.51-.38-1.25-.08-1.25.67v12.73c0 .75.74 1.05 1.25.67z"/></svg>
-              </a>
-              <a
-                href="https://www.youtube.com/@Poulpy_C"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-red-500 transition-colors"
-                aria-label="YouTube"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-              </a>
-              <a
-                href="https://www.tiktok.com/@poulpy_ccs"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-white transition-colors"
-                aria-label="TikTok"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.548,3.256c-2.642,0.881-5.122,2.26-7.057,4.13C4.395,8.777,3.537,10.338,3.25,12.147 C2.977,13.956,3.23,15.757,3.99,17.373c0.58,1.248,1.555,2.359,2.881,3.15c1.172,0.697,2.467,1.138,3.787,1.274 c1.066,0.108,2.126,0.176,3.162,0.176c2.642,0,5.122-0.881,7.057-4.13c1.172-1.182,2.03-2.743,2.307-4.552 c0.273-1.809,0.02-3.61-0.252-5.419c-0.215-1.424-0.66-2.732-1.392-3.871C20.771,4.088,19.59,3.468,18.203,2.899 C16.794,2.307,15.36,2.004,13.735,2.025C13.239,2.029,12.724,2.045,12.215,2.072C12.316,2.387,12.408,2.707,12.5,3.023 C12.532,3.159,12.536,3.237,12.548,3.256z M12.5,19.5c-3.859,0-7.076-1.302-9.587-3.598 c-0.279-0.256-0.556-0.503-0.806-0.779c-0.446-0.493-0.766-1.105-0.909-1.774C0.614,11.64,0.38,10.342,0.36,9.044c0-1.337,0.223-2.67,0.612-3.975 c0.319-1.08,0.779-2.103,1.367-3.037c0.554-0.879,1.248-1.681,2.03-2.341c0.734-0.619,1.545-1.138,2.366-1.521 c0.819-0.381,1.655-0.714,2.498-0.989c0.511-0.168,1.034-0.312,1.562-0.421c-0.171,0.786-0.399,1.589-0.632,2.4c-0.193,0.668-0.427,1.341-0.708,2.008 c-0.409,1.222-1.043,2.395-1.815,3.399c-0.663,0.866-1.493,1.653-2.473,2.326C3.46,17.226,2.554,18.267,2.04,19.476 C2.554,18.267,3.46,17.226,4.523,16.422c0.98-0.673,1.81-1.46,2.473-2.326c0.772-1.004,1.406-2.177,1.815-3.399 c0.281-0.667,0.515-1.34,0.708-2.008c0.233-0.811,0.461-1.614,0.632-2.4c0.528,0.109,1.051,0.253,1.562,0.421 c0.843,0.275,1.679,0.608,2.498,0.989c0.821,0.383,1.632,0.902,2.366,1.521c0.782,0.66,1.476,1.462,2.03,2.341 c0.588,0.934,1.048,1.957,1.367,3.037c0.389,1.305,0.612,2.638,0.612,3.975c0,1.298-0.23,2.596-0.63,3.728 c-0.143,0.669-0.463,1.281-0.909,1.774c-0.25,0.276-0.527,0.523-0.806,0.779C19.576,18.198,16.359,19.5,12.5,19.5z"/></svg>
-              </a>
-            </div>
-          </div>
-
-          <div className="card rounded-2xl p-6 text-center hover:bg-white/5 transition-all group">
-            <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-purple-600 to-cyan-500 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-              <MapPin size={24} className="text-white" />
-            </div>
-            <h3 className="font-bold text-lg mb-2">Localisation</h3>
-            <p className="text-gray-400 text-sm">
-              France 🇫🇷 — Fuseau horaire CET/CEST
-            </p>
-            <p className="mt-3 text-purple-400 text-sm font-medium">
-              Disponible 14h-23h
-            </p>
-          </div>
-        </motion.div>
-
-        {/* Back to home */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="text-center"
-        >
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 px-6 py-3 card rounded-xl font-semibold hover:bg-white/10 transition-all group"
+          {/* Other contact methods */}
+          <motion.div
+            initial={{ opacity: 0, y: 25 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="grid sm:grid-cols-3 gap-4 mb-12"
           >
-            <ArrowRight size={20} className="-rotate-90 group-hover:-translate-x-1 transition-transform" />
-            Retour à l&apos;accueil
-          </Link>
-        </motion.div>
-      </div>
-    </main>
+            {/* Email */}
+            <div className="reticle-box bg-[#121117] border border-white/10 p-6 text-center hover:border-[#CA1C30]/50 transition-colors">
+              <div className="w-11 h-11 bg-[#CA1C30]/15 border border-[#CA1C30]/30 flex items-center justify-center text-[#CA1C30] mx-auto mb-4">
+                <Mail size={20} />
+              </div>
+              <h3 className="font-bold font-display uppercase tracking-wider text-sm text-white mb-1">EMAIL PRO</h3>
+              <p className="text-[11px] text-white/40 mb-3">
+                Partenariats, structures & demandes business
+              </p>
+              <a
+                href="mailto:poulpy.coaching@gmail.com"
+                className="text-xs text-[#00B4A0] hover:text-white font-bold transition-colors break-all"
+              >
+                poulpy.coaching@gmail.com
+              </a>
+            </div>
+
+            {/* Réseaux */}
+            <div className="reticle-box bg-[#121117] border border-white/10 p-6 text-center hover:border-[#00B4A0]/50 transition-colors">
+              <div className="w-11 h-11 bg-[#00B4A0]/15 border border-[#00B4A0]/30 flex items-center justify-center text-[#00B4A0] mx-auto mb-4">
+                <Globe size={20} />
+              </div>
+              <h3 className="font-bold font-display uppercase tracking-wider text-sm text-white mb-1">STREAMS & TIPS</h3>
+              <p className="text-[11px] text-white/40 mb-3">
+                VODs, clips et gameplay en direct
+              </p>
+              <div className="flex items-center justify-center gap-3 text-white/60">
+                <a
+                  href="https://www.twitch.tv/ccs_poulpy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-1.5 bg-white/5 hover:bg-[#9146FF]/20 hover:text-[#a970ff] border border-white/10 transition-colors"
+                  aria-label="Twitch"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714Z"/></svg>
+                </a>
+                <a
+                  href="https://www.youtube.com/@Poulpy_C"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-1.5 bg-white/5 hover:bg-red-500/20 hover:text-red-400 border border-white/10 transition-colors"
+                  aria-label="YouTube"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                </a>
+                <a
+                  href="https://www.tiktok.com/@poulpy_ccs"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="p-1.5 bg-white/5 hover:bg-white/20 hover:text-white border border-white/10 transition-colors"
+                  aria-label="TikTok"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.85.12V9.4a6.33 6.33 0 0 0-1-.08A6.34 6.34 0 0 0 3 15.66a6.34 6.34 0 0 0 10.82 4.48 6.3 6.3 0 0 0 1.86-4.47v-6.9a8.16 8.16 0 0 0 4.91 1.63v-3.71z"/></svg>
+                </a>
+              </div>
+            </div>
+
+            {/* Localisation */}
+            <div className="reticle-box bg-[#121117] border border-white/10 p-6 text-center hover:border-white/30 transition-colors">
+              <div className="w-11 h-11 bg-white/5 border border-white/15 flex items-center justify-center text-white mx-auto mb-4">
+                <MapPin size={20} />
+              </div>
+              <h3 className="font-bold font-display uppercase tracking-wider text-sm text-white mb-1">FUSEAU HORAIRE</h3>
+              <p className="text-[11px] text-white/40 mb-2">
+                France (CET / CEST)
+              </p>
+              <span className="text-[10px] text-[#00B4A0] font-bold uppercase tracking-wider">
+                SESSIONS : 14H00 — 23H00
+              </span>
+            </div>
+          </motion.div>
+
+          {/* Back button */}
+          <div className="text-center">
+            <Link
+              href="/"
+              className="btn-cyber-ghost text-xs py-2 px-6 inline-flex items-center gap-2"
+            >
+              <ArrowLeft size={14} />
+              <span>RETOURNER SUR LE SITE</span>
+            </Link>
+          </div>
+        </div>
+      </main>
+
+      <CyberFooter />
+    </div>
   );
 }

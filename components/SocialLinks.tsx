@@ -226,16 +226,16 @@ export default function SocialLinks({
 
   // Full Minimalist Card (for Student Profile)
   return (
-    <div className="card rounded-2xl p-6 sm:p-8">
+    <div className="reticle-box bg-[#121117] border border-white/10 p-6 sm:p-8">
       {/* Header */}
-      <div className="flex items-center justify-between mb-5">
+      <div className="flex items-center justify-between mb-5 pb-3 border-b border-white/10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-cyan-500 flex items-center justify-center shadow-md">
-            <Globe size={20} className="text-white" />
+          <div className="w-10 h-10 bg-[#00B4A0]/15 border border-[#00B4A0]/30 flex items-center justify-center text-[#00B4A0]">
+            <Globe size={20} />
           </div>
           <div>
-            <h3 className="font-bold text-lg text-white">Mes réseaux</h3>
-            <p className="text-xs text-gray-400">Pour échanger avec ton coach et partager tes replays</p>
+            <h3 className="font-bold text-lg font-display uppercase tracking-wider text-white">MES RÉSEAUX // CANAUX</h3>
+            <p className="text-xs text-white/50 font-mono">Pour échanger avec ton coach et partager tes replays</p>
           </div>
         </div>
 
@@ -243,21 +243,21 @@ export default function SocialLinks({
           <button
             type="button"
             onClick={handleOpenEdit}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-medium text-gray-300 transition-colors"
+            className="btn-cyber-ghost text-xs py-1.5 px-3 flex items-center gap-1.5 cursor-pointer"
           >
             <Edit2 size={13} />
-            <span>{hasAnySocial ? 'Modifier' : 'Ajouter'}</span>
+            <span>{hasAnySocial ? 'MODIFIER' : 'AJOUTER'}</span>
           </button>
         )}
       </div>
 
       {/* Editing Form */}
       {isEditing ? (
-        <div className="space-y-4 pt-1">
+        <div className="space-y-4 pt-1 font-mono">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             {/* Discord */}
             <div>
-              <label className="block text-xs font-semibold text-gray-300 mb-1 flex items-center gap-1.5">
+              <label className="block text-[11px] font-bold text-white/70 mb-1 flex items-center gap-1.5 uppercase">
                 <span className="text-[#7289da]"><DiscordIcon className="w-3.5 h-3.5" /></span>
                 <span>Discord</span>
               </label>
@@ -266,13 +266,13 @@ export default function SocialLinks({
                 value={draft.discord || ''}
                 onChange={(e) => setDraft({ ...draft, discord: e.target.value })}
                 placeholder="Ex: poulpy ou alex#1234"
-                className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-xs sm:text-sm focus:outline-none focus:border-[#5865F2] transition-colors"
+                className="w-full px-3 py-2 bg-black border border-white/20 text-white placeholder-white/30 text-xs focus:outline-none focus:border-[#5865F2] transition-colors"
               />
             </div>
 
             {/* Twitch */}
             <div>
-              <label className="block text-xs font-semibold text-gray-300 mb-1 flex items-center gap-1.5">
+              <label className="block text-[11px] font-bold text-white/70 mb-1 flex items-center gap-1.5 uppercase">
                 <span className="text-[#a970ff]"><TwitchIcon className="w-3.5 h-3.5" /></span>
                 <span>Twitch</span>
               </label>
@@ -281,13 +281,13 @@ export default function SocialLinks({
                 value={draft.twitch || ''}
                 onChange={(e) => setDraft({ ...draft, twitch: e.target.value })}
                 placeholder="Ex: twitch.tv/monpseudo ou monpseudo"
-                className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-xs sm:text-sm focus:outline-none focus:border-[#9146FF] transition-colors"
+                className="w-full px-3 py-2 bg-black border border-white/20 text-white placeholder-white/30 text-xs focus:outline-none focus:border-[#9146FF] transition-colors"
               />
             </div>
 
             {/* YouTube */}
             <div>
-              <label className="block text-xs font-semibold text-gray-300 mb-1 flex items-center gap-1.5">
+              <label className="block text-[11px] font-bold text-white/70 mb-1 flex items-center gap-1.5 uppercase">
                 <span className="text-[#ff4e4e]"><YoutubeIcon className="w-3.5 h-3.5" /></span>
                 <span>YouTube</span>
               </label>
@@ -296,14 +296,14 @@ export default function SocialLinks({
                 value={draft.youtube || ''}
                 onChange={(e) => setDraft({ ...draft, youtube: e.target.value })}
                 placeholder="Ex: @machaine ou youtube.com/@machaine"
-                className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-xs sm:text-sm focus:outline-none focus:border-red-500 transition-colors"
+                className="w-full px-3 py-2 bg-black border border-white/20 text-white placeholder-white/30 text-xs focus:outline-none focus:border-red-500 transition-colors"
               />
             </div>
 
             {/* TikTok */}
             <div>
-              <label className="block text-xs font-semibold text-gray-300 mb-1 flex items-center gap-1.5">
-                <span className="text-cyan-400"><TiktokIcon className="w-3.5 h-3.5" /></span>
+              <label className="block text-[11px] font-bold text-white/70 mb-1 flex items-center gap-1.5 uppercase">
+                <span className="text-[#00B4A0]"><TiktokIcon className="w-3.5 h-3.5" /></span>
                 <span>TikTok</span>
               </label>
               <input
@@ -311,58 +311,58 @@ export default function SocialLinks({
                 value={draft.tiktok || ''}
                 onChange={(e) => setDraft({ ...draft, tiktok: e.target.value })}
                 placeholder="Ex: @moncompte ou tiktok.com/@moncompte"
-                className="w-full px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-xs sm:text-sm focus:outline-none focus:border-cyan-400 transition-colors"
+                className="w-full px-3 py-2 bg-black border border-white/20 text-white placeholder-white/30 text-xs focus:outline-none focus:border-[#00B4A0] transition-colors"
               />
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-2 pt-2 border-t border-white/5">
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-white/10">
             <button
               type="button"
               onClick={() => setIsEditing(false)}
               disabled={isSaving}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-medium text-gray-300 transition-colors disabled:opacity-50"
+              className="btn-cyber-ghost text-xs py-1.5 px-3 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
             >
               <X size={14} />
-              <span>Annuler</span>
+              <span>ANNULER</span>
             </button>
             <button
               type="button"
               onClick={handleSave}
               disabled={isSaving}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-cyan-500 text-white text-xs font-bold shadow-md hover:shadow-purple-500/20 transition-all disabled:opacity-50"
+              className="btn-cyber-primary text-xs py-1.5 px-4 flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
             >
               {isSaving ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
-              <span>Enregistrer</span>
+              <span>ENREGISTRER</span>
             </button>
           </div>
         </div>
       ) : hasAnySocial ? (
         /* View Mode with badges */
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-mono">
           {/* Discord Badge */}
           {currentSocials.discord ? (
             <button
               type="button"
               onClick={() => handleCopyDiscord(currentSocials.discord!)}
-              className="flex items-center justify-between p-3 rounded-xl bg-[#5865F2]/10 hover:bg-[#5865F2]/20 border border-[#5865F2]/20 text-left transition-all group"
+              className="flex items-center justify-between p-3 border border-[#5865F2]/30 bg-[#5865F2]/10 hover:bg-[#5865F2]/15 text-left transition-all group cursor-pointer"
             >
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-8 h-8 rounded-lg bg-[#5865F2]/20 flex items-center justify-center text-[#7289da] flex-shrink-0">
+                <div className="w-8 h-8 bg-[#5865F2]/20 flex items-center justify-center text-[#7289da] flex-shrink-0">
                   <DiscordIcon className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[10px] text-gray-400 block uppercase font-semibold">Discord</span>
-                  <span className="text-xs sm:text-sm font-semibold text-white truncate block">
+                  <span className="text-[10px] text-white/50 block uppercase font-bold tracking-wider">Discord</span>
+                  <span className="text-xs sm:text-sm font-bold text-white truncate block">
                     {currentSocials.discord}
                   </span>
                 </div>
               </div>
-              <span className="text-[11px] text-[#7289da] font-medium flex items-center gap-1 flex-shrink-0 pl-2">
+              <span className="text-[11px] text-[#7289da] font-bold flex items-center gap-1 flex-shrink-0 pl-2">
                 {copiedField === 'discord' ? (
                   <>
-                    <Check size={13} className="text-green-400" />
-                    <span className="text-green-400">Copié !</span>
+                    <Check size={13} className="text-[#00B4A0]" />
+                    <span className="text-[#00B4A0]">Copié !</span>
                   </>
                 ) : (
                   <>
@@ -380,20 +380,20 @@ export default function SocialLinks({
               href={formatSocialUrl('twitch', currentSocials.twitch)}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between p-3 rounded-xl bg-[#9146FF]/10 hover:bg-[#9146FF]/20 border border-[#9146FF]/20 text-left transition-all group"
+              className="flex items-center justify-between p-3 border border-[#9146FF]/30 bg-[#9146FF]/10 hover:bg-[#9146FF]/15 text-left transition-all group cursor-pointer"
             >
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-8 h-8 rounded-lg bg-[#9146FF]/20 flex items-center justify-center text-[#a970ff] flex-shrink-0">
+                <div className="w-8 h-8 bg-[#9146FF]/20 flex items-center justify-center text-[#a970ff] flex-shrink-0">
                   <TwitchIcon className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[10px] text-gray-400 block uppercase font-semibold">Twitch</span>
-                  <span className="text-xs sm:text-sm font-semibold text-white truncate block">
+                  <span className="text-[10px] text-white/50 block uppercase font-bold tracking-wider">Twitch</span>
+                  <span className="text-xs sm:text-sm font-bold text-white truncate block">
                     {formatSocialDisplay('twitch', currentSocials.twitch)}
                   </span>
                 </div>
               </div>
-              <span className="text-[11px] text-[#a970ff] font-medium flex items-center gap-1 flex-shrink-0 pl-2">
+              <span className="text-[11px] text-[#a970ff] font-bold flex items-center gap-1 flex-shrink-0 pl-2">
                 <span className="hidden sm:inline">Voir</span>
                 <ExternalLink size={12} className="opacity-60 group-hover:opacity-100" />
               </span>
@@ -406,20 +406,20 @@ export default function SocialLinks({
               href={formatSocialUrl('youtube', currentSocials.youtube)}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between p-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-left transition-all group"
+              className="flex items-center justify-between p-3 border border-red-500/30 bg-red-500/10 hover:bg-red-500/15 text-left transition-all group cursor-pointer"
             >
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center text-red-400 flex-shrink-0">
+                <div className="w-8 h-8 bg-red-500/20 flex items-center justify-center text-red-400 flex-shrink-0">
                   <YoutubeIcon className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[10px] text-gray-400 block uppercase font-semibold">YouTube</span>
-                  <span className="text-xs sm:text-sm font-semibold text-white truncate block">
+                  <span className="text-[10px] text-white/50 block uppercase font-bold tracking-wider">YouTube</span>
+                  <span className="text-xs sm:text-sm font-bold text-white truncate block">
                     {formatSocialDisplay('youtube', currentSocials.youtube)}
                   </span>
                 </div>
               </div>
-              <span className="text-[11px] text-red-400 font-medium flex items-center gap-1 flex-shrink-0 pl-2">
+              <span className="text-[11px] text-red-400 font-bold flex items-center gap-1 flex-shrink-0 pl-2">
                 <span className="hidden sm:inline">Voir</span>
                 <ExternalLink size={12} className="opacity-60 group-hover:opacity-100" />
               </span>
@@ -432,20 +432,20 @@ export default function SocialLinks({
               href={formatSocialUrl('tiktok', currentSocials.tiktok)}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-between p-3 rounded-xl bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/20 text-left transition-all group"
+              className="flex items-center justify-between p-3 border border-[#00B4A0]/30 bg-[#00B4A0]/10 hover:bg-[#00B4A0]/15 text-left transition-all group cursor-pointer"
             >
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-300 flex-shrink-0">
+                <div className="w-8 h-8 bg-[#00B4A0]/20 flex items-center justify-center text-[#00B4A0] flex-shrink-0">
                   <TiktokIcon className="w-4 h-4" />
                 </div>
                 <div className="min-w-0">
-                  <span className="text-[10px] text-gray-400 block uppercase font-semibold">TikTok</span>
-                  <span className="text-xs sm:text-sm font-semibold text-white truncate block">
+                  <span className="text-[10px] text-white/50 block uppercase font-bold tracking-wider">TikTok</span>
+                  <span className="text-xs sm:text-sm font-bold text-white truncate block">
                     {formatSocialDisplay('tiktok', currentSocials.tiktok)}
                   </span>
                 </div>
               </div>
-              <span className="text-[11px] text-cyan-400 font-medium flex items-center gap-1 flex-shrink-0 pl-2">
+              <span className="text-[11px] text-[#00B4A0] font-bold flex items-center gap-1 flex-shrink-0 pl-2">
                 <span className="hidden sm:inline">Voir</span>
                 <ExternalLink size={12} className="opacity-60 group-hover:opacity-100" />
               </span>
@@ -454,18 +454,18 @@ export default function SocialLinks({
         </div>
       ) : (
         /* Empty State */
-        <div className="text-center py-4 px-2 border border-dashed border-white/10 rounded-xl">
-          <p className="text-xs sm:text-sm text-gray-400 mb-3">
-            Aucun réseau renseigné pour l&apos;instant.
+        <div className="text-center py-6 px-4 border border-dashed border-white/10 font-mono">
+          <p className="text-xs text-white/40 mb-3">
+            Aucun canal de communication renseigné pour l&apos;instant.
           </p>
           {editable && (
             <button
               type="button"
               onClick={handleOpenEdit}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs font-semibold text-purple-400 hover:text-purple-300 transition-colors"
+              className="btn-cyber-ghost text-xs py-2 px-4 inline-flex items-center gap-2 cursor-pointer"
             >
-              <Globe size={13} />
-              <span>Renseigner mes réseaux (Discord, Twitch, YouTube, TikTok)</span>
+              <Globe size={13} className="text-[#00B4A0]" />
+              <span>RENSEIGNER MES RÉSEAUX (DISCORD, TWITCH, YOUTUBE, TIKTOK)</span>
             </button>
           )}
         </div>

@@ -632,7 +632,7 @@ export default function AdminBookingsPage() {
                   <button
                     type="button"
                     onClick={setEveningOnly}
-                    className="px-2.5 py-1.5 bg-black/40 border border-white/10 backdrop-blur-md hover:bg-white/10 text-indigo-300 font-medium transition-colors"
+                    className="px-2.5 py-1.5 bg-black/40 border border-white/10 backdrop-blur-md hover:bg-white/10 text-[#00B4A0] font-medium transition-colors"
                   >
                     🌙 Ouvrir 18h-22h
                   </button>

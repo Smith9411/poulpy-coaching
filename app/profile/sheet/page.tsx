@@ -9,6 +9,8 @@ import {
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import SheetMarkdownPreview from '@/components/admin/SheetMarkdownPreview';
+import CyberNavbar from '@/components/CyberNavbar';
+import CyberFooter from '@/components/CyberFooter';
 
 export default function StudentMySheetPage() {
   const { user, isLoading: authLoading } = useAuth();
@@ -62,128 +64,134 @@ export default function StudentMySheetPage() {
 
   if (authLoading || (isLoading && user)) {
     return (
-      <main className="min-h-screen page-bg py-24 flex items-center justify-center">
+      <div className="min-h-screen bg-[#0B0A0D] py-24 flex items-center justify-center font-mono">
         <div className="text-center">
-          <Loader2 size={40} className="animate-spin text-purple-500 mx-auto mb-4" />
-          <p className="text-gray-400">Chargement de ta fiche personnalisée...</p>
+          <Loader2 size={36} className="animate-spin text-[#CA1C30] mx-auto mb-4" />
+          <p className="text-xs uppercase tracking-wider text-white/50">Chargement de ta fiche personnalisée...</p>
         </div>
-      </main>
+      </div>
     );
   }
 
   if (!user) {
     return (
-      <main className="min-h-screen page-bg py-24 flex items-center justify-center px-4">
-        <div className="glass p-8 rounded-2xl max-w-md text-center border border-purple-500/30">
-          <AlertCircle size={48} className="text-purple-400 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold mb-2">Connexion requise</h1>
-          <p className="text-gray-400 mb-6">Connecte-toi pour accéder à ta fiche de coaching personnalisée.</p>
-          <Link href="/auth" className="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-medium inline-block">
-            Se connecter
+      <div className="min-h-screen bg-[#0B0A0D] py-24 flex items-center justify-center px-4 font-mono">
+        <div className="reticle-box bg-[#121117] border border-white/10 p-8 max-w-md text-center">
+          <AlertCircle size={44} className="text-[#CA1C30] mx-auto mb-4" />
+          <h1 className="text-xl font-bold font-display uppercase tracking-wider mb-2 text-white">CONNEXION REQUISE</h1>
+          <p className="text-xs text-white/50 mb-6">Connecte-toi pour accéder à ta fiche de coaching personnalisée.</p>
+          <Link href="/auth" className="btn-cyber-primary text-xs py-2.5 px-6">
+            SE CONNECTER
           </Link>
         </div>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="min-h-screen page-bg py-20 pb-28">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Navigation retour */}
-        <div className="mb-6 flex items-center justify-between flex-wrap gap-4 print:hidden">
-          <Link
-            href="/profile"
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
-          >
-            <ArrowLeft size={18} />
-            Retour au profil
-          </Link>
+    <div className="min-h-screen bg-[#0B0A0D] text-white flex flex-col font-mono">
+      <CyberNavbar />
 
-          <div className="flex items-center gap-3">
+      <main className="flex-1 py-28 pb-32 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-5xl mx-auto">
+          {/* Navigation retour & tabs */}
+          <div className="mb-6 flex items-center justify-between flex-wrap gap-4 print:hidden">
             <Link
-              href="/profile/coaching"
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-purple-500/10 hover:bg-purple-500/20 text-purple-400 border border-purple-500/20 text-xs sm:text-sm font-medium transition-colors"
+              href="/profile"
+              className="btn-cyber-ghost text-xs py-1.5 px-3 flex items-center gap-2"
             >
-              <MessageSquare size={15} />
-              Chat avec le coach
+              <ArrowLeft size={14} />
+              <span>RETOUR AU PROFIL</span>
             </Link>
-            <Link
-              href="/profile/vod"
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-orange-500/10 hover:bg-orange-500/20 text-orange-400 border border-orange-500/20 text-xs sm:text-sm font-medium transition-colors"
-            >
-              <Film size={15} />
-              Mes clips VOD
-            </Link>
-            <button
-              onClick={() => window.print()}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg glass hover:bg-white/10 text-gray-300 text-xs sm:text-sm transition-colors"
-            >
-              <Printer size={15} />
-              Imprimer / PDF
-            </button>
-          </div>
-        </div>
 
-        {/* En-tête de la fiche */}
-        <div className="glass-dark rounded-2xl p-6 sm:p-8 mb-8 border border-white/10 shadow-xl print:border-none print:shadow-none print:p-0">
-          <div className="flex items-start justify-between gap-4 flex-wrap">
-            <div>
-              <div className="inline-flex items-center gap-2 glass px-3 py-1 rounded-full mb-3 border border-indigo-500/30 text-indigo-300 text-xs font-semibold">
-                <Sparkles size={13} />
-                Fiche Personnalisée de Coaching
-              </div>
-              <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">
-                {title}
-              </h1>
-              <p className="text-gray-400 text-sm">
-                Rédigée et mise à jour par ton coach Poulpy
-              </p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <Link
+                href="/profile/coaching"
+                className="px-3 py-1.5 bg-[#00B4A0]/15 hover:bg-[#00B4A0]/25 text-[#00B4A0] border border-[#00B4A0]/30 text-xs font-bold uppercase transition-colors flex items-center gap-1.5"
+              >
+                <MessageSquare size={13} />
+                <span>CHAT AVEC LE COACH</span>
+              </Link>
+              <Link
+                href="/profile/vod"
+                className="px-3 py-1.5 bg-[#CA1C30]/15 hover:bg-[#CA1C30]/25 text-[#CA1C30] border border-[#CA1C30]/30 text-xs font-bold uppercase transition-colors flex items-center gap-1.5"
+              >
+                <Film size={13} />
+                <span>MES CLIPS VOD</span>
+              </Link>
+              <button
+                onClick={() => window.print()}
+                className="btn-cyber-ghost text-xs py-1.5 px-3 flex items-center gap-1.5 cursor-pointer"
+              >
+                <Printer size={13} />
+                <span>IMPRIMER / PDF</span>
+              </button>
             </div>
+          </div>
 
-            {updatedAt && (
-              <div className="text-xs text-gray-500 flex items-center gap-1.5 font-mono print:text-gray-600">
-                <Calendar size={13} />
-                Dernière mise à jour : {new Date(updatedAt).toLocaleDateString('fr-FR', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                })}
+          {/* En-tête de la fiche */}
+          <div className="reticle-box bg-[#121117] border border-white/10 p-6 sm:p-8 mb-8 shadow-xl print:border-none print:shadow-none print:p-0">
+            <div className="flex items-start justify-between gap-4 flex-wrap">
+              <div>
+                <div className="inline-flex items-center gap-2 px-2.5 py-1 mb-3 border border-[#00B4A0]/30 bg-[#00B4A0]/10 text-[#00B4A0] text-[10px] font-bold uppercase tracking-wider">
+                  <Sparkles size={12} />
+                  <span>FICHE PERSONNALISÉE DE COACHING</span>
+                </div>
+                <h1 className="text-xl sm:text-3xl font-display uppercase tracking-wider text-white mb-2">
+                  {title}
+                </h1>
+                <p className="text-xs text-white/50">
+                  Rédigée et mise à jour par ton coach Poulpy
+                </p>
+              </div>
+
+              {updatedAt && (
+                <div className="text-xs text-white/40 flex items-center gap-1.5 print:text-black">
+                  <Calendar size={13} className="text-[#00B4A0]" />
+                  <span>Dernière mise à jour : {new Date(updatedAt).toLocaleDateString('fr-FR', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {error && (
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-2 print:hidden">
+              <AlertCircle size={15} />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {/* Contenu de la fiche */}
+          <div className="reticle-box bg-[#121117] border border-white/10 p-6 sm:p-10 shadow-2xl min-h-[400px] print:bg-transparent print:border-none print:shadow-none print:p-0">
+            {content.trim() ? (
+              <SheetMarkdownPreview content={content} />
+            ) : (
+              <div className="py-20 text-center">
+                <FileText className="w-14 h-14 text-white/20 mx-auto mb-4" />
+                <h3 className="text-base font-bold text-white uppercase tracking-wider mb-2 font-display">
+                  FICHE DE SUIVI EN COURS DE PRÉPARATION
+                </h3>
+                <p className="text-white/40 text-xs max-w-md mx-auto mb-6">
+                  Ton coach Poulpy prépare ta routine personnalisée, tes objectifs et tes axes d'amélioration. Reviens après ta première séance !
+                </p>
+                <Link
+                  href="/profile/coaching"
+                  className="btn-cyber-primary text-xs py-2.5 px-6 inline-flex items-center gap-2"
+                >
+                  <MessageSquare size={14} />
+                  <span>ÉCHANGER AVEC LE COACH</span>
+                </Link>
               </div>
             )}
           </div>
         </div>
+      </main>
 
-        {error && (
-          <div className="mb-6 p-4 rounded-xl bg-red-500/15 border border-red-500/30 text-red-400 text-sm flex items-center gap-2 print:hidden">
-            <AlertCircle size={16} />
-            {error}
-          </div>
-        )}
-
-        {/* Contenu de la fiche */}
-        <div className="glass-dark rounded-2xl p-6 sm:p-10 border border-white/10 shadow-2xl bg-black/40 min-h-[400px] print:bg-transparent print:border-none print:shadow-none print:p-0">
-          {content.trim() ? (
-            <SheetMarkdownPreview content={content} />
-          ) : (
-            <div className="py-20 text-center">
-              <FileText className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-              <h3 className="text-lg font-bold text-gray-300 mb-2">
-                Ta fiche de suivi est en cours de préparation
-              </h3>
-              <p className="text-gray-500 text-sm max-w-md mx-auto mb-6">
-                Ton coach Poulpy prépare ta routine personnalisée, tes objectifs et tes axes d'amélioration. Reviens après ta première séance !
-              </p>
-              <Link
-                href="/profile/coaching"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-medium text-sm transition-colors"
-              >
-                <MessageSquare size={16} />
-                Envoyer un message au coach
-              </Link>
-            </div>
-          )}
-        </div>
-      </div>
-    </main>
+      <CyberFooter />
+    </div>
   );
 }

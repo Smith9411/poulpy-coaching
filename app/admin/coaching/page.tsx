@@ -160,12 +160,12 @@ export default function AdminCoaching() {
                 />
               </div>
             ) : (
-              <div className={`w-12 h-12 bg-gradient-to-br flex items-center justify-center text-white font-bold flex-shrink-0 ${
+              <div className={`w-12 h-12 flex items-center justify-center font-bold font-display shrink-0 ${
                 hasUnread
-                  ? 'from-[#00B4A0] to-[#00B4A0]/60'
+                  ? 'bg-[#00B4A0] text-black'
                   : isCoachedSection
-                  ? 'from-emerald-500 to-teal-500'
-                  : 'from-[#CA1C30] to-cyan-500'
+                  ? 'bg-[#00B4A0]/20 text-[#00B4A0] border border-[#00B4A0]/40'
+                  : 'bg-[#CA1C30]/20 text-[#CA1C30] border border-[#CA1C30]/40'
               }`}>
                 {student.initial}
               </div>

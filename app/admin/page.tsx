@@ -85,12 +85,12 @@ export default function AdminDashboard() {
 
   const quickActions = [
     { label: 'Planning & Réservations', href: '/admin/bookings', icon: Calendar, cls: 'border-[#00B4A0]/40 hover:bg-[#00B4A0]/10 text-[#00B4A0]' },
-    { label: 'Rangs élèves', href: '/admin/students', icon: Zap, cls: 'border-orange-500/30 hover:bg-orange-500/10 text-orange-400' },
-    { label: 'Gérer utilisateurs', href: '/admin/users', icon: Users, cls: 'border-[#CA1C30]/30 hover:bg-[#CA1C30]/10 text-[#CA1C30]' },
-    { label: 'Gérer coaching', href: '/admin/coaching', icon: MessageSquare, cls: 'border-green-500/30 hover:bg-green-500/10 text-green-400' },
-    { label: 'Voir statistiques', href: '/admin/stats', icon: BarChart2, cls: 'border-[#00B4A0]/30 hover:bg-[#00B4A0]/10 text-[#00B4A0]' },
-    { label: 'Paramètres site', href: '/admin/settings', icon: Settings, cls: 'border-yellow-500/30 hover:bg-yellow-500/10 text-yellow-400' },
-    { label: 'Déconnexion', href: '#', icon: LogOut, cls: 'border-red-500/30 hover:bg-red-500/10 text-red-400', onClick: logout },
+    { label: 'Rangs élèves', href: '/admin/students', icon: Zap, cls: 'border-[#CA1C30]/40 hover:bg-[#CA1C30]/10 text-[#CA1C30]' },
+    { label: 'Gérer utilisateurs', href: '/admin/users', icon: Users, cls: 'border-white/20 hover:bg-white/10 text-white' },
+    { label: 'Gérer coaching & VOD', href: '/admin/coaching', icon: MessageSquare, cls: 'border-[#00B4A0]/40 hover:bg-[#00B4A0]/10 text-[#00B4A0]' },
+    { label: 'Statistiques & Rétention', href: '/admin/stats', icon: BarChart2, cls: 'border-[#CA1C30]/40 hover:bg-[#CA1C30]/10 text-[#CA1C30]' },
+    { label: 'Paramètres site', href: '/admin/settings', icon: Settings, cls: 'border-white/20 hover:bg-white/10 text-white/80' },
+    { label: 'Déconnexion', href: '#', icon: LogOut, cls: 'border-red-500/40 hover:bg-red-500/10 text-red-400', onClick: logout },
   ];
 
   return (

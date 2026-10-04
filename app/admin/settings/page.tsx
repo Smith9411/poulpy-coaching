@@ -511,15 +511,15 @@ export default function AdminSettings() {
             <button
               type="button"
               onClick={handleReset}
-              className="px-6 py-3 reticle-box font-semibold hover:bg-white/10 transition-all flex items-center gap-2"
+              className="btn-cyber-ghost text-xs py-3 px-6 flex items-center gap-2 cursor-pointer"
             >
-              <RotateCcw size={18} />
-              Réinitialiser
+              <RotateCcw size={16} />
+              <span>Réinitialiser</span>
             </button>
             <button
               type="submit"
               disabled={isSaving || hasErrors || tableMissing}
-              className="px-8 py-3 bg-[#CA1C30] text-black font-bold font-semibold hover:shadow-lg hover:shadow-[#CA1C30]/30 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-cyber-primary text-xs py-3 px-8 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
             >
               {isSaving ? (
                 <>

@@ -306,7 +306,7 @@ export default function VisualTableModal({
             <button
               type="button"
               onClick={handleAddRow}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#CA1C30]/15 hover:bg-purple-500/25 text-[#CA1C30]/80 border border-[#CA1C30]/30 text-xs font-semibold shadow-sm transition-all hover:scale-102"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#CA1C30]/15 hover:bg-[#CA1C30]/25 text-[#CA1C30] border border-[#CA1C30]/30 text-xs font-semibold shadow-sm transition-colors cursor-pointer"
             >
               <Plus size={15} />
               <span>Ajouter une ligne en bas</span>
@@ -316,13 +316,13 @@ export default function VisualTableModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-gray-400 hover:text-white hover:bg-white/5 text-xs font-medium transition-colors"
+                className="btn-cyber-ghost text-xs py-2 px-4 cursor-pointer"
               >
                 Annuler
               </button>
               <button
                 type="submit"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#CA1C30] text-black font-bold hover:from-purple-500 hover:to-cyan-400 text-white text-xs font-bold shadow-lg shadow-purple-500/30 transition-all hover:scale-105"
+                className="btn-cyber-primary text-xs py-2 px-5 inline-flex items-center gap-2 cursor-pointer"
               >
                 <Check size={16} />
                 <span>{mode === 'edit' ? 'Mettre à jour le tableau' : 'Insérer dans la fiche'}</span>
