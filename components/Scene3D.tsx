@@ -4,7 +4,7 @@ import React, { useEffect, useRef } from "react";
 import type * as THREE from "three";
 
 export default function Scene3D() {
-  const mountRef = useRef<HTMLDivElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
     let unmounted = false;
@@ -12,8 +12,8 @@ export default function Scene3D() {
 
     // Asynchronously import Three.js in client microtask so main thread UI/scroll never wait
     import("three").then((THREE) => {
-      if (unmounted || !mountRef.current) return;
-      const mount = mountRef.current;
+      if (unmounted || !canvasRef.current) return;
+      const canvasEl = canvasRef.current;
 
       // 1. Scene, Fog, Camera, Renderer
       const scene = new THREE.Scene();
@@ -27,6 +27,7 @@ export default function Scene3D() {
       camera.position.set(0, 0, 560);
 
       const renderer = new THREE.WebGLRenderer({
+        canvas: canvasEl,
         alpha: true,
         antialias: false,
         powerPreference: "high-performance",
@@ -35,7 +36,6 @@ export default function Scene3D() {
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1.25 : 1.5));
       renderer.setSize(width, height);
       renderer.setClearColor(0x0A1C1D, 0);
-      mount.appendChild(renderer.domElement);
 
       // 2. Procedural Soft Glow Droplet Texture (In-memory, 0ms latency)
       const canvas = document.createElement("canvas");
@@ -205,13 +205,6 @@ export default function Scene3D() {
         cancelAnimationFrame(animId);
         window.removeEventListener("mousemove", onMouseMove);
         window.removeEventListener("resize", onResize);
-        try {
-          if (mount && renderer.domElement && mount.contains(renderer.domElement)) {
-            mount.removeChild(renderer.domElement);
-          }
-        } catch (err) {
-          // Handled for React Fast Refresh
-        }
         geometry.dispose();
         material.dispose();
         particleTexture.dispose();
@@ -226,9 +219,9 @@ export default function Scene3D() {
   }, []);
 
   return (
-    <div
-      ref={mountRef}
-      className="fixed inset-0 pointer-events-none z-0 overflow-hidden"
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none z-0 overflow-hidden w-full h-full"
       aria-hidden="true"
     />
   );

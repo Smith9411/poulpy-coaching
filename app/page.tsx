@@ -17,9 +17,31 @@ import CyberFooter from "@/components/CyberFooter";
 import Scene3D from "@/components/Scene3D";
 
 export default function CybercorePoulpyPage() {
+  const [artworkOpacity, setArtworkOpacity] = React.useState<number>(0);
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       gsap.registerPlugin(ScrollToPlugin);
+
+      const handleScroll = () => {
+        const scrollY = window.scrollY;
+        const heroHeight = window.innerHeight;
+        // Start revealing only when reaching horizontal scroll (when 3D is gone)
+        const startThreshold = heroHeight * 0.80;
+        const fullThreshold = heroHeight * 1.05;
+
+        if (scrollY <= startThreshold) {
+          setArtworkOpacity(0);
+        } else {
+          const progress = Math.min(1, (scrollY - startThreshold) / (fullThreshold - startThreshold));
+          setArtworkOpacity(progress);
+        }
+      };
+
+      window.addEventListener("scroll", handleScroll, { passive: true });
+      handleScroll();
+
+      return () => window.removeEventListener("scroll", handleScroll);
     }
   }, []);
 
@@ -70,6 +92,23 @@ export default function CybercorePoulpyPage() {
           />
           {/* Solid obsidian body starting higher up right after the top fade */}
           <div className="absolute top-44 sm:top-52 md:top-60 inset-x-0 bottom-0 bg-[#0B0A0D]" />
+
+          {/* Static transparent VCT trophy watermark positioned strictly behind cards & vignettes on black background */}
+          <div
+            className="fixed inset-0 pointer-events-none select-none z-0 overflow-hidden transition-opacity duration-300 ease-out"
+            style={{ opacity: artworkOpacity * 0.16 }}
+            aria-hidden="true"
+          >
+            <div
+              className="w-full h-full bg-center bg-cover bg-no-repeat mix-blend-screen"
+              style={{
+                backgroundImage: "url('/vct-trophy-official-bw.png')",
+                filter: "contrast(1.35) brightness(0.95)",
+                maskImage: "radial-gradient(ellipse 92% 88% at 50% 50%, black 50%, transparent 98%)",
+                WebkitMaskImage: "radial-gradient(ellipse 92% 88% at 50% 50%, black 50%, transparent 98%)",
+              }}
+            />
+          </div>
         </div>
 
         {/* 03. Pourquoi Poulpy (06 piliers avec défilement horizontal fluide) */}
