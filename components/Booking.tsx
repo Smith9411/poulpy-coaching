@@ -443,16 +443,11 @@ export default function Booking() {
                                 setSelectedPlan("pro");
                                 setProIsPack(false);
                               }}
-                              className={`p-3 rounded-xl text-left transition-all relative cursor-pointer select-none ${
+                              className={`p-3 rounded-xl text-left transition-[background-color,box-shadow,color] duration-150 relative cursor-pointer select-none ${
                                 !proIsPack && selectedPlan === "pro"
                                   ? "bg-[#CA1C30]/15 text-white shadow-[inset_0_0_0_1px_#CA1C30,0_0_15px_rgba(202,28,48,0.25)]"
                                   : "bg-[#0B0A0D]/80 text-[#F5F4F0]/60 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)] hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.3)] hover:text-white"
                               }`}
-                              style={{
-                                WebkitBackfaceVisibility: "hidden",
-                                backfaceVisibility: "hidden",
-                                transform: "translate3d(0, 0, 0)",
-                              }}
                             >
                               <div className="flex items-baseline justify-between">
                                 <span className={`text-2xl sm:text-3xl font-display ${!proIsPack && selectedPlan === "pro" ? "text-[#CA1C30]" : "text-[#F5F4F0]"}`}>
@@ -479,16 +474,11 @@ export default function Booking() {
                                 setSelectedPlan("pro");
                                 setProIsPack(true);
                               }}
-                              className={`p-3 rounded-xl text-left transition-all relative overflow-hidden cursor-pointer select-none ${
+                              className={`p-3 rounded-xl text-left transition-[background-color,box-shadow,color] duration-150 relative overflow-hidden cursor-pointer select-none ${
                                 proIsPack && selectedPlan === "pro"
                                   ? "bg-[#CA1C30]/15 text-white shadow-[inset_0_0_0_1px_#CA1C30,0_0_15px_rgba(202,28,48,0.25)]"
                                   : "bg-[#0B0A0D]/80 text-[#F5F4F0]/60 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)] hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.3)] hover:text-white"
                               }`}
-                              style={{
-                                WebkitBackfaceVisibility: "hidden",
-                                backfaceVisibility: "hidden",
-                                transform: "translate3d(0, 0, 0)",
-                              }}
                             >
                               <div className="absolute top-1.5 right-1.5 px-2 py-0.5 text-[8px] font-bold rounded-full bg-[#CA1C30] text-black uppercase tracking-wider">
                                 +2 GRATUITES
@@ -703,16 +693,11 @@ export default function Booking() {
                                   setSelectedPlan("performance");
                                   setPerfIsPack(false);
                                 }}
-                                className={`p-2 rounded-xl text-left transition-all cursor-pointer select-none ${
+                                className={`p-2 rounded-xl text-left transition-[background-color,box-shadow,color] duration-150 cursor-pointer select-none ${
                                   !perfIsPack && selectedPlan === "performance"
                                     ? "bg-[#00B4A0]/15 text-white shadow-[inset_0_0_0_1px_#00B4A0,0_0_12px_rgba(0,180,160,0.25)]"
                                     : "bg-[#0B0A0D]/80 text-[#F5F4F0]/60 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)] hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.3)] hover:text-white"
                                 }`}
-                                style={{
-                                  WebkitBackfaceVisibility: "hidden",
-                                  backfaceVisibility: "hidden",
-                                  transform: "translate3d(0, 0, 0)",
-                                }}
                               >
                                 <div className="flex items-baseline justify-between">
                                   <span className={`text-xl font-display ${!perfIsPack && selectedPlan === "performance" ? "text-[#00B4A0]" : "text-[#F5F4F0]"}`}>
@@ -731,16 +716,11 @@ export default function Booking() {
                                   setSelectedPlan("performance");
                                   setPerfIsPack(true);
                                 }}
-                                className={`p-2 rounded-xl text-left transition-all relative overflow-hidden cursor-pointer select-none ${
+                                className={`p-2 rounded-xl text-left transition-[background-color,box-shadow,color] duration-150 relative overflow-hidden cursor-pointer select-none ${
                                   perfIsPack && selectedPlan === "performance"
                                     ? "bg-[#00B4A0]/15 text-white shadow-[inset_0_0_0_1px_#00B4A0,0_0_12px_rgba(0,180,160,0.25)]"
                                     : "bg-[#0B0A0D]/80 text-[#F5F4F0]/60 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.1)] hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.3)] hover:text-white"
                                 }`}
-                                style={{
-                                  WebkitBackfaceVisibility: "hidden",
-                                  backfaceVisibility: "hidden",
-                                  transform: "translate3d(0, 0, 0)",
-                                }}
                               >
                                 <div className="absolute top-0.5 right-1 px-1.5 py-0.5 text-[7px] font-bold rounded-full bg-[#00B4A0] text-black uppercase tracking-wider">
                                   +1 OFFERTE
