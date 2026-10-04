@@ -170,7 +170,7 @@ export default function CyberMedia() {
                   <span>S&apos;ABONNER SUR YOUTUBE</span>
                 </a>
                 <a
-                  href={youtubeUrl}
+                  href="https://www.youtube.com/watch?v=4gfWbGCA5q0"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-cyber-ghost px-5 py-2.5 text-[11px] font-medium tracking-wider uppercase cursor-pointer"
