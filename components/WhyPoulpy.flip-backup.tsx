@@ -113,7 +113,7 @@ export default function WhyPoulpy() {
     pillBtnsRef.current.forEach((btn, idx) => {
       if (!btn) return;
       if (idx === activeIdx) {
-        btn.className = "px-2 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer border-[#CA1C30] bg-[#CA1C30] text-black shadow-[0_0_10px_rgba(202, 28, 48,0.4)]";
+        btn.className = "px-2 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer border-[#CA1C30] bg-[#CA1C30] text-black shadow-[0_0_10px_rgba(202,28,48,0.4)]";
       } else {
         btn.className = "px-2 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer border-white/15 text-white/50 hover:border-white/40 hover:text-white bg-black/40";
       }
@@ -311,7 +311,7 @@ export default function WhyPoulpy() {
                 onClick={() => goToCard(idx)}
                 className={`px-2 py-0.5 text-[10px] font-bold border transition-colors cursor-pointer ${
                   idx === 0
-                    ? "border-[#CA1C30] bg-[#CA1C30] text-black shadow-[0_0_10px_rgba(202, 28, 48,0.4)]"
+                    ? "border-[#CA1C30] bg-[#CA1C30] text-black shadow-[0_0_10px_rgba(202,28,48,0.4)]"
                     : "border-white/15 text-white/50 hover:border-white/40 hover:text-white bg-black/40"
                 }`}
               >
@@ -486,7 +486,7 @@ export default function WhyPoulpy() {
                     transformStyle: "preserve-3d",
                     WebkitTransformStyle: "preserve-3d",
                   }}
-                  className="reticle-box p-6 sm:p-8 bg-[#090C12] border-2 border-[#CA1C30] shadow-[0_0_35px_rgba(202, 28, 48,0.3)] flex flex-col justify-between"
+                  className="reticle-box p-6 sm:p-8 bg-[#090C12] border-2 border-[#CA1C30] shadow-[0_0_35px_rgba(202,28,48,0.3)] flex flex-col justify-between"
                 >
                   <CornerBrackets color="coral" />
 
@@ -519,7 +519,7 @@ export default function WhyPoulpy() {
 
                     {/* Play Button with breathing rings */}
                     <div className="relative z-10 flex flex-col items-center gap-3">
-                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#CA1C30]/20 border-2 border-[#CA1C30] flex items-center justify-center text-[#CA1C30] shadow-[0_0_25px_rgba(202, 28, 48,0.5)] group-hover/player:scale-110 transition-transform cursor-pointer">
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-[#CA1C30]/20 border-2 border-[#CA1C30] flex items-center justify-center text-[#CA1C30] shadow-[0_0_25px_rgba(202,28,48,0.5)] group-hover/player:scale-110 transition-transform cursor-pointer">
                         <Play className="w-6 h-6 fill-current ml-1" />
                       </div>
                       <div className="text-center space-y-0.5">

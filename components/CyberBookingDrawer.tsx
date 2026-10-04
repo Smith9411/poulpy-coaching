@@ -62,7 +62,7 @@ export default function CyberBookingDrawer({ isOpen, onClose }: CyberBookingDraw
 
         {submitted ? (
           <div className="py-12 text-center space-y-4 font-mono">
-            <div className="w-16 h-16 rounded-2xl border border-[#CA1C30] bg-[#CA1C30]/10 flex items-center justify-center mx-auto text-[#CA1C30] shadow-[0_0_20px_rgba(202, 28, 48,0.3)]">
+            <div className="w-16 h-16 rounded-2xl border border-[#CA1C30] bg-[#CA1C30]/10 flex items-center justify-center mx-auto text-[#CA1C30] shadow-[0_0_20px_rgba(202,28,48,0.3)]">
               <Check className="w-8 h-8" />
             </div>
             <h3 className="text-2xl font-display text-[#F5F4F0] tracking-wider font-bold">
@@ -100,7 +100,7 @@ export default function CyberBookingDrawer({ isOpen, onClose }: CyberBookingDraw
                     onClick={() => setPkg(p.id)}
                     className={`p-4 rounded-xl border cursor-pointer transition-all space-y-2 ${
                       isSelected
-                        ? "border-[#CA1C30] bg-[#CA1C30]/10 shadow-[0_0_20px_rgba(202, 28, 48,0.25)]"
+                        ? "border-[#CA1C30] bg-[#CA1C30]/10 shadow-[0_0_20px_rgba(202,28,48,0.25)]"
                         : "border-white/10 bg-[#1A1822] hover:border-white/30"
                     }`}
                   >

@@ -226,7 +226,7 @@ export default function SocialLinks({
 
   // Full Minimalist Card (for Student Profile)
   return (
-    <div className="reticle-box bg-[#121117] border border-white/10 p-6 sm:p-8">
+    <div className="rounded-2xl bg-[#121117] border border-white/10 p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-5 pb-3 border-b border-white/10">
         <div className="flex items-center gap-3">

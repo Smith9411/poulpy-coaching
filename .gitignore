@@ -41,3 +41,6 @@ video-studio/
 brag-output/
 public/poulpy-*.mp4
 public/poulpy-*.jpg
+public/audio_samples/
+public/trailer_assets/
+public/trailer.html

@@ -55,7 +55,7 @@ export default function SplashScreen() {
       {/* Center Container */}
       <div className="relative z-10 flex flex-col items-center text-center space-y-6 max-w-sm px-6">
         {/* Logo Frame with Corner Reticles */}
-        <div className="relative p-2 bg-black border border-[#CA1C30]/40 shadow-[0_0_30px_rgba(202, 28, 48,0.25)]">
+        <div className="relative p-2 bg-black border border-[#CA1C30]/40 shadow-[0_0_30px_rgba(202,28,48,0.25)]">
           <div className="absolute -top-1 -left-1 w-2.5 h-2.5 border-t-2 border-l-2 border-[#CA1C30]" />
           <div className="absolute -top-1 -right-1 w-2.5 h-2.5 border-t-2 border-r-2 border-[#CA1C30]" />
           <div className="absolute -bottom-1 -left-1 w-2.5 h-2.5 border-b-2 border-l-2 border-[#CA1C30]" />

@@ -458,37 +458,81 @@ export default function Profile() {
   };
 
   return (
-    <main className="min-h-screen bg-[#0B0A0D] text-white selection:bg-[#CA1C30] selection:text-black pt-28 pb-20 font-mono relative z-10">
+    <main className="min-h-screen bg-[#0B0A0D] cyber-grid text-[#F5F4F0] selection:bg-[#CA1C30] selection:text-black pt-28 pb-20 font-mono relative z-10 overflow-hidden">
+      {/* Ambient Cyber Light */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-gradient-to-b from-[#CA1C30]/10 via-[#00B4A0]/5 to-transparent blur-3xl pointer-events-none -z-10" />
+
       <CyberNavbar />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        {/* Header */}
-        <div className="mb-10 pb-6 border-b border-white/10">
-          <div className="flex items-center gap-3 mb-3">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-1.5 text-xs font-mono text-[#00B4A0] hover:text-white transition-colors uppercase tracking-wider"
-            >
-              <ArrowLeft size={13} />
-              <span>RETOUR AU SITE</span>
-            </Link>
-            <span className="text-white/20">/</span>
-            <span className="data-badge data-badge-laser">ESPACE PERSONNEL</span>
+        {/* Top Cockpit Header & Action Bar */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-8 border-b border-white/10">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <Link
+                href="/"
+                className="inline-flex items-center gap-1.5 text-xs font-mono text-[#00B4A0] hover:text-white transition-colors uppercase tracking-wider"
+              >
+                <ArrowLeft size={13} />
+                <span>RETOUR AU SITE</span>
+              </Link>
+              <span className="text-white/20">/</span>
+              <span className="data-badge data-badge-laser">ESPACE JOUEUR</span>
+            </div>
+
+            <h1 className="text-3xl sm:text-4xl font-display uppercase tracking-wider text-white">
+              COCKPIT // <span className="text-[#CA1C30]">{user.username}</span>
+            </h1>
+            <p className="text-xs text-white/60 mt-0.5 tracking-wide">
+              Suivi e-sport, sessions de coaching et progression en direct.
+            </p>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl font-display uppercase tracking-wider text-white">
-            BIENVENUE, <span className="text-[#CA1C30]">{user.username}</span>
-          </h1>
-          <p className="text-xs text-white/60 mt-1 tracking-wide">
-            Espace de gestion de compte, sessions réservées et suivi e-sport.
-          </p>
+          {/* Quick Navigation Strip (Integrated - no bottom vignettes) */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <Link
+              href="/profile/coaching"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-white transition-all hover:border-[#00B4A0]"
+            >
+              <MessageSquare size={14} className="text-[#00B4A0]" />
+              <span>MESSAGES</span>
+            </Link>
+            <Link
+              href="/profile/vod"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-white transition-all hover:border-[#CA1C30]"
+            >
+              <Film size={14} className="text-[#CA1C30]" />
+              <span>CLIPS VOD</span>
+            </Link>
+            <Link
+              href="/profile/sheet"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-white transition-all hover:border-white"
+            >
+              <FileText size={14} className="text-[#5EEAD4]" />
+              <span>FICHE SUIVI</span>
+            </Link>
+            <Link
+              href="/#booking"
+              className="btn-cyber-primary text-xs py-2 px-3.5"
+            >
+              <Calendar size={13} />
+              <span>RÉSERVER</span>
+            </Link>
+            <button
+              onClick={logout}
+              className="p-2 rounded-xl bg-white/5 hover:bg-red-500/10 border border-white/10 hover:border-red-500/30 text-white/50 hover:text-red-400 transition-colors cursor-pointer"
+              title="Déconnexion"
+            >
+              <LogOut size={15} />
+            </button>
+          </div>
         </div>
 
         {/* Status Toast */}
         {statusMsg && (
           <div
-            className={`mb-6 p-3 text-xs font-mono flex items-center gap-2 border ${
+            className={`mb-6 p-3.5 rounded-xl text-xs font-mono flex items-center gap-2 border ${
               statusMsg.type === 'success'
                 ? 'bg-[#F5F4F0]/10 border-[#F5F4F0]/40 text-[#F5F4F0]'
                 : 'bg-[#CA1C30]/10 border-[#CA1C30]/40 text-[#CA1C30]'
@@ -503,7 +547,7 @@ export default function Profile() {
         {studentAlerts.map((alert) => (
           <div
             key={alert.id}
-            className={`mb-6 p-4 border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono text-xs ${
+            className={`mb-6 p-4 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 font-mono text-xs ${
               alert.status === 'cancelled'
                 ? 'bg-red-500/10 border-red-500/30 text-red-200'
                 : 'bg-[#CA1C30]/10 border-[#CA1C30]/30 text-white'
@@ -539,24 +583,24 @@ export default function Profile() {
           </div>
         ))}
 
-        {/* Profile Card */}
-        <div className="reticle-box bg-[#121117] border border-white/10 p-6 sm:p-8 mb-8">
-          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+        {/* Player Identity Panel (With Integrated Bio) */}
+        <div className="rounded-2xl bg-[#121117] border border-white/10 p-6 sm:p-8 mb-8 relative">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
 
             {/* Avatar */}
-            <div className="relative group">
+            <div className="relative group shrink-0">
               <div
                 onClick={() => fileInputRef.current?.click()}
-                className="w-24 h-24 sm:w-28 sm:h-28 bg-[#CA1C30]/15 border border-[#CA1C30]/40 flex items-center justify-center text-3xl font-bold text-[#CA1C30] overflow-hidden cursor-pointer relative shadow-[0_0_15px_rgba(202, 28, 48,0.15)] group-hover:border-[#CA1C30] transition-colors"
+                className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-black/60 border border-white/15 flex items-center justify-center text-3xl font-bold text-white overflow-hidden cursor-pointer relative shadow-[0_0_20px_rgba(0,0,0,0.5)] group-hover:border-[#CA1C30] transition-colors"
                 title="Cliquer pour changer de photo"
               >
                 {user.avatarUrl ? (
                   <img src={user.avatarUrl} alt={user.username} className="w-full h-full object-cover" />
                 ) : (
-                  user.initial
+                  <span className="text-[#CA1C30]">{user.initial}</span>
                 )}
 
-                <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-[10px] gap-1 font-mono">
+                <div className="absolute inset-0 bg-black/75 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white text-[10px] gap-1 font-mono">
                   {isUploading ? (
                     <Loader2 size={18} className="animate-spin" />
                   ) : (
@@ -578,29 +622,29 @@ export default function Profile() {
               />
             </div>
 
-            {/* Info */}
-            <div className="flex-1 text-center sm:text-left">
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-1">
+            {/* Identity Info + Integrated Bio */}
+            <div className="flex-1 text-center md:text-left min-w-0">
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-1.5">
                 {isEditingName ? (
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
                       value={newName}
                       onChange={(e) => setNewName(e.target.value)}
-                      className="px-2.5 py-1 bg-black border border-white/20 text-white text-lg font-bold font-mono focus:border-[#CA1C30]"
+                      className="px-2.5 py-1 bg-black border border-white/20 rounded-lg text-white text-base font-bold font-mono focus:border-[#CA1C30]"
                       autoFocus
                     />
                     <button
                       onClick={handleSaveUsername}
                       disabled={isSavingName}
-                      className="p-1.5 bg-[#F5F4F0]/20 text-[#F5F4F0] border border-[#F5F4F0]/40 text-xs"
+                      className="p-1.5 bg-[#F5F4F0]/20 text-[#F5F4F0] border border-[#F5F4F0]/40 rounded-lg text-xs"
                       title="Enregistrer"
                     >
                       {isSavingName ? <Loader2 size={14} className="animate-spin" /> : <Check size={14} />}
                     </button>
                     <button
                       onClick={() => setIsEditingName(false)}
-                      className="p-1.5 bg-white/5 text-white/50 hover:text-white text-xs"
+                      className="p-1.5 bg-white/5 text-white/50 hover:text-white rounded-lg text-xs"
                       title="Annuler"
                     >
                       <X size={14} />
@@ -608,7 +652,7 @@ export default function Profile() {
                   </div>
                 ) : (
                   <>
-                    <h2 className="text-2xl font-bold font-display tracking-wider uppercase text-white">{user.username}</h2>
+                    <h2 className="text-2xl font-bold font-display tracking-wider uppercase text-white truncate">{user.username}</h2>
                     <button
                       onClick={() => {
                         setNewName(user.username);
@@ -617,531 +661,494 @@ export default function Profile() {
                       className="p-1 text-white/40 hover:text-white transition-colors cursor-pointer"
                       title="Modifier mon pseudo"
                     >
-                      <Edit2 size={14} />
+                      <Edit2 size={13} />
                     </button>
                   </>
                 )}
               </div>
 
-              <div className="mb-3">
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 mb-3">
                 {user.isAdmin ? (
                   <span className="data-badge data-badge-acid text-[10px]">ADMINISTRATEUR POULPY</span>
                 ) : (
                   <span className="data-badge data-badge-laser text-[10px]">MEMBRE POULPY COACHING</span>
                 )}
+                <div className="flex items-center gap-1.5 text-white/50 text-xs">
+                  <Mail size={12} className="text-[#00B4A0]" />
+                  <span>{user.email}</span>
+                </div>
               </div>
 
-              <div className="flex items-center justify-center sm:justify-start gap-2 text-white/60 text-xs mb-4">
-                <Mail size={13} className="text-[#00B4A0]" />
-                <span>{user.email}</span>
+              {/* Integrated Bio Section */}
+              <div className="pt-3 border-t border-white/10">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[10px] text-white/40 uppercase font-bold tracking-wider flex items-center gap-1.5">
+                    <Quote size={12} className="text-[#CA1C30]" />
+                    PRÉSENTATION & OBJECTIFS
+                  </span>
+                  {!isEditingBio && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setBioDraft(user.bio || '');
+                        setIsEditingBio(true);
+                      }}
+                      className="text-[10px] text-[#00B4A0] hover:text-white font-bold tracking-wider cursor-pointer"
+                    >
+                      {user.bio ? '[ MODIFIER ]' : '[ + AJOUTER ]'}
+                    </button>
+                  )}
+                </div>
+
+                {isEditingBio ? (
+                  <div className="space-y-2 mt-2">
+                    <textarea
+                      value={bioDraft}
+                      onChange={(e) => setBioDraft(e.target.value.slice(0, 280))}
+                      placeholder="Présente ton niveau de jeu, ton rang actuel et tes objectifs e-sport..."
+                      rows={3}
+                      maxLength={280}
+                      className="w-full p-2.5 bg-black/60 border border-white/20 rounded-xl text-white placeholder-white/30 text-xs focus:border-[#CA1C30] resize-none font-mono"
+                      autoFocus
+                    />
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-[10px] text-white/40">{bioDraft.length} / 280</span>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setIsEditingBio(false)}
+                          disabled={isSavingBio}
+                          className="px-2.5 py-1 bg-white/5 hover:bg-white/10 rounded-lg text-white/60 text-xs"
+                        >
+                          Annuler
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleSaveBio}
+                          disabled={isSavingBio}
+                          className="btn-cyber-primary text-xs py-1 px-3"
+                        >
+                          {isSavingBio ? 'Enregistrement...' : 'Sauvegarder'}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : user.bio ? (
+                  <p className="text-xs text-white/75 italic leading-relaxed">&laquo; {user.bio} &raquo;</p>
+                ) : (
+                  <p className="text-xs text-white/35 italic">
+                    Aucune bio renseignée. Ajoute tes objectifs pour aider Poulpy à cibler tes axes d&apos;amélioration.
+                  </p>
+                )}
               </div>
 
-              {/* Photo controls */}
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 pt-3 border-t border-white/10">
+              {/* Avatar controls */}
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 pt-3 mt-3 border-t border-white/5 text-[10px]">
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
-                  className="btn-cyber-ghost text-[10px] py-1 px-2.5 disabled:opacity-50"
+                  className="text-white/60 hover:text-white transition-colors cursor-pointer flex items-center gap-1"
                 >
-                  <Camera size={12} />
-                  <span>{user.avatarUrl ? 'CHANGER PHOTO' : 'AJOUTER PHOTO'}</span>
+                  <Camera size={11} />
+                  <span>{user.avatarUrl ? 'Changer photo' : 'Ajouter photo'}</span>
                 </button>
                 {user.avatarUrl && (
-                  <button
-                    type="button"
-                    onClick={handleRemoveAvatar}
-                    disabled={isUploading}
-                    className="px-2.5 py-1 text-[10px] bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 transition-colors font-mono disabled:opacity-50 cursor-pointer"
-                  >
-                    <Trash2 size={12} className="inline mr-1" />
-                    SUPPRIMER
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Logout */}
-            <button
-              onClick={logout}
-              className="btn-cyber-ghost text-xs py-2 px-4 hover:border-red-500 hover:text-red-400 cursor-pointer"
-            >
-              <LogOut size={14} />
-              <span>DÉCONNEXION</span>
-            </button>
-          </div>
-        </div>
-
-        {/* Bio */}
-        <div className="reticle-box bg-[#121117] border border-white/10 p-6 mb-8">
-          <div className="flex items-center justify-between mb-3 pb-3 border-b border-white/10">
-            <div className="flex items-center gap-2">
-              <Quote size={16} className="text-[#CA1C30]" />
-              <h3 className="font-bold text-sm uppercase tracking-wider text-white">MA BIO // PRÉSENTATION</h3>
-            </div>
-            {!isEditingBio && (
-              <button
-                type="button"
-                onClick={() => {
-                  setBioDraft(user.bio || '');
-                  setIsEditingBio(true);
-                }}
-                className="text-[10px] text-[#00B4A0] hover:text-white uppercase font-bold tracking-wider cursor-pointer"
-              >
-                {user.bio ? '[ MODIFIER ]' : '[ AJOUTER ]'}
-              </button>
-            )}
-          </div>
-
-          {isEditingBio ? (
-            <div>
-              <textarea
-                value={bioDraft}
-                onChange={(e) => setBioDraft(e.target.value.slice(0, 280))}
-                placeholder="Présente ton niveau de jeu, ton rang actuel et tes objectifs e-sport..."
-                rows={4}
-                maxLength={280}
-                className="w-full p-3 bg-black border border-white/20 text-white placeholder-white/30 text-xs focus:border-[#CA1C30] resize-none font-mono"
-                autoFocus
-              />
-              <div className="flex items-center justify-between mt-2">
-                <span className="text-[10px] text-white/40">{bioDraft.length} / 280</span>
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsEditingBio(false)}
-                    disabled={isSavingBio}
-                    className="px-3 py-1 bg-white/5 hover:bg-white/10 text-white/60 text-xs"
-                  >
-                    Annuler
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleSaveBio}
-                    disabled={isSavingBio}
-                    className="btn-cyber-primary text-xs py-1 px-3"
-                  >
-                    {isSavingBio ? 'Enregistrement...' : 'Sauvegarder'}
-                  </button>
-                </div>
-              </div>
-            </div>
-          ) : user.bio ? (
-            <p className="text-xs text-white/80 whitespace-pre-wrap leading-relaxed">{user.bio}</p>
-          ) : (
-            <p className="text-xs text-white/40 italic">
-              Aucune bio renseignée. Ajoute quelques lignes pour que Poulpy adapte ses sessions à tes attentes.
-            </p>
-          )}
-        </div>
-
-        {/* Social Links */}
-        <div className="mb-8">
-          <SocialLinks editable />
-        </div>
-
-        {/* Favorite Games */}
-        {!user.isAdmin && (
-          <div className="mb-8">
-            <FavoriteGames />
-          </div>
-        )}
-
-        {/* ======================================================== */}
-        {/* PACK SÉANCES ACTIF // GESTION & RÉSERVATION DES CRÉNEAUX */}
-        {/* Disparaît automatiquement dès que toutes les séances sont réservées */}
-        {/* ======================================================== */}
-        {packSummary && packSummary.hasActivePack && packSummary.remainingSessions > 0 && (
-          <div className="reticle-box bg-[#090C12] border-2 border-[#CA1C30] shadow-[0_0_35px_rgba(202, 28, 48,0.2)] p-6 sm:p-8 mb-8 relative overflow-hidden">
-            {/* Top Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5 mb-6">
-              <div>
-                <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                  <span className="bg-[#CA1C30] text-black text-[9px] font-bold px-2 py-0.5 uppercase tracking-widest">
-                    PACK SÉANCES ACTIF
-                  </span>
-                  <span className="text-[10px] text-[#F5F4F0] font-bold tracking-wider font-mono border border-[#F5F4F0]/30 bg-[#F5F4F0]/10 px-2 py-0.5">
-                    {packSummary.remainingSessions} SÉANCE(S) RESTANTE(S) À PLANIFIER
-                  </span>
-                </div>
-                <h2 className="text-xl sm:text-2xl font-display text-white tracking-wider">
-                  {packSummary.packName.toUpperCase()}
-                </h2>
-                <p className="text-xs text-white/60 mt-0.5 font-mono">
-                  Sélectionne un créneau horaire pour bloquer gratuitement ta prochaine séance (Séance {packSummary.nextSessionNumber}/{packSummary.totalSessions}).
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setShowPackBooking(!showPackBooking)}
-                className="btn-cyber-primary text-xs py-2.5 px-5 shrink-0 flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(202, 28, 48,0.3)]"
-              >
-                <Calendar size={14} />
-                <span>{showPackBooking ? 'MASQUER LE CALENDRIER' : `RÉSERVER SÉANCE ${packSummary.nextSessionNumber}/${packSummary.totalSessions}`}</span>
-              </button>
-            </div>
-
-            {/* Progress Grid of Pack Sessions */}
-            <div className="space-y-2 mb-6">
-              <div className="text-[10px] text-white/40 uppercase tracking-widest font-mono">
-                AVANCEMENT DU PROTOCOLE DU PACK ({packSummary.bookedSessions} / {packSummary.totalSessions} SÉANCES RÉSERVÉES) :
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
-                {packSummary.sessions.map((s) => (
-                  <div
-                    key={s.number}
-                    className={`p-3 border text-center font-mono transition-all flex flex-col justify-between ${
-                      s.isBooked
-                        ? 'border-[#F5F4F0]/40 bg-[#F5F4F0]/10 text-white shadow-[0_0_10px_rgba(245, 244, 240,0.1)]'
-                        : s.number === packSummary.nextSessionNumber
-                        ? 'border-[#CA1C30] bg-[#CA1C30]/15 text-white ring-1 ring-[#CA1C30] shadow-[0_0_15px_rgba(202, 28, 48,0.25)]'
-                        : 'border-white/10 bg-black/40 text-white/40'
-                    }`}
-                  >
-                    <div className="text-[10px] uppercase font-bold tracking-wider">
-                      SÉANCE {s.number}
-                    </div>
-
-                    {s.isBooked ? (
-                      <div className="mt-1 space-y-0.5">
-                        <span className="text-[8px] text-[#F5F4F0] font-bold block">[ RÉSERVÉE ]</span>
-                        <span className="text-[10px] text-white/80 block font-bold truncate">
-                          {new Date(s.bookingDate!).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} à {s.bookingTime}
-                        </span>
-                      </div>
-                    ) : s.number === packSummary.nextSessionNumber ? (
-                      <div className="mt-1">
-                        <span className="text-[8px] text-[#CA1C30] font-bold block animate-pulse">À RÉSERVER</span>
-                        <span className="text-[10px] text-white font-bold block">0 € INCLUS</span>
-                      </div>
-                    ) : (
-                      <div className="mt-1">
-                        <span className="text-[8px] text-white/30 block">EN ATTENTE</span>
-                        <span className="text-[10px] text-white/30 block">Inclus</span>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Embedded Slot Selector for Next Session */}
-            {showPackBooking && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
-                exit={{ opacity: 0, height: 0 }}
-                className="pt-6 border-t border-white/10 space-y-5"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="text-xs text-white/80 uppercase font-bold tracking-wider flex items-center gap-2">
-                    <span className="w-2 h-2 bg-[#CA1C30]" />
-                    <span>PLANIFICATION DE LA SÉANCE {packSummary.nextSessionNumber} / {packSummary.totalSessions}</span>
-                  </div>
-                  {loadingPackSlots && (
-                    <div className="flex items-center gap-1.5 text-xs text-[#00B4A0]">
-                      <Loader2 size={13} className="animate-spin" />
-                      <span>Actualisation des créneaux...</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Days Selector */}
-                <div className="space-y-2">
-                  <label className="text-[11px] text-white/70 block uppercase font-bold tracking-wider">
-                    1. CHOISIR LE JOUR :
-                  </label>
-                  <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
-                    {packDaysList.map((d, index) => {
-                      const isSelected = selectedPackDayIndex === index;
-                      return (
-                        <div
-                          key={d.dateIso}
-                          onClick={() => {
-                            setSelectedPackDayIndex(index);
-                            setSelectedPackTime('');
-                            setSelectedPackSlotId(null);
-                          }}
-                          className={`flex-shrink-0 w-24 p-2.5 border text-center cursor-pointer transition-all ${
-                            isSelected
-                              ? 'border-[#CA1C30] bg-[#CA1C30]/20 text-white shadow-[0_0_12px_rgba(202, 28, 48,0.3)] ring-1 ring-[#CA1C30]'
-                              : 'border-white/10 bg-black/60 hover:border-white/30 text-white/70'
-                          }`}
-                        >
-                          <div className="text-[9px] uppercase font-bold text-white/50">{d.dayName}</div>
-                          <div className="text-base font-display">{d.dayNumber} {d.monthName}</div>
-                          <div className="mt-1">
-                            {d.availableCount > 0 ? (
-                              <span className="text-[8px] font-bold px-1 py-0.2 bg-[#F5F4F0]/15 border border-[#F5F4F0]/30 text-[#F5F4F0] uppercase block">
-                                {d.availableCount} dispo
-                              </span>
-                            ) : (
-                              <span className="text-[8px] font-medium px-1 py-0.2 bg-white/5 text-white/30 uppercase block">
-                                Complet
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Slots Grid */}
-                <div className="space-y-2">
-                  <label className="text-[11px] text-white/70 block uppercase font-bold tracking-wider">
-                    2. SÉLECTIONNER L'HEURE (CRÉNEAU) :
-                  </label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2">
-                    {packDaysList[selectedPackDayIndex]?.slots.map((slot) => {
-                      const isSelected = selectedPackTime === slot.time;
-                      return (
-                        <button
-                          key={slot.time}
-                          type="button"
-                          disabled={!slot.available}
-                          onClick={() => {
-                            if (slot.available) {
-                              setSelectedPackTime(slot.time);
-                              setSelectedPackSlotId(slot.id || null);
-                            }
-                          }}
-                          className={`p-2.5 border text-center font-mono transition-all text-xs ${
-                            isSelected
-                              ? 'border-[#CA1C30] bg-[#CA1C30] text-black font-bold shadow-[0_0_15px_rgba(202, 28, 48,0.4)] cursor-pointer'
-                              : slot.available
-                              ? 'border-[#F5F4F0]/40 bg-black/60 hover:border-[#F5F4F0] text-white cursor-pointer'
-                              : 'border-white/5 bg-black/20 text-white/20 cursor-not-allowed opacity-40'
-                          }`}
-                        >
-                          <div className="font-bold">{slot.time}</div>
-                          <div className={`text-[8px] font-bold uppercase mt-0.5 ${isSelected ? 'text-black' : slot.available ? 'text-[#F5F4F0]' : 'text-white/20'}`}>
-                            {isSelected ? 'CHOISI' : slot.available ? 'LIBRE' : 'OCCUPÉ'}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Game & Notes Options */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                  <div>
-                    <label className="text-[10px] text-white/70 block uppercase font-bold tracking-wider mb-1">
-                      JEU DE LA SÉANCE :
-                    </label>
-                    <select
-                      value={packGame}
-                      onChange={(e) => setPackGame(e.target.value)}
-                      className="w-full bg-black border border-white/20 p-2.5 text-xs text-white focus:border-[#CA1C30] focus:outline-none"
+                  <>
+                    <span className="text-white/20">•</span>
+                    <button
+                      type="button"
+                      onClick={handleRemoveAvatar}
+                      disabled={isUploading}
+                      className="text-red-400 hover:text-red-300 transition-colors cursor-pointer flex items-center gap-1"
                     >
-                      <option value="Valorant">Valorant</option>
-                      <option value="CS2">Counter-Strike 2</option>
-                      <option value="Overwatch 2">Overwatch 2</option>
-                      <option value="Apex Legends">Apex Legends</option>
-                      <option value="Fortnite">Fortnite</option>
-                      <option value="Autre">Autre FPS</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] text-white/70 block uppercase font-bold tracking-wider mb-1">
-                      NOTES / OBJECTIFS SPÉCIFIQUES :
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Ex: Analyse VOD sur Bind, travail de l'aim..."
-                      value={packNotes}
-                      onChange={(e) => setPackNotes(e.target.value)}
-                      className="w-full bg-black border border-white/20 p-2.5 text-xs text-white placeholder-white/30 focus:border-[#CA1C30] focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                {packBookingError && (
-                  <div className="p-3 bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-2">
-                    <AlertCircle size={15} className="shrink-0" />
-                    <span>{packBookingError}</span>
-                  </div>
+                      <Trash2 size={11} />
+                      <span>Supprimer photo</span>
+                    </button>
+                  </>
                 )}
-
-                {/* Confirm Action Button */}
-                <div className="pt-3 flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div className="text-xs text-white/70 font-mono">
-                    {selectedPackTime ? (
-                      <span>
-                        Créneau sélectionné : <strong className="text-white">{packDaysList[selectedPackDayIndex]?.fullDateLabel} à {selectedPackTime}</strong> (0 € - Inclus Pack)
-                      </span>
-                    ) : (
-                      <span className="text-white/40">Veuillez choisir un créneau ci-dessus</span>
-                    )}
-                  </div>
-
-                  <button
-                    type="button"
-                    disabled={!selectedPackTime || isBookingPackSession}
-                    onClick={handleConfirmPackSession}
-                    className="btn-cyber-primary py-3 px-7 text-xs font-bold uppercase disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer w-full sm:w-auto justify-center"
-                  >
-                    {isBookingPackSession ? (
-                      <>
-                        <Loader2 size={14} className="animate-spin" />
-                        <span>VERROUILLAGE EN COURS...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Send size={14} />
-                        <span>VALIDER LA SÉANCE {packSummary.nextSessionNumber}/{packSummary.totalSessions} (0 €)</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </motion.div>
-            )}
+              </div>
+            </div>
           </div>
-        )}
+        </div>
 
-        {/* Active Coaching Bookings */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4 pb-2 border-b border-white/10">
-            <h2 className="text-lg font-display uppercase tracking-wider text-white flex items-center gap-2">
-              <Calendar size={18} className="text-[#00B4A0]" />
-              <span>SÉANCES DE COACHING RÉSERVÉES</span>
-            </h2>
-            <Link
-              href="/#booking"
-              className="text-xs text-[#CA1C30] hover:underline font-bold"
-            >
-              + RÉSERVER UN NOUVEAU CRÉNEAU
-            </Link>
+        {/* 2-Column Main Cockpit Body */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+          {/* Left Column: Profil & E-Sport (5 cols) */}
+          <div className="lg:col-span-5 space-y-6">
+            {/* Disciplines & Rangs */}
+            {!user.isAdmin && <FavoriteGames />}
+
+            {/* Réseaux Sociaux & Canaux */}
+            <SocialLinks editable />
           </div>
 
-          {bookingsLoading ? (
-            <div className="reticle-box bg-[#121117] border border-white/10 p-8 text-center">
-              <div className="w-6 h-6 border-2 border-[#CA1C30] border-t-transparent animate-spin mx-auto mb-2" />
-              <p className="text-xs text-white/50">Chargement de tes réservations...</p>
-            </div>
-          ) : studentBookings.length === 0 ? (
-            <div className="reticle-box bg-[#121117] border border-white/10 p-8 text-center">
-              <Clock size={32} className="mx-auto mb-3 text-white/30" />
-              <p className="text-xs font-bold text-white uppercase tracking-wider mb-1">AUCUNE SESSION PROGRAMMÉE</p>
-              <p className="text-xs text-white/50 mb-4 max-w-md mx-auto">
-                Choisis ta formule pour bloquer ton créneau et démarrer ton entraînement d&apos;élite.
-              </p>
-              <Link
-                href="/#booking"
-                className="btn-cyber-primary text-xs"
-              >
-                <span>CHOISIR UN CRÉNEAU DISPONIBLE</span>
-                <Award size={14} />
-              </Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {studentBookings.map((b) => (
-                <div
-                  key={b.id}
-                  className="reticle-box bg-[#121117] border border-white/15 hover:border-[#CA1C30]/50 transition-colors p-5 flex flex-col justify-between space-y-3"
-                >
+          {/* Right Column: Coaching & Planning (7 cols) */}
+          <div className="lg:col-span-7 space-y-6">
+
+            {/* Pack Actif (if active) */}
+            {packSummary && packSummary.hasActivePack && packSummary.remainingSessions > 0 && (
+              <div className="rounded-2xl bg-[#121117] border border-[#CA1C30]/50 shadow-[0_0_30px_rgba(202,28,48,0.15)] p-6 relative overflow-hidden">
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-4 mb-5">
                   <div>
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="data-badge data-badge-laser text-[9px]">
-                        {b.plan_name}
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <span className="bg-[#CA1C30] text-black text-[9px] font-bold px-2 py-0.5 rounded-full uppercase tracking-widest">
+                        PACK ACTIF
                       </span>
-                      <span
-                        className={`data-badge text-[9px] ${
-                          b.status === 'completed'
-                            ? 'border-white/20 bg-white/10 text-white/60'
-                            : b.status === 'rescheduled'
-                            ? 'data-badge-acid'
-                            : 'data-badge-laser'
-                        }`}
-                      >
-                        {b.status === 'completed' ? 'TERMINÉE' : b.status === 'rescheduled' ? 'REPORTÉE' : 'CONFIRMÉE'}
+                      <span className="text-[10px] text-[#00B4A0] font-bold tracking-wider font-mono border border-[#00B4A0]/30 bg-[#00B4A0]/10 px-2 py-0.5 rounded-full">
+                        {packSummary.remainingSessions} SÉANCE(S) RESTANTE(S)
                       </span>
                     </div>
-
-                    <div className="text-sm font-bold text-white flex items-center gap-2">
-                      <Calendar size={15} className="text-[#00B4A0]" />
-                      <span>
-                        {new Date(b.booking_date).toLocaleDateString('fr-FR', {
-                          weekday: 'short',
-                          day: 'numeric',
-                          month: 'short',
-                        })}{' '}
-                        à {b.booking_time}
-                      </span>
-                    </div>
-                    <p className="text-xs text-white/60 mt-1">
-                      {b.plan_duration} • Discipline : <span className="text-[#CA1C30] font-bold">{b.game}</span>
+                    <h2 className="text-xl font-display text-white tracking-wider">
+                      {packSummary.packName.toUpperCase()}
+                    </h2>
+                    <p className="text-xs text-white/60 mt-0.5 font-mono">
+                      Séance {packSummary.nextSessionNumber}/{packSummary.totalSessions} prête à être planifiée.
                     </p>
                   </div>
 
-                  <div className="pt-3 border-t border-white/10 flex items-center justify-between gap-2 text-xs">
-                    <span className="text-white/50 text-[11px]">
-                      Discord : <strong className="text-white">{b.student_discord}</strong>
-                    </span>
-                    <a
-                      href="https://discord.gg/rJMg3ZZRkp"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-2.5 py-1 bg-[#00B4A0]/10 border border-[#00B4A0]/30 text-[#00B4A0] hover:text-white text-[10px] font-bold uppercase"
-                    >
-                      DISCORD
-                    </a>
+                  <button
+                    type="button"
+                    onClick={() => setShowPackBooking(!showPackBooking)}
+                    className="btn-cyber-primary text-xs py-2 px-4 shrink-0 flex items-center justify-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(202,28,48,0.3)]"
+                  >
+                    <Calendar size={13} />
+                    <span>{showPackBooking ? 'FERMER' : `PLANIFIER SÉANCE ${packSummary.nextSessionNumber}`}</span>
+                  </button>
+                </div>
+
+                {/* Progress Grid */}
+                <div className="space-y-2 mb-4">
+                  <div className="text-[10px] text-white/40 uppercase tracking-widest font-mono">
+                    AVANCEMENT ({packSummary.bookedSessions} / {packSummary.totalSessions} RÉSERVÉES) :
+                  </div>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                    {packSummary.sessions.map((s) => (
+                      <div
+                        key={s.number}
+                        className={`p-3 rounded-xl border text-center font-mono transition-all flex flex-col justify-between ${
+                          s.isBooked
+                            ? 'border-[#00B4A0]/40 bg-[#00B4A0]/10 text-white'
+                            : s.number === packSummary.nextSessionNumber
+                            ? 'border-[#CA1C30] bg-[#CA1C30]/15 text-white ring-1 ring-[#CA1C30]'
+                            : 'border-white/10 bg-black/40 text-white/40'
+                        }`}
+                      >
+                        <div className="text-[10px] uppercase font-bold tracking-wider">
+                          SÉANCE {s.number}
+                        </div>
+
+                        {s.isBooked ? (
+                          <div className="mt-1 space-y-0.5">
+                            <span className="text-[8px] text-[#00B4A0] font-bold block">[ RÉSERVÉE ]</span>
+                            <span className="text-[10px] text-white/80 block font-bold truncate">
+                              {new Date(s.bookingDate!).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })} à {s.bookingTime}
+                            </span>
+                          </div>
+                        ) : s.number === packSummary.nextSessionNumber ? (
+                          <div className="mt-1">
+                            <span className="text-[8px] text-[#CA1C30] font-bold block animate-pulse">À RÉSERVER</span>
+                            <span className="text-[10px] text-white font-bold block">0 € INCLUS</span>
+                          </div>
+                        ) : (
+                          <div className="mt-1">
+                            <span className="text-[8px] text-white/30 block">EN ATTENTE</span>
+                            <span className="text-[10px] text-white/30 block">Inclus</span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
                   </div>
                 </div>
-              ))}
+
+                {/* Slot Selector Accordion */}
+                {showPackBooking && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="pt-5 border-t border-white/10 space-y-4"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs text-white/80 uppercase font-bold tracking-wider flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-[#CA1C30]" />
+                        <span>PLANIFICATION SÉANCE {packSummary.nextSessionNumber} / {packSummary.totalSessions}</span>
+                      </div>
+                      {loadingPackSlots && (
+                        <div className="flex items-center gap-1.5 text-xs text-[#00B4A0]">
+                          <Loader2 size={13} className="animate-spin" />
+                          <span>Chargement...</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Days Selector */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] text-white/60 block uppercase font-bold tracking-wider">
+                        1. JOUR DE LA SÉANCE :
+                      </label>
+                      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
+                        {packDaysList.map((d, index) => {
+                          const isSelected = selectedPackDayIndex === index;
+                          return (
+                            <div
+                              key={d.dateIso}
+                              onClick={() => {
+                                setSelectedPackDayIndex(index);
+                                setSelectedPackTime('');
+                                setSelectedPackSlotId(null);
+                              }}
+                              className={`flex-shrink-0 w-20 p-2 rounded-xl border text-center cursor-pointer transition-all ${
+                                isSelected
+                                  ? 'border-[#CA1C30] bg-[#CA1C30]/20 text-white shadow-[0_0_12px_rgba(202,28,48,0.3)] ring-1 ring-[#CA1C30]'
+                                  : 'border-white/10 bg-black/60 hover:border-white/30 text-white/70'
+                              }`}
+                            >
+                              <div className="text-[9px] uppercase font-bold text-white/50">{d.dayName}</div>
+                              <div className="text-sm font-display">{d.dayNumber} {d.monthName}</div>
+                              <div className="mt-1">
+                                {d.availableCount > 0 ? (
+                                  <span className="text-[8px] font-bold px-1 py-0.2 bg-[#00B4A0]/15 border border-[#00B4A0]/30 text-[#00B4A0] rounded uppercase block">
+                                    {d.availableCount} dispo
+                                  </span>
+                                ) : (
+                                  <span className="text-[8px] font-medium px-1 py-0.2 bg-white/5 text-white/30 rounded uppercase block">
+                                    Complet
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Slots Grid */}
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] text-white/60 block uppercase font-bold tracking-wider">
+                        2. CRÉNEAU HORAIRE :
+                      </label>
+                      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                        {packDaysList[selectedPackDayIndex]?.slots.map((slot) => {
+                          const isSelected = selectedPackTime === slot.time;
+                          return (
+                            <button
+                              key={slot.time}
+                              type="button"
+                              disabled={!slot.available}
+                              onClick={() => {
+                                if (slot.available) {
+                                  setSelectedPackTime(slot.time);
+                                  setSelectedPackSlotId(slot.id || null);
+                                }
+                              }}
+                              className={`p-2 rounded-lg border text-center font-mono transition-all text-xs ${
+                                isSelected
+                                  ? 'border-[#CA1C30] bg-[#CA1C30] text-black font-bold shadow-[0_0_15px_rgba(202,28,48,0.4)] cursor-pointer'
+                                  : slot.available
+                                  ? 'border-[#00B4A0]/30 bg-black/60 hover:border-[#00B4A0] text-white cursor-pointer'
+                                  : 'border-white/5 bg-black/20 text-white/20 cursor-not-allowed opacity-40'
+                              }`}
+                            >
+                              <div className="font-bold">{slot.time}</div>
+                              <div className={`text-[8px] font-bold uppercase mt-0.5 ${isSelected ? 'text-black' : slot.available ? 'text-[#00B4A0]' : 'text-white/20'}`}>
+                                {isSelected ? 'CHOISI' : slot.available ? 'LIBRE' : 'OCCUPÉ'}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Game & Notes */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                      <div>
+                        <label className="text-[10px] text-white/70 block uppercase font-bold tracking-wider mb-1">
+                          DISCIPLINE :
+                        </label>
+                        <select
+                          value={packGame}
+                          onChange={(e) => setPackGame(e.target.value)}
+                          className="w-full bg-black border border-white/20 rounded-xl p-2.5 text-xs text-white focus:border-[#CA1C30] focus:outline-none"
+                        >
+                          <option value="Valorant">Valorant</option>
+                          <option value="CS2">Counter-Strike 2</option>
+                          <option value="Overwatch 2">Overwatch 2</option>
+                          <option value="Apex Legends">Apex Legends</option>
+                          <option value="Fortnite">Fortnite</option>
+                          <option value="Autre">Autre FPS</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="text-[10px] text-white/70 block uppercase font-bold tracking-wider mb-1">
+                          NOTES DU JOUEUR :
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Ex: Analyse VOD, aim routine..."
+                          value={packNotes}
+                          onChange={(e) => setPackNotes(e.target.value)}
+                          className="w-full bg-black border border-white/20 rounded-xl p-2.5 text-xs text-white placeholder-white/30 focus:border-[#CA1C30] focus:outline-none"
+                        >
+                        </input>
+                      </div>
+                    </div>
+
+                    {packBookingError && (
+                      <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-xs flex items-center gap-2">
+                        <AlertCircle size={15} className="shrink-0" />
+                        <span>{packBookingError}</span>
+                      </div>
+                    )}
+
+                    {/* Confirm Button */}
+                    <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3">
+                      <div className="text-xs text-white/70 font-mono">
+                        {selectedPackTime ? (
+                          <span>
+                            Sélection : <strong className="text-white">{packDaysList[selectedPackDayIndex]?.fullDateLabel} à {selectedPackTime}</strong>
+                          </span>
+                        ) : (
+                          <span className="text-white/40">Choisis un créneau horaire disponible</span>
+                        )}
+                      </div>
+
+                      <button
+                        type="button"
+                        disabled={!selectedPackTime || isBookingPackSession}
+                        onClick={handleConfirmPackSession}
+                        className="btn-cyber-primary py-2.5 px-6 text-xs font-bold uppercase disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer w-full sm:w-auto justify-center"
+                      >
+                        {isBookingPackSession ? (
+                          <>
+                            <Loader2 size={14} className="animate-spin" />
+                            <span>RÉSERVATION...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Send size={14} />
+                            <span>VALIDER SÉANCE {packSummary.nextSessionNumber} (0 €)</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </div>
+            )}
+
+            {/* SÉANCES RÉSERVÉES */}
+            <div className="rounded-2xl bg-[#121117] border border-white/10 p-6 relative">
+              <div className="flex items-center justify-between mb-5 pb-3 border-b border-white/10">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-[#00B4A0]/15 border border-[#00B4A0]/30 flex items-center justify-center text-[#00B4A0]">
+                    <Calendar size={16} />
+                  </div>
+                  <div>
+                    <h2 className="text-base font-display uppercase tracking-wider text-white">
+                      MES SÉANCES RÉSERVÉES
+                    </h2>
+                    <p className="text-[11px] text-white/50 font-mono">
+                      {studentBookings.length} séance(s) au planning
+                    </p>
+                  </div>
+                </div>
+
+                <Link
+                  href="/#booking"
+                  className="text-xs text-[#CA1C30] hover:underline font-bold flex items-center gap-1"
+                >
+                  <span>+ RÉSERVER</span>
+                </Link>
+              </div>
+
+              {bookingsLoading ? (
+                <div className="p-8 text-center">
+                  <div className="w-6 h-6 border-2 border-[#CA1C30] border-t-transparent animate-spin mx-auto mb-2" />
+                  <p className="text-xs text-white/50">Chargement de ton planning...</p>
+                </div>
+              ) : studentBookings.length === 0 ? (
+                <div className="p-8 text-center rounded-xl bg-black/30 border border-white/5">
+                  <Clock size={28} className="mx-auto mb-3 text-white/30" />
+                  <p className="text-xs font-bold text-white uppercase tracking-wider mb-1">AUCUNE SESSION PROGRAMMÉE</p>
+                  <p className="text-xs text-white/50 mb-4 max-w-sm mx-auto">
+                    Choisis ta formule pour bloquer ton créneau et démarrer ton entraînement d&apos;élite.
+                  </p>
+                  <Link
+                    href="/#booking"
+                    className="btn-cyber-primary text-xs py-2 px-4 inline-flex"
+                  >
+                    <span>CHOISIR UN CRÉNEAU DISPONIBLE</span>
+                    <Award size={14} />
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {studentBookings.map((b) => (
+                    <div
+                      key={b.id}
+                      className="rounded-xl bg-black/40 border border-white/10 hover:border-white/20 transition-colors p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="data-badge data-badge-laser text-[9px]">
+                            {b.plan_name}
+                          </span>
+                          <span
+                            className={`data-badge text-[9px] ${
+                              b.status === 'completed'
+                                ? 'border-white/20 bg-white/10 text-white/60'
+                                : b.status === 'rescheduled'
+                                ? 'data-badge-acid'
+                                : 'data-badge-laser'
+                            }`}
+                          >
+                            {b.status === 'completed' ? 'TERMINÉE' : b.status === 'rescheduled' ? 'REPORTÉE' : 'CONFIRMÉE'}
+                          </span>
+                        </div>
+
+                        <div className="text-sm font-bold text-white flex items-center gap-2">
+                          <Calendar size={14} className="text-[#00B4A0]" />
+                          <span>
+                            {new Date(b.booking_date).toLocaleDateString('fr-FR', {
+                              weekday: 'short',
+                              day: 'numeric',
+                              month: 'short',
+                            })}{' '}
+                            à {b.booking_time}
+                          </span>
+                        </div>
+                        <p className="text-xs text-white/60">
+                          {b.plan_duration} • Discipline : <span className="text-[#CA1C30] font-bold">{b.game}</span>
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        <a
+                          href="https://discord.gg/rJMg3ZZRkp"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-1.5 rounded-lg bg-[#00B4A0]/10 hover:bg-[#00B4A0]/20 border border-[#00B4A0]/30 text-[#00B4A0] hover:text-white text-[11px] font-bold uppercase transition-colors"
+                        >
+                          SALON DISCORD
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
+
+          </div>
         </div>
 
-        {/* Quick Access Modules */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <Link
-            href="/profile/coaching"
-            className="reticle-box bg-[#121117] border border-white/10 hover:border-[#00B4A0] p-5 text-center transition-colors group cursor-pointer"
-          >
-            <MessageSquare size={22} className="text-[#00B4A0] mx-auto mb-2 group-hover:scale-110 transition-transform" />
-            <h3 className="font-bold text-xs uppercase tracking-wider mb-0.5">MESSAGES COACH</h3>
-            <p className="text-[10px] text-white/50">Retours & feed-back</p>
-          </Link>
-
-          <Link
-            href="/profile/vod"
-            className="reticle-box bg-[#121117] border border-white/10 hover:border-[#CA1C30] p-5 text-center transition-colors group cursor-pointer"
-          >
-            <Film size={22} className="text-[#CA1C30] mx-auto mb-2 group-hover:scale-110 transition-transform" />
-            <h3 className="font-bold text-xs uppercase tracking-wider mb-0.5">CLIPS VOD</h3>
-            <p className="text-[10px] text-white/50">Analyses de replays</p>
-          </Link>
-
-          <Link
-            href="/#booking"
-            className="reticle-box bg-[#121117] border border-white/10 hover:border-[#F5F4F0] p-5 text-center transition-colors group cursor-pointer"
-          >
-            <Clock size={22} className="text-[#F5F4F0] mx-auto mb-2 group-hover:scale-110 transition-transform" />
-            <h3 className="font-bold text-xs uppercase tracking-wider mb-0.5">SESSIONS</h3>
-            <p className="text-[10px] text-white/50">
-              {studentBookings.length > 0
-                ? `${studentBookings.length} planifiée(s)`
-                : 'Réserver'}
-            </p>
-          </Link>
-
-          <Link
-            href="/profile/sheet"
-            className="reticle-box bg-[#121117] border border-white/10 hover:border-white p-5 text-center transition-colors group cursor-pointer"
-          >
-            <FileText size={22} className="text-white mx-auto mb-2 group-hover:scale-110 transition-transform" />
-            <h3 className="font-bold text-xs uppercase tracking-wider mb-0.5">FICHE PERSO</h3>
-            <p className="text-[10px] text-white/50">Objectifs & axes</p>
-          </Link>
-        </div>
       </div>
 
       <CyberFooter />
     </main>
   );
 }
+

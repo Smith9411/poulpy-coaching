@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 import { Calendar, CheckCircle2, Gamepad2, MessageSquare, Shield, Sparkles, User, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { BookingFormData, Plan } from './types';
-import CornerBrackets from '@/components/CornerBrackets';
 
 interface BookingConfirmationProps {
   plan: Plan;
@@ -27,8 +26,7 @@ export default function BookingConfirmation({
       transition={{ duration: 0.3 }}
       className="max-w-2xl mx-auto font-mono"
     >
-      <div className="reticle-box bg-[#121117] border border-white/10 p-6 sm:p-10 relative text-center shadow-[0_0_50px_rgba(0,0,0,0.8)]">
-        <CornerBrackets color="coral" />
+      <div className="reticle-box bg-[#121117] border border-white/10 rounded-2xl p-6 sm:p-10 relative text-center shadow-[0_0_50px_rgba(0,0,0,0.8)]">
 
         {/* Animated Badge */}
         <div className="w-16 h-16 mx-auto mb-5 border-2 border-[#00B4A0] bg-[#00B4A0]/10 flex items-center justify-center text-[#00B4A0] shadow-[0_0_20px_rgba(0,180,160,0.3)]">

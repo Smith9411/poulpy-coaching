@@ -372,7 +372,10 @@ export default function StudentVodPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0A0D] text-white flex flex-col font-mono">
+    <div className="min-h-screen bg-[#0B0A0D] cyber-grid text-[#F5F4F0] flex flex-col font-mono relative overflow-hidden">
+      {/* Ambient Cyber Light */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-gradient-to-b from-[#CA1C30]/10 via-[#00B4A0]/5 to-transparent blur-3xl pointer-events-none -z-10" />
+
       <CyberNavbar />
 
       <main className="flex-1 py-28 pb-32 px-4 sm:px-6 lg:px-8">
@@ -435,7 +438,7 @@ export default function StudentVodPage() {
 
           {/* Submission Form */}
           {showForm && (
-            <div className="reticle-box bg-[#121117] border border-[#CA1C30]/40 p-6 mb-8 shadow-[0_0_20px_rgba(202, 28, 48,0.15)]">
+            <div className="reticle-box bg-[#121117] border border-[#CA1C30]/40 p-6 mb-8 shadow-[0_0_20px_rgba(202,28,48,0.15)]">
               <h2 className="font-bold text-sm uppercase tracking-wider mb-4 flex items-center gap-2 text-white">
                 <Plus size={16} className="text-[#CA1C30]" />
                 <span>NOUVEAU CLIP POUR ANALYSE</span>

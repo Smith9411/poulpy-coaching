@@ -580,7 +580,7 @@ export default function AdminUsers() {
                               title={u.inCoaching ? 'Retirer du coaching actuel' : 'Marquer en coaching actuel'}
                               className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold transition-all ${
                                 u.inCoaching
-                                  ? 'bg-[#F5F4F0]/20 text-[#F5F4F0] border border-[#F5F4F0]/40 hover:bg-[#F5F4F0]/30 shadow-[0_0_12px_rgba(245, 244, 240,0.2)]'
+                                  ? 'bg-[#F5F4F0]/20 text-[#F5F4F0] border border-[#F5F4F0]/40 hover:bg-[#F5F4F0]/30 shadow-[0_0_12px_rgba(245,244,240,0.2)]'
                                   : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 hover:text-white'
                               } disabled:opacity-50`}
                             >
@@ -603,7 +603,7 @@ export default function AdminUsers() {
                               className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-semibold transition-all ${
                                 socialCount > 0
                                   ? isExpanded
-                                    ? 'bg-[#CA1C30] text-black shadow-[0_0_12px_rgba(202, 28, 48,0.35)]'
+                                    ? 'bg-[#CA1C30] text-black shadow-[0_0_12px_rgba(202,28,48,0.35)]'
                                     : 'bg-[#CA1C30]/15 text-[#CA1C30]/80 border border-[#CA1C30]/30 hover:bg-[#CA1C30]/25 hover:border-[#CA1C30]/50'
                                   : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 hover:text-white'
                               }`}

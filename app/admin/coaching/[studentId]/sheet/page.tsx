@@ -693,7 +693,7 @@ USING (student_id = auth.uid());`;
                 saveSuccess
                   ? 'bg-emerald-500 text-white shadow-emerald-500/30'
                   : isDirty
-                  ? 'bg-[#CA1C30] text-black font-bold hover:bg-[#CA1C30]/80 shadow-[0_0_15px_rgba(202, 28, 48,0.3)] hover:scale-[1.02]'
+                  ? 'bg-[#CA1C30] text-black font-bold hover:bg-[#CA1C30]/80 shadow-[0_0_15px_rgba(202,28,48,0.3)] hover:scale-[1.02]'
                   : 'bg-white/10 hover:bg-white/15 text-gray-300 border border-white/10'
               }`}
             >

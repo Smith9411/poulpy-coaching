@@ -118,7 +118,7 @@ export default function FavoriteGames() {
   const apexTierOptions = APEX_TIERS.map((t) => ({ value: t, label: t }));
 
   return (
-    <div className="reticle-box bg-[#121117] border border-white/10 p-6 sm:p-8 relative z-30">
+    <div className="rounded-2xl bg-[#121117] border border-white/10 p-6 relative">
       <div className="flex items-center gap-3 mb-6 pb-4 border-b border-white/10">
         <div className="w-10 h-10 bg-[#CA1C30]/15 border border-[#CA1C30]/30 flex items-center justify-center text-[#CA1C30]">
           <Gamepad2 size={20} />
@@ -141,8 +141,8 @@ export default function FavoriteGames() {
               className={`p-4 border text-left transition-all cursor-pointer font-mono ${
                 isSelected
                   ? isVal
-                    ? 'border-[#CA1C30] bg-[#CA1C30]/15 text-white ring-1 ring-[#CA1C30] shadow-[0_0_15px_rgba(202, 28, 48,0.25)]'
-                    : 'border-[#00B4A0] bg-[#00B4A0]/15 text-white ring-1 ring-[#00B4A0] shadow-[0_0_15px_rgba(0, 180, 160,0.25)]'
+                    ? 'border-[#CA1C30] bg-[#CA1C30]/15 text-white ring-1 ring-[#CA1C30] shadow-[0_0_15px_rgba(202,28,48,0.25)]'
+                    : 'border-[#00B4A0] bg-[#00B4A0]/15 text-white ring-1 ring-[#00B4A0] shadow-[0_0_15px_rgba(0,180,160,0.25)]'
                   : 'border-white/10 bg-black/40 hover:border-white/20 text-white/70'
               }`}
             >

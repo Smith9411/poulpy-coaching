@@ -56,7 +56,7 @@ export default function CyberMedia() {
               onClick={() => handleSwitchPlatform("youtube")}
               className={`px-6 py-2.5 text-xs font-bold uppercase rounded-full border transition-all flex items-center gap-2 cursor-pointer ${
                 platform === "youtube"
-                  ? "bg-[#CA1C30] text-black border-[#CA1C30] shadow-[0_0_20px_rgba(202, 28, 48,0.4)]"
+                  ? "bg-[#CA1C30] text-black border-[#CA1C30] shadow-[0_0_20px_rgba(202,28,48,0.4)]"
                   : "bg-[#121117] text-[#F5F4F0]/60 border-white/15 hover:border-white/40"
               }`}
             >

@@ -81,7 +81,7 @@ export default function CyberRadarChart() {
       ctx.save();
       ctx.strokeStyle = "#F5F4F0";
       ctx.lineWidth = 2;
-      ctx.fillStyle = "rgba(245, 244, 240, 0.15)";
+      ctx.fillStyle = "rgba(245,244,240, 0.15)";
       ctx.beginPath();
       for (let i = 0; i < count; i++) {
         const angle = (i * Math.PI * 2) / count - Math.PI / 2;

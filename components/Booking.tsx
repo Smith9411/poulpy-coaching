@@ -832,7 +832,7 @@ export default function Booking() {
                             }}
                             className={`flex-shrink-0 w-24 sm:w-28 p-3 border text-center cursor-pointer transition-all flex flex-col justify-between rounded-xl ${
                               isDaySelected
-                                ? "border-[#CA1C30] bg-[#CA1C30]/15 text-[#F5F4F0] shadow-[0_0_15px_rgba(202, 28, 48,0.3)] ring-1 ring-[#CA1C30]"
+                                ? "border-[#CA1C30] bg-[#CA1C30]/15 text-[#F5F4F0] shadow-[0_0_15px_rgba(202,28,48,0.3)] ring-1 ring-[#CA1C30]"
                                 : "border-white/15 bg-[#1A1822] hover:border-white/40 text-[#F5F4F0]"
                             }`}
                           >
@@ -893,7 +893,7 @@ export default function Booking() {
                                 !isAvailable
                                   ? "border-white/5 bg-white/[0.02] text-white/30 cursor-not-allowed line-through opacity-40"
                                   : isTimeSelected
-                                  ? "border-[#CA1C30] bg-[#CA1C30] text-black font-bold shadow-[0_0_20px_rgba(202, 28, 48,0.4)] cursor-pointer"
+                                  ? "border-[#CA1C30] bg-[#CA1C30] text-black font-bold shadow-[0_0_20px_rgba(202,28,48,0.4)] cursor-pointer"
                                   : "border-white/15 bg-[#1A1822] hover:border-[#CA1C30]/60 text-[#F5F4F0] cursor-pointer"
                               }`}
                             >
@@ -1161,7 +1161,7 @@ export default function Booking() {
                 transition={{ duration: 0.2 }}
                 className="py-6 text-center space-y-6 max-w-xl mx-auto"
               >
-                <div className="w-16 h-16 bg-[#00B4A0]/15 border border-[#00B4A0] text-[#00B4A0] flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(0, 180, 160,0.3)] rounded-2xl">
+                <div className="w-16 h-16 bg-[#00B4A0]/15 border border-[#00B4A0] text-[#00B4A0] flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(0,180,160,0.3)] rounded-2xl">
                   <Check className="w-8 h-8" />
                 </div>
 
@@ -1193,9 +1193,9 @@ export default function Booking() {
                 </div>
 
                 {/* Discord CTA with IMPORTANT badge */}
-                <div className="relative p-5 bg-[#1A1822] border border-[#CA1C30] shadow-[0_0_25px_rgba(202, 28, 48,0.2)] text-left rounded-2xl">
+                <div className="relative p-5 bg-[#1A1822] border border-[#CA1C30] shadow-[0_0_25px_rgba(202,28,48,0.2)] text-left rounded-2xl">
                   {/* Badge matching the pack badges */}
-                  <div className="absolute top-2 right-2 px-2 py-0.5 text-[9px] font-bold bg-[#CA1C30] text-black uppercase tracking-wider shadow-[0_0_10px_rgba(202, 28, 48,0.5)] rounded-full">
+                  <div className="absolute top-2 right-2 px-2 py-0.5 text-[9px] font-bold bg-[#CA1C30] text-black uppercase tracking-wider shadow-[0_0_10px_rgba(202,28,48,0.5)] rounded-full">
                     IMPORTANT !
                   </div>
 
@@ -1214,7 +1214,7 @@ export default function Booking() {
                       href="https://discord.gg/rJMg3ZZRkp"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="btn-cyber-primary flex items-center justify-center gap-2 py-3 px-6 text-xs font-bold uppercase tracking-wider shrink-0 cursor-pointer shadow-[0_0_20px_rgba(202, 28, 48,0.3)]"
+                      className="btn-cyber-primary flex items-center justify-center gap-2 py-3 px-6 text-xs font-bold uppercase tracking-wider shrink-0 cursor-pointer shadow-[0_0_20px_rgba(202,28,48,0.3)]"
                     >
                       <MessageCircle className="w-4 h-4" />
                       <span>REJOINDRE LE DISCORD</span>

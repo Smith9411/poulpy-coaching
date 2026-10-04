@@ -6,7 +6,6 @@ import { AlertCircle, ArrowLeft, Loader2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import CyberNavbar from '@/components/CyberNavbar';
 import CyberFooter from '@/components/CyberFooter';
-import CornerBrackets from '@/components/CornerBrackets';
 
 const MAX_ATTEMPTS = 25; // 25 × 400ms ≈ 10s max d'attente de session
 const POLL_INTERVAL_MS = 400;
@@ -71,8 +70,7 @@ export default function AuthCallback() {
 
       <main className="flex-1 flex items-center justify-center px-4 py-28 relative">
         <div className="max-w-md w-full">
-          <div className="reticle-box p-8 bg-[#121117] border border-white/10 relative shadow-[0_0_60px_rgba(0,0,0,0.9)] text-center">
-            <CornerBrackets color="coral" />
+          <div className="reticle-box p-8 bg-[#121117] border border-white/10 rounded-2xl relative shadow-[0_0_60px_rgba(0,0,0,0.9)] text-center">
 
             {error ? (
               <div className="space-y-6">

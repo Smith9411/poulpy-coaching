@@ -66,8 +66,8 @@ export default function CyberVODScrubber() {
             <div className="absolute inset-0 cyber-grid opacity-30" />
 
             {/* Geometry Site Walls */}
-            <div className="absolute w-44 h-28 border border-[rgba(245, 244, 240,0.3)] bg-[rgba(245, 244, 240,0.02)]" />
-            <div className="absolute top-1/4 left-1/4 w-32 h-20 border border-[rgba(0, 180, 160,0.2)]" />
+            <div className="absolute w-44 h-28 border border-[rgba(245,244,240,0.3)] bg-[rgba(245,244,240,0.02)]" />
+            <div className="absolute top-1/4 left-1/4 w-32 h-20 border border-[rgba(0,180,160,0.2)]" />
 
             {/* Player Point */}
             <div
@@ -88,7 +88,7 @@ export default function CyberVODScrubber() {
                   transform: "translate(-10%, -50%) rotate(20deg)",
                   width: "220px",
                   height: "90px",
-                  background: "linear-gradient(to right, rgba(0, 180, 160,0.35), transparent)",
+                  background: "linear-gradient(to right, rgba(0,180,160,0.35), transparent)",
                   clipPath: "polygon(0 50%, 100% 0, 100% 100%)",
                 }}
               />
@@ -150,7 +150,7 @@ export default function CyberVODScrubber() {
               }}
               className={`p-4 border cursor-pointer transition-all space-y-1.5 ${
                 activeLogIdx === idx
-                  ? "bg-black/90 border-[#F5F4F0] shadow-[0_0_15px_rgba(245, 244, 240,0.15)]"
+                  ? "bg-black/90 border-[#F5F4F0] shadow-[0_0_15px_rgba(245,244,240,0.15)]"
                   : "bg-black/40 border-white/5 hover:border-white/20"
               }`}
             >

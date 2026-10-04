@@ -75,10 +75,10 @@ export default function TacticalCursor() {
       <div
         className={`fixed -translate-x-1/2 -translate-y-1/2 transition-all duration-100 ease-out border ${
           hovered
-            ? "w-10 h-10 border-[#F5F4F0] bg-[rgba(245, 244, 240,0.08)] scale-125"
+            ? "w-10 h-10 border-[#F5F4F0] bg-[rgba(245,244,240,0.08)] scale-125"
             : clicked
             ? "w-8 h-8 border-[#ff0033] bg-[rgba(255,0,51,0.15)] scale-90"
-            : "w-7 h-7 border-[rgba(0, 180, 160,0.4)] bg-transparent"
+            : "w-7 h-7 border-[rgba(0,180,160,0.4)] bg-transparent"
         }`}
         style={{
           left: `${trail.x}px`,

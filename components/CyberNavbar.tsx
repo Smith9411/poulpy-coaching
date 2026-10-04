@@ -464,7 +464,7 @@ export default function CyberNavbar({
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="flex items-center gap-2.5 text-xs font-mono tracking-wider text-[#F5F4F0] hover:text-[#CA1C30] transition-colors py-1 px-1 cursor-pointer group"
                 >
-                  <div className="w-8 h-8 rounded-full bg-[#CA1C30]/15 border border-[#CA1C30]/50 text-[#CA1C30] text-xs font-bold flex items-center justify-center overflow-hidden shadow-[0_0_10px_rgba(202, 28, 48,0.2)]">
+                  <div className="w-8 h-8 rounded-full bg-[#CA1C30]/15 border border-[#CA1C30]/50 text-[#CA1C30] text-xs font-bold flex items-center justify-center overflow-hidden shadow-[0_0_10px_rgba(202,28,48,0.2)]">
                     {user.avatarUrl ? (
                       <img src={user.avatarUrl} alt={user.username} className="w-full h-full object-cover" />
                     ) : (
@@ -563,7 +563,7 @@ export default function CyberNavbar({
                   }
                 }
               }}
-              className="btn-cyber-primary rounded-full py-2 px-5 text-[11px] font-bold uppercase tracking-wider flex items-center justify-center cursor-pointer shadow-[0_0_20px_rgba(202, 28, 48,0.3)]"
+              className="btn-cyber-primary rounded-full py-2 px-5 text-[11px] font-bold uppercase tracking-wider flex items-center justify-center cursor-pointer shadow-[0_0_20px_rgba(202,28,48,0.3)]"
             >
               <span>RÉSERVER</span>
             </button>

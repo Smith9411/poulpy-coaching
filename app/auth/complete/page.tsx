@@ -6,7 +6,6 @@ import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import CyberNavbar from '@/components/CyberNavbar';
 import CyberFooter from '@/components/CyberFooter';
-import CornerBrackets from '@/components/CornerBrackets';
 
 const USERNAME_MIN = 2;
 const USERNAME_MAX = 20;
@@ -154,8 +153,7 @@ export default function CompleteProfile() {
 
       <main className="flex-1 flex items-center justify-center px-4 py-28 relative">
         <div className="max-w-md w-full">
-          <div className="reticle-box p-6 sm:p-10 bg-[#121117] border border-[#CA1C30]/40 relative shadow-[0_0_60px_rgba(0,0,0,0.95)]">
-            <CornerBrackets color="coral" />
+          <div className="reticle-box p-6 sm:p-10 bg-[#121117] border border-white/10 rounded-2xl relative shadow-[0_0_60px_rgba(0,0,0,0.95)]">
 
             {/* Header */}
             <div className="border-b border-white/10 pb-5 mb-6 text-center space-y-3">

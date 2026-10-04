@@ -3,7 +3,6 @@
 import React from "react";
 import Image from "next/image";
 import DecryptedText from "./DecryptedText";
-import CornerBrackets from "./CornerBrackets";
 import { Shield, Award, Terminal, CheckCircle2 } from "lucide-react";
 
 interface CyberAboutProps {
@@ -31,8 +30,7 @@ export default function CyberAbout({ onOpenBooking }: CyberAboutProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
           {/* Left: Photo Frame with Cyber Reticles */}
           <div className="lg:col-span-5 relative">
-            <div className="group reticle-box p-3 bg-[#121117] rounded-3xl border border-[#CA1C30]/30 relative overflow-hidden">
-              <CornerBrackets size={12} />
+            <div className="group reticle-box p-3 bg-[#121117] rounded-3xl border border-white/10 relative overflow-hidden">
               <div className="relative aspect-square w-full bg-[#0B0A0D] rounded-2xl overflow-hidden flex items-center justify-center">
                 <Image
                   src="/poulpy-profile.png"

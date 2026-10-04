@@ -5,7 +5,6 @@ import { Mail, Lock, User, Eye, EyeOff, ArrowRight, CheckCircle2, ArrowLeft, Ale
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import CyberNavbar from '@/components/CyberNavbar';
-import CornerBrackets from '@/components/CornerBrackets';
 
 // Logo Google officiel
 function GoogleLogo({ className = "w-4 h-4" }: { className?: string }) {
@@ -125,8 +124,7 @@ export default function AuthPage() {
         </div>
 
         {/* Main Cyber Box */}
-        <div className="reticle-box p-6 sm:p-10 bg-[#121117] border border-[#CA1C30]/40 relative shadow-[0_0_60px_rgba(0,0,0,0.95)]">
-          <CornerBrackets color="coral" />
+        <div className="reticle-box p-6 sm:p-10 bg-[#121117] border border-white/10 rounded-2xl relative shadow-[0_0_60px_rgba(0,0,0,0.95)]">
 
           {/* Header */}
           <div className="border-b border-white/10 pb-5 mb-6 space-y-2">
@@ -165,7 +163,7 @@ export default function AuthPage() {
               }}
               className={`py-2 text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer ${
                 isLogin
-                  ? 'bg-[#CA1C30] text-black border-[#CA1C30] shadow-[0_0_15px_rgba(202, 28, 48,0.35)]'
+                  ? 'bg-[#CA1C30] text-black border-[#CA1C30] shadow-[0_0_15px_rgba(202,28,48,0.35)]'
                   : 'bg-black/60 text-white/50 border-white/10 hover:border-white/30 hover:text-white'
               }`}
             >
@@ -178,7 +176,7 @@ export default function AuthPage() {
               }}
               className={`py-2 text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer ${
                 !isLogin
-                  ? 'bg-[#CA1C30] text-black border-[#CA1C30] shadow-[0_0_15px_rgba(202, 28, 48,0.35)]'
+                  ? 'bg-[#CA1C30] text-black border-[#CA1C30] shadow-[0_0_15px_rgba(202,28,48,0.35)]'
                   : 'bg-black/60 text-white/50 border-white/10 hover:border-white/30 hover:text-white'
               }`}
             >

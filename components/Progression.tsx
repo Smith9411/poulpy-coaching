@@ -36,10 +36,10 @@ const views: Record<"global" | "valorant" | "apex", GameView> = {
     tag: "TOUS TITRES CONFONDUS",
     description: "Moyenne pondérée des performances mécaniques et cognitives mesurées sur l'ensemble de nos élèves actifs.",
     metrics: [
-      { label: "AIM SCORE", subLabel: "FLICK / TRACKING SUB-PIXEL", value: 78, color: "#F5F4F0", accent: "rgba(245, 244, 240,0.2)", icon: Target },
-      { label: "GAME SENSE", subLabel: "MACRO & VISION TACTIQUE", value: 72, color: "#00B4A0", accent: "rgba(0, 180, 160,0.2)", icon: Zap },
+      { label: "AIM SCORE", subLabel: "FLICK / TRACKING SUB-PIXEL", value: 78, color: "#F5F4F0", accent: "rgba(245,244,240,0.2)", icon: Target },
+      { label: "GAME SENSE", subLabel: "MACRO & VISION TACTIQUE", value: 72, color: "#00B4A0", accent: "rgba(0,180,160,0.2)", icon: Zap },
       { label: "MOUVEMENT", subLabel: "FLUIDITÉ & TIMING DEADZONE", value: 68, color: "#ff0033", accent: "rgba(255,0,51,0.2)", icon: Activity },
-      { label: "CONSISTENCY", subLabel: "RÉGULARITÉ EN CLUTCH", value: 81, color: "#F5F4F0", accent: "rgba(245, 244, 240,0.2)", icon: BarChart3 },
+      { label: "CONSISTENCY", subLabel: "RÉGULARITÉ EN CLUTCH", value: 81, color: "#F5F4F0", accent: "rgba(245,244,240,0.2)", icon: BarChart3 },
     ],
     sessions: [
       { s: "S1 // AUDIT", rr: 0 },
@@ -49,7 +49,7 @@ const views: Record<"global" | "valorant" | "apex", GameView> = {
       { s: "S5 // MASTERY", rr: 105 },
     ],
     strokeColor: "#F5F4F0",
-    fillColor: "rgba(245, 244, 240,0.15)",
+    fillColor: "rgba(245,244,240,0.15)",
     pointColor: "#F5F4F0",
   },
   valorant: {
@@ -57,10 +57,10 @@ const views: Record<"global" | "valorant" | "apex", GameView> = {
     tag: "RIOT COMPETITIVE // IMMORTAL+",
     description: "Métriques spécifiques à l'écosystème Valorant : crosshair placement, first-bullet accuracy et timing d'utilitaires.",
     metrics: [
-      { label: "AIM SCORE", subLabel: "HEADSHOT % & FIRST-BULLET", value: 84, color: "#00B4A0", accent: "rgba(0, 180, 160,0.2)", icon: Target },
-      { label: "GAME SENSE", subLabel: "ROTATIONS & UTIL TIMING", value: 76, color: "#F5F4F0", accent: "rgba(245, 244, 240,0.2)", icon: Zap },
+      { label: "AIM SCORE", subLabel: "HEADSHOT % & FIRST-BULLET", value: 84, color: "#00B4A0", accent: "rgba(0,180,160,0.2)", icon: Target },
+      { label: "GAME SENSE", subLabel: "ROTATIONS & UTIL TIMING", value: 76, color: "#F5F4F0", accent: "rgba(245,244,240,0.2)", icon: Zap },
       { label: "MOUVEMENT", subLabel: "COUNTER-STRAFING & JIGGLE", value: 74, color: "#ff0033", accent: "rgba(255,0,51,0.2)", icon: Activity },
-      { label: "CONSISTENCY", subLabel: "K/D RATIO EN SITUATION DE RETAKE", value: 86, color: "#00B4A0", accent: "rgba(0, 180, 160,0.2)", icon: BarChart3 },
+      { label: "CONSISTENCY", subLabel: "K/D RATIO EN SITUATION DE RETAKE", value: 86, color: "#00B4A0", accent: "rgba(0,180,160,0.2)", icon: BarChart3 },
     ],
     sessions: [
       { s: "S1 // AUDIT", rr: 0 },
@@ -70,7 +70,7 @@ const views: Record<"global" | "valorant" | "apex", GameView> = {
       { s: "S5 // MASTERY", rr: 120 },
     ],
     strokeColor: "#00B4A0",
-    fillColor: "rgba(0, 180, 160,0.15)",
+    fillColor: "rgba(0,180,160,0.15)",
     pointColor: "#00B4A0",
   },
   apex: {
@@ -79,8 +79,8 @@ const views: Record<"global" | "valorant" | "apex", GameView> = {
     description: "Métriques axées sur les combats haute vélocité : tracking continu, tap-strafing, shield-swap et rotations de zone.",
     metrics: [
       { label: "AIM SCORE", subLabel: "SMG TRACKING & BEAM ACCURACY", value: 88, color: "#ff0033", accent: "rgba(255,0,51,0.2)", icon: Target },
-      { label: "GAME SENSE", subLabel: "ZONE READING & THIRD-PARTY", value: 79, color: "#F5F4F0", accent: "rgba(245, 244, 240,0.2)", icon: Zap },
-      { label: "MOUVEMENT", subLabel: "TAP-STRAFE / WALLBOUNCE / EVASION", value: 92, color: "#00B4A0", accent: "rgba(0, 180, 160,0.2)", icon: Activity },
+      { label: "GAME SENSE", subLabel: "ZONE READING & THIRD-PARTY", value: 79, color: "#F5F4F0", accent: "rgba(245,244,240,0.2)", icon: Zap },
+      { label: "MOUVEMENT", subLabel: "TAP-STRAFE / WALLBOUNCE / EVASION", value: 92, color: "#00B4A0", accent: "rgba(0,180,160,0.2)", icon: Activity },
       { label: "CONSISTENCY", subLabel: "SURVIVAL TIME & TOP 3 FINISH", value: 75, color: "#ff0033", accent: "rgba(255,0,51,0.2)", icon: BarChart3 },
     ],
     sessions: [
@@ -151,7 +151,7 @@ export default function Progression() {
                   onClick={() => setActiveTab(key)}
                   className={`px-4 py-2 text-xs uppercase font-bold transition-all ${
                     active
-                      ? "bg-[#F5F4F0] text-black shadow-[0_0_15px_rgba(245, 244, 240,0.3)]"
+                      ? "bg-[#F5F4F0] text-black shadow-[0_0_15px_rgba(245,244,240,0.3)]"
                       : "text-white/60 hover:text-white hover:bg-white/5"
                   }`}
                 >

@@ -96,13 +96,13 @@ export default function CyberSensitivityMatrix() {
 
         {/* Matrix Converted Output */}
         <div className="md:col-span-6 grid grid-cols-2 gap-3 font-mono">
-          <div className="p-4 bg-black border border-[rgba(245, 244, 240,0.2)] space-y-1">
+          <div className="p-4 bg-black border border-[rgba(245,244,240,0.2)] space-y-1">
             <span className="text-[10px] text-white/40 uppercase">VALORANT eDPI</span>
             <div className="text-3xl font-bold text-[#F5F4F0]">{edpi}</div>
             <span className="text-[10px] text-white/40 block">Prise d&apos;angle laser</span>
           </div>
 
-          <div className="p-4 bg-black border border-[rgba(0, 180, 160,0.2)] space-y-1">
+          <div className="p-4 bg-black border border-[rgba(0,180,160,0.2)] space-y-1">
             <span className="text-[10px] text-white/40 uppercase">APEX LEGENDS</span>
             <div className="text-3xl font-bold text-[#00B4A0]">{apexSens}</div>
             <span className="text-[10px] text-white/40 block">Tracking close-quarters</span>

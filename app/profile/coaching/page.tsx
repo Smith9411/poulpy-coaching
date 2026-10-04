@@ -373,7 +373,10 @@ export default function StudentCoachingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0A0D] text-white flex flex-col font-mono">
+    <div className="min-h-screen bg-[#0B0A0D] cyber-grid text-[#F5F4F0] flex flex-col font-mono relative overflow-hidden">
+      {/* Ambient Cyber Light */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-gradient-to-b from-[#00B4A0]/10 via-[#CA1C30]/5 to-transparent blur-3xl pointer-events-none -z-10" />
+
       <CyberNavbar />
 
       {/* Lightbox zoom image */}
@@ -471,8 +474,8 @@ export default function StudentCoachingPage() {
                       <div
                         className={`max-w-[85%] sm:max-w-[75%] p-4 border transition-all ${
                           isMine
-                            ? 'bg-[#CA1C30]/15 border-[#CA1C30]/40 text-white shadow-[0_0_15px_rgba(202, 28, 48,0.1)]'
-                            : 'bg-black/60 border-[#00B4A0]/30 text-white shadow-[0_0_15px_rgba(0, 180, 160,0.1)]'
+                            ? 'bg-[#CA1C30]/15 border-[#CA1C30]/40 text-white shadow-[0_0_15px_rgba(202,28,48,0.1)]'
+                            : 'bg-black/60 border-[#00B4A0]/30 text-white shadow-[0_0_15px_rgba(0,180,160,0.1)]'
                         }`}
                       >
                         {!isMine && (
