@@ -126,16 +126,15 @@ const PILLARS_WITH_VIDEO = [
     num: "01",
     code: "PILIER // 01.0",
     icon: Crosshair,
-    badge: "BIOMÉCANIQUE AIM",
-    title: "CALIBRATION DE VISÉE",
-    subtitle: "Routines personnalisées & posture",
+    badge: "MÉCANIQUES PURES",
+    title: "AIM ET MÉCANIQUES",
+    subtitle: "Mécaniques ingame & aim training",
     description:
-      "Audit biomécanique complet : prise en main de souris, ajustement de sensibilité (cm/360) et routines d'échauffement ciblées pour éliminer définitivement l'overshooting.",
+      "Une approche des mécaniques ingame axée sur l'aim pure et l'entraînement (+ de 1000h d'expérience en aim training à vous transmettre). Des analyses détaillées afin d'optimiser vos mouvements et augmenter drastiquement votre HS%.",
     specs: [
-      { label: "Acquisition", val: "135 ms reflex" },
-      { label: "Tracking", val: "99.2% précision" },
-      { label: "Routine", val: "20 min / jour" },
-      { label: "Jeux", val: "Valorant / Apex" },
+      { label: "Routines d'aim training personnalisées", val: "20m à 1h / jour" },
+      { label: "Hold & peak theory", val: "95% d'avantage en duel" },
+      { label: "Crosshair placement", val: "40% d'head-shot" },
     ],
     videoSrc: "/videos/why-poulpy/aim.mp4",
     clipTitle: "AIM TRAINING // VALORANT, APEX & KOVAAK",
@@ -147,15 +146,16 @@ const PILLARS_WITH_VIDEO = [
     code: "PILIER // 02.0",
     icon: Brain,
     badge: "VISION DU JEU",
-    title: "GAMESENSE & CLUTCH",
-    subtitle: "Prise d'information & duel 1vX",
+    title: "GAMESENS ET WIN CONDITIONS",
+    subtitle: "Lecture de jeu & clutchs",
     description:
-      "Transformer le chaos d'un round en une suite de duels 1v1 maîtrisés. Anticipation des rotations adverses, contrôle d'espace et gestion du tempo pour clore les rounds clés.",
+      "Appréhendez les parties différemment, ne perdez plus jamais vos clutchs et convertissez chaque avantage en un round gagné. Ma méthode vous permettra d'être le carry de vos games même dans les mauvais jours.",
     specs: [
-      { label: "Anticipation", val: "Lecture pro" },
-      { label: "Conversion", val: "88% rounds" },
-      { label: "Macro", val: "Contrôle espace" },
-      { label: "Clutch", val: "Arbre de décision" },
+      { label: "Maîtrise d'agents", val: "" },
+      { label: "Identification des wins conditions", val: "" },
+      { label: "Prédiction des rounds", val: "" },
+      { label: "Clutch", val: "" },
+      { label: "Rééquilibrage lors d'un désavantage", val: "" },
     ],
     videoSrc: "/videos/why-poulpy/clutch.mp4",
     clipTitle: "CLUTCH GAME // VALORANT & APEX",
@@ -166,16 +166,16 @@ const PILLARS_WITH_VIDEO = [
     num: "03",
     code: "PILIER // 03.0",
     icon: Flame,
-    badge: "MINDSET PRO",
-    title: "SANG-FROID & ANTI-TILT",
-    subtitle: "Contrôle du stress & focus",
+    badge: "MINDSET & COMMS",
+    title: "MENTAL ET COMMUNICATION",
+    subtitle: "Régularité & leadership",
     description:
-      "Développer le calme des joueurs de tournoi. Neutralisation de la panique sous pression, régulation du rythme cardiaque et élimination immédiate du tilt.",
+      "Devenez le mate que vous avez envie d'avoir : jamais tilt, porte la game grâce à ses calls et hype ses mates ! Ce 3e pilier vous permettra d'être toujours prêt pour vos fights, de jouer constamment à minimum 95% de vos capacités et de vous conditionner lors des games afin de maximiser votre courbe de progression.",
     specs: [
-      { label: "Protocole", val: "Sang-froid 1vX" },
-      { label: "Résilience", val: "0% tilt" },
-      { label: "Lucidité", val: "100% focus" },
-      { label: "Ranked", val: "+300 RR mesurés" },
+      { label: "Conditionnement", val: "Prêts pour 100% des duels" },
+      { label: "Mental ingame", val: "0% de Tilt" },
+      { label: "Constant", val: "Moins 50% de bad game" },
+      { label: "Communication", val: "100% de love de vos teamates" },
     ],
     videoSrc: "/videos/why-poulpy/sang-froid.mp4",
     clipTitle: "SANG-FROID // SITUATIONS CLUTCH",
@@ -292,8 +292,22 @@ export default function WhyPoulpy() {
     >
       <div
         ref={pinnedContainerRef}
-        className="relative w-full h-screen overflow-hidden flex flex-col justify-between pt-8 sm:pt-12 pb-6 sm:pb-8"
+        className="relative w-full h-screen overflow-hidden flex flex-col justify-between pt-6 sm:pt-8 pb-4 sm:pb-6"
       >
+        {/* Top Header */}
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 flex items-center justify-between pb-1 z-20">
+          <div className="flex items-center gap-3">
+            <span className="text-[#CA1C30] text-xs font-bold font-mono tracking-widest">// MÉTHODOLOGIE</span>
+            <span className="text-white/20">|</span>
+            <h2 className="text-lg sm:text-2xl md:text-3xl font-display font-bold uppercase tracking-wider text-white">
+              UNE APPROCHE EN 3 PILIERS :
+            </h2>
+          </div>
+          <span className="text-[11px] text-white/40 font-mono hidden md:inline-block">
+            VALORANT &bull; APEX LEGENDS &bull; AIM
+          </span>
+        </div>
+
         {/* Large Rectangular Horizontal Sliding Track */}
         <div
           ref={trackRef}
@@ -359,18 +373,26 @@ export default function WhyPoulpy() {
                     <div className="space-y-2 pt-3 border-t border-white/10 font-mono text-xs">
                       {item.specs.map((s, sIdx) => (
                         <div key={sIdx} className="flex items-center justify-between gap-3 text-[11px]">
-                          <span className="text-white/45 uppercase tracking-wider flex items-center gap-1.5 truncate">
-                            <span className="w-1 h-1 bg-white/20 rounded-full shrink-0" />
+                          <span className="text-white/80 uppercase tracking-wider flex items-center gap-1.5 truncate">
+                            <span className="w-1.5 h-1.5 bg-[#CA1C30] rounded-full shrink-0" />
                             {s.label}
                           </span>
-                          <span className="text-white/15 flex-1 border-b border-dotted border-white/15" />
-                          <span
-                            className={`font-bold tracking-wide shrink-0 ${
-                              isAcid ? "text-[#CA1C30]" : "text-[#00B4A0]"
-                            }`}
-                          >
-                            {s.val}
-                          </span>
+                          {s.val ? (
+                            <>
+                              <span className="text-white/15 flex-1 border-b border-dotted border-white/15" />
+                              <span
+                                className={`font-bold tracking-wide shrink-0 ${
+                                  isAcid ? "text-[#CA1C30]" : "text-[#00B4A0]"
+                                }`}
+                              >
+                                {s.val}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="text-[#00B4A0] text-[10px] font-mono tracking-wider shrink-0 uppercase">
+                              ✓ INCLUS
+                            </span>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -422,7 +444,7 @@ export default function WhyPoulpy() {
                 <span>ENGAGER LE COACHING</span>
               </a>
               <div className="text-center text-[10px] text-white/40 font-mono">
-                VALORANT (IMMORTAL 2 #5000) &bull; APEX (3x PICK #450)
+                VALORANT (IMMORTAL 2 #5000) &bull; APEX (3x PICK PRED #450)
               </div>
             </div>
           </div>

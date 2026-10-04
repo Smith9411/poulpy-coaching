@@ -98,7 +98,7 @@ export default function HeroCyber({ onOpenBooking }: HeroCyberProps) {
             L&apos;ÉLITE DU COACHING FPS COMPÉTITIF.
             <br />
             <span className="font-accent text-[#00B4A0] text-sm sm:text-base md:text-lg font-semibold tracking-wider block mt-2">
-              VALORANT (IMMORTAL 2 #5000) &amp; APEX (3x PICK #450).
+              VALORANT (IMMORTAL 2 #5000) &amp; APEX (3x PICK PRED #450).
             </span>
           </p>
 
