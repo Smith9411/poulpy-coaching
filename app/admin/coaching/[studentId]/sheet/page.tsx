@@ -8,7 +8,7 @@ import {
   Loader2, Image as ImageIcon, Table, Heading1, Heading2, Heading3,
   Bold, Italic, List, ListOrdered, CheckSquare, Eye, Edit3,
   Columns, Printer, Sparkles, User, Mail, Calendar, HelpCircle,
-  Upload, Copy, ExternalLink, RefreshCw, Quote, Shield
+  Upload, Copy, ExternalLink, RefreshCw, Quote, Shield, CheckCircle2, Clock
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -144,6 +144,36 @@ export default function StudentSheetPage() {
       fetchData();
     }
   }, [user, studentId, fetchData]);
+
+  const [isTogglingCoaching, setIsTogglingCoaching] = useState(false);
+
+  const toggleCoaching = async () => {
+    if (!student || !token) return;
+    setIsTogglingCoaching(true);
+    try {
+      const nextStatus = !student.inCoaching;
+      const res = await fetch('/api/admin/users', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ userId: student.id, inCoaching: nextStatus }),
+      });
+
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(errJson.error || 'Erreur lors du changement de statut coaching');
+      }
+
+      setStudent(prev => (prev ? { ...prev, inCoaching: nextStatus } : null));
+    } catch (err) {
+      console.error('Erreur toggle coaching:', err);
+      setError(err instanceof Error ? err.message : 'Erreur');
+    } finally {
+      setIsTogglingCoaching(false);
+    }
+  };
 
   // Sauvegarder la fiche
   const handleSave = async () => {
@@ -659,12 +689,42 @@ USING (student_id = auth.uid());`;
                 <h1 className="text-2xl sm:text-3xl font-bold text-white truncate">
                   {student?.username}
                 </h1>
-                {student?.inCoaching && (
+                {student?.inCoaching ? (
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold">
                     <Sparkles size={12} />
                     Coaching actif
                   </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-white/10 border border-white/20 text-gray-400 text-xs font-semibold">
+                    <Clock size={12} />
+                    Coaching terminé / Archivé
+                  </span>
                 )}
+
+                <button
+                  type="button"
+                  onClick={toggleCoaching}
+                  disabled={isTogglingCoaching}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-mono transition-colors border cursor-pointer disabled:opacity-50 ${
+                    student?.inCoaching
+                      ? 'bg-red-500/10 hover:bg-red-500/20 text-red-300 border-red-500/30'
+                      : 'bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 border-emerald-500/30'
+                  }`}
+                  title={
+                    student?.inCoaching
+                      ? "Terminer le coaching : l'élève quitte les coachings en cours sans rien supprimer de sa fiche ni de ses clips"
+                      : "Remettre cet élève dans les coachings en cours"
+                  }
+                >
+                  {isTogglingCoaching ? (
+                    <Loader2 size={12} className="animate-spin" />
+                  ) : student?.inCoaching ? (
+                    <CheckCircle2 size={12} />
+                  ) : (
+                    <Sparkles size={12} />
+                  )}
+                  <span>{student?.inCoaching ? 'Terminer le coaching' : 'Remettre en coaching actif'}</span>
+                </button>
               </div>
               <div className="flex items-center gap-4 text-xs sm:text-sm text-gray-400 mt-1 flex-wrap">
                 <span className="flex items-center gap-1.5">
