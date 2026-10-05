@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -455,6 +455,207 @@ export default function AdminBookingsPage() {
     return true;
   });
 
+  // Séparation séances actuelles / à venir vs séances passées
+  const { upcomingBookings, pastBookings } = useMemo(() => {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const d = String(now.getDate()).padStart(2, '0');
+    const todayStr = `${y}-${m}-${d}`;
+    const nowTimeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    const upcoming: CoachingBooking[] = [];
+    const past: CoachingBooking[] = [];
+
+    filteredBookings.forEach((b) => {
+      const bDate = (b.booking_date || '').split('T')[0];
+      const bTime = b.booking_time || '00:00';
+
+      const isPastDate = bDate < todayStr || (bDate === todayStr && bTime < nowTimeStr);
+      const isFinished = b.status === 'completed' || b.status === 'cancelled';
+
+      if (isFinished || isPastDate) {
+        past.push(b);
+      } else {
+        upcoming.push(b);
+      }
+    });
+
+    // Tri des séances à venir : chronologique ascendant (les plus proches en premier)
+    upcoming.sort((a, b) => {
+      const tA = `${(a.booking_date || '').split('T')[0]}T${a.booking_time || '00:00'}`;
+      const tB = `${(b.booking_date || '').split('T')[0]}T${b.booking_time || '00:00'}`;
+      return tA.localeCompare(tB);
+    });
+
+    // Tri des séances passées : chronologique descendant (les plus récentes en premier)
+    past.sort((a, b) => {
+      const tA = `${(a.booking_date || '').split('T')[0]}T${a.booking_time || '00:00'}`;
+      const tB = `${(b.booking_date || '').split('T')[0]}T${b.booking_time || '00:00'}`;
+      return tB.localeCompare(tA);
+    });
+
+    return { upcomingBookings: upcoming, pastBookings: past };
+  }, [filteredBookings]);
+
+  // Rendu d'une carte de réservation
+  const renderBookingCard = (b: CoachingBooking) => {
+    const isActionLoading = actionLoadingId === b.id;
+
+    return (
+      <div
+        key={b.id}
+        className={`reticle-box p-5 border flex flex-col justify-between space-y-4 transition-colors duration-200 ${
+          b.status === 'confirmed'
+            ? 'border-[#00B4A0]/30 hover:border-[#00B4A0]'
+            : b.status === 'rescheduled'
+            ? 'border-[#CA1C30]/40 hover:border-[#CA1C30]'
+            : b.status === 'completed'
+            ? 'border-green-500/20 opacity-75'
+            : 'border-red-500/20 opacity-60'
+        }`}
+      >
+        {/* Header with Plan and Status */}
+        <div>
+          <div className="flex items-center justify-between gap-2 mb-2">
+            <span className="text-xs font-extrabold px-2.5 py-0.5 bg-[#CA1C30]/20 text-[#CA1C30]/80">
+              {b.plan_name}
+            </span>
+            <span
+              className={`text-[11px] font-bold px-2 py-0.5 ${
+                b.status === 'confirmed'
+                  ? 'bg-green-500/20 text-green-300'
+                  : b.status === 'rescheduled'
+                  ? 'bg-[#CA1C30]/20 text-[#CA1C30]/80'
+                  : b.status === 'completed'
+                  ? 'bg-[#00B4A0]/20 text-[#00B4A0]/80'
+                  : 'bg-red-500/20 text-red-400'
+              }`}
+            >
+              {b.status === 'confirmed' && 'Confirmée'}
+              {b.status === 'rescheduled' && 'Reportée'}
+              {b.status === 'completed' && 'Terminée'}
+              {b.status === 'cancelled' && 'Annulée'}
+            </span>
+          </div>
+
+          {/* Date & Time Highlight */}
+          <div className="flex items-center gap-2 text-white font-extrabold text-base mb-1">
+            <CalendarIcon size={16} className="text-[#00B4A0]" />
+            <span>
+              {new Date(b.booking_date).toLocaleDateString('fr-FR', {
+                weekday: 'short',
+                day: 'numeric',
+                month: 'short',
+              })}{' '}
+              à {b.booking_time}
+            </span>
+          </div>
+          <div className="text-xs text-gray-400 flex items-center gap-2">
+            <span>{b.plan_duration}</span>
+            <span>•</span>
+            <span className="text-[#CA1C30]/80 font-bold">{b.plan_price}</span>
+          </div>
+        </div>
+
+        {/* Student Info */}
+        <div className="p-3.5 bg-white/[0.04] border border-white/5 space-y-2 text-xs">
+          <div className="flex items-center justify-between">
+            <span className="text-gray-400">Élève :</span>
+            <span className="font-bold text-white flex items-center gap-1">
+              <User size={12} className="text-[#CA1C30]" />
+              {b.student_name}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <span className="text-gray-400">Discord :</span>
+            <div className="flex items-center gap-1 text-[#00B4A0]/80 font-mono font-semibold">
+              <MessageSquare size={12} />
+              <span>{b.student_discord}</span>
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.clipboard.writeText(b.student_discord);
+                  showToast('success', `Discord de ${b.student_name} copié !`);
+                }}
+                className="p-1 hover:text-white"
+                title="Copier"
+              >
+                <Copy size={11} />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <span className="text-gray-400">Jeu :</span>
+            <span className="font-semibold text-white flex items-center gap-1">
+              <Gamepad2 size={12} className="text-amber-400" />
+              {b.game}
+            </span>
+          </div>
+
+          {b.notes && (
+            <div className="pt-2 border-t border-white/5">
+              <span className="text-[10px] text-gray-400 block mb-0.5">Objectifs :</span>
+              <p className="text-gray-300 italic text-[11px] line-clamp-2">"{b.notes}"</p>
+            </div>
+          )}
+        </div>
+
+        {/* Actions */}
+        <div className="pt-2 border-t border-white/10 flex items-center justify-between gap-2">
+          {b.status !== 'cancelled' && b.status !== 'completed' && (
+            <>
+              <button
+                type="button"
+                disabled={isActionLoading}
+                onClick={() => {
+                  setRescheduleBooking(b);
+                  setRescheduleDate(b.booking_date);
+                  setRescheduleTime(b.booking_time);
+                }}
+                className="flex-1 py-1.5 bg-[#CA1C30]/15 border border-[#CA1C30]/30 text-xs font-semibold text-[#CA1C30]/80 hover:bg-[#CA1C30]/30 hover:text-white transition-colors flex items-center justify-center gap-1 cursor-pointer"
+              >
+                <Edit2 size={13} />
+                <span>Reporter</span>
+              </button>
+
+              <button
+                type="button"
+                disabled={isActionLoading}
+                onClick={() => handleCompleteBooking(b.id)}
+                className="p-1.5 bg-green-500/15 border border-green-500/30 text-xs font-semibold text-green-400 hover:bg-green-500/30 transition-colors cursor-pointer"
+                title="Marquer comme terminée (libère le créneau du planning)"
+              >
+                <CheckCircle2 size={15} />
+              </button>
+
+              <button
+                type="button"
+                disabled={isActionLoading}
+                onClick={() => {
+                  setCancelModalBooking(b);
+                  setCancelReasonInput('Annulée par le coach depuis le panneau admin.');
+                }}
+                className="p-1.5 bg-red-500/15 border border-red-500/30 text-xs font-semibold text-red-400 hover:bg-red-500/30 transition-colors cursor-pointer"
+                title="Annuler la séance (libère le créneau et retire du profil élève)"
+              >
+                <Trash2 size={15} />
+              </button>
+            </>
+          )}
+
+          {(b.status === 'cancelled' || b.status === 'completed') && (
+            <span className="text-xs text-gray-400 font-medium italic w-full text-center py-1">
+              Séance {b.status === 'completed' ? '✓ Effectuée & Terminée' : '✕ Annulée'}
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  };
+
   if (authLoading) {
     return (
       <main className="min-h-screen bg-[#0B0A0D] py-24 flex items-center justify-center">
@@ -870,163 +1071,60 @@ export default function AdminBookingsPage() {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredBookings.map((b) => {
-                  const isActionLoading = actionLoadingId === b.id;
-
-                  return (
-                    <div
-                      key={b.id}
-                      className={`reticle-box p-5 border flex flex-col justify-between space-y-4 transition-colors duration-200 ${
-                        b.status === 'confirmed'
-                          ? 'border-[#00B4A0]/30 hover:border-[#00B4A0]'
-                          : b.status === 'rescheduled'
-                          ? 'border-[#CA1C30]/40 hover:border-[#CA1C30]'
-                          : b.status === 'completed'
-                          ? 'border-green-500/20 opacity-75'
-                          : 'border-red-500/20 opacity-60'
-                      }`}
-                    >
-                      {/* Header with Plan and Status */}
-                      <div>
-                        <div className="flex items-center justify-between gap-2 mb-2">
-                          <span className="text-xs font-extrabold px-2.5 py-0.5 bg-[#CA1C30]/20 text-[#CA1C30]/80">
-                            {b.plan_name}
-                          </span>
-                          <span
-                            className={`text-[11px] font-bold px-2 py-0.5 ${
-                              b.status === 'confirmed'
-                                ? 'bg-green-500/20 text-green-300'
-                                : b.status === 'rescheduled'
-                                ? 'bg-[#CA1C30]/20 text-[#CA1C30]/80'
-                                : b.status === 'completed'
-                                ? 'bg-[#00B4A0]/20 text-[#00B4A0]/80'
-                                : 'bg-red-500/20 text-red-400'
-                            }`}
-                          >
-                            {b.status === 'confirmed' && 'Confirmée'}
-                            {b.status === 'rescheduled' && 'Reportée'}
-                            {b.status === 'completed' && 'Terminée'}
-                            {b.status === 'cancelled' && 'Annulée'}
-                          </span>
-                        </div>
-
-                        {/* Date & Time Highlight */}
-                        <div className="flex items-center gap-2 text-white font-extrabold text-base mb-1">
-                          <CalendarIcon size={16} className="text-[#00B4A0]" />
-                          <span>
-                            {new Date(b.booking_date).toLocaleDateString('fr-FR', {
-                              weekday: 'short',
-                              day: 'numeric',
-                              month: 'short',
-                            })}{' '}
-                            à {b.booking_time}
-                          </span>
-                        </div>
-                        <div className="text-xs text-gray-400 flex items-center gap-2">
-                          <span>{b.plan_duration}</span>
-                          <span>•</span>
-                          <span className="text-[#CA1C30]/80 font-bold">{b.plan_price}</span>
-                        </div>
-                      </div>
-
-                      {/* Student Info */}
-                      <div className="p-3.5 bg-white/[0.04] border border-white/5 space-y-2 text-xs">
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-400">Élève :</span>
-                          <span className="font-bold text-white flex items-center gap-1">
-                            <User size={12} className="text-[#CA1C30]" />
-                            {b.student_name}
-                          </span>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-400">Discord :</span>
-                          <div className="flex items-center gap-1 text-[#00B4A0]/80 font-mono font-semibold">
-                            <MessageSquare size={12} />
-                            <span>{b.student_discord}</span>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                navigator.clipboard.writeText(b.student_discord);
-                                showToast('success', `Discord de ${b.student_name} copié !`);
-                              }}
-                              className="p-1 hover:text-white"
-                              title="Copier"
-                            >
-                              <Copy size={11} />
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <span className="text-gray-400">Jeu :</span>
-                          <span className="font-semibold text-white flex items-center gap-1">
-                            <Gamepad2 size={12} className="text-amber-400" />
-                            {b.game}
-                          </span>
-                        </div>
-
-                        {b.notes && (
-                          <div className="pt-2 border-t border-white/5">
-                            <span className="text-[10px] text-gray-400 block mb-0.5">Objectifs :</span>
-                            <p className="text-gray-300 italic text-[11px] line-clamp-2">"{b.notes}"</p>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Actions */}
-                      <div className="pt-2 border-t border-white/10 flex items-center justify-between gap-2">
-                        {b.status !== 'cancelled' && b.status !== 'completed' && (
-                          <>
-                            <button
-                              type="button"
-                              disabled={isActionLoading}
-                              onClick={() => {
-                                setRescheduleBooking(b);
-                                setRescheduleDate(b.booking_date);
-                                setRescheduleTime(b.booking_time);
-                              }}
-                              className="flex-1 py-1.5 bg-[#CA1C30]/15 border border-[#CA1C30]/30 text-xs font-semibold text-[#CA1C30]/80 hover:bg-[#CA1C30]/30 hover:text-white transition-colors flex items-center justify-center gap-1 cursor-pointer"
-                            >
-                              <Edit2 size={13} />
-                              <span>Reporter</span>
-                            </button>
-
-                            <button
-                              type="button"
-                              disabled={isActionLoading}
-                              onClick={() => handleCompleteBooking(b.id)}
-                              className="p-1.5 bg-green-500/15 border border-green-500/30 text-xs font-semibold text-green-400 hover:bg-green-500/30 transition-colors cursor-pointer"
-                              title="Marquer comme terminée (libère le créneau du planning)"
-                            >
-                              <CheckCircle2 size={15} />
-                            </button>
-
-                            <button
-                              type="button"
-                              disabled={isActionLoading}
-                              onClick={() => {
-                                setCancelModalBooking(b);
-                                setCancelReasonInput('Annulée par le coach depuis le panneau admin.');
-                              }}
-                              className="p-1.5 bg-red-500/15 border border-red-500/30 text-xs font-semibold text-red-400 hover:bg-red-500/30 transition-colors cursor-pointer"
-                              title="Annuler la séance (libère le créneau et retire du profil élève)"
-                            >
-                              <Trash2 size={15} />
-                            </button>
-                          </>
-                        )}
-
-                        {(b.status === 'cancelled' || b.status === 'completed') && (
-                          <span className="text-xs text-gray-400 font-medium italic w-full text-center py-1">
-                            Séance {b.status === 'completed' ? '✓ Effectuée & Terminée' : '✕ Annulée'}
-                          </span>
-                        )}
-                      </div>
+              <div className="space-y-10">
+                {/* Section 1 : Séances actuelles & à venir */}
+                <div>
+                  <div className="flex items-center justify-between mb-4 pb-2 border-b border-white/5">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2.5 h-2.5 rounded-full bg-[#00B4A0] shadow-[0_0_8px_rgba(0,180,160,0.6)] animate-pulse" />
+                      <h3 className="text-sm font-black tracking-wider uppercase text-white font-mono">
+                        Séances actuelles & à venir
+                      </h3>
+                      <span className="px-2 py-0.5 text-xs font-bold bg-[#00B4A0]/20 text-[#00B4A0] rounded-sm">
+                        {upcomingBookings.length}
+                      </span>
                     </div>
-                  );
-                })}
+                    <span className="text-[11px] text-gray-400 font-mono hidden sm:inline-block">
+                      À honorer en priorité
+                    </span>
+                  </div>
+
+                  {upcomingBookings.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {upcomingBookings.map((b) => renderBookingCard(b))}
+                    </div>
+                  ) : (
+                    <div className="p-8 border border-dashed border-white/10 text-center text-gray-400 bg-white/[0.01]">
+                      <p className="text-xs text-gray-400">Aucune séance actuelle ou à venir pour le moment.</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Ligne de séparation */}
+                <div className="relative py-2">
+                  <div className="absolute inset-0 flex items-center" aria-hidden="true">
+                    <div className="w-full border-t border-white/10" />
+                  </div>
+                  <div className="relative flex justify-center">
+                    <span className="px-4 py-1.5 text-xs font-bold font-mono uppercase tracking-widest bg-[#0B0A0D] border border-white/10 text-gray-400 flex items-center gap-2 shadow-lg">
+                      <Clock size={13} className="text-[#CA1C30]" />
+                      Anciennes séances & Historique ({pastBookings.length})
+                    </span>
+                  </div>
+                </div>
+
+                {/* Section 2 : Anciennes séances */}
+                <div>
+                  {pastBookings.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {pastBookings.map((b) => renderBookingCard(b))}
+                    </div>
+                  ) : (
+                    <div className="p-8 border border-dashed border-white/10 text-center text-gray-400 bg-white/[0.01]">
+                      <p className="text-xs text-gray-400">Aucune ancienne séance dans cette vue.</p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
