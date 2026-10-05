@@ -17,7 +17,7 @@ export default function CyberAbout({ onOpenBooking }: CyberAboutProps) {
               QUI EST <span className="text-[#CA1C30]">POULPY ?</span>
             </h2>
             <p className="text-xs sm:text-sm text-[#F5F4F0]/60 max-w-xl leading-relaxed">
-              Coach officiel Atheris Esport, joueur de haut niveau et formateur.
+              Head Coach VRC pour Atheris Esport, joueur de haut niveau et formateur.
             </p>
           </div>
         </div>
@@ -37,7 +37,7 @@ export default function CyberAbout({ onOpenBooking }: CyberAboutProps) {
               <div className="absolute inset-0 bg-gradient-to-t from-[#0B0A0D]/90 via-transparent to-transparent pointer-events-none" />
               <div className="absolute bottom-5 left-5 z-10 pointer-events-none">
                 <span className="glitch-text font-bold text-xs uppercase tracking-wider text-[#F5F4F0]">
-                  COACH EN LIGNE
+                  HEAD COACH VRC
                 </span>
               </div>
             </div>
@@ -47,11 +47,16 @@ export default function CyberAbout({ onOpenBooking }: CyberAboutProps) {
           <div className="lg:col-span-7 space-y-6">
             <div className="space-y-3">
               <h3 className="text-3xl sm:text-4xl font-display text-[#F5F4F0] tracking-wider">
-                PASSIONNÉ ET EXIGEANT.
+                FORMÉ, PASSIONNÉ ET EXIGEANT.
               </h3>
-              <p className="text-xs sm:text-sm text-[#F5F4F0]/75 leading-relaxed">
-                Coach officiel Atheris Esport avec 6 ans d&apos;expérience dans l&apos;analyse de jeu, la visée et la prise de décision. Mon objectif : te transmettre une méthode claire et applicable immédiatement.
-              </p>
+              <div className="space-y-3 text-xs sm:text-sm text-[#F5F4F0]/75 leading-relaxed font-sans">
+                <p>
+                  Coach officiel pour Atheris Esport, 5 ans d&apos;expérience sur des FPS compétitifs (Predator Apex, Immo2 Valorant, Grand Master Overwatch) et aim trainer addict (+ de 1000h sur les aim trainers). Actuellement en licence STAPS entraînement sportif et ayant été au plus proche du haut-niveau sportif à l&apos;INSEP (Institut National du Sport de l&apos;Expertise et de la Performance), j&apos;ai pu m&apos;approprier les méthodes d&apos;optimisation de la performance dans le domaine du sport et les adapter à la scène E-Sportive.
+                </p>
+                <p>
+                  Mon objectif : vous transmettre les méthodes qui m&apos;ont permis d&apos;arriver au top niveau sur plusieurs FPS ainsi que l&apos;expérience accumulée des équipes que j&apos;ai suivies sur les circuits compétitifs Valorant et Apex pour <span className="text-[#F5F4F0] font-semibold">VOUS</span> permettre d&apos;atteindre le niveau dont vous rêvez.
+                </p>
+              </div>
             </div>
 
             {/* Achievements - Version épurée alignée à la DA */}
@@ -61,34 +66,34 @@ export default function CyberAbout({ onOpenBooking }: CyberAboutProps) {
                   ATHERIS ESPORT
                 </div>
                 <div className="text-[11px] text-[#F5F4F0]/50 font-mono">
-                  Coach officiel
+                  Head Coach VRC
                 </div>
               </div>
 
               <div className="space-y-1 sm:pl-4 sm:border-l sm:border-white/10">
                 <div className="text-[#00B4A0] font-display font-bold text-sm tracking-wider uppercase">
-                  +120 ÉLÈVES
+                  5 ANS D&apos;EXP
                 </div>
                 <div className="text-[11px] text-[#F5F4F0]/50 font-mono">
-                  98.4% satisfaction
+                  Sur les FPS compétitifs
                 </div>
               </div>
 
               <div className="space-y-1 sm:pl-4 sm:border-l sm:border-white/10">
-                <div className="text-[#F5F4F0] font-display font-bold text-sm tracking-wider uppercase">
-                  VOLTAIC JADE
+                <div className="text-[#CA1C30] font-display font-bold text-sm tracking-wider uppercase">
+                  1 AN À L&apos;INSEP
                 </div>
                 <div className="text-[11px] text-[#F5F4F0]/50 font-mono">
-                  Top 0.1% visée pure
+                  Méthode haut-niveau sportif
                 </div>
               </div>
 
               <div className="space-y-1 sm:pl-4 sm:border-l sm:border-white/10">
                 <div className="text-[#00B4A0] font-display font-bold text-sm tracking-wider uppercase">
-                  IMMO 2 / PREDATOR
+                  IMMO 2 / PRED / GM
                 </div>
                 <div className="text-[11px] text-[#F5F4F0]/50 font-mono">
-                  Top rank atteint
+                  Top rank sur les FPS
                 </div>
               </div>
             </div>
