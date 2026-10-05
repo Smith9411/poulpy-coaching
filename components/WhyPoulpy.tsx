@@ -80,7 +80,7 @@ function PillarLargeVideo({
   return (
     <div
       onClick={togglePlay}
-      className="relative w-full aspect-video bg-black rounded-xl sm:rounded-3xl transition-all duration-300 flex flex-col items-center justify-center overflow-hidden group/video cursor-pointer select-none shadow-xl sm:shadow-2xl shadow-black/80"
+      className="relative w-full aspect-video bg-black rounded-2xl sm:rounded-3xl transition-all duration-300 flex flex-col items-center justify-center overflow-hidden group/video cursor-pointer select-none shadow-2xl shadow-black/80"
     >
       <video
         ref={videoRef}
@@ -88,17 +88,15 @@ function PillarLargeVideo({
         loop
         muted
         playsInline
-        disablePictureInPicture
-        disableRemotePlayback
-        preload={isActive && isSectionInView ? "metadata" : "none"}
+        preload="metadata"
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
         className="w-full h-full object-cover"
       />
 
-      {/* Subtle CRT Old TV Scanlines Texture Overlay — disabled on mobile to prevent GPU compositing lag */}
+      {/* Subtle CRT Old TV Scanlines Texture Overlay */}
       <div
-        className="absolute inset-0 pointer-events-none z-[5] hidden sm:block"
+        className="absolute inset-0 pointer-events-none z-[5]"
         style={{
           background:
             "repeating-linear-gradient(to bottom, transparent 0px, transparent 3px, rgba(0, 0, 0, 0.22) 3px, rgba(0, 0, 0, 0.22) 4px)",
@@ -111,11 +109,11 @@ function PillarLargeVideo({
       {!isPlaying && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px] z-10">
           <div
-            className={`w-11 h-11 sm:w-14 sm:h-14 rounded-full ${
+            className={`w-14 h-14 rounded-full ${
               isAcid ? "bg-[#CA1C30]" : "bg-[#00B4A0]"
             } text-black flex items-center justify-center shadow-lg shadow-black/80`}
           >
-            <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-current ml-0.5 sm:ml-1" />
+            <Play className="w-6 h-6 fill-current ml-1" />
           </div>
         </div>
       )}
@@ -212,9 +210,8 @@ export default function WhyPoulpy() {
         ctx.revert();
       }
 
-      const isTouch = typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0);
-      const maxScroll = Math.max(0, track.scrollWidth - window.innerWidth + (isTouch ? 40 : 80));
-      const totalScrollDistance = Math.max(isTouch ? 1400 : 2000, maxScroll * (isTouch ? 1.2 : 1.5));
+      const maxScroll = Math.max(0, track.scrollWidth - window.innerWidth + 80);
+      const totalScrollDistance = Math.max(2000, maxScroll * 1.5);
       scrollDistanceRef.current = totalScrollDistance;
 
       ctx = gsap.context(() => {
@@ -228,8 +225,7 @@ export default function WhyPoulpy() {
             pinSpacing: true,
             start: "top top",
             end: () => `+=${totalScrollDistance}`,
-            scrub: isTouch ? 0.2 : 0.6,
-            fastScrollEnd: true,
+            scrub: 0.6,
             invalidateOnRefresh: true,
             onUpdate: (self: { progress: number }) => {
               const progress = self.progress;
@@ -321,7 +317,7 @@ export default function WhyPoulpy() {
             return (
               <div
                 key={item.num}
-                className="w-[90vw] xs:w-[88vw] sm:w-[860px] lg:w-[980px] xl:w-[1060px] h-[520px] sm:h-[530px] lg:h-[540px] max-h-[76vh] sm:max-h-[80vh] shrink-0 rounded-2xl sm:rounded-3xl bg-[#121117] lg:bg-[#121117]/85 lg:backdrop-blur-md p-4 sm:p-6 lg:p-12 flex flex-col justify-between transition-colors relative shadow-xl lg:shadow-2xl shadow-black/80 overflow-hidden"
+                className="w-[90vw] xs:w-[88vw] sm:w-[860px] lg:w-[980px] xl:w-[1060px] h-[520px] sm:h-[530px] lg:h-[540px] max-h-[76vh] sm:max-h-[80vh] shrink-0 rounded-2xl sm:rounded-3xl bg-[#121117]/85 backdrop-blur-md p-4 sm:p-6 lg:p-12 flex flex-col justify-between transition-colors relative shadow-2xl shadow-black/80 overflow-hidden"
               >
                 {/* Header inside module */}
                 <div className="flex items-center justify-between border-b border-white/10 pb-2.5 sm:pb-4 shrink-0">
@@ -411,7 +407,7 @@ export default function WhyPoulpy() {
           })}
 
           {/* Closing Action Rectangle */}
-          <div className="w-[85vw] sm:w-[500px] h-[520px] sm:h-[530px] lg:h-[540px] max-h-[76vh] sm:max-h-[80vh] shrink-0 rounded-2xl sm:rounded-3xl bg-[#121117] lg:bg-black/60 lg:backdrop-blur-md p-6 sm:p-8 lg:p-12 flex flex-col justify-between relative shadow-xl lg:shadow-2xl shadow-black/90 overflow-hidden">
+          <div className="w-[85vw] sm:w-[500px] h-[520px] sm:h-[530px] lg:h-[540px] max-h-[76vh] sm:max-h-[80vh] shrink-0 rounded-2xl sm:rounded-3xl bg-black/60 backdrop-blur-md p-6 sm:p-8 lg:p-12 flex flex-col justify-between relative shadow-2xl shadow-black/90 overflow-hidden">
             <div className="space-y-4">
               <h3 className="text-2xl sm:text-4xl font-display font-bold text-white tracking-tight leading-tight">
                 PRÊT À PASSER LE PALIER ?
