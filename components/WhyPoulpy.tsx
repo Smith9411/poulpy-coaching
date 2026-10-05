@@ -292,12 +292,12 @@ export default function WhyPoulpy() {
     >
       <div
         ref={pinnedContainerRef}
-        className="relative w-full h-screen overflow-hidden flex flex-col justify-center pt-2 sm:pt-4 pb-2 sm:pb-4"
+        className="relative w-full min-h-[100dvh] h-screen overflow-hidden flex flex-col justify-center pt-4 sm:pt-6 lg:pt-8 pb-4 sm:pb-6"
       >
-        {/* Grand Titre de Catégorie — monté pour centrer la lettre */}
-        <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 mb-6 sm:mb-8 md:mb-10 -translate-y-6 sm:-translate-y-7 md:-translate-y-8 shrink-0 z-20">
-          <h2 className="text-3xl sm:text-5xl md:text-6xl font-display text-[#F5F4F0] tracking-wider uppercase">
-            UNE APPROCHE EN <span className="text-[#CA1C30]">3 PILIERS</span>
+        {/* Grand Titre de Catégorie — responsive et safe margin */}
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 mb-4 sm:mb-6 md:mb-8 shrink-0 z-20">
+          <h2 className="text-[clamp(1.75rem,4.2vw,3.75rem)] font-display text-[#F5F4F0] tracking-wider uppercase leading-none sm:leading-tight">
+            UNE APPROCHE EN <span className="text-[#CA1C30] inline-block whitespace-nowrap">3 PILIERS</span>
           </h2>
         </div>
 
@@ -317,7 +317,7 @@ export default function WhyPoulpy() {
             return (
               <div
                 key={item.num}
-                className="w-[92vw] sm:w-[860px] lg:w-[980px] xl:w-[1060px] h-[520px] sm:h-[540px] shrink-0 rounded-3xl bg-[#121117]/85 backdrop-blur-md p-8 sm:p-10 lg:p-12 flex flex-col justify-between transition-colors relative shadow-2xl shadow-black/80 overflow-hidden"
+                className="w-[92vw] sm:w-[860px] lg:w-[980px] xl:w-[1060px] h-[480px] sm:h-[510px] lg:h-[540px] max-h-[66vh] shrink-0 rounded-3xl bg-[#121117]/85 backdrop-blur-md p-6 sm:p-8 lg:p-12 flex flex-col justify-between transition-colors relative shadow-2xl shadow-black/80 overflow-hidden"
               >
                 {/* Header inside module */}
                 <div className="flex items-center justify-between border-b border-white/10 pb-4">
@@ -402,7 +402,7 @@ export default function WhyPoulpy() {
           })}
 
           {/* Closing Action Rectangle */}
-          <div className="w-[85vw] sm:w-[500px] h-[520px] sm:h-[540px] shrink-0 rounded-3xl bg-black/60 backdrop-blur-md p-8 sm:p-12 flex flex-col justify-between relative shadow-2xl shadow-black/90 overflow-hidden">
+          <div className="w-[85vw] sm:w-[500px] h-[480px] sm:h-[510px] lg:h-[540px] max-h-[66vh] shrink-0 rounded-3xl bg-black/60 backdrop-blur-md p-6 sm:p-8 lg:p-12 flex flex-col justify-between relative shadow-2xl shadow-black/90 overflow-hidden">
             <div className="space-y-4">
               <h3 className="text-3xl sm:text-4xl font-display font-bold text-white tracking-tight leading-tight">
                 PRÊT À PASSER LE PALIER ?
