@@ -80,7 +80,7 @@ function PillarLargeVideo({
   return (
     <div
       onClick={togglePlay}
-      className="relative w-full aspect-video bg-black rounded-2xl sm:rounded-3xl transition-all duration-300 flex flex-col items-center justify-center overflow-hidden group/video cursor-pointer select-none shadow-2xl shadow-black/80"
+      className="relative w-full aspect-video bg-black rounded-xl sm:rounded-3xl transition-all duration-300 flex flex-col items-center justify-center overflow-hidden group/video cursor-pointer select-none shadow-xl sm:shadow-2xl shadow-black/80"
     >
       <video
         ref={videoRef}
@@ -88,15 +88,17 @@ function PillarLargeVideo({
         loop
         muted
         playsInline
-        preload="metadata"
+        disablePictureInPicture
+        disableRemotePlayback
+        preload={isActive && isSectionInView ? "metadata" : "none"}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
         className="w-full h-full object-cover"
       />
 
-      {/* Subtle CRT Old TV Scanlines Texture Overlay */}
+      {/* Subtle CRT Old TV Scanlines Texture Overlay — disabled on mobile to prevent GPU compositing lag */}
       <div
-        className="absolute inset-0 pointer-events-none z-[5]"
+        className="absolute inset-0 pointer-events-none z-[5] hidden sm:block"
         style={{
           background:
             "repeating-linear-gradient(to bottom, transparent 0px, transparent 3px, rgba(0, 0, 0, 0.22) 3px, rgba(0, 0, 0, 0.22) 4px)",
@@ -109,11 +111,11 @@ function PillarLargeVideo({
       {!isPlaying && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px] z-10">
           <div
-            className={`w-14 h-14 rounded-full ${
+            className={`w-11 h-11 sm:w-14 sm:h-14 rounded-full ${
               isAcid ? "bg-[#CA1C30]" : "bg-[#00B4A0]"
             } text-black flex items-center justify-center shadow-lg shadow-black/80`}
           >
-            <Play className="w-6 h-6 fill-current ml-1" />
+            <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-current ml-0.5 sm:ml-1" />
           </div>
         </div>
       )}
@@ -210,8 +212,9 @@ export default function WhyPoulpy() {
         ctx.revert();
       }
 
-      const maxScroll = Math.max(0, track.scrollWidth - window.innerWidth + 80);
-      const totalScrollDistance = Math.max(2000, maxScroll * 1.5);
+      const isTouch = typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+      const maxScroll = Math.max(0, track.scrollWidth - window.innerWidth + (isTouch ? 40 : 80));
+      const totalScrollDistance = Math.max(isTouch ? 1400 : 2000, maxScroll * (isTouch ? 1.2 : 1.5));
       scrollDistanceRef.current = totalScrollDistance;
 
       ctx = gsap.context(() => {
@@ -225,7 +228,8 @@ export default function WhyPoulpy() {
             pinSpacing: true,
             start: "top top",
             end: () => `+=${totalScrollDistance}`,
-            scrub: 0.6,
+            scrub: isTouch ? 0.2 : 0.6,
+            fastScrollEnd: true,
             invalidateOnRefresh: true,
             onUpdate: (self: { progress: number }) => {
               const progress = self.progress;
@@ -317,17 +321,17 @@ export default function WhyPoulpy() {
             return (
               <div
                 key={item.num}
-                className="w-[92vw] sm:w-[860px] lg:w-[980px] xl:w-[1060px] h-[480px] sm:h-[510px] lg:h-[540px] max-h-[66vh] shrink-0 rounded-3xl bg-[#121117]/85 backdrop-blur-md p-6 sm:p-8 lg:p-12 flex flex-col justify-between transition-colors relative shadow-2xl shadow-black/80 overflow-hidden"
+                className="w-[90vw] xs:w-[88vw] sm:w-[860px] lg:w-[980px] xl:w-[1060px] h-[520px] sm:h-[530px] lg:h-[540px] max-h-[76vh] sm:max-h-[80vh] shrink-0 rounded-2xl sm:rounded-3xl bg-[#121117] lg:bg-[#121117]/85 lg:backdrop-blur-md p-4 sm:p-6 lg:p-12 flex flex-col justify-between transition-colors relative shadow-xl lg:shadow-2xl shadow-black/80 overflow-hidden"
               >
                 {/* Header inside module */}
-                <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                  <div className="flex items-center gap-3">
-                    <span className="text-[11px] font-mono text-white/40 tracking-widest uppercase">
+                <div className="flex items-center justify-between border-b border-white/10 pb-2.5 sm:pb-4 shrink-0">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <span className="text-[10px] sm:text-[11px] font-mono text-white/40 tracking-widest uppercase">
                       {item.code}
                     </span>
                     <span className="text-white/20 font-mono">|</span>
                     <span
-                      className={`text-xs font-mono font-bold tracking-wider uppercase px-3 py-1 rounded-full ${
+                      className={`text-[10px] sm:text-xs font-mono font-bold tracking-wider uppercase px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full ${
                         isAcid ? "text-[#CA1C30] bg-[#CA1C30]/10" : "text-[#00B4A0] bg-[#00B4A0]/10"
                       }`}
                     >
@@ -337,33 +341,50 @@ export default function WhyPoulpy() {
 
                   {/* Ghost number badge */}
                   <div className="flex items-center">
-                    <span className="font-display text-2xl sm:text-3xl font-bold tracking-tighter text-white/30">
+                    <span className="font-display text-xl sm:text-3xl font-bold tracking-tighter text-white/30">
                       {item.num}
                     </span>
                   </div>
                 </div>
 
-                {/* Main 2-Column Split inside the wide rectangle */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center my-auto py-2">
-                  {/* Left Column (Text & Telemetry) */}
-                  <div className="lg:col-span-5 space-y-4">
-                    <div className="space-y-1.5">
-                      <h3 className="text-2xl sm:text-3xl font-display font-bold text-[#F5F4F0] tracking-tight">
+                {/* Main Content: on mobile, Video is on top so it is NEVER cut off at the bottom! On desktop, 2-column side by side */}
+                <div className="flex flex-col lg:grid lg:grid-cols-12 gap-3 sm:gap-6 lg:gap-10 items-center my-auto py-1 sm:py-2">
+                  {/* Video Stage — full 16:9 aspect ratio, prominently placed */}
+                  <div className="w-full lg:col-span-7 order-1 lg:order-2 shrink-0">
+                    <PillarLargeVideo
+                      videoSrc={item.videoSrc}
+                      clipTitle={item.clipTitle}
+                      clipSubtitle={item.clipSubtitle}
+                      isActive={isMediaActive}
+                      isSectionInView={isSectionInView}
+                      accentColor={item.color}
+                    />
+                  </div>
+
+                  {/* Text & Telemetry Stage */}
+                  <div className="w-full lg:col-span-5 space-y-2 sm:space-y-3 lg:space-y-4 order-2 lg:order-1">
+                    <div className="space-y-0.5 sm:space-y-1.5">
+                      <h3 className="text-base sm:text-2xl lg:text-3xl font-display font-bold text-[#F5F4F0] tracking-tight">
                         {item.title}
                       </h3>
-                      <div className="text-xs font-mono text-white/60 tracking-wider">
+                      <div className="text-[10px] sm:text-xs font-mono text-white/60 tracking-wider">
                         {item.subtitle}
                       </div>
                     </div>
 
-                    <p className="text-xs sm:text-sm text-white/70 font-sans leading-relaxed">
+                    <p className="text-[11px] sm:text-xs lg:text-sm text-white/70 font-sans leading-relaxed line-clamp-2 sm:line-clamp-3 lg:line-clamp-none">
                       {item.description}
                     </p>
 
                     {/* Swiss Telemetry Spec Readout with internal lines */}
-                    <div className="space-y-2 pt-3 border-t border-white/10 font-mono text-xs">
+                    <div className="space-y-1 sm:space-y-2 pt-2 sm:pt-3 border-t border-white/10 font-mono text-xs">
                       {item.specs.map((s, sIdx) => (
-                        <div key={sIdx} className="flex items-center justify-between gap-3 text-[11px]">
+                        <div
+                          key={sIdx}
+                          className={`items-center justify-between gap-2 sm:gap-3 text-[10px] sm:text-[11px] ${
+                            sIdx >= 2 ? "hidden sm:flex" : "flex"
+                          }`}
+                        >
                           <span className="text-white/80 uppercase tracking-wider flex items-center gap-1.5 truncate">
                             <span className="w-1.5 h-1.5 bg-[#CA1C30] rounded-full shrink-0" />
                             {s.label}
@@ -384,27 +405,15 @@ export default function WhyPoulpy() {
                       ))}
                     </div>
                   </div>
-
-                  {/* Right Column (Cinematic Video Stage) */}
-                  <div className="lg:col-span-7">
-                    <PillarLargeVideo
-                      videoSrc={item.videoSrc}
-                      clipTitle={item.clipTitle}
-                      clipSubtitle={item.clipSubtitle}
-                      isActive={isMediaActive}
-                      isSectionInView={isSectionInView}
-                      accentColor={item.color}
-                    />
-                  </div>
                 </div>
               </div>
             );
           })}
 
           {/* Closing Action Rectangle */}
-          <div className="w-[85vw] sm:w-[500px] h-[480px] sm:h-[510px] lg:h-[540px] max-h-[66vh] shrink-0 rounded-3xl bg-black/60 backdrop-blur-md p-6 sm:p-8 lg:p-12 flex flex-col justify-between relative shadow-2xl shadow-black/90 overflow-hidden">
+          <div className="w-[85vw] sm:w-[500px] h-[520px] sm:h-[530px] lg:h-[540px] max-h-[76vh] sm:max-h-[80vh] shrink-0 rounded-2xl sm:rounded-3xl bg-[#121117] lg:bg-black/60 lg:backdrop-blur-md p-6 sm:p-8 lg:p-12 flex flex-col justify-between relative shadow-xl lg:shadow-2xl shadow-black/90 overflow-hidden">
             <div className="space-y-4">
-              <h3 className="text-3xl sm:text-4xl font-display font-bold text-white tracking-tight leading-tight">
+              <h3 className="text-2xl sm:text-4xl font-display font-bold text-white tracking-tight leading-tight">
                 PRÊT À PASSER LE PALIER ?
               </h3>
               <p className="text-xs sm:text-sm text-white/70 font-sans leading-relaxed">
@@ -415,7 +424,7 @@ export default function WhyPoulpy() {
             <div className="pt-4 border-t border-white/10">
               <a
                 href="#booking"
-                className="btn-cyber-primary w-full justify-center text-xs py-4 rounded-full cursor-pointer font-bold tracking-wider"
+                className="btn-cyber-primary w-full justify-center text-xs py-3.5 sm:py-4 rounded-full cursor-pointer font-bold tracking-wider"
               >
                 <span>ENGAGER LE COACHING</span>
               </a>
