@@ -192,6 +192,8 @@ export default function AdminCoaching() {
   const renderStudentCard = (student: StudentRow, isActiveTab: boolean) => {
     const hasUnread = student.unreadCount > 0;
     const isToggling = togglingId === student.id;
+    const displayName = student.discord || student.username;
+    const displayInitial = (displayName || '?').charAt(0).toUpperCase();
 
     return (
       <div
@@ -217,7 +219,7 @@ export default function AdminCoaching() {
               }`}>
                 <img
                   src={student.avatarUrl}
-                  alt={student.username}
+                  alt={displayName}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -229,7 +231,7 @@ export default function AdminCoaching() {
                   ? 'bg-[#00B4A0]/20 text-[#00B4A0] border border-[#00B4A0]/40'
                   : 'bg-white/10 text-gray-300 border border-white/20'
               }`}>
-                {student.initial}
+                {displayInitial}
               </div>
             )}
             {hasUnread && (
@@ -244,8 +246,30 @@ export default function AdminCoaching() {
             <div className="flex items-center justify-between gap-2 mb-1 flex-wrap">
               <div className="flex items-center gap-2 flex-wrap min-w-0">
                 <span className={`font-bold text-lg truncate ${hasUnread ? 'text-white' : ''}`}>
-                  {student.username}
+                  {displayName}
                 </span>
+                {student.discord && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      navigator.clipboard.writeText(student.discord!);
+                      setCopiedDiscordId(student.id);
+                      setTimeout(() => setCopiedDiscordId(null), 2000);
+                    }}
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-mono font-semibold bg-[#5865F2]/15 border border-[#5865F2]/30 text-[#5865F2] hover:bg-[#5865F2]/30 hover:text-white transition-colors cursor-pointer"
+                    title="Copier le pseudo Discord de l'élève"
+                  >
+                    <MessageSquare size={11} className="shrink-0" />
+                    <span>Discord</span>
+                    {copiedDiscordId === student.id ? (
+                      <Check size={11} className="text-emerald-400" />
+                    ) : (
+                      <Copy size={10} className="opacity-70" />
+                    )}
+                  </button>
+                )}
                 {student.inCoaching ? (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[10px] font-semibold">
                     <Sparkles size={10} />
@@ -273,35 +297,17 @@ export default function AdminCoaching() {
                 <span>Fiche perso</span>
               </Link>
             </div>
-            <div className="text-sm text-gray-400 flex items-center gap-2 mb-1">
-              <Mail size={14} />
+            <div className="text-sm text-gray-400 flex items-center gap-2 mb-1 flex-wrap">
+              <Mail size={14} className="shrink-0" />
               <span className="truncate">{student.email}</span>
+              {student.discord && student.username && student.username.toLowerCase() !== student.discord.toLowerCase() && (
+                <span className="text-xs text-gray-500">
+                  · pseudo site : <span className="text-gray-400 font-medium">{student.username}</span>
+                </span>
+              )}
             </div>
-            {student.discord ? (
-              <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-[#5865F2] bg-[#5865F2]/10 border border-[#5865F2]/25 px-2 py-0.5 rounded w-fit mb-1.5">
-                <MessageSquare size={12} className="text-[#5865F2] shrink-0" />
-                <span className="truncate">{student.discord}</span>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    navigator.clipboard.writeText(student.discord!);
-                    setCopiedDiscordId(student.id);
-                    setTimeout(() => setCopiedDiscordId(null), 2000);
-                  }}
-                  className="p-0.5 hover:text-white transition-colors cursor-pointer ml-1 text-[#5865F2]/80 hover:text-white"
-                  title="Copier le pseudo Discord de l'élève"
-                >
-                  {copiedDiscordId === student.id ? (
-                    <Check size={11} className="text-emerald-400" />
-                  ) : (
-                    <Copy size={11} />
-                  )}
-                </button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-1.5 text-xs font-mono text-gray-500 mb-1.5">
+            {!student.discord && (
+              <div className="flex items-center gap-1.5 text-xs font-mono text-gray-500 mb-1">
                 <MessageSquare size={12} className="text-gray-600 shrink-0" />
                 <span className="italic text-[11px]">Discord non renseigné</span>
               </div>
@@ -349,7 +355,7 @@ export default function AdminCoaching() {
               <button
                 type="button"
                 disabled={isToggling}
-                onClick={() => toggleCoachingStatus(student.id, true, student.username)}
+                onClick={() => toggleCoachingStatus(student.id, true, displayName)}
                 className="w-full inline-flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-mono font-medium text-gray-400 hover:text-white bg-white/5 hover:bg-red-500/15 border border-white/10 hover:border-red-500/30 transition-colors cursor-pointer disabled:opacity-50"
                 title="Marquer le coaching comme terminé : l'élève sort des coachings en cours, mais sa fiche et son historique restent conservés intacts."
               >
@@ -364,7 +370,7 @@ export default function AdminCoaching() {
               <button
                 type="button"
                 disabled={isToggling}
-                onClick={() => toggleCoachingStatus(student.id, false, student.username)}
+                onClick={() => toggleCoachingStatus(student.id, false, displayName)}
                 className="w-full inline-flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-mono font-medium text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 transition-colors cursor-pointer disabled:opacity-50"
                 title="Remettre cet élève dans la liste des coachings en cours."
               >

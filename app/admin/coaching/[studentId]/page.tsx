@@ -533,14 +533,19 @@ export default function StudentCoachingPage() {
           </div>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold mb-2">Chat avec {student?.username}</h1>
+              <h1 className="text-3xl font-bold mb-2">Chat avec {student?.discord || student?.username}</h1>
               <div className="text-gray-400 flex items-center gap-3 text-sm flex-wrap">
-                <span className="flex items-center gap-1.5"><Mail size={14} /> {student?.email}</span>
                 {student?.discord && (
                   <span className="inline-flex items-center gap-1.5 text-[#5865F2] font-mono font-bold bg-[#5865F2]/10 border border-[#5865F2]/30 px-2 py-0.5 rounded text-xs">
                     <MessageSquare size={12} /> {student.discord}
                   </span>
                 )}
+                {student?.discord && student?.username && student.username.toLowerCase() !== student.discord.toLowerCase() && (
+                  <span className="text-xs text-gray-400">
+                    compte : <strong className="text-gray-300 font-semibold">{student.username}</strong>
+                  </span>
+                )}
+                <span className="flex items-center gap-1.5"><Mail size={14} /> {student?.email}</span>
                 <span>· Inscrit le {student && new Date(student.createdAt).toLocaleDateString('fr-FR')}</span>
               </div>
             </div>

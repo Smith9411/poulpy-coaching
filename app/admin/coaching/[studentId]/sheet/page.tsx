@@ -29,6 +29,7 @@ interface StudentProfile {
   initial: string;
   createdAt: string;
   inCoaching: boolean;
+  discord?: string | null;
 }
 
 export default function StudentSheetPage() {
@@ -99,6 +100,7 @@ export default function StudentSheetPage() {
         initial: p.initial || p.username.charAt(0).toUpperCase(),
         createdAt: p.createdAt || new Date().toISOString(),
         inCoaching: p.inCoaching === true,
+        discord: p.discord || null,
       });
 
       // 2. Charger la fiche
@@ -676,19 +678,24 @@ USING (student_id = auth.uid());`;
             {student?.avatarUrl ? (
               <img
                 src={student.avatarUrl}
-                alt={student.username}
+                alt={student.discord || student.username}
                 className="w-16 h-16 object-cover border-2 border-[#CA1C30]/40 shadow-lg"
               />
             ) : (
               <div className="w-16 h-16 bg-[#CA1C30] flex items-center justify-center text-black text-2xl font-black shadow-lg">
-                {student?.initial}
+                {(student?.discord || student?.username || student?.initial || '?').charAt(0).toUpperCase()}
               </div>
             )}
             <div className="min-w-0">
               <div className="flex items-center gap-2.5 flex-wrap">
                 <h1 className="text-2xl sm:text-3xl font-bold text-white truncate">
-                  {student?.username}
+                  {student?.discord || student?.username}
                 </h1>
+                {student?.discord && (
+                  <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-mono font-bold bg-[#5865F2]/20 border border-[#5865F2]/35 text-[#5865F2]">
+                    <MessageSquare size={12} /> {student.discord}
+                  </span>
+                )}
                 {student?.inCoaching ? (
                   <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-semibold">
                     <Sparkles size={12} />
@@ -727,6 +734,11 @@ USING (student_id = auth.uid());`;
                 </button>
               </div>
               <div className="flex items-center gap-4 text-xs sm:text-sm text-gray-400 mt-1 flex-wrap">
+                {student?.discord && student?.username && student.username.toLowerCase() !== student.discord.toLowerCase() && (
+                  <span>
+                    Compte site : <strong className="text-gray-300 font-medium">{student.username}</strong>
+                  </span>
+                )}
                 <span className="flex items-center gap-1.5">
                   <Mail size={14} />
                   {student?.email}
