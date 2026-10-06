@@ -361,6 +361,39 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ success: true, booking: updated });
     }
 
+    // ── 3.bis ACTION : ROUVRIR (REMETTRE EN COURS / NON TERMINÉE) ───────────
+    if (action === 'reopen' || action === 'uncomplete') {
+      const { data: updated, error: updateErr } = await supabase
+        .from('coaching_bookings')
+        .update({
+          status: 'confirmed',
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', bookingId)
+        .select()
+        .single();
+
+      if (updateErr) {
+        return NextResponse.json({ error: updateErr.message }, { status: 500 });
+      }
+
+      // Re-bloquer le créneau associé s'il existe
+      if (currentBooking.slot_id) {
+        await supabase
+          .from('coaching_slots')
+          .update({ is_booked: true, updated_at: new Date().toISOString() })
+          .eq('id', currentBooking.slot_id);
+      } else if (currentBooking.booking_date && currentBooking.booking_time) {
+        await supabase
+          .from('coaching_slots')
+          .update({ is_booked: true, updated_at: new Date().toISOString() })
+          .eq('date', currentBooking.booking_date)
+          .eq('start_time', currentBooking.booking_time);
+      }
+
+      return NextResponse.json({ success: true, booking: updated });
+    }
+
     // ── 4. ACTION : MARQUER COMME LU ───────────────────────────────────────
     if (action === 'mark_read') {
       const { data: updated, error: updateErr } = await supabase

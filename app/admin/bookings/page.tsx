@@ -407,6 +407,39 @@ export default function AdminBookingsPage() {
     }
   };
 
+  // Action Admin : Remettre une séance terminée en cours (rouvrir)
+  const handleReopenBooking = async (bookingId: string) => {
+    setActionLoadingId(bookingId);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) return;
+
+      const res = await fetch('/api/admin/bookings', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          bookingId,
+          action: 'reopen',
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || 'Erreur réouverture');
+
+      showToast('success', 'Séance remise en cours avec succès !');
+      fetchBookings();
+      fetchSlots();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Erreur';
+      showToast('error', msg);
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
   // Action Admin : Valider le report de séance
   const handleConfirmReschedule = async () => {
     if (!rescheduleBooking || !rescheduleDate || !rescheduleTime) {
@@ -683,9 +716,27 @@ export default function AdminBookingsPage() {
             </>
           )}
 
-          {(b.status === 'cancelled' || b.status === 'completed') && (
+          {b.status === 'completed' && (
+            <div className="flex items-center justify-between w-full gap-2 py-0.5">
+              <span className="text-xs text-gray-400 font-medium italic">
+                Séance ✓ Effectuée & Terminée
+              </span>
+              <button
+                type="button"
+                disabled={isActionLoading}
+                onClick={() => handleReopenBooking(b.id)}
+                className="px-2 py-1 bg-amber-500/15 border border-amber-500/30 text-amber-300 hover:bg-amber-500/25 hover:text-white text-[11px] font-mono font-medium transition-colors flex items-center gap-1 cursor-pointer shrink-0 disabled:opacity-50"
+                title="Remettre cette séance en non terminée (réactive le créneau)"
+              >
+                <RefreshCw size={11} className={isActionLoading ? 'animate-spin' : ''} />
+                <span>Remettre en cours</span>
+              </button>
+            </div>
+          )}
+
+          {b.status === 'cancelled' && (
             <span className="text-xs text-gray-400 font-medium italic w-full text-center py-1">
-              Séance {b.status === 'completed' ? '✓ Effectuée & Terminée' : '✕ Annulée'}
+              Séance ✕ Annulée
             </span>
           )}
         </div>
