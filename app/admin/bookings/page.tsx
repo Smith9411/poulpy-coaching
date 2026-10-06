@@ -7,8 +7,10 @@ import {
   Calendar as CalendarIcon,
   Check,
   CheckCircle2,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
   Clock,
   Copy,
   Edit2,
@@ -65,6 +67,11 @@ export default function AdminBookingsPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'confirmed' | 'rescheduled' | 'completed' | 'cancelled'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
+  const [expandedNotesIds, setExpandedNotesIds] = useState<Record<string, boolean>>({});
+
+  const toggleNotes = (id: string) => {
+    setExpandedNotesIds(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
   // Modal de report de date
   const [rescheduleBooking, setRescheduleBooking] = useState<CoachingBooking | null>(null);
@@ -595,12 +602,42 @@ export default function AdminBookingsPage() {
             </span>
           </div>
 
-          {b.notes && (
-            <div className="pt-2 border-t border-white/5">
-              <span className="text-[10px] text-gray-400 block mb-0.5">Objectifs :</span>
-              <p className="text-gray-300 italic text-[11px] line-clamp-2">"{b.notes}"</p>
-            </div>
-          )}
+          {b.notes && (() => {
+            const isExpanded = !!expandedNotesIds[b.id];
+            const isLong = b.notes.length > 80 || b.notes.includes('\n');
+
+            return (
+              <div className="pt-2 border-t border-white/5">
+                <div className="flex items-center justify-between gap-1 mb-1">
+                  <span className="text-[10px] text-gray-400 font-mono">Objectifs :</span>
+                  {isLong && (
+                    <button
+                      type="button"
+                      onClick={() => toggleNotes(b.id)}
+                      className="text-[10px] text-[#00B4A0] hover:text-white font-mono font-medium inline-flex items-center gap-0.5 cursor-pointer transition-colors px-1 py-0.5 rounded hover:bg-white/5"
+                      title={isExpanded ? "Réduire l'affichage" : "Dérouler l'objectif complet"}
+                    >
+                      <span>{isExpanded ? 'Réduire' : 'Voir tout'}</span>
+                      {isExpanded ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+                    </button>
+                  )}
+                </div>
+                <div
+                  onClick={() => isLong && toggleNotes(b.id)}
+                  className={`text-gray-300 italic text-[11px] leading-relaxed transition-all ${
+                    isExpanded
+                      ? 'whitespace-pre-wrap break-words max-h-64 overflow-y-auto bg-black/40 p-2.5 border border-white/10 rounded text-gray-200 select-text not-italic shadow-inner font-sans'
+                      : isLong
+                      ? 'line-clamp-2 cursor-pointer hover:text-white'
+                      : ''
+                  }`}
+                  title={isLong && !isExpanded ? "Cliquer pour dérouler l'objectif complet" : undefined}
+                >
+                  {isExpanded ? b.notes : `"${b.notes}"`}
+                </div>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Actions */}
