@@ -4,7 +4,7 @@ import Link from 'next/link';
 import {
   Shield, ArrowLeft, User, Search, MessageSquare, RefreshCw,
   Loader2, Mail, Calendar, Bell, Film, Sparkles, FileText, CheckCircle2,
-  Clock, Check
+  Clock, Check, Copy
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -14,6 +14,7 @@ interface StudentRow {
   id: string;
   username: string;
   email: string;
+  discord?: string | null;
   isAdmin: boolean;
   inCoaching: boolean;
   createdAt: string;
@@ -29,6 +30,7 @@ export default function AdminCoaching() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'active' | 'history'>('active');
   const [togglingId, setTogglingId] = useState<string | null>(null);
+  const [copiedDiscordId, setCopiedDiscordId] = useState<string | null>(null);
   const [successNotice, setSuccessNotice] = useState<string>('');
   const [error, setError] = useState('');
 
@@ -61,10 +63,20 @@ export default function AdminCoaching() {
 
       if (signal?.aborted) return;
 
-      const studentsData = profiles.map((p: { id: string; username: string; email: string; createdAt: string; avatarUrl: string | null; initial: string; inCoaching?: boolean }) => ({
+      const studentsData = profiles.map((p: {
+        id: string;
+        username: string;
+        email: string;
+        createdAt: string;
+        avatarUrl: string | null;
+        initial: string;
+        inCoaching?: boolean;
+        discord?: string | null;
+      }) => ({
         id: p.id,
         username: p.username,
         email: p.email,
+        discord: p.discord || null,
         isAdmin: false,
         inCoaching: p.inCoaching === true,
         createdAt: p.createdAt,
@@ -143,7 +155,8 @@ export default function AdminCoaching() {
     const list = students
       .filter(student =>
         student.username.toLowerCase().includes(q) ||
-        student.email.toLowerCase().includes(q)
+        student.email.toLowerCase().includes(q) ||
+        (student.discord && student.discord.toLowerCase().includes(q))
       )
       .sort((a, b) => {
         if (b.unreadCount !== a.unreadCount) return b.unreadCount - a.unreadCount;
@@ -264,6 +277,35 @@ export default function AdminCoaching() {
               <Mail size={14} />
               <span className="truncate">{student.email}</span>
             </div>
+            {student.discord ? (
+              <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-[#5865F2] bg-[#5865F2]/10 border border-[#5865F2]/25 px-2 py-0.5 rounded w-fit mb-1.5">
+                <MessageSquare size={12} className="text-[#5865F2] shrink-0" />
+                <span className="truncate">{student.discord}</span>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    navigator.clipboard.writeText(student.discord!);
+                    setCopiedDiscordId(student.id);
+                    setTimeout(() => setCopiedDiscordId(null), 2000);
+                  }}
+                  className="p-0.5 hover:text-white transition-colors cursor-pointer ml-1 text-[#5865F2]/80 hover:text-white"
+                  title="Copier le pseudo Discord de l'élève"
+                >
+                  {copiedDiscordId === student.id ? (
+                    <Check size={11} className="text-emerald-400" />
+                  ) : (
+                    <Copy size={11} />
+                  )}
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5 text-xs font-mono text-gray-500 mb-1.5">
+                <MessageSquare size={12} className="text-gray-600 shrink-0" />
+                <span className="italic text-[11px]">Discord non renseigné</span>
+              </div>
+            )}
             <div className="text-xs text-gray-500 flex items-center gap-2">
               <Calendar size={12} />
               <span>

@@ -69,17 +69,44 @@ export async function GET(req: NextRequest) {
           .from('profiles')
           .select('*');
 
-    const [authRes, profRes] = await Promise.all([
+    const bookingsQuery = supabaseAdmin
+      .from('coaching_bookings')
+      .select('user_id, student_email, student_discord, created_at')
+      .order('created_at', { ascending: false });
+
+    const [authRes, profRes, bookingsRes] = await Promise.all([
       authUserPromise,
       profilesQuery,
+      bookingsQuery,
     ]);
 
     const authUsersList = (authRes?.data?.users || []) as Array<{
       id: string;
       email?: string;
       created_at?: string;
-      user_metadata?: { username?: string; avatar_url?: string };
+      user_metadata?: { username?: string; avatar_url?: string; discord?: string };
     }>;
+
+    const bookingsList = ((bookingsRes as { data?: unknown[] })?.data || []) as Array<{
+      user_id?: string | null;
+      student_email?: string | null;
+      student_discord?: string | null;
+    }>;
+
+    const discordByUserId = new Map<string, string>();
+    const discordByEmail = new Map<string, string>();
+
+    for (const b of bookingsList) {
+      if (b.user_id && b.student_discord && !discordByUserId.has(b.user_id)) {
+        discordByUserId.set(b.user_id, b.student_discord.trim());
+      }
+      if (b.student_email && b.student_discord) {
+        const em = b.student_email.trim().toLowerCase();
+        if (!discordByEmail.has(em)) {
+          discordByEmail.set(em, b.student_discord.trim());
+        }
+      }
+    }
 
     interface ProfileRow {
       id: string;
@@ -115,7 +142,13 @@ export async function GET(req: NextRequest) {
       const username = p?.username || meta.username || u?.email?.split('@')[0] || 'Joueur';
       const avatarUrl = meta.avatar_url || null;
       const bio = (p?.bio && typeof p.bio === 'string') ? p.bio : null;
-      const discord = p?.discord || meta.discord || null;
+      const userEmail = u?.email?.trim().toLowerCase();
+      const discord =
+        p?.discord ||
+        meta.discord ||
+        discordByUserId.get(id) ||
+        (userEmail ? discordByEmail.get(userEmail) : null) ||
+        null;
       const twitch = p?.twitch || meta.twitch || null;
       const youtube = p?.youtube || meta.youtube || null;
       const tiktok = p?.tiktok || meta.tiktok || null;
