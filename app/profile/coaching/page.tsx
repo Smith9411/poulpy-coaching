@@ -81,9 +81,12 @@ export default function StudentCoachingPage() {
         throw new Error('Session expirée, reconnecte-toi.');
       }
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erreur lors du chargement des messages');
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `Erreur serveur (${res.status})`);
+      }
 
+      const data = await res.json().catch(() => ({ messages: [] }));
       setMessages(data.messages || []);
       setError('');
       setSessionExpired(false);
