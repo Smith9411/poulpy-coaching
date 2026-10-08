@@ -9,6 +9,25 @@ const nextConfig: NextConfig = {
   env: {
     NEXT_PUBLIC_BUILD_TIME: Date.now().toString(),
   },
+  async redirects() {
+    return [
+      {
+        source: '/coaching',
+        destination: '/#booking',
+        permanent: false,
+      },
+      {
+        source: '/booking',
+        destination: '/#booking',
+        permanent: false,
+      },
+      {
+        source: '/tarifs',
+        destination: '/#booking',
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
