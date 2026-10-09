@@ -47,46 +47,44 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
   const isAcid = current.badgeColor === "acid";
 
   const letterVariants: Variants = {
-    hidden: { opacity: 0, y: 30, filter: "blur(4px)" },
+    hidden: { opacity: 0, y: "110%" },
     visible: (i: number) => ({
       opacity: 1,
       y: 0,
-      filter: "blur(0px)",
       transition: {
-        delay: i * 0.035,
-        duration: 0.35,
-        ease: [0.22, 1, 0.36, 1] as const,
+        delay: 0.05 + i * 0.025,
+        duration: 0.32,
+        ease: [0.16, 1, 0.3, 1] as const,
       },
     }),
     exit: (i: number) => ({
       opacity: 0,
-      y: -25,
-      filter: "blur(4px)",
+      y: "-80%",
       transition: {
-        delay: i * 0.02,
-        duration: 0.22,
-        ease: [0.4, 0, 1, 1] as const,
+        delay: i * 0.012,
+        duration: 0.15,
+        ease: [0.7, 0, 0.84, 0] as const,
       },
     }),
   };
 
   const lineVariants: Variants = {
-    hidden: { opacity: 0, x: -20 },
+    hidden: { opacity: 0, x: -16 },
     visible: (i: number) => ({
       opacity: 1,
       x: 0,
       transition: {
-        delay: 0.15 + i * 0.05,
-        duration: 0.35,
-        ease: [0.22, 1, 0.36, 1] as const,
+        delay: 0.12 + i * 0.04,
+        duration: 0.3,
+        ease: [0.16, 1, 0.3, 1] as const,
       },
     }),
     exit: (i: number) => ({
       opacity: 0,
-      x: 20,
+      x: 16,
       transition: {
-        delay: i * 0.03,
-        duration: 0.2,
+        delay: i * 0.02,
+        duration: 0.15,
       },
     }),
   };
@@ -132,26 +130,42 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
               key={current.id}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              exit={{ opacity: 0, transition: { duration: 0.08 } }}
-              transition={{ duration: 0.12 }}
+              exit={{ opacity: 0, transition: { duration: 0.1 } }}
+              transition={{ duration: 0.15 }}
               className="space-y-8"
             >
               {/* Monumental Animated Title + Rank Directly Below */}
               <div className="space-y-2 py-1">
                 <div className="overflow-hidden">
-                  <h3 className="text-5xl sm:text-7xl lg:text-8xl font-display font-bold tracking-tight text-[#F5F4F0] flex flex-wrap">
-                    {current.title.split("").map((letter, i) => (
-                      <motion.span
-                        key={`${current.id}-${i}`}
-                        custom={i}
-                        variants={letterVariants}
-                        initial="hidden"
-                        animate="visible"
-                        className="inline-block whitespace-pre"
-                      >
-                        {letter}
-                      </motion.span>
-                    ))}
+                  <h3 className="text-5xl sm:text-7xl lg:text-8xl font-display font-bold tracking-tight text-[#F5F4F0] flex flex-wrap gap-x-4 sm:gap-x-6">
+                    {current.title.split(" ").map((word, wordIdx) => {
+                      const prevCount = current.title
+                        .split(" ")
+                        .slice(0, wordIdx)
+                        .reduce((acc, w) => acc + w.length, 0);
+
+                      return (
+                        <span key={`${current.id}-w-${wordIdx}`} className="inline-flex overflow-hidden">
+                          {word.split("").map((letter, letterIdx) => (
+                            <motion.span
+                              key={`${current.id}-${wordIdx}-${letterIdx}`}
+                              custom={prevCount + letterIdx}
+                              variants={letterVariants}
+                              initial="hidden"
+                              animate="visible"
+                              exit="exit"
+                              className="inline-block transform-gpu will-change-transform"
+                              style={{
+                                backfaceVisibility: "hidden",
+                                WebkitFontSmoothing: "antialiased",
+                              }}
+                            >
+                              {letter}
+                            </motion.span>
+                          ))}
+                        </span>
+                      );
+                    })}
                   </h3>
                 </div>
 
