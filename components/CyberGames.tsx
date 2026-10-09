@@ -68,25 +68,23 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
     }),
   };
 
-  const lineVariants: Variants = {
-    hidden: { opacity: 0, x: -16 },
-    visible: (i: number) => ({
+  const contentVariants: Variants = {
+    hidden: { opacity: 0, y: 6 },
+    visible: {
       opacity: 1,
-      x: 0,
+      y: 0,
       transition: {
-        delay: 0.12 + i * 0.04,
-        duration: 0.3,
+        duration: 0.25,
         ease: [0.16, 1, 0.3, 1] as const,
       },
-    }),
-    exit: (i: number) => ({
+    },
+    exit: {
       opacity: 0,
-      x: 16,
+      y: -4,
       transition: {
-        delay: i * 0.02,
-        duration: 0.15,
+        duration: 0.1,
       },
-    }),
+    },
   };
 
   return (
@@ -123,7 +121,7 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
           </div>
         </div>
 
-        {/* Pure Typographic Game Content (Snappy mini blank + crisp letter cascade) */}
+        {/* Pure Typographic Game Content */}
         <div className="relative min-h-[340px]">
           <AnimatePresence mode="wait">
             <motion.div
@@ -171,9 +169,9 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
 
                 {/* Rank badge aligned with game theme color */}
                 <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.08, duration: 0.22 }}
+                  variants={contentVariants}
+                  initial="hidden"
+                  animate="visible"
                   className={`text-xs sm:text-sm font-mono font-bold tracking-widest uppercase ${
                     isAcid ? "text-[#CA1C30]" : "text-[#00B4A0]"
                   }`}
@@ -184,27 +182,28 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
 
               {/* Description */}
               <motion.p
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.12, duration: 0.25 }}
+                variants={contentVariants}
+                initial="hidden"
+                animate="visible"
                 className="text-sm sm:text-base text-[#F5F4F0]/70 max-w-3xl leading-relaxed font-sans"
               >
                 {current.desc}
               </motion.p>
 
               {/* Typographic Protocols List */}
-              <div className="space-y-4 pt-2">
+              <motion.div
+                variants={contentVariants}
+                initial="hidden"
+                animate="visible"
+                className="space-y-4 pt-2"
+              >
                 <span className="text-xs font-mono text-[#F5F4F0]/40 uppercase tracking-widest block">
                   MODULES D&apos;ENTRAÎNEMENT SPÉCIFIQUES :
                 </span>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {current.protocols.map((p, idx) => (
-                    <motion.div
+                    <div
                       key={`${current.id}-proto-${idx}`}
-                      custom={idx}
-                      variants={lineVariants}
-                      initial="hidden"
-                      animate="visible"
                       className="flex items-center gap-4 py-3.5 border-b border-white/10 group"
                     >
                       <span
@@ -217,16 +216,16 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
                       <span className="text-xs sm:text-sm text-[#F5F4F0]/90 font-mono tracking-wide group-hover:text-white transition-colors">
                         {p.name}
                       </span>
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
 
               {/* Action Button */}
               <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.25 }}
+                variants={contentVariants}
+                initial="hidden"
+                animate="visible"
                 className="pt-4 flex justify-start"
               >
                 <button
