@@ -195,3 +195,89 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
+
+/**
+ * POST /api/notifications/admin-summary
+ * Marque les notifications admin comme lues (soit tout, soit par id/type).
+ */
+export async function POST(req: NextRequest) {
+  try {
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+    }
+    const token = authHeader.replace('Bearer ', '').trim();
+
+    const { data: authData, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !authData.user) {
+      return NextResponse.json({ error: 'Token invalide' }, { status: 401 });
+    }
+    const userId = authData.user.id;
+
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', userId)
+      .single();
+
+    if (profile?.is_admin !== true) {
+      return NextResponse.json({ error: 'Réservé aux administrateurs' }, { status: 403 });
+    }
+
+    const body = await req.json().catch(() => ({}));
+    const { action, bookingId, clipId, studentId } = body;
+    const now = new Date().toISOString();
+
+    if (action === 'mark_all_read') {
+      // 1. Tous les messages élèves non lus
+      await supabase
+        .from('coaching_messages')
+        .update({ read_at: now })
+        .neq('sender_id', userId)
+        .is('read_at', null);
+
+      // 2. Toutes les réservations non lues
+      await supabase
+        .from('coaching_bookings')
+        .update({ read_by_admin: true, updated_at: now })
+        .eq('read_by_admin', false);
+
+      // 3. Tous les clips non lus
+      await supabase
+        .from('vod_clips')
+        .update({ read_at: now })
+        .is('read_at', null);
+
+      return NextResponse.json({ success: true, message: 'Toutes les notifications admin marquées comme lues' });
+    }
+
+    if (bookingId) {
+      await supabase
+        .from('coaching_bookings')
+        .update({ read_by_admin: true, updated_at: now })
+        .eq('id', bookingId);
+    }
+
+    if (clipId) {
+      await supabase
+        .from('vod_clips')
+        .update({ read_at: now })
+        .eq('id', clipId);
+    }
+
+    if (studentId) {
+      await supabase
+        .from('coaching_messages')
+        .update({ read_at: now })
+        .eq('student_id', studentId)
+        .neq('sender_id', userId)
+        .is('read_at', null);
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Erreur serveur';
+    console.error('Erreur POST admin-summary:', err);
+    return NextResponse.json({ error: msg }, { status: 500 });
+  }
+}

@@ -28,15 +28,7 @@ import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 import AuthModal from "./AuthModal";
 import ThemeToggle from "./ThemeToggle";
-
-interface RealNotificationItem {
-  id: string;
-  type: "message" | "annotation" | "booking" | "clip";
-  title: string;
-  description: string;
-  timeAgo: string;
-  href: string;
-}
+import NotificationBell from "./NotificationBell";
 
 export default function CyberNavbar({
   onOpenBooking,
@@ -52,126 +44,9 @@ export default function CyberNavbar({
   const [mobileOpen, setMobileOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [notifsOpen, setNotifsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("");
-  
-  // Real notifications state
-  const [realNotifs, setRealNotifs] = useState<RealNotificationItem[]>([]);
-  const [unreadCount, setUnreadCount] = useState<number>(0);
-  const [loadingNotifs, setLoadingNotifs] = useState<boolean>(false);
 
-  const notifsRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
-
-  // Fetch real notifications from Supabase
-  const fetchRealNotifications = async () => {
-    if (!user) {
-      setRealNotifs([]);
-      setUnreadCount(0);
-      return;
-    }
-
-    try {
-      setLoadingNotifs(true);
-      let { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) return;
-
-      if (session.expires_at && new Date(session.expires_at * 1000) <= new Date()) {
-        const { data: r } = await supabase.auth.refreshSession();
-        session = r.session ?? session;
-        if (!session?.access_token) return;
-      }
-
-      const endpoint = user.isAdmin
-        ? "/api/notifications/admin-summary"
-        : "/api/notifications/student-summary";
-
-      const res = await fetch(endpoint, {
-        headers: { Authorization: `Bearer ${session.access_token}` },
-      });
-
-      if (!res.ok) return;
-      const data = await res.json();
-
-      const items: RealNotificationItem[] = [];
-
-      if (user.isAdmin) {
-        // Admin notifications
-        if (data.unreadMessages && Array.isArray(data.unreadMessages)) {
-          data.unreadMessages.forEach((m: { studentId: string; studentName: string; count: number; lastMessage: string }) => {
-            items.push({
-              id: `msg-${m.studentId}`,
-              type: "message",
-              title: `MESSAGE DE ${m.studentName.toUpperCase()}`,
-              description: m.lastMessage || `${m.count} nouveau(x) message(s)`,
-              timeAgo: "RÉCENT",
-              href: `/admin/coaching/${m.studentId}`,
-            });
-          });
-        }
-        if (data.pendingClips && Array.isArray(data.pendingClips)) {
-          data.pendingClips.forEach((c: { id: string; studentName: string; title: string }) => {
-            items.push({
-              id: `clip-${c.id}`,
-              type: "clip",
-              title: "NOUVEAU CLIP VOD À REVOIR",
-              description: `${c.studentName} : ${c.title}`,
-              timeAgo: "EN ATTENTE",
-              href: "/admin/coaching",
-            });
-          });
-        }
-        setUnreadCount(data.totalCount || items.length);
-      } else {
-        // Student notifications
-        if (data.unreadMsgCount && data.unreadMsgCount > 0) {
-          items.push({
-            id: "student-msgs",
-            type: "message",
-            title: "NOUVEAU MESSAGE DU COACH",
-            description: data.lastMsg?.message || `Vous avez ${data.unreadMsgCount} nouveau(x) message(s) de Poulpy.`,
-            timeAgo: "RÉCENT",
-            href: "/profile/coaching",
-          });
-        }
-        if (data.newAnnotationsCount && data.newAnnotationsCount > 0) {
-          items.push({
-            id: "student-annot",
-            type: "annotation",
-            title: "ANNOTATION SUR VOTRE VOD",
-            description: data.lastAnnotation?.content || "Poulpy a annoté un de vos clips.",
-            timeAgo: "RÉCENT",
-            href: "/profile/vod",
-          });
-        }
-        if (data.bookingAlerts && Array.isArray(data.bookingAlerts)) {
-          data.bookingAlerts.forEach((b: { id: string; status: string; planName: string; bookingDate: string; bookingTime: string }) => {
-            items.push({
-              id: `booking-${b.id}`,
-              type: "booking",
-              title: b.status === "cancelled" ? "SÉANCE ANNULÉE" : "SÉANCE REPLANIFIÉE",
-              description: `${b.planName} du ${b.bookingDate} à ${b.bookingTime}`,
-              timeAgo: "IMPORTANT",
-              href: "/profile",
-            });
-          });
-        }
-        setUnreadCount(data.totalUnread || items.length);
-      }
-
-      setRealNotifs(items);
-    } catch {
-      // silently fail
-    } finally {
-      setLoadingNotifs(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchRealNotifications();
-    const interval = setInterval(fetchRealNotifications, 15000);
-    return () => clearInterval(interval);
-  }, [user]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -232,9 +107,6 @@ export default function CyberNavbar({
     window.addEventListener("resize", onScrollThrottled, { passive: true });
 
     const handleClickOutside = (e: MouseEvent) => {
-      if (notifsRef.current && !notifsRef.current.contains(e.target as Node)) {
-        setNotifsOpen(false);
-      }
       if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
         setUserMenuOpen(false);
       }
@@ -370,93 +242,8 @@ export default function CyberNavbar({
             {/* Theme Toggle (Light / Dark) */}
             <ThemeToggle className="text-white/70 hover:text-white" />
 
-            {/* Notification Bell with Dropdown (REAL NOTIFICATIONS ONLY) */}
-            <div className="relative" ref={notifsRef}>
-              <button
-                onClick={() => setNotifsOpen(!notifsOpen)}
-                className="relative p-2 text-[#F5F4F0]/70 hover:text-[#F5F4F0] transition-colors cursor-pointer flex items-center justify-center"
-                title="Notifications Système"
-              >
-                <Bell className="w-4 h-4" />
-                {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-[#CA1C30] rounded-full animate-ping" />
-                )}
-                {unreadCount > 0 && (
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-[#CA1C30] rounded-full" />
-                )}
-              </button>
-
-              {/* Notification Dropdown Panel */}
-              {notifsOpen && (
-                <div className="absolute top-full right-0 mt-2 w-80 bg-[#121117] border border-[#CA1C30]/30 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.9)] p-4 space-y-3 font-mono text-xs z-50">
-                  <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
-                    <span className="text-[10px] text-[#CA1C30] font-bold tracking-wider flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 bg-[#CA1C30] animate-pulse rounded-full" />
-                      NOTIFICATIONS // {unreadCount} {unreadCount > 1 ? "NOUVELLES" : "NOUVELLE"}
-                    </span>
-                    {unreadCount > 0 && (
-                      <button
-                        onClick={() => setUnreadCount(0)}
-                        className="text-[10px] text-[#F5F4F0]/50 hover:text-[#F5F4F0] underline cursor-pointer"
-                      >
-                        TOUT VU
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="space-y-2 max-h-72 overflow-y-auto">
-                    {!user ? (
-                      <div className="py-6 text-center text-[#F5F4F0]/40 space-y-2">
-                        <Bell className="w-6 h-6 text-white/20 mx-auto" />
-                        <div className="text-xs font-bold text-[#F5F4F0]/70">NON CONNECTÉ</div>
-                        <p className="text-[10px] text-[#F5F4F0]/40">Connectez-vous pour voir vos notifications.</p>
-                        <button
-                          onClick={() => {
-                            setNotifsOpen(false);
-                            setAuthOpen(true);
-                          }}
-                          className="btn-cyber-primary py-1.5 px-4 text-[10px] mt-1 inline-block"
-                        >
-                          SE CONNECTER
-                        </button>
-                      </div>
-                    ) : realNotifs.length === 0 ? (
-                      <div className="py-6 text-center text-[#F5F4F0]/40 space-y-1.5">
-                        <CheckCircle2 className="w-6 h-6 text-[#00B4A0]/40 mx-auto" />
-                        <div className="text-xs font-bold text-[#F5F4F0]/70">AUCUNE NOTIFICATION</div>
-                        <p className="text-[10px] text-[#F5F4F0]/30">Toutes vos notifications sont à jour.</p>
-                      </div>
-                    ) : (
-                      realNotifs.map((item) => (
-                        <Link
-                          key={item.id}
-                          href={item.href}
-                          onClick={() => setNotifsOpen(false)}
-                          className="block p-2.5 bg-[#1A1822] border border-white/5 space-y-1 hover:border-[#CA1C30]/40 transition-colors rounded-xl"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className="text-[10px] text-[#CA1C30] font-bold flex items-center gap-1">
-                              {item.type === "message" ? (
-                                <MessageSquare className="w-3 h-3" />
-                              ) : item.type === "annotation" ? (
-                                <Film className="w-3 h-3" />
-                              ) : (
-                                <Calendar className="w-3 h-3" />
-                              )}
-                              {item.title}
-                            </span>
-                            <span className="text-[9px] text-[#F5F4F0]/40">{item.timeAgo}</span>
-                          </div>
-                          <p className="text-[11px] text-[#F5F4F0]/80 leading-snug">
-                            {item.description}
-                          </p>
-                        </Link>
-                      ))
-                    )}
-                  </div>
-                </div>
-              )}
-            </div>
+            {/* Unified Realtime Notification Bell */}
+            <NotificationBell theme="cyber" />
 
             {/* User Profile / Connexion Dropdown */}
             {user ? (
@@ -570,8 +357,9 @@ export default function CyberNavbar({
             </button>
           </div>
 
-          {/* Mobile Actions: ThemeToggle + Hamburger Button */}
-          <div className="flex sm:hidden items-center gap-2">
+          {/* Mobile Actions: NotificationBell + ThemeToggle + Hamburger Button */}
+          <div className="flex sm:hidden items-center gap-1.5">
+            <NotificationBell theme="cyber" />
             <ThemeToggle className="p-2 text-white/80 hover:text-white border border-white/20" />
             <button
               onClick={() => setMobileOpen(!mobileOpen)}

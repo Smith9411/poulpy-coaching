@@ -145,7 +145,7 @@ export async function GET(req: NextRequest) {
 
 /**
  * POST /api/notifications/student-summary
- * Marque une alerte de réservation comme lue par l'élève.
+ * Marque les notifications élève comme lues (soit tout, soit par id/type).
  */
 export async function POST(req: NextRequest) {
   try {
@@ -157,16 +157,96 @@ export async function POST(req: NextRequest) {
     const { data: authData } = await supabase.auth.getUser(token);
     if (!authData?.user) return NextResponse.json({ error: 'Invalide' }, { status: 401 });
 
-    const body = await req.json();
-    const { bookingId } = body;
+    const userId = authData.user.id;
+    const userEmail = authData.user.email?.toLowerCase();
+    const body = await req.json().catch(() => ({}));
+    const { action, bookingId } = body;
+    const now = new Date().toISOString();
+
+    if (action === 'mark_all_read') {
+      // 1. Marquer tous les messages reçus du coach comme lus
+      await supabase
+        .from('coaching_messages')
+        .update({ read_at: now })
+        .eq('student_id', userId)
+        .neq('sender_id', userId)
+        .is('read_at', null);
+
+      // 2. Marquer toutes les alertes de réservation comme lues
+      let bQuery = supabase
+        .from('coaching_bookings')
+        .update({ read_by_student: true, updated_at: now })
+        .eq('read_by_student', false);
+
+      if (userEmail) {
+        bQuery = bQuery.or(`user_id.eq.${userId},student_email.eq.${userEmail}`);
+      } else {
+        bQuery = bQuery.eq('user_id', userId);
+      }
+      await bQuery;
+
+      // 3. Marquer toutes les annotations VOD comme lues
+      try {
+        const { data: clips } = await supabase
+          .from('vod_clips')
+          .select('id')
+          .eq('student_id', userId);
+
+        if (clips && clips.length > 0) {
+          const clipIds = clips.map((c: { id: string }) => c.id);
+          await supabase
+            .from('vod_annotations')
+            .update({ read_at: now })
+            .in('clip_id', clipIds)
+            .is('read_at', null);
+        }
+      } catch {
+        // Ignorer si les tables VOD n'existent pas
+      }
+
+      return NextResponse.json({ success: true, message: 'Toutes les notifications élève marquées comme lues' });
+    }
+
+    if (action === 'mark_messages') {
+      await supabase
+        .from('coaching_messages')
+        .update({ read_at: now })
+        .eq('student_id', userId)
+        .neq('sender_id', userId)
+        .is('read_at', null);
+      return NextResponse.json({ success: true });
+    }
+
+    if (action === 'mark_annotations') {
+      try {
+        const { data: clips } = await supabase
+          .from('vod_clips')
+          .select('id')
+          .eq('student_id', userId);
+
+        if (clips && clips.length > 0) {
+          const clipIds = clips.map((c: { id: string }) => c.id);
+          await supabase
+            .from('vod_annotations')
+            .update({ read_at: now })
+            .in('clip_id', clipIds)
+            .is('read_at', null);
+        }
+      } catch {}
+      return NextResponse.json({ success: true });
+    }
+
     if (bookingId) {
       await supabase
         .from('coaching_bookings')
-        .update({ read_by_student: true })
+        .update({ read_by_student: true, updated_at: now })
         .eq('id', bookingId);
+      return NextResponse.json({ success: true });
     }
+
     return NextResponse.json({ success: true });
   } catch (err) {
-    return NextResponse.json({ error: 'Erreur' }, { status: 500 });
+    console.error('Erreur POST student-summary:', err);
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }
