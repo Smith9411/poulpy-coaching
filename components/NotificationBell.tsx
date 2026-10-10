@@ -92,7 +92,7 @@ export default function NotificationBell({
             notifList.push({
               id: `msg-${m.studentId}`,
               type: "message",
-              title: `MESSAGE DE ${m.studentName.toUpperCase()}`,
+              title: `MESSAGE DE ${(m.studentName || "ÉLÈVE").toUpperCase()}`,
               description: m.lastMessage || `${m.count} nouveau(x) message(s)`,
               timeAgo: formatTimeAgo(m.lastAt),
               href: `/admin/coaching/${m.studentId}`,
@@ -114,7 +114,7 @@ export default function NotificationBell({
               id: `clip-${c.clipId}`,
               type: "clip",
               title: "NOUVEAU CLIP VOD À REVOIR",
-              description: `${c.studentName} : ${c.title}`,
+              description: `${c.studentName || "Élève"} : ${c.title || "Clip"}`,
               timeAgo: formatTimeAgo(c.submittedAt),
               href: `/admin/coaching/${c.studentId}/clips`,
               rawId: c.clipId,
@@ -137,8 +137,8 @@ export default function NotificationBell({
             notifList.push({
               id: `booking-${b.bookingId}`,
               type: "booking",
-              title: `RÉSERVATION • ${b.game.toUpperCase()}`,
-              description: `${b.studentName} — ${b.planName} le ${b.bookingDate} à ${b.bookingTime}`,
+              title: `RÉSERVATION • ${(b.game || "COACHING").toUpperCase()}`,
+              description: `${b.studentName || "Élève"} — ${b.planName || "Séance"} le ${b.bookingDate || ""} à ${b.bookingTime || ""}`,
               timeAgo: formatTimeAgo(b.createdAt),
               href: "/admin/bookings",
               rawId: b.bookingId,
@@ -212,8 +212,9 @@ export default function NotificationBell({
     if (!user) return;
 
     // Supabase Realtime Channel
+    const channelName = `realtime_notifs_${user.id}_${Math.random().toString(36).slice(2, 7)}`;
     const channel = supabase
-      .channel(`realtime_notifications_${user.id}`)
+      .channel(channelName)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "coaching_messages" },
