@@ -85,6 +85,7 @@ export default function CyberMedia() {
             <iframe
               src={youtubeEmbed}
               title="Poulpy YouTube"
+              loading="lazy"
               className="w-full h-full border-0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
@@ -107,8 +108,9 @@ export default function CyberMedia() {
             className="absolute inset-0 w-full h-full z-10 bg-black"
           >
             <iframe
-              src={twitchEmbed}
+              src={platform === "twitch" ? twitchEmbed : undefined}
               title="Poulpy Twitch"
+              loading="lazy"
               className="w-full h-full border-0"
               allowFullScreen
             />

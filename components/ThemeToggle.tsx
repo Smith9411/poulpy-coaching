@@ -41,7 +41,7 @@ export default function ThemeToggle({
   if (!mounted) {
     return (
       <div className={`${baseClass} text-white/40 ${className}`}>
-        <Moon className="w-4 h-4 sm:w-5 sm:h-5" />
+        <Sun className="w-4 h-4 sm:w-5 sm:h-5" />
       </div>
     );
   }
@@ -55,9 +55,9 @@ export default function ThemeToggle({
       className={`${baseClass} transition-all duration-300 group cursor-pointer focus:outline-none ${className}`}
     >
       {isLight ? (
-        <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-[#8A5A44] hover:text-[#C85045] hover:rotate-45 hover:scale-110 transition-all duration-300 drop-shadow-sm" />
+        <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-[#8A5A44] hover:text-[#C85045] hover:-rotate-12 hover:scale-110 transition-all duration-300 drop-shadow-sm" />
       ) : (
-        <Moon className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 hover:text-[#00B4A0] hover:-rotate-12 hover:scale-110 transition-all duration-300 drop-shadow-[0_0_8px_rgba(0,180,160,0.5)]" />
+        <Sun className="w-4 h-4 sm:w-5 sm:h-5 text-white/70 hover:text-[#00B4A0] hover:rotate-45 hover:scale-110 transition-all duration-300 drop-shadow-[0_0_8px_rgba(0,180,160,0.5)]" />
       )}
     </button>
   );

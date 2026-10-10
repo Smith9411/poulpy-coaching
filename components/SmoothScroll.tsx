@@ -8,18 +8,19 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function SmoothScroll({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    if (typeof document !== "undefined" && document.fonts) {
-      document.fonts.ready.then(() => {
-        ScrollTrigger.refresh();
-      });
-    }
-
-    const timer = setTimeout(() => {
+    // Postpone heavy layout recalculations until after hero intro animation finishes completely
+    const refreshTimer = setTimeout(() => {
       ScrollTrigger.refresh();
-    }, 250);
+    }, 7000);
+
+    const onFirstScroll = () => {
+      ScrollTrigger.refresh();
+    };
+    window.addEventListener("scroll", onFirstScroll, { passive: true, once: true });
 
     return () => {
-      clearTimeout(timer);
+      clearTimeout(refreshTimer);
+      window.removeEventListener("scroll", onFirstScroll);
     };
   }, []);
 

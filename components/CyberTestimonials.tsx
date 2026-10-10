@@ -66,7 +66,11 @@ export default function CyberTestimonials() {
   }, []);
 
   useEffect(() => {
-    fetchFeaturedReviews();
+    // Postpone below-the-fold reviews fetch until after hero 3D intro animation fully completes
+    const timer = setTimeout(() => {
+      fetchFeaturedReviews();
+    }, 7000);
+    return () => clearTimeout(timer);
   }, [fetchFeaturedReviews]);
 
   // Adjust activeIdx if reviews change

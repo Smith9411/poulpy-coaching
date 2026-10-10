@@ -695,3 +695,40 @@ html.light .btn-cyber-ghost {
   color: #1C1917 !important;
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   HERO POULPY PURE GPU KEYFRAMES (0% JS Main-Thread Overhead)
+   ═══════════════════════════════════════════════════════════════ */
+.poulpy-letter {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(115%) translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+.poulpy-letter-active {
+  animation: poulpyLetterEntrance 0.92s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes poulpyLetterEntrance {
+  0% {
+    opacity: 0;
+    transform: translateY(115%) translateZ(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) translateZ(0);
+  }
+}
+
+@keyframes poulpyHudFade {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) translateZ(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) translateZ(0);
+  }
+}
+

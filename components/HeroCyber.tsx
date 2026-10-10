@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
-import gsap from "gsap";
+import React, { useEffect, useState } from "react";
 import DecryptedText from "./DecryptedText";
 import { ArrowUpRight, ChevronDown } from "lucide-react";
 
@@ -10,58 +9,22 @@ interface HeroCyberProps {
 }
 
 export default function HeroCyber({ onOpenBooking }: HeroCyberProps) {
-  const containerRef = useRef<HTMLElement | null>(null);
-  const titleLettersRef = useRef<HTMLDivElement | null>(null);
-  const hudMetricsRef = useRef<HTMLDivElement | null>(null);
+  const [isRevealed, setIsRevealed] = useState(false);
 
   useEffect(() => {
-    const letters = titleLettersRef.current?.querySelectorAll(".letter-reveal");
-    
-    // Set initial hidden state
-    if (letters) {
-      gsap.set(letters, {
-        yPercent: 120,
-        opacity: 0,
-        rotateX: -45,
-      });
-    }
-    if (hudMetricsRef.current) {
-      gsap.set(hudMetricsRef.current, { opacity: 0, y: 20 });
-    }
+    let fallbackTimer: NodeJS.Timeout | undefined;
 
-    let hasAnimated = false;
-    const animateHero = () => {
-      if (hasAnimated) return;
-      hasAnimated = true;
-
-      if (letters) {
-        gsap.to(letters, {
-          yPercent: 0,
-          opacity: 1,
-          rotateX: 0,
-          stagger: 0.05,
-          duration: 1.1,
-          ease: "power4.out",
-        });
-      }
-
-      if (hudMetricsRef.current) {
-        gsap.to(hudMetricsRef.current, {
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          ease: "power3.out",
-          delay: 0.35,
-        });
-      }
+    const reveal = () => {
+      setIsRevealed(true);
+      if (fallbackTimer) clearTimeout(fallbackTimer);
     };
 
-    window.addEventListener("poulpy_splash_reveal", animateHero);
-    const fallbackTimer = setTimeout(animateHero, 1150);
+    window.addEventListener("poulpy_splash_reveal", reveal);
+    fallbackTimer = setTimeout(reveal, 3000);
 
     return () => {
-      window.removeEventListener("poulpy_splash_reveal", animateHero);
-      clearTimeout(fallbackTimer);
+      window.removeEventListener("poulpy_splash_reveal", reveal);
+      if (fallbackTimer) clearTimeout(fallbackTimer);
     };
   }, []);
 
@@ -69,7 +32,6 @@ export default function HeroCyber({ onOpenBooking }: HeroCyberProps) {
 
   return (
     <section
-      ref={containerRef}
       className="relative min-h-[100dvh] h-screen flex flex-col justify-between pt-20 pb-6 px-6 sm:px-12 lg:px-16 z-10 overflow-hidden"
     >
       {/* Spacer top for navbar clearance */}
@@ -77,15 +39,20 @@ export default function HeroCyber({ onOpenBooking }: HeroCyberProps) {
 
       {/* Main Centered Hero Block */}
       <div className="max-w-5xl mx-auto w-full my-auto py-6 flex flex-col items-center justify-center text-center select-none">
-        {/* Architectural Title with Subtle Smooth Hover Lift & Color Glow */}
+        {/* Architectural Title with Pure GPU Composited Fluid Entrance */}
         <div
-          ref={titleLettersRef}
-          className="relative flex items-center justify-center leading-[0.95] text-[clamp(2.75rem,8.5vw,7.8rem)] font-display font-bold text-[#F5F4F0] tracking-tight py-2"
+          className="relative flex items-center justify-center leading-[0.95] text-[clamp(2.75rem,8.5vw,7.8rem)] font-display font-bold text-[#F5F4F0] tracking-tight py-2 overflow-hidden"
+          style={{ transform: "translateZ(0)" }}
         >
           {titleString.split("").map((letter, idx) => (
             <span
               key={idx}
-              className="letter-reveal inline-block will-change-transform transition-all duration-300 ease-out hover:-translate-y-2 hover:scale-105 hover:text-[#CA1C30] hover:drop-shadow-[0_4px_25px_rgba(202,28,48,0.45)] cursor-default"
+              style={{
+                animationDelay: `${idx * 55}ms`,
+              }}
+              className={`letter-reveal inline-block select-none cursor-default poulpy-letter ${
+                isRevealed ? "poulpy-letter-active" : ""
+              } hover:-translate-y-2 hover:scale-105 hover:text-[#CA1C30] hover:drop-shadow-[0_4px_25px_rgba(202,28,48,0.45)] transition-transform duration-300`}
             >
               {letter}
             </span>
@@ -121,7 +88,13 @@ export default function HeroCyber({ onOpenBooking }: HeroCyberProps) {
 
       {/* Bottom Subtle Bouncing Down Arrow */}
       <div
-        ref={hudMetricsRef}
+        style={{
+          animation: isRevealed
+            ? "poulpyHudFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) 250ms both"
+            : "none",
+          opacity: isRevealed ? undefined : 0,
+          transform: "translateZ(0)",
+        }}
         className="flex items-center justify-center pb-2 z-20 pointer-events-auto"
       >
         <a

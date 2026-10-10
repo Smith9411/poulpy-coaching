@@ -41,13 +41,16 @@ export default function PwaRegister() {
   };
 
   useEffect(() => {
-    // Nettoyer proprement les anciens Service Workers résiduels pour éviter les conflits de cache
+    // Nettoyer proprement les anciens Service Workers résiduels après le chargement d'intro pour ne pas bloquer les I/O
+    let swTimer: NodeJS.Timeout | undefined;
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then((registrations) => {
-        for (const reg of registrations) {
-          reg.unregister();
-        }
-      }).catch(() => {});
+      swTimer = setTimeout(() => {
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          for (const reg of registrations) {
+            reg.unregister();
+          }
+        }).catch(() => {});
+      }, 8000);
     }
 
     // Check notification permission
@@ -55,10 +58,11 @@ export default function PwaRegister() {
       setNotificationPermission(Notification.permission);
     }
 
-    // Vérification immédiate de mise à jour au montage
+    // Vérification différée de mise à jour pour libérer le thread pendant l'animation d'intro
+    let updateTimer: NodeJS.Timeout | undefined;
     if (!hasCheckedVersionRef.current) {
       hasCheckedVersionRef.current = true;
-      checkForSiteUpdate();
+      updateTimer = setTimeout(checkForSiteUpdate, 7500);
     }
 
     // Re-vérifier lors du retour sur l'onglet + effacer la pastille rouge
@@ -77,6 +81,8 @@ export default function PwaRegister() {
     }, 60000);
 
     return () => {
+      if (swTimer) clearTimeout(swTimer);
+      if (updateTimer) clearTimeout(updateTimer);
       window.removeEventListener('focus', handleFocus);
       clearInterval(intervalId);
     };

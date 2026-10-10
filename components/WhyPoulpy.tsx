@@ -24,6 +24,7 @@ if (typeof window !== "undefined") {
 
 interface PillarVideoProps {
   videoSrc: string;
+  posterSrc?: string;
   clipTitle: string;
   clipSubtitle: string;
   isActive: boolean;
@@ -33,6 +34,7 @@ interface PillarVideoProps {
 
 function PillarLargeVideo({
   videoSrc,
+  posterSrc,
   clipTitle,
   clipSubtitle,
   isActive,
@@ -85,6 +87,7 @@ function PillarLargeVideo({
       <video
         ref={videoRef}
         src={videoSrc}
+        poster={posterSrc}
         loop
         muted
         playsInline
@@ -137,6 +140,7 @@ const PILLARS_WITH_VIDEO = [
       { label: "Crosshair placement", val: "40% d'head-shot" },
     ],
     videoSrc: "/videos/why-poulpy/aim.mp4",
+    posterSrc: "/videos/why-poulpy/aim-poster.webp",
     clipTitle: "AIM TRAINING // VALORANT, APEX & KOVAAK",
     clipSubtitle: "Démonstration visée et posture",
     color: "laser" as const,
@@ -158,6 +162,7 @@ const PILLARS_WITH_VIDEO = [
       { label: "Rééquilibrage lors d'un désavantage", val: "" },
     ],
     videoSrc: "/videos/why-poulpy/clutch.mp4",
+    posterSrc: "/videos/why-poulpy/clutch-poster.webp",
     clipTitle: "CLUTCH GAME // VALORANT & APEX",
     clipSubtitle: "Gestion de duels et tempo",
     color: "acid" as const,
@@ -178,6 +183,7 @@ const PILLARS_WITH_VIDEO = [
       { label: "Communication", val: "100% de love de vos teamates" },
     ],
     videoSrc: "/videos/why-poulpy/sang-froid.mp4",
+    posterSrc: "/videos/why-poulpy/sang-froid-poster.webp",
     clipTitle: "SANG-FROID // SITUATIONS CLUTCH",
     clipSubtitle: "Contrôle mental en match",
     color: "laser" as const,
@@ -349,6 +355,7 @@ export default function WhyPoulpy() {
                   <div className="w-full lg:col-span-7 order-1 lg:order-2 shrink-0">
                     <PillarLargeVideo
                       videoSrc={item.videoSrc}
+                      posterSrc={item.posterSrc}
                       clipTitle={item.clipTitle}
                       clipSubtitle={item.clipSubtitle}
                       isActive={isMediaActive}

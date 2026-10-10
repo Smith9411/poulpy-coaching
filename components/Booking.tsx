@@ -122,7 +122,11 @@ export default function Booking() {
   };
 
   useEffect(() => {
-    fetchSlots();
+    // Postpone non-critical slots fetch until after hero 3D intro animation fully completes
+    const timer = setTimeout(() => {
+      fetchSlots();
+    }, 7000);
+    return () => clearTimeout(timer);
   }, []);
 
   // Compute 14 upcoming days

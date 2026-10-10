@@ -375,17 +375,13 @@ export default function NotificationBell({
 
   return (
     <div ref={wrapperRef} className={`relative ${className}`}>
-      {/* Bouton Cloche */}
+      {/* Bouton Cloche (icône épurée sans rond d'arrière-plan) */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         aria-label={`Notifications ${unreadCount > 0 ? `(${unreadCount} non lues)` : ""}`}
-        className={`relative p-2.5 rounded-full transition-all cursor-pointer flex items-center justify-center ${
-          isCyber
-            ? "text-[#F5F4F0]/80 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#CA1C30]/40"
-            : "text-gray-300 hover:text-white hover:bg-white/5"
-        } ${buttonClassName}`}
+        className={`relative p-1.5 text-[#F5F4F0]/80 hover:text-[#CA1C30] transition-colors cursor-pointer flex items-center justify-center ${buttonClassName}`}
       >
-        <Bell className="w-4 h-4" />
+        <Bell className="w-[18px] h-[18px]" />
 
         {/* Pastille Rouge Pulsante */}
         {unreadCount > 0 && (
