@@ -50,53 +50,40 @@ export default function PwaRegister() {
       }).catch(() => {});
     }
 
-      // Écouter les messages de mise à jour envoyés par le Service Worker
-      const handleSwMessage = (event: MessageEvent) => {
-        if (event.data?.type === 'SW_UPDATED') {
-          console.log('[PWA] Message SW_UPDATED reçu.');
-          if (user?.isAdmin) {
-            notifyAdminSiteUpdate();
-          }
-        }
-      };
-      navigator.serviceWorker.addEventListener('message', handleSwMessage);
-
-      // Check notification permission
-      if ('Notification' in window) {
-        setNotificationPermission(Notification.permission);
-      }
-
-      // Vérification immédiate de mise à jour au montage
-      if (!hasCheckedVersionRef.current) {
-        hasCheckedVersionRef.current = true;
-        checkForSiteUpdate();
-      }
-
-      // Re-vérifier lors du retour sur l'onglet + effacer la pastille rouge
-      const handleFocus = () => {
-        checkForSiteUpdate();
-        // L'utilisateur a ouvert l'app → on efface la pastille rouge
-        clearAppBadge();
-      };
-      window.addEventListener('focus', handleFocus);
-      // Effacer aussi immédiatement au montage si l'app est déjà en focus
-      clearAppBadge();
-
-      // Vérification périodique toutes les 60 secondes pour les admins connectés
-      const intervalId = setInterval(() => {
-        if (user?.isAdmin) {
-          checkForSiteUpdate();
-        }
-      }, 60000);
-
-      return () => {
-        navigator.serviceWorker.removeEventListener('message', handleSwMessage);
-        window.removeEventListener('focus', handleFocus);
-        clearInterval(intervalId);
-      };
+    // Check notification permission
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      setNotificationPermission(Notification.permission);
     }
 
-    // 2. Capture BeforeInstallPrompt
+    // Vérification immédiate de mise à jour au montage
+    if (!hasCheckedVersionRef.current) {
+      hasCheckedVersionRef.current = true;
+      checkForSiteUpdate();
+    }
+
+    // Re-vérifier lors du retour sur l'onglet + effacer la pastille rouge
+    const handleFocus = () => {
+      checkForSiteUpdate();
+      clearAppBadge();
+    };
+    window.addEventListener('focus', handleFocus);
+    clearAppBadge();
+
+    // Vérification périodique toutes les 60 secondes pour les admins connectés
+    const intervalId = setInterval(() => {
+      if (user?.isAdmin) {
+        checkForSiteUpdate();
+      }
+    }, 60000);
+
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      clearInterval(intervalId);
+    };
+  }, [user?.isAdmin]);
+
+  // Capture BeforeInstallPrompt
+  useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
@@ -118,7 +105,7 @@ export default function PwaRegister() {
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
-  }, [user?.isAdmin]);
+  }, []);
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) return;
