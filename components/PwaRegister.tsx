@@ -41,29 +41,14 @@ export default function PwaRegister() {
   };
 
   useEffect(() => {
-    // 1. Register Service Worker
+    // Nettoyer proprement les anciens Service Workers résiduels pour éviter les conflits de cache
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
-      navigator.serviceWorker
-        .register('/sw.js')
-        .then((registration) => {
-          // Check for SW updates
-          registration.onupdatefound = () => {
-            const installingWorker = registration.installing;
-            if (installingWorker) {
-              installingWorker.onstatechange = () => {
-                if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.log('[PWA] Nouvelle version prête.');
-                  if (user?.isAdmin) {
-                    notifyAdminSiteUpdate();
-                  }
-                }
-              };
-            }
-          };
-        })
-        .catch((err) => {
-          console.warn('[PWA] Enregistrement SW échoué:', err);
-        });
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        for (const reg of registrations) {
+          reg.unregister();
+        }
+      }).catch(() => {});
+    }
 
       // Écouter les messages de mise à jour envoyés par le Service Worker
       const handleSwMessage = (event: MessageEvent) => {
