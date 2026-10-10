@@ -35,10 +35,11 @@
   --red: #CA1C30;
   --red-glow: 0 0 20px rgba(202, 28, 48, 0.45), 0 0 50px rgba(202, 28, 48, 0.18);
 
-  --font-display: var(--font-unbounded), "Unbounded", sans-serif;
-  --font-sans: var(--font-sans), "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-accent: var(--font-accent), "Space Grotesk", sans-serif;
-  --font-mono: var(--font-sans), "Plus Jakarta Sans", sans-serif;
+  --font-unbounded: "Unbounded", sans-serif;
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-accent: "Space Grotesk", sans-serif;
+  --font-display: var(--font-unbounded);
+  --font-mono: var(--font-sans);
   
   --grid-line: rgba(0, 180, 160, 0.05);
 

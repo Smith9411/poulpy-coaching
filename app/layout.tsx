@@ -1,31 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Unbounded, Plus_Jakarta_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import PwaRegister from "@/components/PwaRegister";
 import SplashScreen from "@/components/SplashScreen";
 import SmoothScroll from "@/components/SmoothScroll";
-
-const unbounded = Unbounded({
-  weight: ["700", "800", "900"],
-  subsets: ["latin"],
-  variable: "--font-unbounded",
-  display: "swap",
-});
-
-const plusJakarta = Plus_Jakarta_Sans({
-  weight: ["400", "500", "600", "700", "800"],
-  subsets: ["latin"],
-  variable: "--font-sans",
-  display: "swap",
-});
-
-const spaceGrotesk = Space_Grotesk({
-  weight: ["500", "600", "700"],
-  subsets: ["latin"],
-  variable: "--font-accent",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://poulpy-coaching.vercel.app"),
@@ -196,7 +174,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" suppressHydrationWarning className={`${unbounded.variable} ${plusJakarta.variable} ${spaceGrotesk.variable}`}>
+    <html lang="fr" suppressHydrationWarning>
       <head>
         <link rel="icon" type="image/png" href="/poulpy-favicon.png?v=4" />
         <link rel="shortcut icon" type="image/png" href="/poulpy-favicon.png?v=4" />
