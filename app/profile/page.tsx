@@ -1128,7 +1128,7 @@ export default function Profile() {
 
                       <div className="flex items-center gap-2 shrink-0">
                         <a
-                          href="https://discord.gg/rJMg3ZZRkp"
+                          href="https://discord.gg/BC24FH4xpd"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="px-3 py-1.5 rounded-lg bg-[#00B4A0]/10 hover:bg-[#00B4A0]/20 border border-[#00B4A0]/30 text-[#00B4A0] hover:text-white text-[11px] font-bold uppercase transition-colors"

@@ -17,7 +17,7 @@ INSERT INTO settings (key, value) VALUES
   ('site_name', 'Poulpy Coaching'),
   ('description', 'Coaching compétitif pour joueurs Valorant, Apex Legends et passionnés d''aim.'),
   ('contact_email', 'poulpy.coaching@gmail.com'),
-  ('discord_url', 'https://discord.gg/rJMg3ZZRkp'),
+  ('discord_url', 'https://discord.gg/BC24FH4xpd'),
   ('youtube_url', 'https://www.youtube.com/watch?v=4gfWbGCA5q0'),
   ('twitch_url', 'https://www.twitch.tv/poulpy_coaching')
 ON CONFLICT (key) DO NOTHING;

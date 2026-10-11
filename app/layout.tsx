@@ -138,7 +138,7 @@ const jsonLd = {
         "sameAs": [
           "https://www.youtube.com/@Poulpy_C",
           "https://www.twitch.tv/poulpy_coaching",
-          "https://discord.gg/rJMg3ZZRkp"
+          "https://discord.gg/BC24FH4xpd"
         ]
       },
       "knowsAbout": [
@@ -162,7 +162,7 @@ const jsonLd = {
       "sameAs": [
         "https://www.youtube.com/@Poulpy_C",
         "https://www.twitch.tv/poulpy_coaching",
-        "https://discord.gg/rJMg3ZZRkp"
+        "https://discord.gg/BC24FH4xpd"
       ]
     }
   ]

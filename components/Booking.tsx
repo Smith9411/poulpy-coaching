@@ -1215,7 +1215,7 @@ export default function Booking() {
                     </div>
 
                     <a
-                      href="https://discord.gg/rJMg3ZZRkp"
+                      href="https://discord.gg/BC24FH4xpd"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-cyber-primary flex items-center justify-center gap-2 py-3 px-6 text-xs font-bold uppercase tracking-wider shrink-0 cursor-pointer shadow-[0_0_20px_rgba(202,28,48,0.3)]"

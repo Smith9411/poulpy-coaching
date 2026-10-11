@@ -120,7 +120,7 @@ export default function BookingConfirmation({
         {/* Actions */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <a
-            href="https://discord.gg/rJMg3ZZRkp"
+            href="https://discord.gg/BC24FH4xpd"
             target="_blank"
             rel="noopener noreferrer"
             className="btn-cyber-primary w-full sm:w-auto py-3 px-6 text-xs inline-flex items-center justify-center gap-2"

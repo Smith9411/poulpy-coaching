@@ -57,7 +57,7 @@ export default function Contact() {
                 </div>
 
                 <a
-                  href="https://discord.gg/rJMg3ZZRkp"
+                  href="https://discord.gg/BC24FH4xpd"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn-cyber-primary text-xs sm:text-sm py-3.5 px-8 inline-flex items-center gap-3 cursor-pointer shadow-[0_0_20px_rgba(202,28,48,0.3)]"

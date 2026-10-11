@@ -28,7 +28,7 @@ export default function Footer() {
   const socialLinks = [
     {
       icon: MessageCircle,
-      href: 'https://discord.gg/rJMg3ZZRkp',
+      href: 'https://discord.gg/BC24FH4xpd',
       label: 'Discord'
     },
     {

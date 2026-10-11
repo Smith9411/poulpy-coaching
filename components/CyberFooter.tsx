@@ -44,7 +44,7 @@ export default function CyberFooter() {
             >
               [CONFIDENTIALITÉ · RGPD]
             </button>
-            <a href="https://discord.gg/rJMg3ZZRkp" target="_blank" rel="noreferrer" className="hover:text-[#00B4A0] transition-colors">
+            <a href="https://discord.gg/BC24FH4xpd" target="_blank" rel="noreferrer" className="hover:text-[#00B4A0] transition-colors">
               [DISCORD]
             </a>
             <a href="https://twitch.tv/poulpy_coaching" target="_blank" rel="noreferrer" className="hover:text-[#9146FF] transition-colors">

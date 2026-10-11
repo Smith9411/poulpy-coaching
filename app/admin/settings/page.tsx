@@ -22,7 +22,7 @@ const DEFAULTS = {
   siteName: 'Poulpy Coaching',
   description: "Coaching compétitif pour joueurs Valorant, Apex Legends et passionnés d'aim.",
   contactEmail: 'poulpy.coaching@gmail.com',
-  discordUrl: 'https://discord.gg/rJMg3ZZRkp',
+  discordUrl: 'https://discord.gg/BC24FH4xpd',
   youtubeUrl: 'https://www.youtube.com/watch?v=4gfWbGCA5q0',
   twitchUrl: 'https://www.twitch.tv/poulpy_coaching',
 } as const;

@@ -15,7 +15,7 @@ export default function About() {
   const [settings, setSettings] = useState({
     youtubeUrl: 'https://www.youtube.com/watch?v=4gfWbGCA5q0',
     twitchUrl: 'https://www.twitch.tv/poulpy_coaching',
-    discordUrl: 'https://discord.gg/rJMg3ZZRkp',
+    discordUrl: 'https://discord.gg/BC24FH4xpd',
   });
 
   // Fetch settings from API
@@ -28,7 +28,7 @@ export default function About() {
           setSettings({
             youtubeUrl: data.settings.youtube_url || 'https://www.youtube.com/watch?v=4gfWbGCA5q0',
             twitchUrl: data.settings.twitch_url || 'https://www.twitch.tv/poulpy_coaching',
-            discordUrl: data.settings.discord_url || 'https://discord.gg/rJMg3ZZRkp',
+            discordUrl: data.settings.discord_url || 'https://discord.gg/BC24FH4xpd',
           });
         }
       } catch (error) {
@@ -159,7 +159,7 @@ export default function About() {
                 {/* Social links */}
                 <div className="flex items-center justify-center lg:justify-center gap-3 max-w-md mx-auto">
                   <a
-                    href="https://discord.gg/rJMg3ZZRkp"
+                    href={settings.discordUrl || "https://discord.gg/BC24FH4xpd"}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="glass px-4 py-2 rounded-lg hover:bg-white/10 transition-all flex items-center gap-2 text-sm"

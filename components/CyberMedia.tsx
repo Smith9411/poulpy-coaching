@@ -199,7 +199,7 @@ export default function CyberMedia() {
             )}
 
             <a
-              href="https://discord.gg/rJMg3ZZRkp"
+              href="https://discord.gg/BC24FH4xpd"
               target="_blank"
               rel="noopener noreferrer"
               className="btn-cyber-ghost px-5 py-2.5 text-[11px] font-medium tracking-wider uppercase cursor-pointer"
