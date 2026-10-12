@@ -217,7 +217,7 @@ export default function WhyPoulpy() {
       }
 
       const maxScroll = Math.max(0, track.scrollWidth - window.innerWidth + 80);
-      const totalScrollDistance = Math.max(2000, maxScroll * 1.5);
+      const totalScrollDistance = Math.max(900, maxScroll * 0.7);
       scrollDistanceRef.current = totalScrollDistance;
 
       ctx = gsap.context(() => {
@@ -231,7 +231,7 @@ export default function WhyPoulpy() {
             pinSpacing: true,
             start: "top top",
             end: () => `+=${totalScrollDistance}`,
-            scrub: 0.6,
+            scrub: 0.2,
             invalidateOnRefresh: true,
             onUpdate: (self: { progress: number }) => {
               const progress = self.progress;
