@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin/
 Disallow: /api/
 
-Sitemap: https://poulpy-coaching.vercel.app/sitemap.xml
+Sitemap: https://www.poulpy-coaching.fr/sitemap.xml
