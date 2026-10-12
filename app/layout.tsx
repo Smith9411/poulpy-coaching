@@ -6,7 +6,7 @@ import SplashScreen from "@/components/SplashScreen";
 import SmoothScroll from "@/components/SmoothScroll";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://poulpy-coaching.vercel.app"),
+  metadataBase: new URL("https://www.poulpy-coaching.fr"),
   title: {
     default: "Poulpy Coaching — Coach E-sport Valorant & Apex Legends (Immortal & Predator)",
     template: "%s | Poulpy Coaching",
@@ -14,11 +14,11 @@ export const metadata: Metadata = {
   description:
     "Poulpy Coaching : Plateforme officielle de coaching e-sport d'élite sur Valorant et Apex Legends par Coach Poulpy (Atheris Esport). Analyse VOD chirurgicale, biomécanique aim, routine personnalisée et suivi Discord.",
   applicationName: "Poulpy Coaching",
-  authors: [{ name: "Poulpy", url: "https://poulpy-coaching.vercel.app" }],
+  authors: [{ name: "Poulpy", url: "https://www.poulpy-coaching.fr" }],
   creator: "Poulpy",
   publisher: "Poulpy Coaching",
   alternates: {
-    canonical: "https://poulpy-coaching.vercel.app",
+    canonical: "https://www.poulpy-coaching.fr",
   },
   keywords: [
     "Poulpy",
@@ -53,7 +53,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "fr_FR",
-    url: "https://poulpy-coaching.vercel.app",
+    url: "https://www.poulpy-coaching.fr",
     siteName: "Poulpy Coaching",
     title: "Poulpy Coaching — Coach E-sport Valorant & Apex Legends",
     description:
@@ -104,30 +104,30 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "WebSite",
-      "@id": "https://poulpy-coaching.vercel.app/#website",
-      "url": "https://poulpy-coaching.vercel.app",
+      "@id": "https://www.poulpy-coaching.fr/#website",
+      "url": "https://www.poulpy-coaching.fr",
       "name": "Poulpy Coaching",
       "alternateName": ["Poulpy", "Coach Poulpy", "PoulpyCoaching", "Poulpi Coaching", "Poulpi"],
       "description": "Plateforme officielle de coaching e-sport Valorant et Apex Legends par Coach Poulpy.",
       "publisher": {
         "@type": "Organization",
-        "@id": "https://poulpy-coaching.vercel.app/#organization",
+        "@id": "https://www.poulpy-coaching.fr/#organization",
         "name": "Poulpy Coaching",
-        "url": "https://poulpy-coaching.vercel.app",
+        "url": "https://www.poulpy-coaching.fr",
         "logo": {
           "@type": "ImageObject",
-          "url": "https://poulpy-coaching.vercel.app/icons/icon-512x512.png"
+          "url": "https://www.poulpy-coaching.fr/icons/icon-512x512.png"
         }
       }
     },
     {
       "@type": ["ProfessionalService", "Organization", "SportsActivityLocation"],
-      "@id": "https://poulpy-coaching.vercel.app/#organization",
+      "@id": "https://www.poulpy-coaching.fr/#organization",
       "name": "Poulpy Coaching",
       "alternateName": ["Coach Poulpy", "Poulpy", "Poulpi Coaching", "PoulpyCoaching"],
-      "url": "https://poulpy-coaching.vercel.app",
-      "logo": "https://poulpy-coaching.vercel.app/icons/icon-512x512.png",
-      "image": "https://poulpy-coaching.vercel.app/icons/icon-512x512.png",
+      "url": "https://www.poulpy-coaching.fr",
+      "logo": "https://www.poulpy-coaching.fr/icons/icon-512x512.png",
+      "image": "https://www.poulpy-coaching.fr/icons/icon-512x512.png",
       "description": "Coaching e-sport d'élite sur Valorant et Apex Legends. Analyse VOD, biomécanique de visée et routine d'entraînement sur-mesure par Poulpy.",
       "priceRange": "€€",
       "founder": {

@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://poulpy-coaching.vercel.app";
+  const baseUrl = "https://www.poulpy-coaching.fr";
   const now = new Date();
 
   return [

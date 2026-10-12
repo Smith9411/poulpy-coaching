@@ -166,7 +166,7 @@ export async function POST(req: NextRequest) {
       }
 
       try {
-        const origin = req.headers.get('origin') || 'https://poulpy-coaching.vercel.app';
+        const origin = req.headers.get('origin') || 'https://www.poulpy-coaching.fr';
         const sessionPayload = {
           customer_email: studentEmail.trim().toLowerCase(),
           line_items: [

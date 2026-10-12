@@ -5,12 +5,12 @@ export const metadata: Metadata = {
   description:
     "Rejoignez le Discord officiel de Poulpy Coaching ou contactez directement Coach Poulpy pour planifier votre séance de coaching Valorant ou Apex Legends.",
   alternates: {
-    canonical: "https://poulpy-coaching.vercel.app/contact",
+    canonical: "https://www.poulpy-coaching.fr/contact",
   },
   openGraph: {
     title: "Contact & Discord — Poulpy Coaching",
     description: "Rejoins la communauté Discord et réserve ta session de coaching avec Poulpy.",
-    url: "https://poulpy-coaching.vercel.app/contact",
+    url: "https://www.poulpy-coaching.fr/contact",
   },
 };
 

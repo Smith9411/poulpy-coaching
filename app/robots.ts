@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/admin/", "/api/", "/profile/"],
       },
     ],
-    sitemap: "https://poulpy-coaching.vercel.app/sitemap.xml",
+    sitemap: "https://www.poulpy-coaching.fr/sitemap.xml",
   };
 }
