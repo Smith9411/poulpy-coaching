@@ -16,6 +16,16 @@ const MAX_TEXT_LENGTH = 2000;
 const MAX_NAME_LENGTH = 60;
 const MAX_RANK_LENGTH = 60;
 
+function cleanDiscordUsername(raw?: string | null): string | null {
+  if (!raw) return null;
+  let str = String(raw).trim();
+  if (str.startsWith('@')) str = str.slice(1).trim();
+  if (str.includes('#')) {
+    str = str.split('#')[0].trim();
+  }
+  return str.length > 0 ? str : null;
+}
+
 interface ReviewItem {
   id: string;
   name: string;
@@ -124,6 +134,7 @@ export async function GET(req: NextRequest) {
 
     let reviews = (dbReviews || []).map((r: any) => ({
       ...r,
+      name: cleanDiscordUsername(r.name) || r.name,
       featured: featuredIds.includes(r.id) || r.featured === true,
     }));
 
@@ -165,20 +176,76 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Récupération du pseudo officiel du profil
+    // Récupération automatique du pseudo Discord si connecté ou renseigné
+    let discordUsername: string | null = null;
+
+    // 1. Identité OAuth Discord liée au compte
+    const discordIdentity = authUser.identities?.find((i: any) => i.provider === 'discord');
+    if (discordIdentity?.identity_data) {
+      const idData = discordIdentity.identity_data;
+      discordUsername = cleanDiscordUsername(
+        idData.custom_claims?.global_name ||
+        idData.full_name ||
+        idData.name ||
+        idData.user_name ||
+        idData.username
+      );
+    }
+
+    // 2. Métadonnées utilisateur (OAuth Discord ou champ discord)
+    if (!discordUsername) {
+      const meta = authUser.user_metadata || {};
+      const candidate =
+        meta.custom_claims?.global_name ||
+        meta.discord ||
+        (authUser.app_metadata?.provider === 'discord' ? (meta.full_name || meta.name || meta.user_name) : null);
+      discordUsername = cleanDiscordUsername(candidate);
+    }
+
+    // 3. Réservation de coaching précédente (student_discord)
+    if (!discordUsername) {
+      try {
+        const { data: latestBooking } = await supabase
+          .from('coaching_bookings')
+          .select('student_discord')
+          .or(`user_id.eq.${authUser.id},student_email.eq.${authUser.email}`)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (latestBooking?.student_discord) {
+          discordUsername = cleanDiscordUsername(latestBooking.student_discord);
+        }
+      } catch (err) {
+        console.warn('Erreur vérification booking discord:', err);
+      }
+    }
+
+    // Récupération du profil
     const { data: profile } = await supabase
       .from('profiles')
-      .select('username')
+      .select('*')
       .eq('id', authUser.id)
       .maybeSingle();
 
+    if (!discordUsername && (profile as any)?.discord) {
+      discordUsername = cleanDiscordUsername((profile as any).discord);
+    }
+
+    // Priorité absolue au pseudo Discord (sans # ni @), sinon username profil / meta
     const authorName = (
+      discordUsername ||
       profile?.username ||
       authUser.user_metadata?.username ||
       authUser.user_metadata?.full_name ||
       name ||
       'Élève Poulpy'
     ).trim();
+
+    // Auto-synchronisation du pseudo de profil si c'était un identifiant brut d'email
+    if (discordUsername && profile?.username && (profile.username.includes('.') || /^[a-z]\d{6,}$/i.test(profile.username))) {
+      await supabase.from('profiles').update({ username: discordUsername }).eq('id', authUser.id);
+    }
 
     const nameTrimmed = authorName.slice(0, MAX_NAME_LENGTH);
     const textTrimmed = String(text).trim();

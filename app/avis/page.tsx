@@ -617,11 +617,11 @@ export default function Avis() {
                 <div className="space-y-5 text-xs">
                   <div>
                     <label className="block text-[11px] font-bold text-[#F5F4F0]/70 uppercase tracking-wider mb-2">
-                      PSEUDO AFFICHÉ
+                      PSEUDO AFFICHÉ {user.discord && <span className="text-[#5865F2] font-normal lowercase text-[10px]">(discord)</span>}
                     </label>
                     <input
                       type="text"
-                      value={user.username}
+                      value={(user.discord ? user.discord.replace(/#.*$/, '').replace(/^@/, '').trim() : user.username)}
                       disabled
                       className="w-full px-4 py-3 bg-[#1A1822] rounded-xl text-white/40 cursor-not-allowed text-xs font-mono border border-white/5"
                     />
