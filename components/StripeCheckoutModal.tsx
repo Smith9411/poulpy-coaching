@@ -111,30 +111,30 @@ export default function StripeCheckoutModal({
   const modalContent = (
     <AnimatePresence>
       <div className="fixed inset-0 z-[99999] flex items-center justify-center p-3 sm:p-6 overflow-y-auto pt-20 pb-8 font-mono">
-        {/* Backdrop sombre flouté — ne ferme PAS le formulaire au clic pour éviter les fausses manipulations */}
+        {/* Backdrop sombre flouté */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/90 backdrop-blur-md"
+          className="fixed inset-0 bg-black/75 backdrop-blur-md"
         />
 
-        {/* Modal Window Cyberpunk */}
+        {/* Modal Window Cyberpunk — Fond carbone adouci */}
         <motion.div
           initial={{ opacity: 0, scale: 0.96, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 20 }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
-          className="relative w-full max-w-2xl bg-[#0D0F12] border border-white/10 rounded-2xl shadow-[0_30px_90px_rgba(0,0,0,0.98)] overflow-hidden z-10 flex flex-col my-auto max-h-[86vh]"
+          className="relative w-full max-w-2xl bg-[#181A20] border border-white/15 rounded-2xl shadow-[0_30px_90px_rgba(0,0,0,0.85)] overflow-hidden z-10 flex flex-col my-auto max-h-[86vh]"
         >
           {/* Header épuré sans vignette */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[#121418]">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[#1F222B]">
             <div>
               <h3 className="text-sm font-display font-bold text-white tracking-wider flex items-center gap-2">
                 <span>PAIEMENT SÉCURISÉ</span>
                 {planPrice && (
-                  <span className="text-xs px-2 py-0.5 rounded bg-[#00B4A0]/20 text-[#00B4A0] border border-[#00B4A0]/30 font-mono">
-                    {planPrice}
+                  <span className="text-sm font-mono text-[#00B4A0] font-bold">
+                    · {planPrice}
                   </span>
                 )}
               </h3>
@@ -154,9 +154,9 @@ export default function StripeCheckoutModal({
           </div>
 
           {/* Body */}
-          <div className="relative p-3 sm:p-5 flex-1 overflow-y-auto bg-[#0D0F12] min-h-[480px]">
+          <div className="relative p-3 sm:p-5 flex-1 overflow-y-auto bg-[#181A20] min-h-[480px]">
             {loading && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0D0F12] z-20 text-white/50">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#181A20] z-20 text-white/50">
                 <Loader2 className="w-8 h-8 animate-spin text-[#CA1C30]" />
                 <span className="text-xs font-mono">Connexion sécurisée à Stripe...</span>
               </div>
@@ -182,7 +182,7 @@ export default function StripeCheckoutModal({
           </div>
 
           {/* Footer Security Badges */}
-          <div className="px-5 sm:px-6 py-3 border-t border-white/5 bg-[#121418]/80 flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] font-mono text-white/40">
+          <div className="px-5 sm:px-6 py-3 border-t border-white/10 bg-[#1F222B] flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] font-mono text-white/40">
             <div className="flex items-center gap-1.5 text-[#00B4A0]">
               <ShieldCheck size={13} />
               <span>Chiffrement SSL 256 bits · Stripe Checkout</span>
