@@ -168,7 +168,7 @@ export async function POST(req: NextRequest) {
       try {
         const origin = req.headers.get('origin') || 'https://poulpy-coaching.vercel.app';
         const session = await stripe.checkout.sessions.create({
-          ui_mode: 'embedded_page',
+          ui_mode: 'embedded' as any,
           customer_email: studentEmail.trim().toLowerCase(),
           line_items: [
             {
