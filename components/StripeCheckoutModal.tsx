@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, Lock, ShieldCheck, Loader2 } from 'lucide-react';
+import { X, ShieldCheck, Loader2 } from 'lucide-react';
 import { loadStripe, StripeEmbeddedCheckout } from '@stripe/stripe-js';
 
 const stripePromise = loadStripe(
@@ -127,35 +127,29 @@ export default function StripeCheckoutModal({
           transition={{ duration: 0.25, ease: 'easeOut' }}
           className="relative w-full max-w-2xl bg-[#0D0F12] border border-white/10 rounded-2xl shadow-[0_30px_90px_rgba(0,0,0,0.98)] overflow-hidden z-10 flex flex-col my-auto max-h-[86vh]"
         >
-          {/* Header avec bouton RETOUR ARRIÈRE explicite */}
-          <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-white/10 bg-[#121418]">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-[#CA1C30]/15 border border-[#CA1C30]/30 flex items-center justify-center text-[#CA1C30] shrink-0">
-                <Lock size={15} />
-              </div>
-              <div>
-                <h3 className="text-sm font-display font-bold text-white tracking-wider flex items-center gap-2">
-                  <span>TERMINAL DE PAIEMENT</span>
-                  {planPrice && (
-                    <span className="text-xs px-2 py-0.5 rounded bg-[#00B4A0]/20 text-[#00B4A0] border border-[#00B4A0]/30 font-mono">
-                      {planPrice}
-                    </span>
-                  )}
-                </h3>
-                <p className="text-[11px] font-mono text-white/50 truncate max-w-[280px] sm:max-w-md">
-                  {planName || 'Coaching E-sport officiel Poulpy'}
-                </p>
-              </div>
+          {/* Header épuré sans vignette */}
+          <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[#121418]">
+            <div>
+              <h3 className="text-sm font-display font-bold text-white tracking-wider flex items-center gap-2">
+                <span>PAIEMENT SÉCURISÉ</span>
+                {planPrice && (
+                  <span className="text-xs px-2 py-0.5 rounded bg-[#00B4A0]/20 text-[#00B4A0] border border-[#00B4A0]/30 font-mono">
+                    {planPrice}
+                  </span>
+                )}
+              </h3>
+              <p className="text-[11px] font-mono text-white/50 truncate max-w-[280px] sm:max-w-md mt-0.5">
+                {planName || 'Coaching E-sport officiel Poulpy'}
+              </p>
             </div>
 
-            {/* Bouton retour en arrière officiel */}
+            {/* Croix de fermeture épurée qui se colore en rouge au survol */}
             <button
               onClick={onClose}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white border border-white/10 transition-colors text-xs font-mono cursor-pointer shrink-0"
-              title="Retour au formulaire de réservation"
+              className="p-2 rounded-xl text-white/40 hover:text-[#CA1C30] hover:bg-[#CA1C30]/10 transition-colors cursor-pointer shrink-0"
+              title="Fermer et retourner au formulaire"
             >
-              <ArrowLeft size={14} />
-              <span className="hidden sm:inline">RETOUR</span>
+              <X size={20} />
             </button>
           </div>
 
