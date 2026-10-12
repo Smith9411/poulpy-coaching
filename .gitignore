@@ -38,6 +38,8 @@ next-env.d.ts
 # raw local video sources
 Vidéo why poulpy/
 video-studio/
+.agents/
+skills-lock.json
 brag-output/
 public/poulpy-*.mp4
 public/poulpy-*.jpg
