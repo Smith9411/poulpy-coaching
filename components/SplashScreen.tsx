@@ -4,11 +4,29 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 
 export default function SplashScreen() {
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(() => {
+    if (typeof window !== "undefined") {
+      const alreadyDone =
+        Boolean((window as any).__poulpy_splash_done) ||
+        sessionStorage.getItem("poulpy_splash_done") === "true";
+      return !alreadyDone;
+    }
+    return false;
+  });
   const [progress, setProgress] = useState(15);
   const [isFadingOut, setIsFadingOut] = useState(false);
 
   useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      ((window as any).__poulpy_splash_done ||
+        sessionStorage.getItem("poulpy_splash_done") === "true")
+    ) {
+      window.dispatchEvent(new CustomEvent("poulpy_splash_reveal"));
+      setIsVisible(false);
+      return;
+    }
+
     let isCancelled = false;
 
     // Smooth visual increments while page and fonts are loading
@@ -61,6 +79,10 @@ export default function SplashScreen() {
           if (isCancelled) return;
           setIsFadingOut(true);
           if (typeof window !== "undefined") {
+            (window as any).__poulpy_splash_done = true;
+            try {
+              sessionStorage.setItem("poulpy_splash_done", "true");
+            } catch (e) {}
             window.dispatchEvent(new CustomEvent("poulpy_splash_reveal"));
           }
         }, 120);

@@ -9,9 +9,28 @@ interface HeroCyberProps {
 }
 
 export default function HeroCyber({ onOpenBooking }: HeroCyberProps) {
-  const [isRevealed, setIsRevealed] = useState(false);
+  const [isRevealed, setIsRevealed] = useState(() => {
+    if (typeof window !== "undefined") {
+      return Boolean(
+        (window as any).__poulpy_splash_done ||
+        sessionStorage.getItem("poulpy_splash_done") === "true"
+      );
+    }
+    return false;
+  });
 
   useEffect(() => {
+    if (isRevealed) return;
+
+    if (
+      typeof window !== "undefined" &&
+      ((window as any).__poulpy_splash_done ||
+        sessionStorage.getItem("poulpy_splash_done") === "true")
+    ) {
+      setIsRevealed(true);
+      return;
+    }
+
     let fallbackTimer: NodeJS.Timeout | undefined;
 
     const reveal = () => {
@@ -20,13 +39,13 @@ export default function HeroCyber({ onOpenBooking }: HeroCyberProps) {
     };
 
     window.addEventListener("poulpy_splash_reveal", reveal);
-    fallbackTimer = setTimeout(reveal, 3000);
+    fallbackTimer = setTimeout(reveal, 600);
 
     return () => {
       window.removeEventListener("poulpy_splash_reveal", reveal);
       if (fallbackTimer) clearTimeout(fallbackTimer);
     };
-  }, []);
+  }, [isRevealed]);
 
   const titleString = "POULPY";
 
