@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createNotionBooking } from '@/lib/notion';
-import { stripe } from '@/lib/stripe';
+import { stripe, isStripeConfigured } from '@/lib/stripe';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -265,7 +265,7 @@ export async function POST(req: NextRequest) {
       amountInCents = priceStr.includes('60') ? 6000 : 2000;
     }
 
-    if (amountInCents > 0 && process.env.STRIPE_SECRET_KEY) {
+    if (amountInCents > 0 && isStripeConfigured) {
       try {
         const origin = req.headers.get('origin') || 'https://poulpy-coaching.vercel.app';
         const session = await stripe.checkout.sessions.create({
