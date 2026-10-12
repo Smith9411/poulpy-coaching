@@ -182,7 +182,7 @@ export default function CyberFooter() {
               <div>
                 <strong className="text-[#F5F4F0] block mb-1">04. VOS DROITS (ACCÈS &amp; SUPPRESSION)</strong>
                 <p>
-                  Conformément au RGPD, vous disposez d&apos;un droit d&apos;accès, de rectification et d&apos;effacement de vos données. Pour exercer ce droit, contactez simplement le coach sur Discord ou à l&apos;adresse poulpy.coaching@gmail.com.
+                  Conformément au RGPD, vous disposez d&apos;un droit d&apos;accès, de rectification et d&apos;effacement de vos données. Pour exercer ce droit, contactez simplement le coach sur Discord ou à l&apos;adresse contact@poulpy-coaching.fr.
                 </p>
               </div>
             </div>
@@ -225,7 +225,7 @@ export default function CyberFooter() {
                   Le site <span className="text-[#00B4A0]">poulpy-coaching.fr</span> est édité par Coach Poulpy (Poulpy Coaching), prestataire indépendant de services d&apos;entraînement, de coaching e-sportif et d&apos;analyse tactique.
                 </p>
                 <p className="mt-1 text-[#F5F4F0]/50">
-                  Contact officiel : <span className="text-white">poulpy.coaching@gmail.com</span> ou via le serveur Discord communautaire officiel.
+                  Contact officiel : <span className="text-white">contact@poulpy-coaching.fr</span> ou via le serveur Discord communautaire officiel.
                 </p>
               </div>
 

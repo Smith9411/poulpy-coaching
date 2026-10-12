@@ -91,10 +91,10 @@ export default function Contact() {
                 Partenariats, structures & demandes business
               </p>
               <a
-                href="mailto:poulpy.coaching@gmail.com"
+                href="mailto:contact@poulpy-coaching.fr"
                 className="text-xs text-[#00B4A0] hover:text-white font-bold transition-colors break-all"
               >
-                poulpy.coaching@gmail.com
+                contact@poulpy-coaching.fr
               </a>
             </div>
 
