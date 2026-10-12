@@ -4,14 +4,10 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const host = request.headers.get('host') || '';
 
-  // Redirection automatique et permanente de vercel.app vers le domaine officiel www.poulpy-coaching.fr
-  // Transfère 100% de la réputation SEO de Google vers le nouveau domaine
+  // Redirection automatique de tout trafic provenant de l'ancien vercel.app
+  // (y compris le lien /avis actuellement référencé sur Google) directement vers la page d'accueil officielle
   if (host.includes('poulpy-coaching.vercel.app')) {
-    const url = request.nextUrl.clone();
-    url.host = 'www.poulpy-coaching.fr';
-    url.protocol = 'https';
-    url.port = '';
-    return NextResponse.redirect(url, 308);
+    return NextResponse.redirect(new URL('https://www.poulpy-coaching.fr', request.url), 308);
   }
 
   return NextResponse.next();
