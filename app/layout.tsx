@@ -4,6 +4,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import PwaRegister from "@/components/PwaRegister";
 import SplashScreen from "@/components/SplashScreen";
 import SmoothScroll from "@/components/SmoothScroll";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.poulpy-coaching.fr"),
@@ -203,6 +204,7 @@ export default function RootLayout({
             <div className="relative z-10">{children}</div>
           </SmoothScroll>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
