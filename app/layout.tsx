@@ -92,6 +92,9 @@ export const metadata: Metadata = {
     ],
     shortcut: "/poulpy-favicon.png?v=4",
   },
+  verification: {
+    google: "nT2EwQTNqVoSAscGKb752xfoEhAUA6UO3mZBD8D04DQ",
+  },
 };
 
 export const viewport: Viewport = {
@@ -177,6 +180,7 @@ export default function RootLayout({
   return (
     <html lang="fr" suppressHydrationWarning>
       <head>
+        <meta name="google-site-verification" content="nT2EwQTNqVoSAscGKb752xfoEhAUA6UO3mZBD8D04DQ" />
         <link rel="icon" type="image/png" href="/poulpy-favicon.png?v=4" />
         <link rel="shortcut icon" type="image/png" href="/poulpy-favicon.png?v=4" />
         <link rel="apple-touch-icon" href="/poulpy-favicon.png?v=4" />
