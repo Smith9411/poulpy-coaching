@@ -157,7 +157,14 @@ export async function POST(req: NextRequest) {
     }
 
     // 4. SI FORMULE PAYANTE : Créer la session Stripe SANS créer la réservation ni notifier Discord/Notion
-    if (amountInCents > 0 && isStripeConfigured) {
+    if (amountInCents > 0) {
+      if (!isStripeConfigured) {
+        return NextResponse.json(
+          { error: 'Le paiement Stripe n\'est pas encore configuré côté serveur (STRIPE_SECRET_KEY manquante ou invalide).' },
+          { status: 500 }
+        );
+      }
+
       try {
         const origin = req.headers.get('origin') || 'https://poulpy-coaching.vercel.app';
         const session = await stripe.checkout.sessions.create({
@@ -201,9 +208,10 @@ export async function POST(req: NextRequest) {
           clientSecret: session.client_secret,
           checkoutUrl: session.url,
         });
-      } catch (stripeErr) {
+      } catch (stripeErr: any) {
         console.error('Erreur création session Stripe Checkout:', stripeErr);
-        return NextResponse.json({ error: 'Impossible d\'initialiser le paiement Stripe.' }, { status: 500 });
+        const detailMsg = stripeErr?.message || 'Erreur Stripe';
+        return NextResponse.json({ error: `Impossible d'initialiser le paiement Stripe: ${detailMsg}` }, { status: 500 });
       }
     }
 
