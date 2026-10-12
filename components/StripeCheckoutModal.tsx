@@ -125,10 +125,10 @@ export default function StripeCheckoutModal({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: 20 }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
-          className="relative w-full max-w-2xl bg-[#181A20] border border-white/15 rounded-2xl shadow-[0_30px_90px_rgba(0,0,0,0.85)] overflow-hidden z-10 flex flex-col my-auto max-h-[86vh]"
+          className="relative w-full max-w-2xl bg-[#1E2028] border border-white/20 rounded-2xl shadow-[0_30px_90px_rgba(0,0,0,0.7)] overflow-hidden z-10 flex flex-col my-auto max-h-[86vh]"
         >
           {/* Header épuré sans vignette */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[#1F222B]">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-[#252833]">
             <div>
               <h3 className="text-sm font-display font-bold text-white tracking-wider flex items-center gap-2">
                 <span>PAIEMENT SÉCURISÉ</span>
@@ -154,9 +154,9 @@ export default function StripeCheckoutModal({
           </div>
 
           {/* Body */}
-          <div className="relative p-3 sm:p-5 flex-1 overflow-y-auto bg-[#181A20] min-h-[480px]">
+          <div className="relative p-3 sm:p-5 flex-1 overflow-y-auto bg-[#1E2028] min-h-[480px]">
             {loading && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#181A20] z-20 text-white/50">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#1E2028] z-20 text-white/50">
                 <Loader2 className="w-8 h-8 animate-spin text-[#CA1C30]" />
                 <span className="text-xs font-mono">Connexion sécurisée à Stripe...</span>
               </div>
@@ -182,7 +182,7 @@ export default function StripeCheckoutModal({
           </div>
 
           {/* Footer Security Badges */}
-          <div className="px-5 sm:px-6 py-3 border-t border-white/10 bg-[#1F222B] flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] font-mono text-white/40">
+          <div className="px-5 sm:px-6 py-3 border-t border-white/10 bg-[#252833] flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] font-mono text-white/40">
             <div className="flex items-center gap-1.5 text-[#00B4A0]">
               <ShieldCheck size={13} />
               <span>Chiffrement SSL 256 bits · Stripe Checkout</span>
