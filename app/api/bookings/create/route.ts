@@ -167,8 +167,7 @@ export async function POST(req: NextRequest) {
 
       try {
         const origin = req.headers.get('origin') || 'https://poulpy-coaching.vercel.app';
-        const session = await stripe.checkout.sessions.create({
-          ui_mode: 'embedded' as any,
+        const sessionPayload = {
           customer_email: studentEmail.trim().toLowerCase(),
           line_items: [
             {
@@ -183,7 +182,7 @@ export async function POST(req: NextRequest) {
               quantity: 1,
             },
           ],
-          mode: 'payment',
+          mode: 'payment' as const,
           metadata: {
             userId: userId || '',
             slotId: targetSlotId || '',
@@ -200,7 +199,24 @@ export async function POST(req: NextRequest) {
             notes: notes?.trim() || '',
           },
           return_url: `${origin}/?booking_success=true&session_id={CHECKOUT_SESSION_ID}`,
-        });
+        };
+
+        let session;
+        try {
+          session = await stripe.checkout.sessions.create({
+            ...sessionPayload,
+            ui_mode: 'embedded_page' as any,
+          });
+        } catch (firstErr: any) {
+          if (firstErr?.message?.includes('embedded_page')) {
+            session = await stripe.checkout.sessions.create({
+              ...sessionPayload,
+              ui_mode: 'embedded' as any,
+            });
+          } else {
+            throw firstErr;
+          }
+        }
 
         return NextResponse.json({
           success: true,
