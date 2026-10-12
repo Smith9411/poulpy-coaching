@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createNotionBooking } from '@/lib/notion';
+import { sendBookingConfirmationEmail } from '@/lib/email';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -265,6 +266,25 @@ export async function POST(req: NextRequest) {
       }
     } catch (notionErr) {
       console.error('[Notion Sync Error - Pack Session]', notionErr);
+    }
+
+    // Envoi de l'email officiel de confirmation avec Google Calendar
+    try {
+      if (studentEmail) {
+        await sendBookingConfirmationEmail({
+          studentName,
+          studentEmail,
+          studentDiscord,
+          planName: sessionPlanName,
+          planPrice: `Inclus (${packSummary.packName})`,
+          planDuration: sessionDuration,
+          bookingDate,
+          bookingTime,
+          game: selectedGame,
+        });
+      }
+    } catch (emailErr) {
+      console.error('[Email Dispatch Error - Pack Session]', emailErr);
     }
 
     return NextResponse.json({
