@@ -5,7 +5,7 @@ import DecryptedText from "./DecryptedText";
 import { Terminal, Shield, ArrowUp, X, ShieldCheck, FileText, Lock } from "lucide-react";
 
 export default function CyberFooter() {
-  const [legalModal, setLegalModal] = useState<"cgv" | "privacy" | null>(null);
+  const [legalModal, setLegalModal] = useState<"cgv" | "privacy" | "legal" | null>(null);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -32,6 +32,12 @@ export default function CyberFooter() {
             <a href="/contact" className="hover:text-[#CA1C30] transition-colors font-bold">
               [CONTACT &amp; SUPPORT]
             </a>
+            <button
+              onClick={() => setLegalModal("legal")}
+              className="hover:text-white transition-colors cursor-pointer text-[#F5F4F0]/60"
+            >
+              [MENTIONS LÉGALES]
+            </button>
             <button
               onClick={() => setLegalModal("cgv")}
               className="hover:text-white transition-colors cursor-pointer text-[#F5F4F0]/60"
@@ -187,6 +193,83 @@ export default function CyberFooter() {
                 className="btn-cyber-primary py-2 px-6 text-xs cursor-pointer"
               >
                 <span>FERMER LE REGISTRE</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Interactive Modal: Mentions Légales (LCEN & Conformité) */}
+      {legalModal === "legal" && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/85 backdrop-blur-md font-mono">
+          <div className="relative w-full max-w-2xl bg-[#121117] border border-white/20 shadow-[0_0_60px_rgba(0,0,0,0.9)] p-6 sm:p-8 space-y-6 max-h-[85vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-[#CA1C30]" />
+                <h3 className="text-xl font-display text-[#F5F4F0] tracking-wider">
+                  MENTIONS LÉGALES &amp; INFORMATIONS ÉDITEUR
+                </h3>
+              </div>
+              <button
+                onClick={() => setLegalModal(null)}
+                className="p-1 border border-white/15 text-white/60 hover:text-white transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-xs text-[#F5F4F0]/70 leading-relaxed">
+              <div>
+                <strong className="text-[#F5F4F0] block mb-1">01. ÉDITEUR DE LA PLATEFORME</strong>
+                <p>
+                  Le site <span className="text-[#00B4A0]">poulpy-coaching.fr</span> est édité par Coach Poulpy (Poulpy Coaching), prestataire indépendant de services d&apos;entraînement, de coaching e-sportif et d&apos;analyse tactique.
+                </p>
+                <p className="mt-1 text-[#F5F4F0]/50">
+                  Contact officiel : <span className="text-white">contact@poulpy-coaching.fr</span> ou via le serveur Discord communautaire officiel.
+                </p>
+              </div>
+
+              <div>
+                <strong className="text-[#F5F4F0] block mb-1">02. HÉBERGEMENT &amp; INFRASTRUCTURE</strong>
+                <p>
+                  • <strong>Hébergement de l&apos;application :</strong> Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis (Serveurs CDN Edge sécurisés).
+                </p>
+                <p className="mt-1">
+                  • <strong>Nom de domaine &amp; Zone DNS :</strong> OVHcloud SAS, 2 rue Kellermann, 59100 Roubaix, France.
+                </p>
+                <p className="mt-1">
+                  • <strong>Base de données &amp; Authentification :</strong> Supabase Inc., 970 Toa Payoh North #07-04, Singapour (Infrastructure PostgreSQL chiffrée SSL/TLS).
+                </p>
+              </div>
+
+              <div>
+                <strong className="text-[#F5F4F0] block mb-1">03. PAIEMENTS &amp; SÉCURITÉ DES TRANSACTIONS</strong>
+                <p>
+                  Les transactions bancaires sont intégralement opérées par <strong>Stripe Payments Europe, Ltd.</strong> (1 Grand Canal Street Lower, Grand Canal Dock, Dublin, D02 H210, Irlande), établissement certifié conforme au standard de sécurité bancaire le plus strict <strong>PCI-DSS Niveau 1</strong>. Aucune donnée bancaire n&apos;est stockée sur les serveurs de Poulpy Coaching.
+                </p>
+              </div>
+
+              <div>
+                <strong className="text-[#F5F4F0] block mb-1">04. PROPRIÉTÉ INTELLECTUELLE</strong>
+                <p>
+                  L&apos;ensemble des contenus, marques visuelles, mascottes, codes graphiques et pédagogies de coaching présents sur ce site sont protégés par le droit d&apos;auteur. Valorant et Apex Legends sont des marques déposées respectivement de Riot Games et Electronic Arts, citées ici uniquement aux fins d&apos;identification du support des cours de perfectionnement.
+                </p>
+              </div>
+
+              <div>
+                <strong className="text-[#F5F4F0] block mb-1">05. COOKIES &amp; RESPECT DE LA VIE PRIVÉE</strong>
+                <p>
+                  Ce site n&apos;utilise aucun cookie publicitaire ou traceur tiers intrusif. La mesure d&apos;audience est assurée par Vercel Web Analytics, conforme aux recommandations de la CNIL et au RGPD sans collecte de données nominatives.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-white/10 flex justify-end">
+              <button
+                onClick={() => setLegalModal(null)}
+                className="btn-cyber-primary py-2 px-6 text-xs cursor-pointer"
+              >
+                <span>FERMER LES MENTIONS</span>
               </button>
             </div>
           </div>

@@ -45,6 +45,9 @@ export async function POST(req: NextRequest) {
     if (!planId || !planName) {
       return NextResponse.json({ error: 'Formule de coaching requise.' }, { status: 400 });
     }
+    if (!['session', 'pro', 'performance'].includes(planId)) {
+      return NextResponse.json({ error: 'Formule de coaching invalide.' }, { status: 400 });
+    }
 
     // 1. Détection et vérification obligatoire de l'utilisateur connecté
     const authHeader = req.headers.get('authorization');
@@ -71,6 +74,22 @@ export async function POST(req: NextRequest) {
     const isFreeTrial = planId === 'session';
 
     if (isFreeTrial) {
+      // Protection anti-abus : 1 seule séance d'essai gratuite par compte
+      const { data: existingFreeBooking } = await supabase
+        .from('coaching_bookings')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('plan_id', 'session')
+        .neq('status', 'cancelled')
+        .maybeSingle();
+
+      if (existingFreeBooking) {
+        return NextResponse.json(
+          { error: 'Vous avez déjà bénéficié d\'une séance d\'essai gratuite avec ce compte.' },
+          { status: 403 }
+        );
+      }
+
       // Séance d'essai gratuite : validation contre le planning gratuit
       let freeSlots: Record<string, boolean> = {};
       try {
@@ -153,6 +172,13 @@ export async function POST(req: NextRequest) {
         amountInCents = priceStr.includes('50') ? 5000 : 1000;
       } else if (planId === 'performance') {
         amountInCents = priceStr.includes('60') ? 6000 : 2000;
+      }
+
+      if (amountInCents <= 0) {
+        return NextResponse.json(
+          { error: 'Montant de paiement invalide pour cette formule.' },
+          { status: 400 }
+        );
       }
     }
 
