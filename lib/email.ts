@@ -207,7 +207,7 @@ export async function sendBookingConfirmationEmail(params: SendBookingEmailParam
   // 1. Si Resend est configuré, envoi officiel en production
   if (resend) {
     try {
-      const { data, error } = await resend.emails.send({
+      let res = await resend.emails.send({
         from: 'Poulpy Coaching <contact@poulpy-coaching.fr>',
         to: studentEmail,
         replyTo: 'contact@poulpy-coaching.fr',
@@ -215,13 +215,25 @@ export async function sendBookingConfirmationEmail(params: SendBookingEmailParam
         html: htmlContent,
       });
 
-      if (error) {
-        console.error('[Resend Error]', error);
-        return { error: error.message };
+      // Si le domaine custom n'est pas encore vérifié sur Resend, bascule automatique sans bloquer l'envoi
+      if (res.error && (res.error.message?.toLowerCase().includes('domain') || res.error.message?.toLowerCase().includes('verify'))) {
+        console.warn('[Resend] Domaine non vérifié sur Resend, envoi avec adresse par défaut');
+        res = await resend.emails.send({
+          from: 'Poulpy Coaching <onboarding@resend.dev>',
+          to: studentEmail,
+          replyTo: 'contact@poulpy-coaching.fr',
+          subject: `🎯 Session Confirmée : ${planName} le ${formattedDate} à ${bookingTime}`,
+          html: htmlContent,
+        });
       }
 
-      console.log(`[Email Sent] Confirmation envoyée avec succès à ${studentEmail} (ID: ${data?.id})`);
-      return { success: true, id: data?.id };
+      if (res.error) {
+        console.error('[Resend Error]', res.error);
+        return { error: res.error.message };
+      }
+
+      console.log(`[Email Sent] Confirmation envoyée avec succès à ${studentEmail} (ID: ${res.data?.id})`);
+      return { success: true, id: res.data?.id };
     } catch (err: any) {
       console.error('[Resend Exception]', err);
       return { error: err.message };
