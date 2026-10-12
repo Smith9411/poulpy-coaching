@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, ArrowRight, MessageSquarePlus, Trash2, Check, X, Loader2, Shield, User as UserIcon, MessageSquare, Send, ChevronDown, Edit3, Clock, ArrowLeft } from 'lucide-react';
+import { Star, ArrowRight, MessageSquarePlus, Trash2, Check, X, Loader2, Shield, User as UserIcon, MessageSquare, Send, ChevronDown, Edit3, Clock, ArrowLeft, Pin } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -24,6 +24,7 @@ interface Review {
   admin_response?: string;
   admin_response_at?: string;
   featured?: boolean;
+  pinned?: boolean;
 }
 
 const EDIT_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
@@ -509,6 +510,52 @@ export default function Avis() {
     }
   };
 
+  const [togglingPinnedId, setTogglingPinnedId] = useState<string | null>(null);
+
+  const handleTogglePinned = async (reviewId: string, nextPinned: boolean) => {
+    if (!user?.isAdmin) return;
+    setTogglingPinnedId(reviewId);
+    try {
+      let { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        const { data: r } = await supabase.auth.refreshSession();
+        session = r.session;
+      }
+      if (!session?.access_token) throw new Error("Session expirée. Veuillez vous reconnecter.");
+
+      const res = await fetch('/api/reviews', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ id: reviewId, pinned: nextPinned }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || "Erreur lors de la mise à jour");
+
+      setReviews((prev) =>
+        prev.map((r) => ({
+          ...r,
+          pinned: r.id === reviewId ? nextPinned : (nextPinned ? false : r.pinned),
+          featured: r.id === reviewId && nextPinned ? true : r.featured,
+        }))
+      );
+
+      showStatus(
+        'success',
+        nextPinned
+          ? "📌 Avis épinglé en 1ère position sur la page d'accueil !"
+          : "Avis désépinglé de la 1ère position."
+      );
+    } catch (err: any) {
+      showStatus('error', err.message || "Erreur lors de la mise à jour");
+    } finally {
+      setTogglingPinnedId(null);
+    }
+  };
+
   const avgRating =
     reviews.length > 0
       ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
@@ -901,18 +948,34 @@ export default function Avis() {
                       {user && (user.id === testimonial.user_id || user.isAdmin) && (
                         <div className="flex items-center gap-1 ml-2">
                           {user.isAdmin && (
-                            <button
-                              onClick={() => handleToggleFeatured(testimonial.id, !testimonial.featured)}
-                              disabled={togglingFeaturedId === testimonial.id}
-                              title={testimonial.featured ? "Retirer de l'accueil" : "Mettre à l'accueil"}
-                              className={`px-2 py-0.5 text-[9px] font-bold rounded-md transition-all cursor-pointer ${
-                                testimonial.featured
-                                  ? 'bg-[#CA1C30] text-black shadow-[0_0_8px_rgba(202,28,48,0.5)]'
-                                  : 'bg-[#1A1822] text-white/50 hover:text-white'
-                              }`}
-                            >
-                              ★
-                            </button>
+                            <>
+                              <button
+                                onClick={() => handleTogglePinned(testimonial.id, !testimonial.pinned)}
+                                disabled={togglingPinnedId === testimonial.id}
+                                title={testimonial.pinned ? "Désépingler de la 1ère position" : "Épingler en 1ère position sur l'accueil (Top 1)"}
+                                className={`px-2 py-0.5 text-[9px] font-bold rounded-md transition-all cursor-pointer flex items-center gap-1 ${
+                                  testimonial.pinned
+                                    ? 'bg-[#00B4A0] text-black shadow-[0_0_8px_rgba(0,180,160,0.6)]'
+                                    : 'bg-[#1A1822] text-white/50 hover:text-[#00B4A0]'
+                                }`}
+                              >
+                                <Pin size={10} className={testimonial.pinned ? "fill-current" : ""} />
+                                <span>{testimonial.pinned ? "TOP 1" : "TOP"}</span>
+                              </button>
+
+                              <button
+                                onClick={() => handleToggleFeatured(testimonial.id, !testimonial.featured)}
+                                disabled={togglingFeaturedId === testimonial.id}
+                                title={testimonial.featured ? "Retirer de l'accueil" : "Mettre à l'accueil"}
+                                className={`px-2 py-0.5 text-[9px] font-bold rounded-md transition-all cursor-pointer ${
+                                  testimonial.featured
+                                    ? 'bg-[#CA1C30] text-black shadow-[0_0_8px_rgba(202,28,48,0.5)]'
+                                    : 'bg-[#1A1822] text-white/50 hover:text-white'
+                                }`}
+                              >
+                                ★
+                              </button>
+                            </>
                           )}
 
                           {editingId !== testimonial.id && canEdit(testimonial) && (
@@ -954,9 +1017,15 @@ export default function Avis() {
 
                   {/* Student Name & Rank */}
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <h4 className="text-xl font-display font-bold text-[#F5F4F0] tracking-wider">{testimonial.name}</h4>
-                      {testimonial.featured && (
+                      {testimonial.pinned && (
+                        <span className="px-2 py-0.5 bg-[#00B4A0]/20 text-[#00B4A0] border border-[#00B4A0]/40 rounded-md text-[9px] font-bold flex items-center gap-1 shadow-[0_0_8px_rgba(0,180,160,0.3)]">
+                          <Pin size={9} className="fill-current" />
+                          1ÈRE POSITION
+                        </span>
+                      )}
+                      {testimonial.featured && !testimonial.pinned && (
                         <span className="px-2 py-0.5 bg-[#CA1C30]/15 text-[#CA1C30] border border-[#CA1C30]/30 rounded-md text-[9px] font-bold">
                           ACCUEIL
                         </span>

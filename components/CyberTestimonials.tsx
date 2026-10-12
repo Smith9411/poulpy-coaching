@@ -15,6 +15,7 @@ interface RealReview {
   user_id?: string;
   created_at: string;
   featured?: boolean;
+  pinned?: boolean;
   admin_response?: string | null;
 }
 
@@ -66,11 +67,7 @@ export default function CyberTestimonials() {
   }, []);
 
   useEffect(() => {
-    // Postpone below-the-fold reviews fetch until after hero 3D intro animation fully completes
-    const timer = setTimeout(() => {
-      fetchFeaturedReviews();
-    }, 7000);
-    return () => clearTimeout(timer);
+    fetchFeaturedReviews();
   }, [fetchFeaturedReviews]);
 
   // Adjust activeIdx if reviews change
@@ -214,9 +211,16 @@ export default function CyberTestimonials() {
 
                 {/* Top Header Row (Sans pastille, nom du jeu & 5 étoiles fixes) */}
                 <div className="flex items-center justify-between border-b border-white/10 pb-4 relative z-10">
-                  <span className="text-xs font-mono tracking-widest text-[#F5F4F0]/60 uppercase font-bold">
-                    {current.game.toUpperCase()}
-                  </span>
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-xs font-mono tracking-widest text-[#F5F4F0]/60 uppercase font-bold">
+                      {current.game.toUpperCase()}
+                    </span>
+                    {current.pinned && (
+                      <span className="px-2 py-0.5 bg-[#00B4A0]/15 text-[#00B4A0] border border-[#00B4A0]/30 rounded-md text-[9px] font-bold tracking-wider">
+                        📌 ÉPINGLÉ
+                      </span>
+                    )}
+                  </div>
                   
                   {/* Fixed 5-star container: prevents star shifting/bugging when rating varies */}
                   <div

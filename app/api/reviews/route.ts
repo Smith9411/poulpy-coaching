@@ -39,6 +39,7 @@ interface ReviewItem {
   admin_response_at?: string;
   updated_at?: string;
   featured?: boolean;
+  pinned?: boolean;
 }
 
 async function getFeaturedIds(): Promise<string[]> {
@@ -68,6 +69,36 @@ async function saveFeaturedIds(ids: string[]): Promise<void> {
     }, { onConflict: 'key' });
   } catch (e) {
     console.error('Erreur sauvegarde featured_review_ids:', e);
+  }
+}
+
+async function getPinnedReviewId(): Promise<string | null> {
+  try {
+    const { data } = await supabase
+      .from('settings')
+      .select('value')
+      .eq('key', 'pinned_review_id')
+      .maybeSingle();
+
+    if (data?.value) {
+      const val = String(data.value).trim();
+      return val.length > 0 ? val : null;
+    }
+  } catch (e) {
+    console.error('Erreur lecture pinned_review_id:', e);
+  }
+  return null;
+}
+
+async function savePinnedReviewId(id: string | null): Promise<void> {
+  try {
+    await supabase.from('settings').upsert({
+      key: 'pinned_review_id',
+      value: id ? String(id).trim() : '',
+      updated_at: new Date().toISOString(),
+    }, { onConflict: 'key' });
+  } catch (e) {
+    console.error('Erreur sauvegarde pinned_review_id:', e);
   }
 }
 
@@ -131,11 +162,13 @@ export async function GET(req: NextRequest) {
     if (error) throw error;
 
     const featuredIds = await getFeaturedIds();
+    const pinnedReviewId = await getPinnedReviewId();
 
     let reviews = (dbReviews || []).map((r: any) => ({
       ...r,
       name: cleanDiscordUsername(r.name) || r.name,
       featured: featuredIds.includes(r.id) || r.featured === true,
+      pinned: r.id === pinnedReviewId,
     }));
 
     if (onlyFeatured) {
@@ -144,10 +177,20 @@ export async function GET(req: NextRequest) {
       reviews = featuredOnly.length > 0 ? featuredOnly : reviews;
     }
 
+    // L'avis épinglé doit être garanti en TOUTE PREMIÈRE POSITION
+    if (pinnedReviewId) {
+      const pinnedIdx = reviews.findIndex((r: any) => r.id === pinnedReviewId);
+      if (pinnedIdx > 0) {
+        const [pinnedReview] = reviews.splice(pinnedIdx, 1);
+        reviews.unshift(pinnedReview);
+      }
+    }
+
     return NextResponse.json({
       reviews,
       totalCount: (dbReviews || []).length,
       featuredCount: featuredIds.length,
+      pinnedReviewId,
     });
   } catch (error) {
     console.error('Erreur récupération avis:', error);
@@ -329,6 +372,38 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
+    // Gestion du toggle "Épingler en première position" réservé aux admins
+    if (body.pinned !== undefined) {
+      if (!isAdmin) {
+        return NextResponse.json(
+          { error: "Seul un administrateur peut épingler un avis en première position." },
+          { status: 403 }
+        );
+      }
+      const shouldPin = Boolean(body.pinned);
+      const currentPinned = await getPinnedReviewId();
+      const newPinnedId = shouldPin ? id : (currentPinned === id ? null : currentPinned);
+      await savePinnedReviewId(newPinnedId);
+
+      // Si on épingle l'avis, il doit obligatoirement être sur l'accueil (featured)
+      let featuredIds = await getFeaturedIds();
+      if (shouldPin && !featuredIds.includes(id)) {
+        featuredIds.push(id);
+        await saveFeaturedIds(featuredIds);
+        try {
+          await supabase.from('reviews').update({ featured: true }).eq('id', id);
+        } catch {}
+      }
+
+      return NextResponse.json({
+        success: true,
+        pinned: shouldPin,
+        pinnedReviewId: newPinnedId,
+        review: { ...existing, featured: shouldPin ? true : existing.featured, pinned: shouldPin },
+        message: shouldPin ? "Avis épinglé en 1ère position !" : "Avis désépinglé de la 1ère position",
+      });
+    }
+
     // Gestion du toggle "Épingler sur l'accueil" réservé aux admins
     if (body.featured !== undefined) {
       if (!isAdmin) {
@@ -345,6 +420,11 @@ export async function PATCH(req: NextRequest) {
         }
       } else {
         featuredIds = featuredIds.filter((fid) => fid !== id);
+        // Si l'avis était épinglé en 1ère position et qu'on le retire de l'accueil, on le désépingle aussi
+        const currentPinned = await getPinnedReviewId();
+        if (currentPinned === id) {
+          await savePinnedReviewId(null);
+        }
       }
       await saveFeaturedIds(featuredIds);
 
