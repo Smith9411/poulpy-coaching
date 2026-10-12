@@ -28,7 +28,7 @@ export default function CyberMedia() {
   const youtubeUrl = "https://www.youtube.com/@Poulpy_C";
   const youtubeEmbed = "https://www.youtube-nocookie.com/embed/4gfWbGCA5q0";
   const twitchUrl = "https://www.twitch.tv/poulpy_coaching";
-  const twitchEmbed = "https://player.twitch.tv/?channel=poulpy_coaching&parent=localhost&parent=127.0.0.1&parent=poulpy-coaching.vercel.app";
+  const twitchEmbed = "https://player.twitch.tv/?channel=poulpy_coaching&parent=localhost&parent=127.0.0.1&parent=poulpy-coaching.vercel.app&parent=poulpy-coaching.fr&parent=www.poulpy-coaching.fr";
 
   const handleSwitchPlatform = (target: "youtube" | "twitch") => {
     if (target === platform) return;
