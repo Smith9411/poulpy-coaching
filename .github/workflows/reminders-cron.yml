@@ -1,0 +1,17 @@
+name: Coaching Reminders H-2 Cron
+
+on:
+  schedule:
+    # Exécution toutes les 15 minutes (UTC)
+    - cron: '*/15 * * * *'
+  workflow_dispatch: # Permet aussi de déclencher manuellement depuis l'interface GitHub
+
+jobs:
+  run-reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Reminders API
+        run: |
+          echo "Vérification des séances à rappeler dans 2h..."
+          RESPONSE=$(curl -s -w "\nHTTP_STATUS:%{http_code}" "https://www.poulpy-coaching.fr/api/cron/reminders")
+          echo "$RESPONSE"
