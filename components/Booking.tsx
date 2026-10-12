@@ -132,6 +132,17 @@ export default function Booking() {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       if (params.get("booking_success") === "true") {
+        const sessionId = params.get("session_id");
+        if (sessionId) {
+          fetch(`/api/bookings/confirm?session_id=${sessionId}`, { method: "POST" })
+            .then((r) => r.json())
+            .then((data) => {
+              if (data.booking?.id) {
+                setConfirmedMissionId(data.booking.id.slice(0, 8).toUpperCase());
+              }
+            })
+            .catch((err) => console.error("Erreur confirmation réservation:", err));
+        }
         setStep(4);
         setTimeout(() => {
           const bookingEl = document.getElementById("booking");

@@ -145,7 +145,69 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // 3. Création de la réservation
+    // 3. Calcul du montant de la formule
+    let amountInCents = 0;
+    const priceStr = String(planPrice || '');
+    if (!isFreeTrial) {
+      if (planId === 'pro') {
+        amountInCents = priceStr.includes('50') ? 5000 : 1000;
+      } else if (planId === 'performance') {
+        amountInCents = priceStr.includes('60') ? 6000 : 2000;
+      }
+    }
+
+    // 4. SI FORMULE PAYANTE : Créer la session Stripe SANS créer la réservation ni notifier Discord/Notion
+    if (amountInCents > 0 && isStripeConfigured) {
+      try {
+        const origin = req.headers.get('origin') || 'https://poulpy-coaching.vercel.app';
+        const session = await stripe.checkout.sessions.create({
+          ui_mode: 'embedded_page',
+          customer_email: studentEmail.trim().toLowerCase(),
+          line_items: [
+            {
+              price_data: {
+                currency: 'eur',
+                unit_amount: amountInCents,
+                product_data: {
+                  name: `Poulpy Coaching — ${planName}`,
+                  description: `Session e-sport sur ${game || 'Valorant / Apex'} (${planDuration || 'Coaching'})`,
+                },
+              },
+              quantity: 1,
+            },
+          ],
+          mode: 'payment',
+          metadata: {
+            userId: userId || '',
+            slotId: targetSlotId || '',
+            bookingDate,
+            bookingTime,
+            planId,
+            planName,
+            planPrice: planPrice || '',
+            planDuration: planDuration || '60 min',
+            studentName: studentName.trim(),
+            studentEmail: studentEmail.trim().toLowerCase(),
+            studentDiscord: studentDiscord.trim(),
+            game: game || 'Valorant',
+            notes: notes?.trim() || '',
+          },
+          return_url: `${origin}/?booking_success=true&session_id={CHECKOUT_SESSION_ID}`,
+        });
+
+        return NextResponse.json({
+          success: true,
+          requiresPayment: true,
+          clientSecret: session.client_secret,
+          checkoutUrl: session.url,
+        });
+      } catch (stripeErr) {
+        console.error('Erreur création session Stripe Checkout:', stripeErr);
+        return NextResponse.json({ error: 'Impossible d\'initialiser le paiement Stripe.' }, { status: 500 });
+      }
+    }
+
+    // 5. SI SÉANCE D'ESSAI GRATUITE (0 €) : Création immédiate de la réservation
     const { data: newBooking, error: bookingError } = await supabase
       .from('coaching_bookings')
       .insert({
@@ -153,8 +215,8 @@ export async function POST(req: NextRequest) {
         slot_id: targetSlotId || null,
         plan_id: planId,
         plan_name: planName,
-        plan_price: planPrice || '0€',
-        plan_duration: planDuration || '60 min',
+        plan_price: '0 € (Gratuit)',
+        plan_duration: planDuration || '45 min - 1h',
         booking_date: bookingDate,
         booking_time: bookingTime,
         student_name: studentName.trim(),
@@ -169,42 +231,19 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (bookingError) {
-      console.error('Erreur création réservation:', bookingError);
+      console.error('Erreur création réservation gratuite:', bookingError);
       return NextResponse.json({ error: 'Impossible d\'enregistrer la réservation.' }, { status: 500 });
     }
 
-    // 4. Verrouillage du créneau (is_booked = true)
+    // Verrouillage du créneau pour séance d'essai
     if (targetSlotId) {
       await supabase
         .from('coaching_slots')
         .update({ is_booked: true, updated_at: new Date().toISOString() })
         .eq('id', targetSlotId);
-    } else {
-      try {
-        const { data: createdSlot } = await supabase
-          .from('coaching_slots')
-          .insert({
-            date: bookingDate,
-            start_time: bookingTime,
-            is_active: true,
-            is_booked: true,
-            created_by: userId,
-          })
-          .select('id')
-          .maybeSingle();
-
-        if (createdSlot?.id) {
-          await supabase
-            .from('coaching_bookings')
-            .update({ slot_id: createdSlot.id })
-            .eq('id', newBooking.id);
-        }
-      } catch (slotErr) {
-        console.warn('Création auto slot ignorée:', slotErr);
-      }
     }
 
-    // 5. Synchronisation automatique avec Notion Calendar
+    // Synchronisation Notion Calendar
     try {
       const notionPageId = await createNotionBooking({
         bookingId: newBooking.id,
@@ -229,86 +268,22 @@ export async function POST(req: NextRequest) {
       console.error('[Notion Sync Error]', notionErr);
     }
 
-    // 6. Attribuer le rôle 'in_coaching = true' au profil pour qu'il apparaisse immédiatement dans Gérer le coaching
+    // Activer in_coaching sur le profil
     try {
       if (userId) {
         await supabase
           .from('profiles')
           .update({ in_coaching: true })
           .eq('id', userId);
-      } else {
-        const { data: matchedProfile } = await supabase
-          .from('profiles')
-          .select('id')
-          .or(`username.eq.${studentName.trim()},email.eq.${studentEmail.trim().toLowerCase()}`)
-          .maybeSingle();
-
-        if (matchedProfile?.id) {
-          await supabase
-            .from('profiles')
-            .update({ in_coaching: true })
-            .eq('id', matchedProfile.id);
-        }
       }
     } catch (e) {
       console.error('Erreur mise à jour in_coaching profil:', e);
     }
 
-    // 7. Génération de la session de paiement Stripe Checkout (si formule payante)
-    let checkoutUrl: string | null = null;
-    let clientSecret: string | null = null;
-    let amountInCents = 0;
-
-    const priceStr = String(planPrice || '');
-    if (planId === 'pro') {
-      amountInCents = priceStr.includes('50') ? 5000 : 1000;
-    } else if (planId === 'performance') {
-      amountInCents = priceStr.includes('60') ? 6000 : 2000;
-    }
-
-    if (amountInCents > 0 && isStripeConfigured) {
-      try {
-        const origin = req.headers.get('origin') || 'https://poulpy-coaching.vercel.app';
-        const session = await stripe.checkout.sessions.create({
-          ui_mode: 'embedded_page',
-          customer_email: studentEmail.trim().toLowerCase(),
-          line_items: [
-            {
-              price_data: {
-                currency: 'eur',
-                unit_amount: amountInCents,
-                product_data: {
-                  name: `Poulpy Coaching — ${planName}`,
-                  description: `Session e-sport sur ${game || 'Valorant / Apex'} (${planDuration || 'Coaching'})`,
-                },
-              },
-              quantity: 1,
-            },
-          ],
-          mode: 'payment',
-          metadata: {
-            booking_id: newBooking.id,
-            user_id: userId,
-            plan_id: planId,
-            plan_name: planName,
-            plan_price: planPrice || '',
-          },
-          return_url: `${origin}/?booking_success=true&booking_id=${newBooking.id}&session_id={CHECKOUT_SESSION_ID}`,
-        });
-
-        checkoutUrl = session.url;
-        clientSecret = session.client_secret;
-      } catch (stripeErr) {
-        console.error('Erreur création session Stripe Checkout:', stripeErr);
-      }
-    }
-
     return NextResponse.json({
       success: true,
       booking: newBooking,
-      clientSecret,
-      checkoutUrl,
-      requiresPayment: Boolean(clientSecret || checkoutUrl),
+      requiresPayment: false,
     });
   } catch (err: unknown) {
     console.error('Erreur POST /api/bookings/create:', err);
