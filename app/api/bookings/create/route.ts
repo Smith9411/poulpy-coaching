@@ -256,6 +256,7 @@ export async function POST(req: NextRequest) {
 
     // 7. Génération de la session de paiement Stripe Checkout (si formule payante)
     let checkoutUrl: string | null = null;
+    let clientSecret: string | null = null;
     let amountInCents = 0;
 
     const priceStr = String(planPrice || '');
@@ -269,6 +270,7 @@ export async function POST(req: NextRequest) {
       try {
         const origin = req.headers.get('origin') || 'https://poulpy-coaching.vercel.app';
         const session = await stripe.checkout.sessions.create({
+          ui_mode: 'embedded_page',
           customer_email: studentEmail.trim().toLowerCase(),
           line_items: [
             {
@@ -291,11 +293,11 @@ export async function POST(req: NextRequest) {
             plan_name: planName,
             plan_price: planPrice || '',
           },
-          success_url: `${origin}/?booking_success=true&booking_id=${newBooking.id}`,
-          cancel_url: `${origin}/?booking_cancelled=true`,
+          return_url: `${origin}/?booking_success=true&booking_id=${newBooking.id}&session_id={CHECKOUT_SESSION_ID}`,
         });
 
         checkoutUrl = session.url;
+        clientSecret = session.client_secret;
       } catch (stripeErr) {
         console.error('Erreur création session Stripe Checkout:', stripeErr);
       }
@@ -304,8 +306,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       booking: newBooking,
+      clientSecret,
       checkoutUrl,
-      requiresPayment: Boolean(checkoutUrl),
+      requiresPayment: Boolean(clientSecret || checkoutUrl),
     });
   } catch (err: unknown) {
     console.error('Erreur POST /api/bookings/create:', err);

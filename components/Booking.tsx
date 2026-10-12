@@ -7,6 +7,7 @@ import DecryptedText from "./DecryptedText";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
 import AuthModal from "./AuthModal";
+import StripeCheckoutModal from "./StripeCheckoutModal";
 
 interface RawSlot {
   id: string;
@@ -97,6 +98,8 @@ export default function Booking() {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [confirmedMissionId, setConfirmedMissionId] = useState<string>("");
+  const [stripeClientSecret, setStripeClientSecret] = useState<string | null>(null);
+  const [isStripeModalOpen, setIsStripeModalOpen] = useState<boolean>(false);
 
   // Auto-fill form from user context
   useEffect(() => {
@@ -341,8 +344,17 @@ export default function Booking() {
           throw new Error(data.error || "Erreur lors de la réservation");
         }
 
+        if (data.clientSecret) {
+          // Ouverture du pop-up / modal Stripe directement dans la page
+          setConfirmedMissionId(missionId);
+          setStripeClientSecret(data.clientSecret);
+          setIsStripeModalOpen(true);
+          fetchSlots();
+          return;
+        }
+
         if (data.checkoutUrl) {
-          // Redirection instantanée vers Stripe Checkout sécurisé
+          // Fallback redirection externe si nécessaire
           window.location.href = data.checkoutUrl;
           return;
         }
@@ -1312,6 +1324,13 @@ export default function Booking() {
       </div>
 
       <AuthModal isOpen={authModalOpen} onClose={() => setAuthModalOpen(false)} />
+      <StripeCheckoutModal
+        isOpen={isStripeModalOpen}
+        clientSecret={stripeClientSecret}
+        planName={activePlan.name}
+        planPrice={activePlan.price}
+        onClose={() => setIsStripeModalOpen(false)}
+      />
     </section>
   );
 }
