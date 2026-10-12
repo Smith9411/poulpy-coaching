@@ -145,15 +145,8 @@ export default function Scene3D() {
       geometry.setAttribute("aRadius", new THREE.BufferAttribute(aRadius, 1));
       geometry.setAttribute("aIsAmbient", new THREE.BufferAttribute(aIsAmbient, 1));
 
-      const isAlreadyDone =
-        typeof window !== "undefined" &&
-        Boolean(
-          (window as any).__poulpy_splash_done ||
-          sessionStorage.getItem("poulpy_splash_done") === "true"
-        );
-
       const animUniforms = {
-        uProgress: { value: isAlreadyDone ? 1.0 : 0.0 },
+        uProgress: { value: 0.0 },
         uSize: { value: isMobile ? 4.0 : 4.5 },
         uScale: { value: height * 0.5 },
         uTexture: { value: particleTexture },
@@ -228,21 +221,19 @@ export default function Scene3D() {
       const vortexMesh = new THREE.Points(geometry, material);
       scene.add(vortexMesh);
 
-      let isRevealing = isAlreadyDone;
-      let revealStartTime = performance.now();
+      let isRevealing = false;
+      let revealStartTime = 0;
       let fallbackTimer: NodeJS.Timeout | undefined;
 
       const startReveal = () => {
-        if (isRevealing && animUniforms.uProgress.value >= 1.0) return;
+        if (isRevealing) return;
         isRevealing = true;
         if (fallbackTimer) clearTimeout(fallbackTimer);
         revealStartTime = performance.now();
       };
 
       window.addEventListener("poulpy_splash_reveal", startReveal);
-      if (!isAlreadyDone) {
-        fallbackTimer = setTimeout(startReveal, 350);
-      }
+      fallbackTimer = setTimeout(startReveal, 3000);
 
       // 4. Mouse & Scroll Interactivity
       let mouseX = 0;
@@ -318,9 +309,9 @@ export default function Scene3D() {
         // Perfectly synchronous, hardware-clock driven branch expansion inside RAF
         if (isRevealing && animUniforms.uProgress.value < 1.0) {
           const elapsed = (now - revealStartTime) * 0.001;
-          const t = Math.min(1.0, elapsed / 1.8);
+          const t = Math.min(1.0, elapsed / 4.5);
           // Fluid organic ease-out: starts immediately with gentle presence as Poulpy reveals,
-          // then settles progressively into full bloom
+          // completely removing the 0.5s dead gap, then settles progressively into full bloom
           const s = 1.0 - Math.pow(1.0 - t, 2.4);
           animUniforms.uProgress.value = s;
         }
