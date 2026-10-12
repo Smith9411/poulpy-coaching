@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createNotionBooking } from '@/lib/notion';
 import { stripe, isStripeConfigured } from '@/lib/stripe';
+import { sendBookingConfirmationEmail } from '@/lib/email';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -328,6 +329,23 @@ export async function POST(req: NextRequest) {
       }
     } catch (e) {
       console.error('Erreur mise à jour in_coaching profil:', e);
+    }
+
+    // Envoi de l'email officiel de confirmation avec Google Calendar
+    try {
+      await sendBookingConfirmationEmail({
+        studentName: studentName.trim(),
+        studentEmail: studentEmail.trim().toLowerCase(),
+        studentDiscord: studentDiscord.trim(),
+        planName: planName || 'Séance d\'Essai Gratuite',
+        planPrice: '0 € (Gratuit)',
+        planDuration: planDuration || '45 min - 1h',
+        bookingDate,
+        bookingTime,
+        game: game || 'Valorant',
+      });
+    } catch (emailErr) {
+      console.error('[Email Dispatch Error]', emailErr);
     }
 
     return NextResponse.json({

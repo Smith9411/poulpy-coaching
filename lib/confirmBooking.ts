@@ -1,6 +1,7 @@
 import { stripe } from './stripe';
 import { createClient } from '@supabase/supabase-js';
 import { createNotionBooking } from './notion';
+import { sendBookingConfirmationEmail } from './email';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -158,6 +159,23 @@ export async function confirmStripeBooking(sessionId: string) {
       }
     } catch (e) {
       console.error('Erreur mise à jour profil in_coaching:', e);
+    }
+
+    // 7. Envoi de l'email officiel de confirmation avec Google Calendar
+    try {
+      await sendBookingConfirmationEmail({
+        studentName: studentName.trim(),
+        studentEmail: studentEmail.trim().toLowerCase(),
+        studentDiscord: studentDiscord.trim(),
+        planName: planName || 'Coaching E-sport',
+        planPrice: planPrice || '10 €',
+        planDuration: planDuration || '60 min',
+        bookingDate,
+        bookingTime,
+        game: game || 'Valorant',
+      });
+    } catch (emailErr) {
+      console.error('[Email Dispatch Error après Stripe]', emailErr);
     }
 
     return { success: true, booking: newBooking };
