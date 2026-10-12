@@ -124,11 +124,20 @@ export default function Booking() {
   };
 
   useEffect(() => {
-    // Postpone non-critical slots fetch until after hero 3D intro animation fully completes
-    const timer = setTimeout(() => {
-      fetchSlots();
-    }, 7000);
-    return () => clearTimeout(timer);
+    fetchSlots();
+
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("booking_success") === "true") {
+        setStep(4);
+        setTimeout(() => {
+          const bookingEl = document.getElementById("booking");
+          if (bookingEl) {
+            bookingEl.scrollIntoView({ behavior: "smooth" });
+          }
+        }, 300);
+      }
+    }
   }, []);
 
   // Compute 14 upcoming days
@@ -330,6 +339,12 @@ export default function Booking() {
 
         if (!res.ok || data.error) {
           throw new Error(data.error || "Erreur lors de la réservation");
+        }
+
+        if (data.checkoutUrl) {
+          // Redirection instantanée vers Stripe Checkout sécurisé
+          window.location.href = data.checkoutUrl;
+          return;
         }
 
         setConfirmedMissionId(missionId);
@@ -1184,11 +1199,15 @@ export default function Booking() {
                       {isSubmitting ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          <span>VERROUILLAGE EN COURS...</span>
+                          <span>{selectedPlan === "session" ? "VERROUILLAGE EN COURS..." : "OUVERTURE DU PAIEMENT..."}</span>
                         </>
                       ) : (
                         <>
-                          <span>CONFIRMER LA SESSION</span>
+                          <span>
+                            {selectedPlan === "session"
+                              ? "CONFIRMER LA SESSION (GRATUIT)"
+                              : `RÉSERVER & PAYER (${activePlan.price})`}
+                          </span>
                           <Send className="w-4 h-4" />
                         </>
                       )}

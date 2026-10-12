@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createNotionBooking } from '@/lib/notion';
+import { stripe } from '@/lib/stripe';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -253,9 +254,58 @@ export async function POST(req: NextRequest) {
       console.error('Erreur mise à jour in_coaching profil:', e);
     }
 
+    // 7. Génération de la session de paiement Stripe Checkout (si formule payante)
+    let checkoutUrl: string | null = null;
+    let amountInCents = 0;
+
+    const priceStr = String(planPrice || '');
+    if (planId === 'pro') {
+      amountInCents = priceStr.includes('50') ? 5000 : 1000;
+    } else if (planId === 'performance') {
+      amountInCents = priceStr.includes('60') ? 6000 : 2000;
+    }
+
+    if (amountInCents > 0 && process.env.STRIPE_SECRET_KEY) {
+      try {
+        const origin = req.headers.get('origin') || 'https://poulpy-coaching.vercel.app';
+        const session = await stripe.checkout.sessions.create({
+          customer_email: studentEmail.trim().toLowerCase(),
+          line_items: [
+            {
+              price_data: {
+                currency: 'eur',
+                unit_amount: amountInCents,
+                product_data: {
+                  name: `Poulpy Coaching — ${planName}`,
+                  description: `Session e-sport sur ${game || 'Valorant / Apex'} (${planDuration || 'Coaching'})`,
+                },
+              },
+              quantity: 1,
+            },
+          ],
+          mode: 'payment',
+          metadata: {
+            booking_id: newBooking.id,
+            user_id: userId,
+            plan_id: planId,
+            plan_name: planName,
+            plan_price: planPrice || '',
+          },
+          success_url: `${origin}/?booking_success=true&booking_id=${newBooking.id}`,
+          cancel_url: `${origin}/?booking_cancelled=true`,
+        });
+
+        checkoutUrl = session.url;
+      } catch (stripeErr) {
+        console.error('Erreur création session Stripe Checkout:', stripeErr);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       booking: newBooking,
+      checkoutUrl,
+      requiresPayment: Boolean(checkoutUrl),
     });
   } catch (err: unknown) {
     console.error('Erreur POST /api/bookings/create:', err);
