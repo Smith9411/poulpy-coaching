@@ -90,13 +90,29 @@ export async function GET(req: NextRequest) {
         return s;
       });
 
+      // Récupérer les créneaux gratuits configurés (depuis la table settings)
+      let freeSlots: Record<string, boolean> = {};
+      try {
+        const { data: freeSetting } = await supabase
+          .from('settings')
+          .select('value')
+          .eq('key', 'free_trial_slots')
+          .maybeSingle();
+        if (freeSetting?.value) {
+          freeSlots = JSON.parse(freeSetting.value);
+        }
+      } catch (err) {
+        console.warn('Impossible de charger free_trial_slots:', err);
+      }
+
       return NextResponse.json({
         slots: sanitizedSlots,
+        freeSlots: freeSlots || {},
         bookings: bookings || [],
       });
     }
 
-    // Requête publique (Élève/Visiteur) : tous les créneaux configurés sur la plage
+    // Requête publique (Élève/Visiteur) : créneaux payants + créneaux gratuits configurés
     const { data: slots, error } = await supabase
       .from('coaching_slots')
       .select('id, date, start_time, is_active, is_booked')
@@ -105,23 +121,39 @@ export async function GET(req: NextRequest) {
       .order('date', { ascending: true })
       .order('start_time', { ascending: true });
 
-    if (error) {
-      return NextResponse.json({ slots: [] });
+    let freeSlots: Record<string, boolean> = {};
+    try {
+      const { data: freeSetting } = await supabase
+        .from('settings')
+        .select('value')
+        .eq('key', 'free_trial_slots')
+        .maybeSingle();
+      if (freeSetting?.value) {
+        freeSlots = JSON.parse(freeSetting.value);
+      }
+    } catch (err) {
+      console.warn('Impossible de charger free_trial_slots (public):', err);
     }
 
-    return NextResponse.json({ slots: slots || [] });
+    if (error) {
+      return NextResponse.json({ slots: [], freeSlots: freeSlots || {} });
+    }
+
+    return NextResponse.json({
+      slots: slots || [],
+      freeSlots: freeSlots || {},
+    });
   } catch (err: unknown) {
     console.error('Erreur GET /api/bookings/slots:', err);
-    return NextResponse.json({ error: 'Erreur interne', slots: [] }, { status: 500 });
+    return NextResponse.json({ error: 'Erreur interne', slots: [], freeSlots: {} }, { status: 500 });
   }
 }
 
 /**
  * POST /api/bookings/slots
- * Enregistre ou met à jour en masse les disponibilités configurées par l'administrateur.
- * Body: {
- *   slots: Array<{ date: string; start_time: string; is_active: boolean }>
- * }
+ * Enregistre ou met à jour en masse les disponibilités configurées par l'administrateur :
+ * - slots : créneaux payants (dans coaching_slots)
+ * - freeSlots : créneaux gratuits (dans settings -> free_trial_slots)
  */
 export async function POST(req: NextRequest) {
   try {
@@ -147,30 +179,48 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const slotsToUpsert = body.slots;
+    const freeSlotsToSave = body.freeSlots;
 
-    if (!Array.isArray(slotsToUpsert) || slotsToUpsert.length === 0) {
-      return NextResponse.json({ error: 'Aucun créneau fourni' }, { status: 400 });
+    let savedPaidCount = 0;
+
+    // 1. Sauvegarde des créneaux payants (coaching_slots)
+    if (Array.isArray(slotsToUpsert) && slotsToUpsert.length > 0) {
+      const formattedSlots = slotsToUpsert.map((s: { date: string; start_time: string; is_active: boolean }) => ({
+        date: s.date,
+        start_time: s.start_time,
+        is_active: Boolean(s.is_active),
+        updated_at: new Date().toISOString(),
+      }));
+
+      const { data, error } = await supabase
+        .from('coaching_slots')
+        .upsert(formattedSlots, { onConflict: 'date,start_time' })
+        .select();
+
+      if (error) {
+        console.error('Erreur upsert coaching_slots:', error);
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
+      savedPaidCount = data?.length || 0;
     }
 
-    // On prépare les données à insérer/mettre à jour
-    const formattedSlots = slotsToUpsert.map((s: { date: string; start_time: string; is_active: boolean }) => ({
-      date: s.date,
-      start_time: s.start_time,
-      is_active: Boolean(s.is_active),
-      updated_at: new Date().toISOString(),
-    }));
+    // 2. Sauvegarde des créneaux gratuits (table settings -> free_trial_slots)
+    if (freeSlotsToSave && typeof freeSlotsToSave === 'object') {
+      const { error: freeError } = await supabase
+        .from('settings')
+        .upsert({
+          key: 'free_trial_slots',
+          value: JSON.stringify(freeSlotsToSave),
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'key' });
 
-    const { data, error } = await supabase
-      .from('coaching_slots')
-      .upsert(formattedSlots, { onConflict: 'date,start_time' })
-      .select();
-
-    if (error) {
-      console.error('Erreur upsert coaching_slots:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      if (freeError) {
+        console.error('Erreur sauvegarde free_trial_slots:', freeError);
+        return NextResponse.json({ error: freeError.message }, { status: 500 });
+      }
     }
 
-    return NextResponse.json({ success: true, count: data?.length || 0 });
+    return NextResponse.json({ success: true, count: savedPaidCount });
   } catch (err: unknown) {
     console.error('Erreur POST /api/bookings/slots:', err);
     return NextResponse.json({ error: 'Erreur interne' }, { status: 500 });

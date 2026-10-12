@@ -15,6 +15,7 @@ import {
   Copy,
   Edit2,
   Gamepad2,
+  Gift,
   Loader2,
   Mail,
   MessageSquare,
@@ -51,11 +52,13 @@ export default function AdminBookingsPage() {
 
   const [activeTab, setActiveTab] = useState<'slots' | 'bookings'>('slots');
 
-  // État des créneaux
+  // État des créneaux (Payant vs Gratuit)
+  const [slotCategory, setSlotCategory] = useState<'paid' | 'free'>('paid');
   const [weekOffset, setWeekOffset] = useState(0); // 0 = cette semaine, 1 = semaine prochaine, etc.
   const [slotsData, setSlotsData] = useState<CoachingSlot[]>([]);
   const [existingBookings, setExistingBookings] = useState<CoachingBooking[]>([]);
-  const [localSlotStates, setLocalSlotStates] = useState<Record<string, boolean>>({}); // key = `${date}_${time}` -> is_active
+  const [localPaidSlotStates, setLocalPaidSlotStates] = useState<Record<string, boolean>>({}); // Payant : key = `${date}_${time}` -> is_active
+  const [localFreeSlotStates, setLocalFreeSlotStates] = useState<Record<string, boolean>>({}); // Gratuit : key = `${date}_${time}` -> is_active
   const [isSavingSlots, setIsSavingSlots] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [customHourInput, setCustomHourInput] = useState('');
@@ -144,17 +147,19 @@ export default function AdminBookingsPage() {
       if (!res.ok) return;
       const data = await res.json();
       const slots: CoachingSlot[] = data.slots || [];
+      const freeSlots: Record<string, boolean> = data.freeSlots || {};
       const bookings: CoachingBooking[] = data.bookings || [];
 
       setSlotsData(slots);
       setExistingBookings(bookings);
 
-      // Initialiser le dictionnaire local
-      const newMap: Record<string, boolean> = {};
+      // Initialiser le dictionnaire local pour les créneaux payants
+      const newPaidMap: Record<string, boolean> = {};
       slots.forEach((s) => {
-        newMap[`${s.date}_${s.start_time}`] = s.is_active;
+        newPaidMap[`${s.date}_${s.start_time}`] = s.is_active;
       });
-      setLocalSlotStates(newMap);
+      setLocalPaidSlotStates(newPaidMap);
+      setLocalFreeSlotStates(freeSlots);
       setHasUnsavedChanges(false);
     } catch (err) {
       console.error('Erreur chargement slots admin:', err);
@@ -200,19 +205,27 @@ export default function AdminBookingsPage() {
     }
   }, [user?.isAdmin, fetchSlots, fetchBookings]);
 
-  // Basculer l'état d'un créneau individuel
+  // Basculer l'état d'un créneau individuel (selon l'onglet Payant ou Gratuit actif)
   const toggleSlot = (date: string, time: string) => {
     const key = `${date}_${time}`;
-    setLocalSlotStates((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }));
+    if (slotCategory === 'paid') {
+      setLocalPaidSlotStates((prev) => ({
+        ...prev,
+        [key]: !prev[key],
+      }));
+    } else {
+      setLocalFreeSlotStates((prev) => ({
+        ...prev,
+        [key]: !prev[key],
+      }));
+    }
     setHasUnsavedChanges(true);
   };
 
   // Actions de masse sur un jour donné
   const setDaySlots = (date: string, active: boolean) => {
-    setLocalSlotStates((prev) => {
+    const setter = slotCategory === 'paid' ? setLocalPaidSlotStates : setLocalFreeSlotStates;
+    setter((prev) => {
       const next = { ...prev };
       availableHours.forEach((time) => {
         next[`${date}_${time}`] = active;
@@ -224,7 +237,8 @@ export default function AdminBookingsPage() {
 
   // Actions de masse sur toute la semaine affichée
   const setAllWeekSlots = (active: boolean) => {
-    setLocalSlotStates((prev) => {
+    const setter = slotCategory === 'paid' ? setLocalPaidSlotStates : setLocalFreeSlotStates;
+    setter((prev) => {
       const next = { ...prev };
       currentWeekDates.forEach((day) => {
         if (!day.isPast) {
@@ -240,7 +254,8 @@ export default function AdminBookingsPage() {
 
   // Ouvrir uniquement après-midis (14h-18h)
   const setAfternoonOnly = () => {
-    setLocalSlotStates((prev) => {
+    const setter = slotCategory === 'paid' ? setLocalPaidSlotStates : setLocalFreeSlotStates;
+    setter((prev) => {
       const next = { ...prev };
       currentWeekDates.forEach((day) => {
         if (!day.isPast) {
@@ -257,7 +272,8 @@ export default function AdminBookingsPage() {
 
   // Ouvrir uniquement soirées (18h-22h)
   const setEveningOnly = () => {
-    setLocalSlotStates((prev) => {
+    const setter = slotCategory === 'paid' ? setLocalPaidSlotStates : setLocalFreeSlotStates;
+    setter((prev) => {
       const next = { ...prev };
       currentWeekDates.forEach((day) => {
         if (!day.isPast) {
@@ -291,20 +307,20 @@ export default function AdminBookingsPage() {
     }
   };
 
-  // Enregistrer les créneaux dans Supabase
+  // Enregistrer les disponibilités (Payant & Gratuit) dans Supabase
   const handleSaveSlots = async () => {
     setIsSavingSlots(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) return;
 
-      const slotsToSave: Array<{ date: string; start_time: string; is_active: boolean }> = [];
+      const paidSlotsToSave: Array<{ date: string; start_time: string; is_active: boolean }> = [];
 
       currentWeekDates.forEach((day) => {
         availableHours.forEach((time) => {
           const key = `${day.fullDate}_${time}`;
-          const isActive = Boolean(localSlotStates[key]);
-          slotsToSave.push({
+          const isActive = Boolean(localPaidSlotStates[key]);
+          paidSlotsToSave.push({
             date: day.fullDate,
             start_time: time,
             is_active: isActive,
@@ -318,7 +334,10 @@ export default function AdminBookingsPage() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ slots: slotsToSave }),
+        body: JSON.stringify({
+          slots: paidSlotsToSave,
+          freeSlots: localFreeSlotStates,
+        }),
       });
 
       const result = await res.json();
@@ -326,7 +345,7 @@ export default function AdminBookingsPage() {
         throw new Error(result.error || 'Erreur sauvegarde');
       }
 
-      showToast('success', 'Disponibilités enregistrées avec succès !');
+      showToast('success', 'Disponibilités (Payant & Gratuit) enregistrées avec succès !');
       setHasUnsavedChanges(false);
       fetchSlots();
     } catch (err: unknown) {
@@ -844,6 +863,45 @@ export default function AdminBookingsPage() {
         {/* ══════════════════════════════════════════════════════════════════════════ */}
         {activeTab === 'slots' && (
           <div className="space-y-6">
+            {/* Sous-onglets de planification : Payant vs Gratuit */}
+            <div className="bg-black/60 border border-white/10 p-3 sm:p-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-xl">
+              <div className="flex items-center gap-2 p-1 bg-white/5 border border-white/10 rounded-xl">
+                <button
+                  type="button"
+                  onClick={() => setSlotCategory('paid')}
+                  className={`flex items-center gap-2 py-2 px-3 sm:px-4 rounded-lg font-display text-xs tracking-wider uppercase transition-all cursor-pointer ${
+                    slotCategory === 'paid'
+                      ? 'bg-[#CA1C30] text-white font-bold shadow-md shadow-[#CA1C30]/40'
+                      : 'text-[#F5F4F0]/60 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Zap size={14} />
+                  <span>Séances Payantes (Standard & Packs)</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSlotCategory('free')}
+                  className={`flex items-center gap-2 py-2 px-3 sm:px-4 rounded-lg font-display text-xs tracking-wider uppercase transition-all cursor-pointer ${
+                    slotCategory === 'free'
+                      ? 'bg-[#00B4A0] text-black font-bold shadow-md shadow-[#00B4A0]/40'
+                      : 'text-[#F5F4F0]/60 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Gift size={14} />
+                  <span>Séances Gratuites (Session d'essai)</span>
+                </button>
+              </div>
+
+              <div className="text-xs text-[#F5F4F0]/70 flex items-center gap-2 px-2">
+                <span className={`w-2.5 h-2.5 rounded-full ${slotCategory === 'paid' ? 'bg-[#CA1C30]' : 'bg-[#00B4A0]'}`} />
+                <span className="font-mono text-[11px]">
+                  {slotCategory === 'paid'
+                    ? 'Planning Actif : Séances payantes (Ranked 10€, Pro 20€ & Packs)'
+                    : 'Planning Actif : Sessions d\'essai gratuites (Diagnostic VOD 0€)'}
+                </span>
+              </div>
+            </div>
+
             {/* Quick Actions & Navigation Bar */}
             <div className="bg-black/40 border border-white/10 backdrop-blur-md-dark p-4 sm:p-6 border border-white/10 space-y-4">
               <div className="flex items-center justify-between flex-wrap gap-4">
@@ -966,7 +1024,8 @@ export default function AdminBookingsPage() {
             <div className="grid grid-cols-1 md:grid-cols-7 gap-3">
               {currentWeekDates.map((day) => {
                 const dayBookings = existingBookings.filter((b) => b.booking_date === day.fullDate);
-                const activeCount = availableHours.filter((t) => localSlotStates[`${day.fullDate}_${t}`]).length;
+                const currentStates = slotCategory === 'paid' ? localPaidSlotStates : localFreeSlotStates;
+                const activeCount = availableHours.filter((t) => currentStates[`${day.fullDate}_${t}`]).length;
 
                 return (
                   <div
@@ -974,13 +1033,17 @@ export default function AdminBookingsPage() {
                     className={`reticle-box p-3.5 flex flex-col justify-between border transition-all ${
                       day.isPast
                         ? 'opacity-40 bg-white/[0.02] border-white/5'
-                        : 'border-white/10 hover:border-[#CA1C30]/30'
+                        : slotCategory === 'paid'
+                        ? 'border-white/10 hover:border-[#CA1C30]/30'
+                        : 'border-white/10 hover:border-[#00B4A0]/30'
                     }`}
                   >
                     {/* Day Column Header */}
                     <div className="border-b border-white/10 pb-2.5 mb-2.5">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold uppercase tracking-wider text-[#CA1C30]">
+                        <span className={`text-xs font-bold uppercase tracking-wider ${
+                          slotCategory === 'paid' ? 'text-[#CA1C30]' : 'text-[#00B4A0]'
+                        }`}>
                           {day.dayName.slice(0, 3)}
                         </span>
                         <span className="text-xs text-gray-400 font-medium">{day.dateStr}</span>
@@ -988,7 +1051,11 @@ export default function AdminBookingsPage() {
 
                       {/* Day count & Quick toggles */}
                       <div className="flex items-center justify-between mt-2 pt-1 text-[11px]">
-                        <span className={`font-semibold ${activeCount > 0 ? 'text-[#00B4A0]' : 'text-gray-500'}`}>
+                        <span className={`font-semibold ${
+                          activeCount > 0
+                            ? (slotCategory === 'paid' ? 'text-[#CA1C30]' : 'text-[#00B4A0]')
+                            : 'text-gray-500'
+                        }`}>
                           {activeCount} ouvert{activeCount > 1 ? 's' : ''}
                         </span>
                         {!day.isPast && (
@@ -1017,7 +1084,7 @@ export default function AdminBookingsPage() {
                     <div className="space-y-1.5 flex-1">
                       {availableHours.map((time) => {
                         const key = `${day.fullDate}_${time}`;
-                        const isChecked = Boolean(localSlotStates[key]);
+                        const isChecked = Boolean(currentStates[key]);
                         const bookingOnSlot = dayBookings.find((b) => b.booking_time === time);
 
                         if (bookingOnSlot) {
@@ -1049,7 +1116,9 @@ export default function AdminBookingsPage() {
                             key={key}
                             className={`flex items-center justify-between p-2 text-xs font-semibold cursor-pointer select-none transition-all border ${
                               isChecked
-                                ? 'bg-gradient-to-r from-[#CA1C30]/30 to-cyan-500/20 border-[#00B4A0]/60 text-white shadow-sm'
+                                ? (slotCategory === 'paid'
+                                    ? 'bg-gradient-to-r from-[#CA1C30]/30 to-[#CA1C30]/10 border-[#CA1C30]/60 text-white shadow-sm'
+                                    : 'bg-gradient-to-r from-[#00B4A0]/30 to-[#00B4A0]/10 border-[#00B4A0]/60 text-white shadow-sm')
                                 : 'bg-white/5 border-white/5 text-gray-400 hover:bg-white/10 hover:text-gray-200'
                             }`}
                           >
@@ -1058,16 +1127,24 @@ export default function AdminBookingsPage() {
                                 type="checkbox"
                                 checked={isChecked}
                                 onChange={() => toggleSlot(day.fullDate, time)}
-                                className="w-3.5 h-3.5 rounded border-gray-600 text-[#00B4A0] focus:ring-[#00B4A0] focus:ring-offset-0 bg-gray-800 cursor-pointer"
+                                className={`w-3.5 h-3.5 rounded border-gray-600 ${
+                                  slotCategory === 'paid'
+                                    ? 'text-[#CA1C30] focus:ring-[#CA1C30]'
+                                    : 'text-[#00B4A0] focus:ring-[#00B4A0]'
+                                } focus:ring-offset-0 bg-gray-800 cursor-pointer`}
                               />
                               <span>{time}</span>
                             </span>
                             <span
                               className={`text-[10px] px-1.5 py-0.5 rounded font-bold uppercase tracking-wider ${
-                                isChecked ? 'text-[#00B4A0]/80 bg-[#00B4A0]/20' : 'text-gray-500'
+                                isChecked
+                                  ? (slotCategory === 'paid'
+                                      ? 'text-[#CA1C30] bg-[#CA1C30]/20'
+                                      : 'text-[#00B4A0] bg-[#00B4A0]/20')
+                                  : 'text-gray-500'
                               }`}
                             >
-                              {isChecked ? 'Dispo' : 'Fermé'}
+                              {isChecked ? (slotCategory === 'paid' ? 'Payant dispo' : 'Essai dispo') : 'Fermé'}
                             </span>
                           </label>
                         );

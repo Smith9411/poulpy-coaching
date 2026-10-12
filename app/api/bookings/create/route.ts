@@ -65,39 +65,82 @@ export async function POST(req: NextRequest) {
 
     const userId = authData.user.id;
 
-    // 2. Vérification et réservation du créneau dans coaching_slots
+    // 2. Vérification et réservation du créneau
     let targetSlotId = slotId;
+    const isFreeTrial = planId === 'session';
 
-    if (!targetSlotId) {
-      // Trouver le slot par date et heure
+    if (isFreeTrial) {
+      // Séance d'essai gratuite : validation contre le planning gratuit
+      let freeSlots: Record<string, boolean> = {};
+      try {
+        const { data: freeSetting } = await supabase
+          .from('settings')
+          .select('value')
+          .eq('key', 'free_trial_slots')
+          .maybeSingle();
+        if (freeSetting?.value) {
+          freeSlots = JSON.parse(freeSetting.value);
+        }
+      } catch (err) {
+        console.warn('Erreur lecture free_trial_slots lors de la réservation:', err);
+      }
+
+      const slotKey = `${bookingDate}_${bookingTime}`;
+      if (!freeSlots[slotKey]) {
+        return NextResponse.json(
+          { error: 'Désolé, ce créneau n\'est plus disponible pour les sessions d\'essai gratuites.' },
+          { status: 409 }
+        );
+      }
+
+      // Vérifier si le créneau est déjà réservé par un autre élève
       const { data: foundSlot } = await supabase
         .from('coaching_slots')
-        .select('id, is_active, is_booked')
+        .select('id, is_booked')
         .eq('date', bookingDate)
         .eq('start_time', bookingTime)
         .maybeSingle();
 
-      if (foundSlot) {
-        targetSlotId = foundSlot.id;
-        if (!foundSlot.is_active || foundSlot.is_booked) {
+      if (foundSlot?.is_booked) {
+        return NextResponse.json(
+          { error: 'Désolé, ce créneau vient d\'être réservé par un autre élève.' },
+          { status: 409 }
+        );
+      }
+
+      targetSlotId = foundSlot?.id || null;
+    } else {
+      // Séance payante : validation dans coaching_slots (is_active && !is_booked)
+      if (!targetSlotId) {
+        const { data: foundSlot } = await supabase
+          .from('coaching_slots')
+          .select('id, is_active, is_booked')
+          .eq('date', bookingDate)
+          .eq('start_time', bookingTime)
+          .maybeSingle();
+
+        if (foundSlot) {
+          targetSlotId = foundSlot.id;
+          if (!foundSlot.is_active || foundSlot.is_booked) {
+            return NextResponse.json(
+              { error: 'Désolé, ce créneau vient d\'être réservé ou n\'est plus disponible.' },
+              { status: 409 }
+            );
+          }
+        }
+      } else {
+        const { data: slotRecord } = await supabase
+          .from('coaching_slots')
+          .select('id, is_active, is_booked')
+          .eq('id', targetSlotId)
+          .single();
+
+        if (!slotRecord || !slotRecord.is_active || slotRecord.is_booked) {
           return NextResponse.json(
-            { error: 'Désolé, ce créneau vient d\'être réservé ou n\'est plus disponible.' },
+            { error: 'Ce créneau n\'est plus disponible. Merci d\'en choisir un autre.' },
             { status: 409 }
           );
         }
-      }
-    } else {
-      const { data: slotRecord } = await supabase
-        .from('coaching_slots')
-        .select('id, is_active, is_booked')
-        .eq('id', targetSlotId)
-        .single();
-
-      if (!slotRecord || !slotRecord.is_active || slotRecord.is_booked) {
-        return NextResponse.json(
-          { error: 'Ce créneau n\'est plus disponible. Merci d\'en choisir un autre.' },
-          { status: 409 }
-        );
       }
     }
 

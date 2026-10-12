@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Calendar, Clock, User, Shield, ChevronRight, ChevronLeft, ArrowRight, Send, Loader2, AlertCircle, Crosshair, MessageCircle, ExternalLink } from "lucide-react";
+import { Check, Calendar, Clock, User, Shield, ChevronRight, ChevronLeft, ArrowRight, Send, Loader2, AlertCircle, Crosshair, MessageCircle, ExternalLink, Gift, Zap } from "lucide-react";
 import DecryptedText from "./DecryptedText";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
@@ -79,6 +79,7 @@ export default function Booking() {
 
   // Slots data
   const [dbSlots, setDbSlots] = useState<RawSlot[]>([]);
+  const [freeSlots, setFreeSlots] = useState<Record<string, boolean>>({});
   const [loadingSlots, setLoadingSlots] = useState<boolean>(true);
   const [selectedDayIndex, setSelectedDayIndex] = useState<number>(0);
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null);
@@ -113,6 +114,7 @@ export default function Booking() {
       if (res.ok) {
         const data = await res.json();
         setDbSlots(data.slots || []);
+        setFreeSlots(data.freeSlots || {});
       }
     } catch (err) {
       console.warn("Erreur fetch slots:", err);
@@ -141,6 +143,8 @@ export default function Booking() {
       slotsByDate.set(s.date, arr);
     });
 
+    const isFreeTrial = selectedPlan === "session";
+
     for (let i = 1; i <= 14; i++) {
       const d = new Date(baseDate);
       d.setDate(baseDate.getDate() + i);
@@ -155,26 +159,47 @@ export default function Booking() {
       const fullDateLabel = `${dayFull} ${dayNum} ${monthFull}`;
 
       const dayDbSlots = slotsByDate.get(dateIso) || [];
+      const dbSlotsByTime = new Map<string, RawSlot>();
+      dayDbSlots.forEach((s) => dbSlotsByTime.set(s.start_time, s));
 
-      let slotItems: Array<{ id?: string; time: string; available: boolean; isBooked: boolean; isActive: boolean }> = [];
+      // Rassembler tous les horaires existants pour cette date
+      const timesSet = new Set<string>(STANDARD_HOURS);
+      dayDbSlots.forEach((s) => timesSet.add(s.start_time));
+      Object.keys(freeSlots).forEach((k) => {
+        if (k.startsWith(`${dateIso}_`)) {
+          const t = k.split("_")[1];
+          if (t) timesSet.add(t);
+        }
+      });
 
-      if (dayDbSlots.length > 0) {
-        slotItems = dayDbSlots.map((s) => ({
-          id: s.id,
-          time: s.start_time,
-          available: Boolean(s.is_active && !s.is_booked),
-          isBooked: Boolean(s.is_booked),
-          isActive: Boolean(s.is_active),
-        }));
-        slotItems.sort((a, b) => a.time.localeCompare(b.time));
-      } else {
-        slotItems = STANDARD_HOURS.map((h) => ({
-          time: h,
-          available: false,
-          isBooked: false,
-          isActive: false,
-        }));
-      }
+      const allTimes = Array.from(timesSet).sort((a, b) => a.localeCompare(b));
+
+      const slotItems = allTimes.map((time) => {
+        const dbSlot = dbSlotsByTime.get(time);
+        const isBooked = Boolean(dbSlot?.is_booked);
+        const freeKey = `${dateIso}_${time}`;
+
+        let isActive = false;
+        let available = false;
+
+        if (isFreeTrial) {
+          // Pour la session d'essai gratuite, le créneau doit être activé dans freeSlots
+          isActive = Boolean(freeSlots[freeKey]);
+          available = isActive && !isBooked;
+        } else {
+          // Pour le coaching payant, le créneau doit être actif dans coaching_slots
+          isActive = Boolean(dbSlot?.is_active);
+          available = isActive && !isBooked;
+        }
+
+        return {
+          id: dbSlot?.id,
+          time,
+          available,
+          isBooked,
+          isActive,
+        };
+      });
 
       const availableCount = slotItems.filter((s) => s.available).length;
 
@@ -190,7 +215,19 @@ export default function Booking() {
     }
 
     return list;
-  }, [dbSlots]);
+  }, [dbSlots, freeSlots, selectedPlan]);
+
+  // Si l'utilisateur change de formule (Payant <-> Gratuit), réinitialiser le créneau sélectionné s'il n'est plus valide
+  useEffect(() => {
+    if (selectedTime) {
+      const day = daysList[selectedDayIndex];
+      const matchingSlot = day?.slots.find((s) => s.time === selectedTime);
+      if (!matchingSlot || !matchingSlot.available) {
+        setSelectedTime("");
+        setSelectedSlotId(null);
+      }
+    }
+  }, [selectedPlan, daysList, selectedDayIndex, selectedTime]);
 
   const currentDay = daysList[selectedDayIndex] || daysList[0];
 
@@ -798,12 +835,24 @@ export default function Booking() {
                 transition={{ duration: 0.15 }}
                 className="space-y-6"
               >
-                <div className="flex items-center justify-between border-b border-white/15 pb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/15 pb-3">
                   <div className="text-xs text-[#F5F4F0]/70 uppercase tracking-wider font-bold flex items-center gap-2">
-                    <span className="w-2 h-2 bg-[#CA1C30]" />
+                    <span className={`w-2 h-2 ${selectedPlan === "session" ? "bg-[#00B4A0]" : "bg-[#CA1C30]"}`} />
                     ÉTAPE 02 : VERROUILLAGE DU CALENDRIER // CRÉNEAUX EN DIRECT
                   </div>
-                  <span className="text-xs text-[#CA1C30] font-bold tracking-wider">FORMULE: {activePlan.name}</span>
+                  <div className="flex items-center gap-2">
+                    {selectedPlan === "session" ? (
+                      <span className="text-xs bg-[#00B4A0]/15 text-[#00B4A0] border border-[#00B4A0]/40 px-2.5 py-1 rounded-md font-bold tracking-wider flex items-center gap-1.5">
+                        <Gift className="w-3.5 h-3.5" />
+                        CRÉNEAUX ESSAI GRATUIT
+                      </span>
+                    ) : (
+                      <span className="text-xs bg-[#CA1C30]/15 text-[#CA1C30] border border-[#CA1C30]/40 px-2.5 py-1 rounded-md font-bold tracking-wider flex items-center gap-1.5">
+                        <Zap className="w-3.5 h-3.5" />
+                        CRÉNEAUX COACHING PAYANT
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <div className="space-y-5">
@@ -878,7 +927,9 @@ export default function Booking() {
                           AUCUN CRÉNEAU DISPONIBLE POUR CETTE DATE
                         </h4>
                         <p className="text-xs text-[#F5F4F0]/50 max-w-md mx-auto">
-                          Le coach n&apos;a pas ouvert de disponibilités pour ce jour ou tous les créneaux ont déjà été réservés.
+                          {selectedPlan === "session"
+                            ? "Le coach n'a pas ouvert de créneaux pour les sessions d'essai gratuites à cette date ou ils ont déjà été réservés."
+                            : "Le coach n'a pas ouvert de disponibilités pour les séances payantes à cette date ou tous les créneaux ont déjà été réservés."}
                         </p>
                       </div>
                     ) : (
