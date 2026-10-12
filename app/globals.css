@@ -700,14 +700,10 @@ html.light .btn-cyber-ghost {
    ═══════════════════════════════════════════════════════════════ */
 .poulpy-letter {
   display: inline-block;
-  opacity: 0;
-  transform: translateY(115%) translateZ(0);
-  will-change: transform, opacity;
+  opacity: 1;
+  transform: translateY(0) translateZ(0);
+  will-change: transform;
   backface-visibility: hidden;
-}
-
-.poulpy-letter-active {
-  animation: poulpyLetterEntrance 0.92s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @keyframes poulpyLetterEntrance {
