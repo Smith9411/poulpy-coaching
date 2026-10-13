@@ -9,9 +9,31 @@ interface HeroCyberProps {
 }
 
 export default function HeroCyber({ onOpenBooking }: HeroCyberProps) {
-  const [isRevealed, setIsRevealed] = useState(false);
+  const [isRevealed, setIsRevealed] = useState(() => {
+    if (typeof window !== "undefined") {
+      try {
+        return Boolean(
+          (window as any).__poulpy_splash_done ||
+          sessionStorage.getItem("poulpy_splash_done") === "true"
+        );
+      } catch {}
+    }
+    return false;
+  });
 
   useEffect(() => {
+    const isAlreadyDone =
+      typeof window !== "undefined" &&
+      Boolean(
+        (window as any).__poulpy_splash_done ||
+        sessionStorage.getItem("poulpy_splash_done") === "true"
+      );
+
+    if (isAlreadyDone) {
+      setIsRevealed(true);
+      return;
+    }
+
     let fallbackTimer: NodeJS.Timeout | undefined;
 
     const reveal = () => {
@@ -20,7 +42,7 @@ export default function HeroCyber({ onOpenBooking }: HeroCyberProps) {
     };
 
     window.addEventListener("poulpy_splash_reveal", reveal);
-    fallbackTimer = setTimeout(reveal, 3000);
+    fallbackTimer = setTimeout(reveal, 800);
 
     return () => {
       window.removeEventListener("poulpy_splash_reveal", reveal);

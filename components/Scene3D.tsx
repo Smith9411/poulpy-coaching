@@ -221,9 +221,20 @@ export default function Scene3D() {
       const vortexMesh = new THREE.Points(geometry, material);
       scene.add(vortexMesh);
 
-      let isRevealing = false;
-      let revealStartTime = 0;
+      const isAlreadyDone =
+        typeof window !== "undefined" &&
+        Boolean(
+          (window as any).__poulpy_splash_done ||
+          sessionStorage.getItem("poulpy_splash_done") === "true"
+        );
+
+      let isRevealing = isAlreadyDone;
+      let revealStartTime = isAlreadyDone ? performance.now() : 0;
       let fallbackTimer: NodeJS.Timeout | undefined;
+
+      if (isAlreadyDone) {
+        animUniforms.uProgress.value = 1.0;
+      }
 
       const startReveal = () => {
         if (isRevealing) return;
@@ -232,8 +243,10 @@ export default function Scene3D() {
         revealStartTime = performance.now();
       };
 
-      window.addEventListener("poulpy_splash_reveal", startReveal);
-      fallbackTimer = setTimeout(startReveal, 3000);
+      if (!isAlreadyDone) {
+        window.addEventListener("poulpy_splash_reveal", startReveal);
+        fallbackTimer = setTimeout(startReveal, 800);
+      }
 
       // 4. Mouse & Scroll Interactivity
       let mouseX = 0;
