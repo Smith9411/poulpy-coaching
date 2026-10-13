@@ -82,15 +82,15 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: "/poulpy-favicon.png?v=4", type: "image/png" },
-      { url: "/icons/icon-192x192.png?v=4", sizes: "192x192", type: "image/png" },
-      { url: "/icons/icon-512x512.png?v=4", sizes: "512x512", type: "image/png" },
-      { url: "/favicon.ico?v=4", sizes: "any" },
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/poulpy-favicon.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
     ],
     apple: [
-      { url: "/poulpy-favicon.png?v=4", sizes: "180x180", type: "image/png" },
+      { url: "/poulpy-favicon.png", sizes: "180x180", type: "image/png" },
     ],
-    shortcut: "/poulpy-favicon.png?v=4",
+    shortcut: "/poulpy-favicon.png",
   },
   verification: {
     google: "nT2EwQTNqVoSAscGKb752xfoEhAUA6UO3mZBD8D04DQ",
@@ -125,14 +125,15 @@ const jsonLd = {
       }
     },
     {
-      "@type": ["ProfessionalService", "Organization", "SportsActivityLocation"],
+      "@type": ["ProfessionalService", "Organization", "EducationalOrganization"],
       "@id": "https://www.poulpy-coaching.fr/#organization",
       "name": "Poulpy Coaching",
       "alternateName": ["Coach Poulpy", "Poulpy", "Poulpi Coaching", "PoulpyCoaching"],
       "url": "https://www.poulpy-coaching.fr",
       "logo": "https://www.poulpy-coaching.fr/icons/icon-512x512.png",
       "image": "https://www.poulpy-coaching.fr/icons/icon-512x512.png",
-      "description": "Coaching e-sport d'élite sur Valorant et Apex Legends. Analyse VOD, biomécanique de visée et routine d'entraînement sur-mesure par Poulpy.",
+      "description": "Coaching e-sport d'élite sur Valorant et Apex Legends. Analyse VOD chirurgicale, biomécanique de visée et routine d'entraînement sur-mesure par Poulpy (Atheris Esport).",
+      "disambiguatingDescription": "Plateforme d'entraînement et de cours e-sport pour joueurs de jeux vidéo compétitifs sur PC (Valorant et Apex Legends). Aucun rapport avec le fitness, le coaching sportif physique ou la musculation.",
       "priceRange": "€€",
       "founder": {
         "@type": "Person",
@@ -148,10 +149,11 @@ const jsonLd = {
       "knowsAbout": [
         "Valorant",
         "Apex Legends",
-        "Aim Training",
         "E-sport",
-        "VOD Review",
         "Gaming Coaching",
+        "VOD Review",
+        "Aim Training",
+        "Crosshair Placement",
         "KovaaKs",
         "Aim Lab"
       ],
@@ -181,9 +183,11 @@ export default function RootLayout({
     <html lang="fr" suppressHydrationWarning>
       <head>
         <meta name="google-site-verification" content="nT2EwQTNqVoSAscGKb752xfoEhAUA6UO3mZBD8D04DQ" />
-        <link rel="icon" type="image/png" href="/poulpy-favicon.png?v=4" />
-        <link rel="shortcut icon" type="image/png" href="/poulpy-favicon.png?v=4" />
-        <link rel="apple-touch-icon" href="/poulpy-favicon.png?v=4" />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/poulpy-favicon.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png" />
+        <link rel="shortcut icon" type="image/png" href="/poulpy-favicon.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/poulpy-favicon.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=Unbounded:wght@600;700;800;900&display=swap" rel="stylesheet" />
