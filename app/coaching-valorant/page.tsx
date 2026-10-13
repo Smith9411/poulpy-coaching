@@ -4,28 +4,34 @@ import CyberNavbar from '@/components/CyberNavbar';
 import CyberFooter from '@/components/CyberFooter';
 
 export const metadata: Metadata = {
-  title: 'Coaching Valorant France — Cours Particuliers, Analyse VOD & Aim',
+  title: 'Coaching Valorant & Valorant Coaching France — Cours Particuliers, Aim & VOD',
   description:
-    'Coaching Valorant personnalisé par Coach Poulpy (Atheris Esport). Analyse VOD chirurgicale, biomécanique de visée, crosshair placement et routine sur-mesure. Réserve ta séance découverte offerte.',
+    'Coaching Valorant d\'élite par Coach Poulpy (Atheris Esport). Cours particuliers, Valorant coach individuel, analyse VOD chirurgicale et biomécanique de visée. Séance d\'essai offerte.',
   keywords: [
     'coaching valorant',
+    'valorant coaching',
     'coach valorant',
+    'valorant coach',
     'coaching valorant france',
+    'coaching valorant fr',
     'cours valorant',
     'cours particulier valorant',
     'analyse vod valorant',
+    'aim coaching valorant',
+    'aim training valorant',
     'progresser sur valorant',
+    'comment monter immortal valorant',
     'monter radiant valorant',
-    'coach esports valorant',
+    'cours esport valorant',
     'poulpy coaching valorant',
   ],
   alternates: {
     canonical: 'https://www.poulpy-coaching.fr/coaching-valorant',
   },
   openGraph: {
-    title: 'Coaching Valorant France — Coach Poulpy (Atheris Esport)',
+    title: 'Coaching Valorant & Valorant Coaching France — Coach Poulpy',
     description:
-      'Progresse rapidement sur Valorant grâce au coaching individuel : analyse VOD, positionnement, aim training et prise de décision.',
+      'Progresse sur Valorant avec un coaching personnalisé : analyse VOD, positionnement, cours individuels et routine aim.',
     url: 'https://www.poulpy-coaching.fr/coaching-valorant',
     images: [{ url: '/icons/icon-512x512.png', width: 512, height: 512, alt: 'Coaching Valorant Poulpy' }],
   },
@@ -144,12 +150,13 @@ export default function CoachingValorantPage() {
               <span>Atheris Esport</span>
             </div>
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight uppercase leading-[1.1] mb-6">
-              Coaching Valorant <span className="text-[#FF4655]">France</span>
+              Coaching Valorant & <span className="text-[#FF4655]">Valorant Coaching</span>
             </h1>
             <p className="text-base sm:text-lg text-zinc-400 leading-relaxed mb-8">
-              Débloque ton plein potentiel mécanique et stratégique. Analyse VOD chirurgicale, 
+              Tu cherches un <strong>coach Valorant en France</strong> pour sortir du elo hell ou atteindre l'élite compétitive ? 
+              Bénéficie d'un suivi sur-mesure combinant analyse VOD chirurgicale, 
               biomécanique de visée, placement de viseur et plan de montée vers Immortel & Radiant 
-              avec <strong>Coach Poulpy</strong>.
+              avec <strong>Coach Poulpy</strong> (Atheris Esport).
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">

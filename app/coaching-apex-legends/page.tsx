@@ -4,27 +4,37 @@ import CyberNavbar from '@/components/CyberNavbar';
 import CyberFooter from '@/components/CyberFooter';
 
 export const metadata: Metadata = {
-  title: 'Coaching Apex Legends France — Cours Particuliers, Aim & Movement (Master/Predator)',
+  title: 'Coaching Apex & Apex Legends Coaching France — Cours Particuliers & Aim',
   description:
-    'Coaching Apex Legends individuel par Coach Poulpy. Travail du movement (superglide, tap strafe), recoil smoothing, gestion des 3v3 et rotations de zone. Séance découverte offerte.',
+    'Coaching Apex Legends et Apex coaching individuel par Coach Poulpy. Travail du movement (superglide, tap strafe), recoil smoothing, 3v3 et cours particuliers. Séance offerte.',
   keywords: [
+    'coaching apex',
+    'apex coaching',
     'coaching apex legends',
+    'apex legends coaching',
+    'coach apex',
+    'apex coach',
     'coach apex legends',
-    'coaching apex legends france',
+    'cours apex',
     'cours apex legends',
+    'cours particulier apex',
+    'coaching apex france',
+    'coaching apex fr',
+    'movement coach apex',
+    'aim coaching apex',
     'tap strafe coaching',
-    'movement apex legends',
-    'monter predator apex',
-    'coaching aim apex',
+    'superglide coaching',
+    'progresser sur apex legends',
+    'comment monter predator apex',
     'poulpy coaching apex',
   ],
   alternates: {
     canonical: 'https://www.poulpy-coaching.fr/coaching-apex-legends',
   },
   openGraph: {
-    title: 'Coaching Apex Legends France — Coach Poulpy (Atheris Esport)',
+    title: 'Coaching Apex & Apex Legends Coaching France — Coach Poulpy',
     description:
-      'Progresse sur Apex Legends : movement avancé, tracking à haut DPS, gestion des rotations et clutchs en ranked avec Coach Poulpy.',
+      'Progresse sur Apex Legends avec du coaching personnalisé : movement tech, aim tracking, cours particuliers et ranked.',
     url: 'https://www.poulpy-coaching.fr/coaching-apex-legends',
     images: [{ url: '/icons/icon-512x512.png', width: 512, height: 512, alt: 'Coaching Apex Legends Poulpy' }],
   },
@@ -94,11 +104,12 @@ export default function CoachingApexLegendsPage() {
               <span>Master & Predator Tier</span>
             </div>
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight uppercase leading-[1.1] mb-6">
-              Coaching Apex Legends <span className="text-[#FF4655]">France</span>
+              Coaching Apex Legends & <span className="text-[#FF4655]">Apex Coaching</span>
             </h1>
             <p className="text-base sm:text-lg text-zinc-400 leading-relaxed mb-8">
-              Deviens intuable dans les 3v3. Movement avancé, tracking longue et courte portée, 
-              gestion des rotations de zone et callouts d'équipe avec <strong>Coach Poulpy</strong>.
+              Tu cherches un <strong>coach Apex Legends en France</strong> pour maîtriser les 3v3 et passer Master ou Predator ? 
+              Movement tech avancé (tap strafe, superglide), tracking haute précision, 
+              gestion des rotations et cours particuliers avec <strong>Coach Poulpy</strong>.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
