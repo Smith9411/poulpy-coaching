@@ -9,16 +9,11 @@ export default function SplashScreen() {
   const [isFadingOut, setIsFadingOut] = useState(false);
 
   useEffect(() => {
-    // If splash has already run in this session, hide immediately without blocking
-    if (
-      typeof window !== "undefined" &&
-      Boolean(
-        (window as any).__poulpy_splash_done ||
-        sessionStorage.getItem("poulpy_splash_done") === "true"
-      )
-    ) {
-      setIsVisible(false);
-      return;
+    // Nettoyer tout vestige de sessionStorage antérieur
+    if (typeof window !== "undefined") {
+      try {
+        sessionStorage.removeItem("poulpy_splash_done");
+      } catch {}
     }
 
     let isCancelled = false;
@@ -74,9 +69,6 @@ export default function SplashScreen() {
           setIsFadingOut(true);
           if (typeof window !== "undefined") {
             (window as any).__poulpy_splash_done = true;
-            try {
-              sessionStorage.setItem("poulpy_splash_done", "true");
-            } catch {}
             window.dispatchEvent(new CustomEvent("poulpy_splash_reveal"));
           }
         }, 120);

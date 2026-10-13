@@ -222,11 +222,7 @@ export default function Scene3D() {
       scene.add(vortexMesh);
 
       const isAlreadyDone =
-        typeof window !== "undefined" &&
-        Boolean(
-          (window as any).__poulpy_splash_done ||
-          sessionStorage.getItem("poulpy_splash_done") === "true"
-        );
+        typeof window !== "undefined" && Boolean((window as any).__poulpy_splash_done);
 
       let isRevealing = isAlreadyDone;
       let revealStartTime = isAlreadyDone ? performance.now() : 0;
@@ -245,7 +241,7 @@ export default function Scene3D() {
 
       if (!isAlreadyDone) {
         window.addEventListener("poulpy_splash_reveal", startReveal);
-        fallbackTimer = setTimeout(startReveal, 800);
+        fallbackTimer = setTimeout(startReveal, 3000);
       }
 
       // 4. Mouse & Scroll Interactivity

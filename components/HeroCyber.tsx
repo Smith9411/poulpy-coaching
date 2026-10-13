@@ -9,25 +9,12 @@ interface HeroCyberProps {
 }
 
 export default function HeroCyber({ onOpenBooking }: HeroCyberProps) {
-  const [isRevealed, setIsRevealed] = useState(() => {
-    if (typeof window !== "undefined") {
-      try {
-        return Boolean(
-          (window as any).__poulpy_splash_done ||
-          sessionStorage.getItem("poulpy_splash_done") === "true"
-        );
-      } catch {}
-    }
-    return false;
-  });
+  const [isRevealed, setIsRevealed] = useState(false);
 
   useEffect(() => {
+    // Si la splash screen a déjà été vue dans la session SPA (ex: retour depuis /admin)
     const isAlreadyDone =
-      typeof window !== "undefined" &&
-      Boolean(
-        (window as any).__poulpy_splash_done ||
-        sessionStorage.getItem("poulpy_splash_done") === "true"
-      );
+      typeof window !== "undefined" && Boolean((window as any).__poulpy_splash_done);
 
     if (isAlreadyDone) {
       setIsRevealed(true);
@@ -42,7 +29,7 @@ export default function HeroCyber({ onOpenBooking }: HeroCyberProps) {
     };
 
     window.addEventListener("poulpy_splash_reveal", reveal);
-    fallbackTimer = setTimeout(reveal, 800);
+    fallbackTimer = setTimeout(reveal, 3000);
 
     return () => {
       window.removeEventListener("poulpy_splash_reveal", reveal);
