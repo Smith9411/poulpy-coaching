@@ -128,8 +128,15 @@ export default function CyberNavbar({
       const target = document.getElementById(hash);
       if (target) {
         const timer = setTimeout(() => {
-          const navOffset = 70;
-          const targetTop = target.getBoundingClientRect().top + window.scrollY - navOffset;
+          const heading = target.querySelector("h2, h3") as HTMLElement | null;
+          let targetTop = 0;
+          if (hash === "coaching") {
+            targetTop = target.getBoundingClientRect().top + window.scrollY;
+          } else if (heading) {
+            targetTop = Math.max(0, heading.getBoundingClientRect().top + window.scrollY - 88);
+          } else {
+            targetTop = Math.max(0, target.getBoundingClientRect().top + window.scrollY - 70);
+          }
           gsap.to(window, {
             scrollTo: { y: targetTop, autoKill: false },
             duration: 1.2,
@@ -167,8 +174,16 @@ export default function CyberNavbar({
     const targetEl = document.getElementById(targetId);
 
     if (targetEl) {
-      const navOffset = 70;
-      const targetTop = targetEl.getBoundingClientRect().top + window.scrollY - navOffset;
+      const heading = targetEl.querySelector("h2, h3") as HTMLElement | null;
+      let targetTop = 0;
+      if (targetId === "coaching") {
+        targetTop = targetEl.getBoundingClientRect().top + window.scrollY;
+      } else if (heading) {
+        targetTop = Math.max(0, heading.getBoundingClientRect().top + window.scrollY - 88);
+      } else {
+        targetTop = Math.max(0, targetEl.getBoundingClientRect().top + window.scrollY - 70);
+      }
+
       const distance = Math.abs(targetTop - window.scrollY);
       const duration = Math.min(1.8, Math.max(0.9, distance / 3200));
 
@@ -341,8 +356,10 @@ export default function CyberNavbar({
                 } else {
                   const el = document.getElementById("booking");
                   if (el) {
-                    const navOffset = 70;
-                    const targetTop = el.getBoundingClientRect().top + window.scrollY - navOffset;
+                    const heading = el.querySelector("h2, h3") as HTMLElement | null;
+                    const targetTop = heading
+                      ? Math.max(0, heading.getBoundingClientRect().top + window.scrollY - 88)
+                      : Math.max(0, el.getBoundingClientRect().top + window.scrollY - 70);
                     gsap.to(window, {
                       scrollTo: { y: targetTop, autoKill: false },
                       duration: 1.2,

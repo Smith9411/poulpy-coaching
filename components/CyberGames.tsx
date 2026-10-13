@@ -87,7 +87,7 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
   };
 
   return (
-    <section id="games" className="py-16 sm:py-20 px-6 sm:px-12 lg:px-16 bg-transparent">
+    <section id="games" className="pt-10 sm:pt-14 pb-16 sm:pb-20 px-6 sm:px-12 lg:px-16 bg-transparent">
       <div className="max-w-6xl mx-auto space-y-12 sm:space-y-16 font-mono">
         {/* Section Header with Minimal Game Selectors */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-8">

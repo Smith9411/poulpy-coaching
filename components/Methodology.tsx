@@ -279,7 +279,7 @@ export default function Methodology() {
   };
 
   return (
-    <section id="methodology" className="pt-24 sm:pt-36 pb-16 sm:pb-24 px-6 sm:px-12 lg:px-16 bg-transparent font-mono relative">
+    <section id="methodology" className="pt-10 sm:pt-14 pb-16 sm:pb-24 px-6 sm:px-12 lg:px-16 bg-transparent font-mono relative">
       <div className="max-w-6xl mx-auto space-y-12 sm:space-y-16 relative z-10">
         {/* Section Header */}
         <div className="space-y-2 border-b border-white/10 pb-8">

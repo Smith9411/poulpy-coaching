@@ -39,7 +39,7 @@ export default function CyberFAQ() {
   };
 
   return (
-    <section id="faq" className="py-16 sm:py-20 px-6 sm:px-12 lg:px-16 bg-transparent font-mono">
+    <section id="faq" className="pt-10 sm:pt-14 pb-16 sm:pb-20 px-6 sm:px-12 lg:px-16 bg-transparent font-mono">
       <div className="max-w-6xl mx-auto space-y-10 sm:space-y-12">
         {/* Section Header aligné avec la DA (Pôles d'excellence, À Propos, Média) */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-8">

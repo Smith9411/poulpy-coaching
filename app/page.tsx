@@ -48,8 +48,10 @@ export default function CybercorePoulpyPage() {
   const scrollToBooking = () => {
     const el = document.getElementById("booking");
     if (el) {
-      const navOffset = 70;
-      const targetTop = el.getBoundingClientRect().top + window.scrollY - navOffset;
+      const heading = el.querySelector("h2, h3") as HTMLElement | null;
+      const targetTop = heading
+        ? Math.max(0, heading.getBoundingClientRect().top + window.scrollY - 88)
+        : Math.max(0, el.getBoundingClientRect().top + window.scrollY - 70);
       const distance = Math.abs(targetTop - window.scrollY);
       const duration = Math.min(1.8, Math.max(0.9, distance / 3200));
       gsap.to(window, {

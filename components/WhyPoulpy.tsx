@@ -298,7 +298,7 @@ export default function WhyPoulpy() {
     >
       <div
         ref={pinnedContainerRef}
-        className="relative w-full min-h-[100dvh] h-screen overflow-hidden flex flex-col justify-center pt-4 sm:pt-6 lg:pt-8 pb-4 sm:pb-6"
+        className="relative w-full min-h-[100dvh] h-screen overflow-hidden flex flex-col justify-start pt-20 sm:pt-24 lg:pt-26 pb-4 sm:pb-6"
       >
         {/* Grand Titre de Catégorie — responsive et safe margin */}
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 mb-4 sm:mb-6 md:mb-8 shrink-0 z-20">

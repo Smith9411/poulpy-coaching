@@ -106,7 +106,7 @@ export default function CyberTestimonials() {
       : [];
 
   return (
-    <section id="avis" className="py-20 sm:py-24 px-6 sm:px-12 lg:px-16 bg-transparent font-mono relative z-10">
+    <section id="avis" className="pt-10 sm:pt-14 pb-20 sm:pb-24 px-6 sm:px-12 lg:px-16 bg-transparent font-mono relative z-10">
       <div className="max-w-7xl mx-auto space-y-10 sm:space-y-12">
         
         {/* Section Header with Sleek Minimalist Navigation Controls */}
