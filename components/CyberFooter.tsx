@@ -26,12 +26,6 @@ export default function CyberFooter() {
           </div>
 
           <div className="flex flex-wrap items-center gap-5 text-[11px]">
-            <a href="/coaching-valorant" className="hover:text-[#CA1C30] transition-colors font-bold text-white">
-              [COACHING VALORANT]
-            </a>
-            <a href="/coaching-apex-legends" className="hover:text-[#CA1C30] transition-colors font-bold text-white">
-              [COACHING APEX LEGENDS]
-            </a>
             <a href="/avis" className="hover:text-[#CA1C30] transition-colors font-bold">
               [TOUS LES AVIS]
             </a>

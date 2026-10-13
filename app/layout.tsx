@@ -9,11 +9,11 @@ import { Analytics } from "@vercel/analytics/next";
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.poulpy-coaching.fr"),
   title: {
-    default: "Poulpy Coaching — Coach E-sport Valorant & Apex Legends (Immortal & Predator)",
+    default: "Poulpy Coaching — Coaching Valorant & Apex Legends | Coach E-sport France",
     template: "%s | Poulpy Coaching",
   },
   description:
-    "Poulpy Coaching : Plateforme officielle de coaching e-sport d'élite sur Valorant et Apex Legends par Coach Poulpy (Atheris Esport). Analyse VOD chirurgicale, biomécanique aim, routine personnalisée et suivi Discord.",
+    "Poulpy Coaching : Coaching Valorant & Apex Legends en France par Coach Poulpy (Atheris Esport). Cours particuliers, analyse VOD chirurgicale, biomécanique aim, routine personnalisée et séance d'essai offerte.",
   applicationName: "Poulpy Coaching",
   authors: [{ name: "Poulpy", url: "https://www.poulpy-coaching.fr" }],
   creator: "Poulpy",

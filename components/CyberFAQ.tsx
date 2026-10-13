@@ -9,24 +9,28 @@ export default function CyberFAQ() {
 
   const faqs = [
     {
-      q: "Comment se déroule une session ?",
-      a: "Sur Discord en vocal et partage d'écran. Analyse de VOD en direct, identification des points de blocage et plan d'entraînement concret.",
+      q: "Comment se déroule une séance de coaching Valorant ou Apex Legends ?",
+      a: "La session se déroule en direct sur Discord en vocal et partage d'écran 60 FPS. Elle combine l'analyse de VOD personnalisée (VOD review), la correction de tes mécaniques de tir et de positionnement, et l'établissement d'une feuille de route concrète.",
     },
     {
-      q: "Quel niveau faut-il avoir pour commencer ?",
-      a: "Tous les niveaux sont acceptés. L'entraînement est personnalisé en fonction de ton rang et de tes objectifs.",
+      q: "Quel niveau faut-il avoir pour prendre un coach Valorant ou un coach Apex ?",
+      a: "Tous les rangs sont accompagnés : du joueur débutant bloqué en Fer/Bronze ou Silver voulant acquérir de bonnes bases, au joueur compétitif cherchant à passer Ascendant/Immortel sur Valorant ou Master/Predator sur Apex Legends.",
     },
     {
-      q: "Comment envoyer ma VOD ?",
-      a: "Enregistre une partie représentative (format YouTube non répertorié ou lien direct) et transmets-la avant la séance.",
+      q: "Pourquoi choisir le coaching Valorant avec Coach Poulpy ?",
+      a: "Coach Poulpy (Atheris Esport, Immortal 2 #5000) applique une méthode scientifique éprouvée : biomécanique de visée, crosshair placement, routines KovaaKs/Aim Lab sur-mesure et prise de décision collective.",
     },
     {
-      q: "Sur quels jeux interviens-tu ?",
-      a: "Spécialisation Valorant et Apex Legends (visée pure, biomécanique, game sense et prise de décision).",
+      q: "Qu'apprend-on lors d'un coaching Apex Legends (Apex coaching) ?",
+      a: "Tu travailles le tracking réactif à haut DPS, le movement tech avancé (tap-strafe, superglide, wall bounce), les rotations intelligentes et la gestion des combats 3v3 sous pression.",
     },
     {
-      q: "Comment fonctionne le paiement et la confirmation ?",
-      a: "Paiement en ligne sécurisé lors de la réservation. Tu reçois instantanément la confirmation de ton créneau par email.",
+      q: "Comment fonctionne la première séance d'essai gratuite ?",
+      a: "La séance d'initiation de 30 minutes est 100 % offerte et sans engagement. Tu choisis ton créneau sur le calendrier du site pour faire un premier bilan de tes objectifs et de ton gameplay.",
+    },
+    {
+      q: "Comment envoyer ma VOD avant le cours ?",
+      a: "Enregistre simplement une partie compétitive représentative (format YouTube non répertorié ou lien direct) et transmets-la sur Discord avant le début de ta séance.",
     },
   ];
 

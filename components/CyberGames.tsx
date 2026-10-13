@@ -16,10 +16,10 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
     {
       id: "val" as const,
       title: "VALORANT",
-      subtitle: "FPS TACTIQUE 5V5 · RIOT GAMES",
+      subtitle: "FPS TACTIQUE 5V5 · RIOT GAMES · COACHING VALORANT FRANCE",
       badge: "HEAD COACH ÉQUIPE VRC — IMMORTAL 2 #5000",
       badgeColor: "acid" as const,
-      desc: "Une approche personnalisée, aiguillée par une expérience professionnelle et une étude des meilleurs joueurs/équipes de la scène.",
+      desc: "Coaching Valorant & Valorant coaching personnalisé par Coach Poulpy (Atheris Esport). Cours particuliers, analyse VOD chirurgicale, crosshair placement, routines KovaaKs/Aim Lab et prise de décision pour monter de rang jusqu'à Immortel & Radiant.",
       protocols: [
         { num: "01", name: "Raw aim : Click timing, micro-flicks, réflexes..." },
         { num: "02", name: "Mouvements : Deadzoning, strafes, peaks..." },
@@ -30,10 +30,10 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
     {
       id: "apex" as const,
       title: "APEX LEGENDS",
-      subtitle: "BATTLE ROYALE RAPIDE · EA",
+      subtitle: "BATTLE ROYALE RAPIDE · EA · COACHING APEX LEGENDS FRANCE",
       badge: "3X PICK #450 S24 (PREDATOR)",
       badgeColor: "laser" as const,
-      desc: "Tracking haute vitesse réactif, mécanique de déplacement avancée, fight selection et domination du positionnement.",
+      desc: "Coaching Apex Legends & Apex coaching individuel. Tracking haute vitesse réactif, movement avancé (tap-strafe, superglide, wall bounce), fight selection en 3v3 et domination du positionnement pour atteindre Master & Predator.",
       protocols: [
         { num: "01", name: "Smooth & Reactive Tracking" },
         { num: "02", name: "Movement avancé (Tap-strafe, Superglide)" },
