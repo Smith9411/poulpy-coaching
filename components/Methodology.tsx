@@ -284,10 +284,10 @@ export default function Methodology() {
         {/* Section Header */}
         <div className="space-y-2 border-b border-white/10 pb-8">
           <h2 className="text-3xl sm:text-5xl font-display text-[#F5F4F0] tracking-wider">
-            3 MÉTHODES POUR <span className="text-[#CA1C30]">3 TYPES DE PROFILS.</span>
+            3 MÉTHODES DE COACHING <span className="text-[#CA1C30]">VALORANT &amp; APEX</span>
           </h2>
           <p className="text-xs sm:text-sm text-[#F5F4F0]/60 max-w-xl leading-relaxed">
-            Protocoles sur-mesure et adaptés à chaque niveau d&apos;ambition.
+            Coaching Valorant &amp; coaching Apex : protocoles sur-mesure et adaptés à chaque niveau d&apos;ambition.
           </p>
         </div>
 

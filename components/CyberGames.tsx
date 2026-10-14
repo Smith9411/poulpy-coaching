@@ -93,10 +93,10 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-8">
           <div className="space-y-2">
             <h2 className="text-3xl sm:text-5xl font-display text-[#F5F4F0] tracking-wider">
-              PÔLES D&apos;<span className="text-[#CA1C30]">EXCELLENCE</span>
+              COACHING <span className="text-[#CA1C30]">VALORANT</span> &amp; <span className="text-[#00B4A0]">APEX</span>
             </h2>
             <p className="text-xs sm:text-sm text-[#F5F4F0]/60 max-w-xl leading-relaxed">
-              Protocoles d&apos;entraînement dédiés et calibrés par discipline.
+              Pôles d&apos;excellence e-sport : cours particuliers et entraînements intensifs calibrés pour monter en rank.
             </p>
           </div>
 

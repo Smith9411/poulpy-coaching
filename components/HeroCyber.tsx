@@ -49,13 +49,15 @@ export default function HeroCyber({ onOpenBooking }: HeroCyberProps) {
       {/* Main Centered Hero Block */}
       <div className="max-w-5xl mx-auto w-full my-auto py-6 flex flex-col items-center justify-center text-center select-none">
         {/* Architectural Title with Pure GPU Composited Fluid Entrance */}
-        <div
+        <h1
           className="relative flex items-center justify-center leading-[0.95] text-[clamp(2.75rem,8.5vw,7.8rem)] font-display font-bold text-[#F5F4F0] tracking-tight py-2 overflow-hidden"
           style={{ transform: "translateZ(0)" }}
         >
+          <span className="sr-only">Poulpy Coaching — Coaching Valorant &amp; Apex Legends</span>
           {titleString.split("").map((letter, idx) => (
             <span
               key={idx}
+              aria-hidden="true"
               style={{
                 animationDelay: `${idx * 55}ms`,
               }}
@@ -66,17 +68,17 @@ export default function HeroCyber({ onOpenBooking }: HeroCyberProps) {
               {letter}
             </span>
           ))}
-        </div>
+        </h1>
 
         {/* Sub-headline & Call-To-Actions (Centered) */}
         <div className="mt-6 sm:mt-8 max-w-2xl mx-auto flex flex-col items-center text-center space-y-6">
-          <p className="text-lg sm:text-xl md:text-2xl text-[#F5F4F0] font-semibold leading-snug tracking-tight">
-            L&apos;ÉLITE DU COACHING FPS COMPÉTITIF.
+          <h2 className="text-lg sm:text-xl md:text-2xl text-[#F5F4F0] font-semibold leading-snug tracking-tight">
+            L&apos;ÉLITE DU COACHING VALORANT &amp; APEX LEGENDS.
             <br />
             <span className="font-accent text-[#00B4A0] text-sm sm:text-base md:text-lg font-semibold tracking-wider block mt-2">
-              VALORANT (IMMORTAL 2 #5000) &amp; APEX (3x PICK PRED #450).
+              COACHING VALORANT (IMMORTAL 2 #5000) &amp; APEX COACHING (3x PICK PRED #450).
             </span>
-          </p>
+          </h2>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2 w-full max-w-md">
             <button

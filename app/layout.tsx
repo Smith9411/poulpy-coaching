@@ -169,6 +169,10 @@ const jsonLd = {
       "knowsAbout": [
         "Valorant",
         "Apex Legends",
+        "Coaching Valorant",
+        "Valorant Coaching",
+        "Coaching Apex Legends",
+        "Apex Coaching",
         "E-sport",
         "Gaming Coaching",
         "VOD Review",
@@ -177,6 +181,53 @@ const jsonLd = {
         "KovaaKs",
         "Aim Lab"
       ],
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Offres de Coaching E-sport",
+        "itemListElement": [
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Coaching Valorant",
+              "alternateName": "Valorant Coaching France",
+              "description": "Coaching Valorant personnalisé : cours particuliers, analyse VOD chirurgicale, crosshair placement, routines KovaaKs/Aim Lab et prise de décision pour monter Immortel & Radiant.",
+              "provider": {
+                "@id": "https://www.poulpy-coaching.fr/#organization"
+              }
+            },
+            "price": "10.00",
+            "priceCurrency": "EUR"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Coaching Apex Legends",
+              "alternateName": "Apex Coaching France",
+              "description": "Coaching Apex Legends individuel : tracking haute vitesse réactif, movement avancé (tap-strafe, superglide, wall bounce) et gestion 3v3 vers Master & Predator.",
+              "provider": {
+                "@id": "https://www.poulpy-coaching.fr/#organization"
+              }
+            },
+            "price": "10.00",
+            "priceCurrency": "EUR"
+          },
+          {
+            "@type": "Offer",
+            "itemOffered": {
+              "@type": "Service",
+              "name": "Session Diagnostic Gratuite",
+              "description": "Séance de diagnostic offerte pour tester le coaching Valorant ou Apex Legends et préparer votre plan de progression.",
+              "provider": {
+                "@id": "https://www.poulpy-coaching.fr/#organization"
+              }
+            },
+            "price": "0.00",
+            "priceCurrency": "EUR"
+          }
+        ]
+      },
       "aggregateRating": {
         "@type": "AggregateRating",
         "ratingValue": "5.0",
