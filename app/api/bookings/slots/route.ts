@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { triggerOpportunisticRemindersCheck } from '@/app/api/cron/reminders/route';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -16,6 +17,9 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(req: NextRequest) {
   try {
+    // Vérification opportuniste non-bloquante des rappels de séances (max 1 fois / 10 min)
+    triggerOpportunisticRemindersCheck();
+
     const { searchParams } = new URL(req.url);
     const isAdminMode = searchParams.get('admin') === 'true';
     const startDateParam = searchParams.get('startDate');

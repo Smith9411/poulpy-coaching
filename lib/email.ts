@@ -13,10 +13,11 @@ interface SendBookingEmailParams {
   bookingDate: string; // YYYY-MM-DD
   bookingTime: string; // HH:mm
   game?: string;
+  diffInMinutes?: number;
 }
 
 /**
- * Génère le lien d'ajout direct à Google Calendar
+ * Génère le lien d'ajout direct à Google Calendar (fuseau Europe/Paris explicite)
  */
 function generateGoogleCalendarUrl({
   planName,
@@ -31,11 +32,19 @@ function generateGoogleCalendarUrl({
 }): string {
   try {
     const [hours, minutes] = bookingTime.split(':').map(Number);
-    const start = new Date(`${bookingDate}T${String(hours || 0).padStart(2, '0')}:${String(minutes || 0).padStart(2, '0')}:00`);
-    const end = new Date(start.getTime() + 90 * 60 * 1000); // 1h30 par défaut
+    const startUtc = new Date(Date.UTC(
+      Number(bookingDate.slice(0, 4)),
+      Number(bookingDate.slice(5, 7)) - 1,
+      Number(bookingDate.slice(8, 10)),
+      hours || 0,
+      minutes || 0,
+      0
+    ));
+    const endUtc = new Date(startUtc.getTime() + 90 * 60 * 1000); // 1h30 par défaut
 
-    const formatGCal = (d: Date) =>
-      d.toISOString().replace(/-|:|\.\d\d\d/g, '');
+    // Format local sans le 'Z' final + paramètre ctz=Europe/Paris pour éviter le décalage UTC (+2h) sur Vercel
+    const formatLocalGCal = (d: Date) =>
+      d.toISOString().replace(/-|:|\.\d\d\d|Z/g, '');
 
     const title = encodeURIComponent(`Coaching E-sport ${game || 'Valorant'} — Poulpy Coaching`);
     const details = encodeURIComponent(
@@ -43,7 +52,7 @@ function generateGoogleCalendarUrl({
     );
     const location = encodeURIComponent('Discord Poulpy Coaching (https://discord.gg/BC24FH4xpd)');
 
-    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${formatGCal(start)}/${formatGCal(end)}&details=${details}&location=${location}`;
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${formatLocalGCal(startUtc)}/${formatLocalGCal(endUtc)}&ctz=Europe/Paris&details=${details}&location=${location}`;
   } catch (e) {
     return 'https://calendar.google.com/';
   }
@@ -269,12 +278,31 @@ export async function sendBookingReminderEmail(params: SendBookingEmailParams) {
     bookingDate,
     bookingTime,
     game = 'Valorant',
+    diffInMinutes = 120,
   } = params;
 
   if (!studentEmail) {
     console.warn('[Email] Aucun email renseigné pour l\'envoi du rappel.');
     return { error: 'Email manquant' };
   }
+
+  const timeHeadingLabel =
+    diffInMinutes >= 150
+      ? 'Début dans ~3 heures'
+      : diffInMinutes >= 90
+      ? 'Début dans 2 heures'
+      : diffInMinutes >= 45
+      ? 'Début dans 1 heure'
+      : `Début dans ${Math.max(15, Math.round(diffInMinutes / 5) * 5)} minutes`;
+
+  const timeShortLabel =
+    diffInMinutes >= 150
+      ? 'dans ~3h'
+      : diffInMinutes >= 90
+      ? 'dans 2h'
+      : diffInMinutes >= 45
+      ? 'dans ~1h'
+      : `dans ${Math.max(15, Math.round(diffInMinutes / 5) * 5)} min`;
 
   const formattedDate = (() => {
     try {
@@ -317,7 +345,7 @@ export async function sendBookingReminderEmail(params: SendBookingEmailParams) {
             <td style="padding: 36px 36px 18px; text-align: center;">
               <img src="https://www.poulpy-coaching.fr/poulpy-octopus.png" alt="Poulpy Coaching" width="52" height="52" style="display: inline-block; margin-bottom: 12px;" />
               <div style="font-size: 13px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: #CA1C30;">POULPY COACHING</div>
-              <h1 style="margin: 12px 0 0; font-size: 24px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.3px;">Rappel : Début dans 2 heures</h1>
+              <h1 style="margin: 12px 0 0; font-size: 24px; font-weight: 700; color: #FFFFFF; letter-spacing: -0.3px;">Rappel : ${timeHeadingLabel}</h1>
             </td>
           </tr>
 
@@ -325,7 +353,7 @@ export async function sendBookingReminderEmail(params: SendBookingEmailParams) {
           <tr>
             <td style="padding: 0 36px 22px; text-align: center;">
               <p style="margin: 0 0 10px; font-size: 15px; line-height: 1.6; color: #A0A4B0;">
-                Salut <span style="color: #FFFFFF; font-weight: 600;">${studentName}</span>, ta séance de coaching commence aujourd'hui à <span style="color: #00B4A0; font-weight: 700;">${bookingTime}</span> (dans 2h).
+                Salut <span style="color: #FFFFFF; font-weight: 600;">${studentName}</span>, ta séance de coaching commence aujourd'hui à <span style="color: #00B4A0; font-weight: 700;">${bookingTime}</span> (${timeShortLabel}).
               </p>
               <p style="margin: 0; font-size: 14px; line-height: 1.6; color: #7E8494;">
                 Pense à vérifier que tu as bien rejoint le serveur Discord pour être prêt à l'heure convenue.
@@ -421,7 +449,7 @@ export async function sendBookingReminderEmail(params: SendBookingEmailParams) {
         from: 'Poulpy Coaching <contact@poulpy-coaching.fr>',
         to: studentEmail,
         replyTo: 'contact@poulpy-coaching.fr',
-        subject: `⚡ Rappel : Ton coaching commence à ${bookingTime} (dans 2h) !`,
+        subject: `⚡ Rappel : Ton coaching commence à ${bookingTime} (${timeShortLabel}) !`,
         html: htmlContent,
       });
 
@@ -431,7 +459,7 @@ export async function sendBookingReminderEmail(params: SendBookingEmailParams) {
           from: 'Poulpy Coaching <onboarding@resend.dev>',
           to: studentEmail,
           replyTo: 'contact@poulpy-coaching.fr',
-          subject: `⚡ Rappel : Ton coaching commence à ${bookingTime} (dans 2h) !`,
+          subject: `⚡ Rappel : Ton coaching commence à ${bookingTime} (${timeShortLabel}) !`,
           html: htmlContent,
         });
       }

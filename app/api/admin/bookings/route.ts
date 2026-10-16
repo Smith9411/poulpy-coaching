@@ -269,13 +269,17 @@ export async function PATCH(req: NextRequest) {
           .eq('id', targetSlotId);
       }
 
-      // 3. Mettre à jour la réservation (avec fallback si read_by_student manque)
+      // 3. Mettre à jour la réservation (et réinitialiser le marqueur de rappel pour le nouveau créneau)
+      const cleanedNotes = String(adminNotes ?? currentBooking.admin_notes ?? '')
+        .replace(/\s*\[reminder_2h_sent\]/g, '')
+        .trim();
+
       const reschedulePayload: Record<string, unknown> = {
         booking_date: newDate,
         booking_time: newTime,
         slot_id: targetSlotId || null,
         status: 'rescheduled',
-        admin_notes: adminNotes || currentBooking.admin_notes,
+        admin_notes: cleanedNotes || null,
         updated_at: new Date().toISOString(),
       };
 
