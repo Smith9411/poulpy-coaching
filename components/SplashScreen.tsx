@@ -92,6 +92,8 @@ export default function SplashScreen() {
 
   return (
     <div
+      aria-hidden="true"
+      data-nosnippet=""
       className={`fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#0B0A0D] font-mono select-none transition-opacity duration-300 ease-out will-change-opacity ${
         isFadingOut
           ? "opacity-0 pointer-events-none"

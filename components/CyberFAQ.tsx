@@ -10,27 +10,27 @@ export default function CyberFAQ() {
   const faqs = [
     {
       q: "Comment se déroule une séance de coaching Valorant ou Apex Legends ?",
-      a: "La session se déroule en direct sur Discord en vocal et partage d'écran 60 FPS. Elle combine l'analyse de VOD personnalisée (VOD review), la correction de tes mécaniques de tir et de positionnement, et l'établissement d'une feuille de route concrète.",
+      a: "La session de coaching Valorant (Valorant coaching) ou de coaching Apex Legends (Apex coaching) se déroule en direct sur Discord en vocal et partage d'écran 60 FPS avec Coach Poulpy. Elle combine l'analyse de VOD personnalisée (VOD review), la correction de tes mécaniques de tir (aim training KovaaKs / Aim Lab, crosshair placement, strafes) et l'établissement d'une fiche de suivi concrète pour monter en rank.",
     },
     {
       q: "Quel niveau faut-il avoir pour prendre un coach Valorant ou un coach Apex ?",
-      a: "Tous les rangs sont accompagnés : du joueur débutant bloqué en Fer/Bronze ou Silver voulant acquérir de bonnes bases, au joueur compétitif cherchant à passer Ascendant/Immortel sur Valorant ou Master/Predator sur Apex Legends.",
+      a: "Tous les rangs sont accompagnés : du joueur débutant bloqué en Fer, Bronze, Argent, Or ou Platine voulant acquérir des bases solides, au joueur compétitif cherchant à passer Diamant, Ascendant, Immortel ou Radiant sur Valorant, ou Master et Predator sur Apex Legends.",
     },
     {
-      q: "Pourquoi choisir le coaching Valorant avec Coach Poulpy ?",
-      a: "Coach Poulpy (Atheris Esport, Immortal 2 #5000) applique une méthode scientifique éprouvée : biomécanique de visée, crosshair placement, routines KovaaKs/Aim Lab sur-mesure et prise de décision collective.",
+      q: "Pourquoi choisir le coaching Valorant (Valorant coaching) avec Coach Poulpy ?",
+      a: "Coach Poulpy (Head Coach VRC pour Atheris Esport, Immortal 2 #5000 et formateur issu de la filière STAPS / INSEP) applique une méthode d'entraînement e-sport scientifique : biomécanique de visée, crosshair placement, deadzoning, routines KovaaKs et Aim Lab sur-mesure, lecture de jeu (game sense) et communication d'équipe.",
     },
     {
       q: "Qu'apprend-on lors d'un coaching Apex Legends (Apex coaching) ?",
-      a: "Tu travailles le tracking réactif à haut DPS, le movement tech avancé (tap-strafe, superglide, wall bounce), les rotations intelligentes et la gestion des combats 3v3 sous pression.",
+      a: "En coaching Apex Legends avec un 3x Predator (#450), tu travailles le tracking réactif haute vitesse, le movement avancé (tap-strafe, superglide, wall bounce), le positionnement, les rotations macro et la sélection de fights en 3v3 pour grimper jusqu'aux rangs Master et Apex Predator.",
     },
     {
-      q: "Comment fonctionne la première séance d'essai gratuite ?",
-      a: "La séance d'initiation de 30 minutes est 100 % offerte et sans engagement. Tu choisis ton créneau sur le calendrier du site pour faire un premier bilan de tes objectifs et de ton gameplay.",
+      q: "Comment fonctionne la première séance de coaching gratuite (Session Diagnostic) ?",
+      a: "La Session Diagnostic (45 min à 1h en live) est 100 % gratuite et sans engagement. Tu réserves ton créneau directement sur poulpy-coaching.fr : Coach Poulpy réalise une VOD review complète d'une de tes parties sur Valorant ou Apex Legends pour identifier tes erreurs majeures et définir ton plan de progression.",
     },
     {
-      q: "Comment envoyer ma VOD avant le cours ?",
-      a: "Enregistre simplement une partie compétitive représentative (format YouTube non répertorié ou lien direct) et transmets-la sur Discord avant le début de ta séance.",
+      q: "Qu'est-ce que Poulpy Coaching (poulpy-coaching.fr) ?",
+      a: "Poulpy Coaching (www.poulpy-coaching.fr) est la plateforme française officielle de coaching e-sport fondée par Coach Poulpy, dédiée exclusivement aux joueurs PC sur Valorant et Apex Legends. Nos cours particuliers d'e-sport et d'aim training sont 100 % dédiés au jeu vidéo compétitif (et totalement indépendants de tout service de fitness ou de coaching sportif physique).",
     },
   ];
 
@@ -48,7 +48,7 @@ export default function CyberFAQ() {
               FOIRE AUX <span className="text-[#CA1C30]">QUESTIONS</span>
             </h2>
             <p className="text-xs sm:text-sm text-[#F5F4F0]/60 max-w-xl leading-relaxed">
-              Tout ce qu&apos;il faut savoir avant de réserver ta première session.
+              Tout savoir sur notre coaching Valorant et coaching Apex Legends avant de réserver.
             </p>
           </div>
         </div>
@@ -69,7 +69,7 @@ export default function CyberFAQ() {
                     <span className="text-xs sm:text-sm font-mono font-bold text-[#CA1C30] shrink-0 tracking-widest">
                       0{idx + 1}
                     </span>
-                    <span
+                    <h3
                       className={`text-base sm:text-lg md:text-xl font-display font-medium tracking-wide transition-colors ${
                         isOpen
                           ? "text-[#F5F4F0]"
@@ -77,7 +77,7 @@ export default function CyberFAQ() {
                       }`}
                     >
                       {faq.q}
-                    </span>
+                    </h3>
                   </div>
 
                   <div className="pt-1 shrink-0">
@@ -92,8 +92,9 @@ export default function CyberFAQ() {
                 </button>
 
                 <AnimatePresence initial={false}>
-                  {isOpen && (
+                  {isOpen ? (
                     <motion.div
+                      key="open"
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
@@ -104,6 +105,10 @@ export default function CyberFAQ() {
                         {faq.a}
                       </div>
                     </motion.div>
+                  ) : (
+                    <div key="closed" className="sr-only">
+                      {faq.a}
+                    </div>
                   )}
                 </AnimatePresence>
               </div>

@@ -326,7 +326,7 @@ export default function Methodology() {
         {/* Subtitle / Intro for selected method (si présent) */}
         {currentPlan.intro ? (
           <div className="max-w-3xl mx-auto text-center">
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" initial={false}>
               <motion.p
                 key={activePlan}
                 initial={{ opacity: 0, y: 8 }}
@@ -342,7 +342,7 @@ export default function Methodology() {
         ) : null}
 
         {/* Scroll Stacking Typographic Panels with AnimatePresence */}
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={activePlan}
             initial={{ opacity: 0, y: 15 }}
@@ -434,6 +434,23 @@ export default function Methodology() {
             })}
           </motion.div>
         </AnimatePresence>
+
+        {/* Crawlable SEO Content for Inactive Plans so Google indexes all 3 methods */}
+        {PLAN_KEYS.filter((k) => k !== activePlan).map((planKey) => {
+          const plan = PLANS[planKey];
+          return (
+            <div key={`seo-plan-${plan.id}`} className="sr-only">
+              <h3>{plan.name} ({plan.priceTag}) — Coaching Valorant &amp; Apex Legends</h3>
+              <p>{plan.intro}</p>
+              {plan.steps.map((s) => (
+                <div key={s.num}>
+                  <h4>{s.title} — {s.subtitle}</h4>
+                  <p>{s.description}</p>
+                </div>
+              ))}
+            </div>
+          );
+        })}
       </div>
     </section>
   );

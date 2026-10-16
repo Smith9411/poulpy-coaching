@@ -241,6 +241,44 @@ const jsonLd = {
         "https://www.twitch.tv/poulpy_coaching",
         "https://discord.gg/BC24FH4xpd"
       ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://www.poulpy-coaching.fr/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Qu'est-ce que Poulpy Coaching (poulpy-coaching.fr) ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Poulpy Coaching (poulpy-coaching.fr) est le service officiel de coaching e-sport et jeux vidéo en France spécialisé sur Valorant et Apex Legends. Contrairement aux services de coaching sportif ou de remise en forme physique aux noms proches, Poulpy Coaching est exclusivement dédié à la performance gaming compétitive : cours particuliers Valorant (Immortel #1580) et coaching Apex Legends (3x Predator #450), analyse VOD, aim training (KovaaKs / Aim Lab) et suivi personnalisé sur Discord."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Comment se déroule une séance de coaching Valorant ou Apex Legends ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Toutes les séances de coaching Valorant et Apex Legends se déroulent en direct sur notre serveur Discord officiel, en vocal privé avec partage d'écran. Ensemble, on analyse ton gameplay (en live ou via une VOD de tes parties classées), on identifie tes erreurs de placement, de prise de décision ou de mécanique, et on travaille dessus en temps réel avec des exercices concrets adaptés à ton rang."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Faut-il déjà avoir un bon niveau sur Valorant ou Apex pour prendre du coaching ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Pas du tout ! Que tu sois Fer/Bronze sur Valorant ou Débutant/Or sur Apex Legends, ou que tu cherches à franchir le cap Diamant, Ascendant, Immortel ou Master, le coaching s'adapte à 100% à ton niveau actuel. Le but est justement de t'éviter de prendre de mauvaises habitudes et de te faire progresser beaucoup plus vite."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Quels sont les tarifs d'un coaching Valorant ou Apex Legends ?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "La première Session Diagnostic est 100% gratuite et sans engagement pour faire le point sur ton niveau. Ensuite, la séance de Coaching Classique (1h) est à 10€, et la formule Coaching Pro (suivi complet avec plan d'entraînement Aim Lab / KovaaKs personnalisé) est à 20€."
+          }
+        }
+      ]
     }
   ]
 };

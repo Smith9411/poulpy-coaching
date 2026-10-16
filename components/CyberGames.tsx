@@ -122,7 +122,7 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
 
         {/* Pure Typographic Game Content */}
         <div className="relative min-h-[340px]">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={current.id}
               initial={{ opacity: 0 }}
@@ -238,6 +238,24 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
               </motion.div>
             </motion.div>
           </AnimatePresence>
+
+          {/* Crawlable SEO Content for Inactive Tab so Google indexes both Valorant & Apex Legends */}
+          {games
+            .filter((g) => g.id !== current.id)
+            .map((otherGame) => (
+              <div key={`seo-${otherGame.id}`} className="sr-only">
+                <h3>Coaching {otherGame.title} — {otherGame.subtitle}</h3>
+                <div>{otherGame.badge}</div>
+                <p>{otherGame.desc}</p>
+                <ul>
+                  {otherGame.protocols.map((p, idx) => (
+                    <li key={idx}>
+                      {p.num} - {p.name}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
         </div>
       </div>
     </section>
