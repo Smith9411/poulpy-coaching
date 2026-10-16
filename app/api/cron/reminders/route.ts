@@ -86,14 +86,20 @@ export async function runDueBookingReminders() {
 
     const diffInMinutes = sessionMinutes - nowMinutes;
 
-    // Fenêtre élargie : entre 15 min et 180 min (3h) avant le début de la séance.
-    // Comme chaque réservation envoyée reçoit immédiatement le tag [reminder_2h_sent],
-    // l'email n'est envoyé qu'une seule fois tout en absorbant d'éventuels retards du runner GitHub Actions.
-    if (diffInMinutes >= 15 && diffInMinutes <= 180) {
-      console.log(`[Cron Reminders] Envoi du rappel (H-${diffInMinutes}min) pour ${booking.student_email} (séance à ${booking.booking_time})`);
+    // 1. Si la séance est entre 15 min et 180 min (3h), envoi immédiat.
+    // 2. Si la séance est plus tard aujourd'hui ou demain (entre 181 min et 36h),
+    //    programmation exacte à H-2h via Resend (scheduledAt) pour que l'élève reçoive son mail pile 2h avant !
+    if (diffInMinutes >= 15 && diffInMinutes <= 36 * 60) {
+      const isScheduledForLater = diffInMinutes > 180;
+      const scheduledAt = isScheduledForLater
+        ? new Date(now.getTime() + (diffInMinutes - 120) * 60 * 1000).toISOString()
+        : undefined;
 
-      // Poser le verrou en base AVANT ou immédiatement après l'envoi pour éviter toute course
-      const updatedNotes = `${booking.admin_notes || ''} [reminder_2h_sent]`.trim();
+      console.log(
+        isScheduledForLater
+          ? `[Cron Reminders] Programmation Resend à H-2h (${scheduledAt}) pour ${booking.student_email} (séance le ${booking.booking_date} à ${booking.booking_time})`
+          : `[Cron Reminders] Envoi immédiat (H-${diffInMinutes}min) pour ${booking.student_email} (séance à ${booking.booking_time})`
+      );
 
       const res = await sendBookingReminderEmail({
         studentName: booking.student_name,
@@ -105,10 +111,14 @@ export async function runDueBookingReminders() {
         bookingDate: booking.booking_date,
         bookingTime: booking.booking_time,
         game: booking.game || 'Valorant',
-        diffInMinutes,
+        diffInMinutes: isScheduledForLater ? 120 : diffInMinutes,
+        scheduledAt,
       });
 
       if (res && !('error' in res)) {
+        const emailIdTag = 'id' in res && res.id ? ` [reminder_email_id:${res.id}]` : '';
+        const updatedNotes = `${booking.admin_notes || ''} [reminder_2h_sent]${emailIdTag}`.trim();
+
         const { error: updateError } = await supabase
           .from('coaching_bookings')
           .update({

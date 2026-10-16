@@ -8,7 +8,9 @@ import {
 import {
   sendBookingRescheduledEmail,
   sendBookingCancelledEmail,
+  cancelScheduledReminderEmail,
 } from '@/lib/email';
+import { runDueBookingReminders } from '@/app/api/cron/reminders/route';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -187,9 +189,10 @@ export async function PATCH(req: NextRequest) {
 
     // ── 1. ACTION : ANNULER ────────────────────────────────────────────────
     if (action === 'cancel') {
+      const cleanedCancelNotes = await cancelScheduledReminderEmail(currentBooking.admin_notes);
       const updatePayload: Record<string, unknown> = {
         status: 'cancelled',
-        admin_notes: adminNotes || currentBooking.admin_notes,
+        admin_notes: adminNotes || cleanedCancelNotes || null,
         updated_at: new Date().toISOString(),
       };
 
@@ -295,9 +298,11 @@ export async function PATCH(req: NextRequest) {
           .eq('id', targetSlotId);
       }
 
-      // 3. Mettre à jour la réservation (et réinitialiser le marqueur de rappel pour le nouveau créneau)
-      const cleanedNotes = String(adminNotes ?? currentBooking.admin_notes ?? '')
+      // 3. Annuler l'ancien rappel programmé chez Resend et réinitialiser le marqueur
+      const baseNotes = await cancelScheduledReminderEmail(currentBooking.admin_notes);
+      const cleanedNotes = String(adminNotes ?? baseNotes)
         .replace(/\s*\[reminder_2h_sent\]/g, '')
+        .replace(/\s*\[reminder_email_id:[^\]]+\]/g, '')
         .trim();
 
       const reschedulePayload: Record<string, unknown> = {
@@ -362,6 +367,9 @@ export async function PATCH(req: NextRequest) {
           game: currentBooking.game || 'Valorant',
         }).catch((e) => console.error('[Email Reschedule Error]', e));
       }
+
+      // 6. Reprogrammer immédiatement le rappel H-2h si la nouvelle date est aujourd'hui ou demain
+      runDueBookingReminders().catch((e) => console.warn('[Reminder Reschedule Trigger]', e));
 
       return NextResponse.json({ success: true, booking: updated });
     }

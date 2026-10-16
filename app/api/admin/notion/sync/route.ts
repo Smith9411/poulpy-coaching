@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { queryAllNotionBookings, cleanNotionId } from '@/lib/notion';
+import { cancelScheduledReminderEmail } from '@/lib/email';
+import { runDueBookingReminders } from '@/app/api/cron/reminders/route';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -63,9 +65,15 @@ export async function POST(req: NextRequest) {
         // Vérifier si archivé / annulé
         if (page.isArchived || page.status === 'Annulé') {
           if (matchedBooking.status !== 'cancelled') {
+            const cleanedCancelNotes = await cancelScheduledReminderEmail(matchedBooking.admin_notes);
             await supabase
               .from('coaching_bookings')
-              .update({ status: 'cancelled', read_by_student: false, updated_at: nowIso })
+              .update({
+                status: 'cancelled',
+                admin_notes: cleanedCancelNotes || null,
+                read_by_student: false,
+                updated_at: nowIso,
+              })
               .eq('id', matchedBooking.id);
 
             if (matchedBooking.slot_id) {
@@ -122,9 +130,7 @@ export async function POST(req: NextRequest) {
               .eq('id', foundSlot.id);
           }
 
-          const cleanedAdminNotes = String(matchedBooking.admin_notes || '')
-            .replace(/\[reminder_2h_sent\]/g, '')
-            .trim();
+          const cleanedAdminNotes = await cancelScheduledReminderEmail(matchedBooking.admin_notes);
 
           await supabase
             .from('coaching_bookings')
@@ -133,7 +139,7 @@ export async function POST(req: NextRequest) {
               booking_time: finalTime,
               slot_id: newSlotId || matchedBooking.slot_id,
               status: 'rescheduled',
-              admin_notes: cleanedAdminNotes,
+              admin_notes: cleanedAdminNotes || null,
               read_by_student: false,
               updated_at: nowIso,
             })
@@ -141,6 +147,10 @@ export async function POST(req: NextRequest) {
           updatedCount++;
         }
       }
+    }
+
+    if (updatedCount > 0) {
+      runDueBookingReminders().catch((e) => console.warn('[Notion Sync Reminder Trigger]', e));
     }
 
     return NextResponse.json({

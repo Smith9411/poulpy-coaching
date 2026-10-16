@@ -2,6 +2,7 @@ import { stripe } from './stripe';
 import { createClient } from '@supabase/supabase-js';
 import { createNotionBooking } from './notion';
 import { sendBookingConfirmationEmail } from './email';
+import { runDueBookingReminders } from '@/app/api/cron/reminders/route';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -177,6 +178,9 @@ export async function confirmStripeBooking(sessionId: string) {
     } catch (emailErr) {
       console.error('[Email Dispatch Error après Stripe]', emailErr);
     }
+
+    // 8. Programmer immédiatement le rappel H-2h si la séance a lieu aujourd'hui ou demain
+    runDueBookingReminders().catch((e) => console.warn('[Stripe Confirm Reminder Trigger]', e));
 
     return { success: true, booking: newBooking };
   } catch (err: unknown) {

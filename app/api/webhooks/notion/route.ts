@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { fetchNotionPage, cleanNotionId } from '@/lib/notion';
-import { sendBookingCancelledEmail, sendBookingRescheduledEmail } from '@/lib/email';
+import {
+  sendBookingCancelledEmail,
+  sendBookingRescheduledEmail,
+  cancelScheduledReminderEmail,
+} from '@/lib/email';
+import { runDueBookingReminders } from '@/app/api/cron/reminders/route';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -215,11 +220,14 @@ export async function POST(req: NextRequest) {
       if (booking.status !== 'cancelled') {
         console.info(`[Notion Webhook] Annulation de la réservation #${booking.id}`);
 
+        const cleanedCancelNotes = await cancelScheduledReminderEmail(booking.admin_notes);
+
         // Mettre à jour la réservation + déclencher notification élève (read_by_student = false)
         await supabase
           .from('coaching_bookings')
           .update({
             status: 'cancelled',
+            admin_notes: cleanedCancelNotes || null,
             read_by_student: false,
             updated_at: nowIso,
           })
@@ -297,9 +305,7 @@ export async function POST(req: NextRequest) {
           .eq('id', foundSlot.id);
       }
 
-      const cleanedAdminNotes = String(booking.admin_notes || '')
-        .replace(/\[reminder_2h_sent\]/g, '')
-        .trim();
+      const cleanedAdminNotes = await cancelScheduledReminderEmail(booking.admin_notes);
 
       // 3. Mettre à jour la réservation avec statut 'rescheduled' et read_by_student = false (Alerte élève)
       await supabase
@@ -309,7 +315,7 @@ export async function POST(req: NextRequest) {
           booking_time: finalTime,
           slot_id: newSlotId || booking.slot_id,
           status: 'rescheduled',
-          admin_notes: cleanedAdminNotes,
+          admin_notes: cleanedAdminNotes || null,
           read_by_student: false, // Déclenche la cloche rouge pour l'élève
           updated_at: nowIso,
         })
@@ -328,6 +334,8 @@ export async function POST(req: NextRequest) {
           game: booking.game || 'FPS',
         }).catch((e) => console.error('Erreur envoi email report Notion:', e));
       }
+
+      runDueBookingReminders().catch((e) => console.warn('[Notion Reschedule Reminder Trigger]', e));
 
       return NextResponse.json({
         success: true,

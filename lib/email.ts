@@ -14,6 +14,7 @@ interface SendBookingEmailParams {
   bookingTime: string; // HH:mm
   game?: string;
   diffInMinutes?: number;
+  scheduledAt?: string;
 }
 
 /**
@@ -279,6 +280,7 @@ export async function sendBookingReminderEmail(params: SendBookingEmailParams) {
     bookingTime,
     game = 'Valorant',
     diffInMinutes = 120,
+    scheduledAt,
   } = params;
 
   if (!studentEmail) {
@@ -445,22 +447,24 @@ export async function sendBookingReminderEmail(params: SendBookingEmailParams) {
 
   if (resend) {
     try {
-      let res = await resend.emails.send({
+      const payload: any = {
         from: 'Poulpy Coaching <contact@poulpy-coaching.fr>',
         to: studentEmail,
         replyTo: 'contact@poulpy-coaching.fr',
         subject: `⚡ Rappel : Ton coaching commence à ${bookingTime} (${timeShortLabel}) !`,
         html: htmlContent,
-      });
+      };
+      if (scheduledAt) {
+        payload.scheduledAt = scheduledAt;
+      }
+
+      let res = await resend.emails.send(payload);
 
       if (res.error && (res.error.message?.toLowerCase().includes('domain') || res.error.message?.toLowerCase().includes('verify'))) {
         console.warn('[Resend] Fallback onboarding@resend.dev pour rappel');
         res = await resend.emails.send({
+          ...payload,
           from: 'Poulpy Coaching <onboarding@resend.dev>',
-          to: studentEmail,
-          replyTo: 'contact@poulpy-coaching.fr',
-          subject: `⚡ Rappel : Ton coaching commence à ${bookingTime} (${timeShortLabel}) !`,
-          html: htmlContent,
         });
       }
 
@@ -469,8 +473,12 @@ export async function sendBookingReminderEmail(params: SendBookingEmailParams) {
         return { error: res.error.message };
       }
 
-      console.log(`[Email Reminder Sent] Rappel envoyé avec succès à ${studentEmail} (ID: ${res.data?.id})`);
-      return { success: true, id: res.data?.id };
+      console.log(
+        scheduledAt
+          ? `[Email Reminder Scheduled] Rappel programmé pour ${scheduledAt} à ${studentEmail} (ID: ${res.data?.id})`
+          : `[Email Reminder Sent] Rappel envoyé avec succès à ${studentEmail} (ID: ${res.data?.id})`
+      );
+      return { success: true, id: res.data?.id, scheduledAt };
     } catch (err: any) {
       console.error('[Resend Reminder Exception]', err);
       return { error: err.message };
@@ -479,6 +487,28 @@ export async function sendBookingReminderEmail(params: SendBookingEmailParams) {
 
   console.log(`[Email Reminder Notice] Rappel simulé pour ${studentEmail} (${bookingTime})`);
   return { simulated: true };
+}
+
+/**
+ * Annule un e-mail de rappel programmé chez Resend (si la séance est déplacée ou annulée)
+ * et nettoie les marqueurs dans admin_notes.
+ */
+export async function cancelScheduledReminderEmail(adminNotes?: string | null): Promise<string> {
+  const raw = String(adminNotes || '');
+  const match = raw.match(/\[reminder_email_id:([^\]]+)\]/);
+  if (match && match[1] && resend) {
+    try {
+      await resend.emails.cancel(match[1]);
+      console.log(`[Email Reminder Cancelled] Rappel programmé annulé sur Resend (ID: ${match[1]})`);
+    } catch (err: any) {
+      console.warn(`[Email Reminder Cancel Notice] Impossible d'annuler ${match[1]} (peut-être déjà envoyé):`, err?.message || err);
+    }
+  }
+  return raw
+    .replace(/\[reminder_2h_sent\]/g, '')
+    .replace(/\[reminder_email_id:[^\]]+\]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 /**

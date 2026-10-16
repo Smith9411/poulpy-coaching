@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createNotionBooking } from '@/lib/notion';
 import { sendBookingConfirmationEmail } from '@/lib/email';
+import { runDueBookingReminders } from '@/app/api/cron/reminders/route';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -286,6 +287,9 @@ export async function POST(req: NextRequest) {
     } catch (emailErr) {
       console.error('[Email Dispatch Error - Pack Session]', emailErr);
     }
+
+    // Programmer immédiatement le rappel H-2h si la séance a lieu aujourd'hui ou demain
+    runDueBookingReminders().catch((e) => console.warn('[Pack Session Reminder Trigger]', e));
 
     return NextResponse.json({
       success: true,
