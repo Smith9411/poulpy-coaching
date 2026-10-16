@@ -109,7 +109,7 @@ export default function Contact() {
               </p>
               <div className="flex items-center justify-center gap-3 text-white/60">
                 <a
-                  href="https://www.twitch.tv/ccs_poulpy"
+                  href="https://www.twitch.tv/poulpy_coaching"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-1.5 bg-white/5 hover:bg-[#9146FF]/20 hover:text-[#a970ff] border border-white/10 transition-colors"

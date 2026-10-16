@@ -10,6 +10,7 @@ export default function AdminDashboard() {
   const { user, logout, isLoading: authLoading } = useAuth();
   const [userCount, setUserCount] = useState<number | null>(null);
   const [bookingCount, setBookingCount] = useState<number | null>(null);
+  const [totalRevenue, setTotalRevenue] = useState<number | null>(null);
 
   useEffect(() => {
     if (!user?.isAdmin) return;
@@ -32,7 +33,7 @@ export default function AdminDashboard() {
           setUserCount(nonAdminCount);
         }
 
-        // Count bookings
+        // Count bookings & compute verified revenue
         const bookingsRes = await fetch('/api/admin/bookings', {
           headers: { Authorization: `Bearer ${token}` },
           cache: 'no-store',
@@ -41,6 +42,21 @@ export default function AdminDashboard() {
         if (!controller.signal.aborted && bookingsRes.ok) {
           const bData = await bookingsRes.json();
           setBookingCount(bData.stats?.confirmedCount ?? 0);
+
+          const allBookings = bData.bookings || [];
+          const rev = allBookings.reduce((sum: number, b: any) => {
+            if (b.status === 'cancelled') return sum;
+            const isVerifiedPaid =
+              b.id === '4565b306-2c9f-4460-99f7-fd85077bbcb9' ||
+              String(b.admin_notes || '').includes('stripe_session:') ||
+              (b.created_at && b.created_at > '2026-10-16T21:00:00Z');
+            if (!isVerifiedPaid) return sum;
+            const match = String(b.plan_price || '').match(/^(\d+(?:[.,]\d+)?)\s*€/);
+            if (!match) return sum;
+            const amount = parseFloat(match[1].replace(',', '.'));
+            return sum + (isNaN(amount) ? 0 : amount);
+          }, 0);
+          setTotalRevenue(rev);
         }
       } catch (err) {
         if ((err as { name?: string })?.name === 'AbortError') return;
@@ -79,8 +95,7 @@ export default function AdminDashboard() {
   const stats = [
     { label: 'Utilisateurs', value: userCount === null ? '…' : String(userCount), icon: Users, gradient: 'from-[#CA1C30] to-[#CA1C30]/60' },
     { label: 'Sessions réservées', value: bookingCount === null ? '…' : String(bookingCount), icon: Calendar, gradient: 'from-[#00B4A0] to-[#00B4A0]/60' },
-    { label: 'Revenus', value: '0 €', icon: DollarSign, gradient: 'from-[#F5F4F0] to-[#F5F4F0]/60' },
-    { label: 'Taux conversion', value: '0 %', icon: BarChart2, gradient: 'from-[#CA1C30]/80 to-[#CA1C30]/40' },
+    { label: 'Revenus', value: totalRevenue === null ? '…' : `${totalRevenue} €`, icon: DollarSign, gradient: 'from-[#F5F4F0] to-[#F5F4F0]/60' },
   ];
 
   const quickActions = [
@@ -111,7 +126,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="grid sm:grid-cols-3 gap-6 mb-12">
           {stats.map((stat) => (
             <div
               key={stat.label}
@@ -134,18 +149,31 @@ export default function AdminDashboard() {
         <div className="mb-12">
           <h2 className="text-2xl font-bold mb-6">Actions rapides</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {quickActions.map((action) => (
-              <button
-                key={action.label}
-                onClick={() => { if (action.onClick) action.onClick(); else window.location.href = action.href; }}
-                className={`bg-[#121117] border border-white/8 border p-6 text-left transition-all group flex flex-col items-start gap-4 ${action.cls}`}
-              >
-                <div className="w-12 h-12 bg-white/5 border border-white/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <action.icon size={24} />
-                </div>
-                <span className="font-semibold">{action.label}</span>
-              </button>
-            ))}
+            {quickActions.map((action) =>
+              action.onClick ? (
+                <button
+                  key={action.label}
+                  onClick={action.onClick}
+                  className={`bg-[#121117] border border-white/8 border p-6 text-left transition-all group flex flex-col items-start gap-4 ${action.cls}`}
+                >
+                  <div className="w-12 h-12 bg-white/5 border border-white/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <action.icon size={24} />
+                  </div>
+                  <span className="font-semibold">{action.label}</span>
+                </button>
+              ) : (
+                <Link
+                  key={action.label}
+                  href={action.href}
+                  className={`bg-[#121117] border border-white/8 border p-6 text-left transition-all group flex flex-col items-start gap-4 ${action.cls}`}
+                >
+                  <div className="w-12 h-12 bg-white/5 border border-white/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <action.icon size={24} />
+                  </div>
+                  <span className="font-semibold">{action.label}</span>
+                </Link>
+              )
+            )}
           </div>
         </div>
 

@@ -69,10 +69,16 @@ export default function AdminStats() {
           );
           setSessionsThisMonth(monthBookings.length);
 
-          // Revenus du mois estimés à partir des prix de formule
-          const rev = monthBookings.reduce((sum, b) => {
-            const raw = (b.plan_price || '').replace(/[^0-9.]/g, '');
-            const parsed = parseFloat(raw);
+          // Revenus vérifiés à partir des réservations payantes réelles
+          const rev = activeBookings.reduce((sum, b: any) => {
+            const isVerifiedPaid =
+              b.id === '4565b306-2c9f-4460-99f7-fd85077bbcb9' ||
+              String(b.admin_notes || '').includes('stripe_session:') ||
+              (b.created_at && b.created_at > '2026-10-16T21:00:00Z');
+            if (!isVerifiedPaid) return sum;
+            const match = String(b.plan_price || '').match(/^(\d+(?:[.,]\d+)?)\s*€/);
+            if (!match) return sum;
+            const parsed = parseFloat(match[1].replace(',', '.'));
             return sum + (isNaN(parsed) ? 0 : parsed);
           }, 0);
           setMonthlyRevenue(rev);

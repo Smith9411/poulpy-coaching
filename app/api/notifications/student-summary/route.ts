@@ -237,10 +237,17 @@ export async function POST(req: NextRequest) {
     }
 
     if (bookingId) {
-      await supabase
+      let bUpdate = supabase
         .from('coaching_bookings')
         .update({ read_by_student: true, updated_at: now })
         .eq('id', bookingId);
+
+      if (userEmail) {
+        bUpdate = bUpdate.or(`user_id.eq.${userId},student_email.eq.${userEmail}`);
+      } else {
+        bUpdate = bUpdate.eq('user_id', userId);
+      }
+      await bUpdate;
       return NextResponse.json({ success: true });
     }
 

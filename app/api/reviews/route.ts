@@ -164,9 +164,20 @@ export async function GET(req: NextRequest) {
     const featuredIds = await getFeaturedIds();
     const pinnedReviewId = await getPinnedReviewId();
 
+    const avatarMap: Record<string, string> = {};
+    try {
+      const { data: authUsersData } = await supabase.auth.admin.listUsers({ perPage: 1000 });
+      (authUsersData?.users || []).forEach((u) => {
+        const meta = u.user_metadata || {};
+        const url = meta.avatar_url || meta.picture || '';
+        if (url) avatarMap[u.id] = url;
+      });
+    } catch {}
+
     let reviews = (dbReviews || []).map((r: any) => ({
       ...r,
       name: cleanDiscordUsername(r.name) || r.name,
+      avatar_url: r.user_id ? avatarMap[r.user_id] || null : null,
       featured: featuredIds.includes(r.id) || r.featured === true,
       pinned: r.id === pinnedReviewId,
     }));

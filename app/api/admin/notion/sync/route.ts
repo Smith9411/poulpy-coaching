@@ -67,6 +67,19 @@ export async function POST(req: NextRequest) {
               .from('coaching_bookings')
               .update({ status: 'cancelled', read_by_student: false, updated_at: nowIso })
               .eq('id', matchedBooking.id);
+
+            if (matchedBooking.slot_id) {
+              await supabase
+                .from('coaching_slots')
+                .update({ is_booked: false, updated_at: nowIso })
+                .eq('id', matchedBooking.slot_id);
+            } else if (matchedBooking.booking_date && matchedBooking.booking_time) {
+              await supabase
+                .from('coaching_slots')
+                .update({ is_booked: false, updated_at: nowIso })
+                .eq('date', matchedBooking.booking_date)
+                .eq('start_time', matchedBooking.booking_time);
+            }
             updatedCount++;
           }
           continue;
@@ -80,12 +93,47 @@ export async function POST(req: NextRequest) {
           const finalDate = page.bookingDate || matchedBooking.booking_date;
           const finalTime = page.bookingTime || matchedBooking.booking_time;
 
+          if (matchedBooking.slot_id) {
+            await supabase
+              .from('coaching_slots')
+              .update({ is_booked: false, updated_at: nowIso })
+              .eq('id', matchedBooking.slot_id);
+          } else if (matchedBooking.booking_date && matchedBooking.booking_time) {
+            await supabase
+              .from('coaching_slots')
+              .update({ is_booked: false, updated_at: nowIso })
+              .eq('date', matchedBooking.booking_date)
+              .eq('start_time', matchedBooking.booking_time);
+          }
+
+          let newSlotId: string | null = null;
+          const { data: foundSlot } = await supabase
+            .from('coaching_slots')
+            .select('id')
+            .eq('date', finalDate)
+            .eq('start_time', finalTime)
+            .maybeSingle();
+
+          if (foundSlot) {
+            newSlotId = foundSlot.id;
+            await supabase
+              .from('coaching_slots')
+              .update({ is_booked: true, updated_at: nowIso })
+              .eq('id', foundSlot.id);
+          }
+
+          const cleanedAdminNotes = String(matchedBooking.admin_notes || '')
+            .replace(/\[reminder_2h_sent\]/g, '')
+            .trim();
+
           await supabase
             .from('coaching_bookings')
             .update({
               booking_date: finalDate,
               booking_time: finalTime,
+              slot_id: newSlotId || matchedBooking.slot_id,
               status: 'rescheduled',
+              admin_notes: cleanedAdminNotes,
               read_by_student: false,
               updated_at: nowIso,
             })

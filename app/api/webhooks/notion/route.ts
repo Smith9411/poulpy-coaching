@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { fetchNotionPage, cleanNotionId } from '@/lib/notion';
+import { sendBookingCancelledEmail, sendBookingRescheduledEmail } from '@/lib/email';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -11,9 +12,38 @@ export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/webhooks/notion
- * Affiche l'état du webhook, le jeton et le dernier événement reçu pour diagnostiquer en 1 seconde
+ * Affiche l'état du webhook (détails réservés aux administrateurs)
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
+  let isAuthorized = false;
+  const authHeader = req.headers.get('authorization');
+  const queryKey = req.nextUrl.searchParams.get('key');
+  const cronSecret = process.env.CRON_SECRET;
+
+  if (cronSecret && queryKey === cronSecret) {
+    isAuthorized = true;
+  } else if (authHeader?.startsWith('Bearer ')) {
+    const token = authHeader.replace('Bearer ', '').trim();
+    const { data: authData } = await supabase.auth.getUser(token);
+    if (authData?.user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', authData.user.id)
+        .maybeSingle();
+      if (profile?.is_admin === true) {
+        isAuthorized = true;
+      }
+    }
+  }
+
+  if (!isAuthorized) {
+    return NextResponse.json({
+      status: 'ok',
+      service: 'Poulpy Coaching Notion Webhook',
+    });
+  }
+
   let tokenFromDb: string | null = null;
   let lastEventLog: any = null;
 
@@ -208,6 +238,16 @@ export async function POST(req: NextRequest) {
             .eq('date', booking.booking_date)
             .eq('start_time', booking.booking_time);
         }
+
+        if (booking.student_email) {
+          sendBookingCancelledEmail({
+            studentEmail: booking.student_email,
+            studentName: booking.student_name || 'Élève',
+            bookingDate: booking.booking_date,
+            bookingTime: booking.booking_time,
+            planName: booking.plan_name || 'Coaching',
+          }).catch((e) => console.error('Erreur envoi email annulation Notion:', e));
+        }
       }
 
       return NextResponse.json({ success: true, action: 'cancelled', bookingId: booking.id });
@@ -257,6 +297,10 @@ export async function POST(req: NextRequest) {
           .eq('id', foundSlot.id);
       }
 
+      const cleanedAdminNotes = String(booking.admin_notes || '')
+        .replace(/\[reminder_2h_sent\]/g, '')
+        .trim();
+
       // 3. Mettre à jour la réservation avec statut 'rescheduled' et read_by_student = false (Alerte élève)
       await supabase
         .from('coaching_bookings')
@@ -265,10 +309,25 @@ export async function POST(req: NextRequest) {
           booking_time: finalTime,
           slot_id: newSlotId || booking.slot_id,
           status: 'rescheduled',
+          admin_notes: cleanedAdminNotes,
           read_by_student: false, // Déclenche la cloche rouge pour l'élève
           updated_at: nowIso,
         })
         .eq('id', booking.id);
+
+      if (booking.student_email) {
+        sendBookingRescheduledEmail({
+          studentEmail: booking.student_email,
+          studentName: booking.student_name || 'Élève',
+          studentDiscord: booking.student_discord || '',
+          bookingDate: finalDate,
+          bookingTime: finalTime,
+          planName: booking.plan_name || 'Coaching',
+          planPrice: booking.plan_price || '0 €',
+          planDuration: booking.plan_duration || '60 min',
+          game: booking.game || 'FPS',
+        }).catch((e) => console.error('Erreur envoi email report Notion:', e));
+      }
 
       return NextResponse.json({
         success: true,

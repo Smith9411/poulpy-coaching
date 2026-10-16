@@ -81,10 +81,20 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ bookings: [], alerts });
     }
 
-    // Auto-complétion automatique des séances passées
+    // Auto-complétion automatique des séances passées (fuseau Europe/Paris)
     const now = new Date();
-    const todayStr = now.toISOString().split('T')[0];
-    const currentHourStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const todayStr = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Europe/Paris',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(now);
+    const currentHourStr = new Intl.DateTimeFormat('fr-FR', {
+      timeZone: 'Europe/Paris',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).format(now);
 
     const pastIdsToComplete: string[] = [];
     const sanitizedBookings = (bookings || []).map((b: any) => {

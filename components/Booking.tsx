@@ -172,7 +172,7 @@ export default function Booking() {
       const d = new Date(baseDate);
       d.setDate(baseDate.getDate() + i);
 
-      const dateIso = d.toISOString().split("T")[0];
+      const dateIso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
       const dayOfWeek = d.getDay();
       const dayName = DAYS_SHORT[dayOfWeek];
       const dayFull = DAYS_FULL[dayOfWeek];

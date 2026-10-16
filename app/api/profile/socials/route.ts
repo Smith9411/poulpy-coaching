@@ -21,22 +21,30 @@ function cleanHandle(val?: string | null): string | null {
 
 export async function GET(req: NextRequest) {
   try {
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+    }
+    const token = authHeader.replace('Bearer ', '').trim();
+    const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+    if (error || !user) {
+      return NextResponse.json({ error: 'Session invalide' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(req.url);
     const targetUserId = searchParams.get('userId');
+    let userId = user.id;
 
-    let userId = targetUserId;
-
-    if (!userId) {
-      const authHeader = req.headers.get('authorization');
-      if (!authHeader?.startsWith('Bearer ')) {
-        return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+    if (targetUserId && targetUserId !== user.id) {
+      const { data: callerProfile } = await supabaseAdmin
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single();
+      if (callerProfile?.is_admin !== true) {
+        return NextResponse.json({ error: 'Non autorisé' }, { status: 403 });
       }
-      const token = authHeader.replace('Bearer ', '').trim();
-      const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
-      if (error || !user) {
-        return NextResponse.json({ error: 'Session invalide' }, { status: 401 });
-      }
-      userId = user.id;
+      userId = targetUserId;
     }
 
     // 1. Try reading from profiles

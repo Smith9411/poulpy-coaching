@@ -70,7 +70,24 @@ export async function POST(req: NextRequest) {
 
     const userId = authData.user.id;
 
-    // 2. Vérification et réservation du créneau
+    // 2. Vérification anti-double-réservation sur la même date et heure dans coaching_bookings
+    const { data: activeDuplicate } = await supabase
+      .from('coaching_bookings')
+      .select('id')
+      .eq('booking_date', bookingDate)
+      .eq('booking_time', bookingTime)
+      .in('status', ['confirmed', 'rescheduled'])
+      .limit(1)
+      .maybeSingle();
+
+    if (activeDuplicate) {
+      return NextResponse.json(
+        { error: 'Désolé, ce créneau vient d\'être réservé par un autre élève.' },
+        { status: 409 }
+      );
+    }
+
+    // 2b. Vérification et réservation du créneau
     let targetSlotId = slotId;
     const isFreeTrial = planId === 'session';
 

@@ -5,6 +5,10 @@ import {
   updateNotionBookingDate,
   completeNotionBooking,
 } from '@/lib/notion';
+import {
+  sendBookingRescheduledEmail,
+  sendBookingCancelledEmail,
+} from '@/lib/email';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -59,10 +63,20 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ bookings: [] });
     }
 
-    // Auto-complétion automatique des séances passées
+    // Auto-complétion automatique des séances passées (fuseau Europe/Paris)
     const now = new Date();
-    const todayStr = now.toISOString().split('T')[0];
-    const currentHourStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const todayStr = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Europe/Paris',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(now);
+    const currentHourStr = new Intl.DateTimeFormat('fr-FR', {
+      timeZone: 'Europe/Paris',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).format(now);
 
     const pastIdsToComplete: string[] = [];
     const allBookings = (bookings || []).map((b: any) => {
@@ -227,6 +241,18 @@ export async function PATCH(req: NextRequest) {
         );
       }
 
+      // 4. Notification email à l'élève
+      if (currentBooking.student_email) {
+        sendBookingCancelledEmail({
+          studentName: currentBooking.student_name || 'Élève',
+          studentEmail: currentBooking.student_email,
+          planName: currentBooking.plan_name || 'Coaching',
+          bookingDate: currentBooking.booking_date,
+          bookingTime: currentBooking.booking_time,
+          reason: adminNotes || null,
+        }).catch((e) => console.error('[Email Cancel Error]', e));
+      }
+
       return NextResponse.json({ success: true, booking: updated });
     }
 
@@ -320,6 +346,21 @@ export async function PATCH(req: NextRequest) {
         ).catch((e) =>
           console.error('[Notion Sync Error on Reschedule]', e)
         );
+      }
+
+      // 5. Notification email à l'élève avec le nouvel horaire et lien Google Agenda
+      if (currentBooking.student_email) {
+        sendBookingRescheduledEmail({
+          studentName: currentBooking.student_name || 'Élève',
+          studentEmail: currentBooking.student_email,
+          studentDiscord: currentBooking.student_discord || '',
+          planName: currentBooking.plan_name || 'Coaching',
+          planPrice: currentBooking.plan_price || '',
+          planDuration: currentBooking.plan_duration || '60 min',
+          bookingDate: newDate,
+          bookingTime: newTime,
+          game: currentBooking.game || 'Valorant',
+        }).catch((e) => console.error('[Email Reschedule Error]', e));
       }
 
       return NextResponse.json({ success: true, booking: updated });

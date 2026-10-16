@@ -16,7 +16,10 @@ export async function POST(req: NextRequest) {
 
     let event;
 
-    if (webhookSecret && signature) {
+    if (webhookSecret) {
+      if (!signature) {
+        return NextResponse.json({ error: 'Signature Stripe manquante' }, { status: 400 });
+      }
       try {
         event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret);
       } catch (err: any) {
@@ -24,10 +27,9 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: `Webhook Error: ${err.message}` }, { status: 400 });
       }
     } else {
-      // Si pas encore de webhookSecret configuré dans Vercel, parser le body JSON
       try {
         event = JSON.parse(rawBody);
-      } catch (e) {
+      } catch {
         return NextResponse.json({ error: 'Body JSON invalide' }, { status: 400 });
       }
     }

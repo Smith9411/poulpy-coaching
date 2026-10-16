@@ -59,8 +59,9 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    const existingMeta = (targetUser.user.user_metadata || {}) as Record<string, unknown>;
     const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
-      user_metadata: { avatar_url: '' },
+      user_metadata: { ...existingMeta, avatar_url: '' },
     });
 
     if (error) throw error;

@@ -171,22 +171,11 @@ export default function Avis() {
         setReviews(data.reviews);
 
         const avatarMap: Record<string, string> = {};
-        const userIds = data.reviews.filter((r: Review) => r.user_id).map((r: Review) => r.user_id);
-
-        if (userIds.length > 0) {
-          const { data: profiles } = await supabase
-            .from('profiles')
-            .select('id, avatar_url')
-            .in('id', userIds);
-
-          if (profiles) {
-            profiles.forEach((profile: any) => {
-              if (profile.avatar_url) {
-                avatarMap[profile.id] = profile.avatar_url;
-              }
-            });
+        data.reviews.forEach((r: any) => {
+          if (r.user_id && r.avatar_url) {
+            avatarMap[r.user_id] = r.avatar_url;
           }
-        }
+        });
 
         setUserAvatars(avatarMap);
       }
