@@ -210,7 +210,6 @@ export default function WhyPoulpy() {
     if (!section || !track || !pinnedContainer) return;
 
     let ctx: gsap.Context | null = null;
-    let stInstance: ScrollTrigger | null = null;
 
     const setup = () => {
       if (ctx) {
@@ -222,7 +221,7 @@ export default function WhyPoulpy() {
       scrollDistanceRef.current = totalScrollDistance;
 
       ctx = gsap.context(() => {
-        const anim = gsap.to(track, {
+        gsap.to(track, {
           x: -maxScroll,
           ease: "none",
           scrollTrigger: {
@@ -254,75 +253,10 @@ export default function WhyPoulpy() {
             },
           },
         });
-        stInstance = anim.scrollTrigger || null;
       }, section);
     };
 
     setup();
-
-    // Gestion tactile sur mobile : quand la section est épinglée (bloquée),
-    // le swipe vertical est bloqué et c'est le swipe horizontal qui fait avancer/reculer les cartes
-    let touchStartX = 0;
-    let touchStartY = 0;
-
-    const handleTouchStart = (e: TouchEvent) => {
-      if (window.innerWidth >= 640) return;
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (window.innerWidth >= 640 || !stInstance) return;
-
-      // Est-ce que la section est actuellement bloquée/épinglée par ScrollTrigger ?
-      const progress = stInstance.progress;
-      const isPinned = progress > 0.001 && progress < 0.999;
-
-      const currentX = e.touches[0].clientX;
-      const currentY = e.touches[0].clientY;
-      const deltaX = touchStartX - currentX;
-      const deltaY = touchStartY - currentY;
-
-      // Si la section est bloquée
-      if (isPinned) {
-        // Si l'utilisateur swipe horizontalement avec son doigt (vers la gauche pour avancer, vers la droite pour reculer)
-        if (Math.abs(deltaX) > Math.abs(deltaY)) {
-          if (e.cancelable) e.preventDefault();
-          touchStartX = currentX;
-          touchStartY = currentY;
-
-          // Convertir le mouvement horizontal du doigt en scroll de la timeline
-          const scrollDistance = scrollDistanceRef.current;
-          const currentScroll = window.scrollY;
-          const newScroll = Math.max(
-            stInstance.start,
-            Math.min(stInstance.end, currentScroll + deltaX * 2.2)
-          );
-          window.scrollTo({ top: newScroll, behavior: 'instant' as ScrollBehavior });
-          return;
-        }
-
-        // Si l'utilisateur swipe verticalement pendant que c'est bloqué : on bloque le défilement vertical
-        if (e.cancelable) {
-          e.preventDefault();
-        }
-      } else if (progress <= 0.001) {
-        // En haut de la section : si l'utilisateur glisse vers la gauche, on engage le blocage
-        if (deltaX > 20 && Math.abs(deltaX) > Math.abs(deltaY)) {
-          if (e.cancelable) e.preventDefault();
-          window.scrollTo({ top: stInstance.start + 5, behavior: 'instant' as ScrollBehavior });
-        }
-      } else if (progress >= 0.999) {
-        // En fin de section : si l'utilisateur glisse vers la droite, on réengage le blocage vers l'arrière
-        if (deltaX < -20 && Math.abs(deltaX) > Math.abs(deltaY)) {
-          if (e.cancelable) e.preventDefault();
-          window.scrollTo({ top: stInstance.end - 5, behavior: 'instant' as ScrollBehavior });
-        }
-      }
-    };
-
-    window.addEventListener("touchstart", handleTouchStart, { passive: true });
-    window.addEventListener("touchmove", handleTouchMove, { passive: false });
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -346,8 +280,6 @@ export default function WhyPoulpy() {
       observer.disconnect();
       clearTimeout(resizeTimer);
       window.removeEventListener("resize", handleResize);
-      window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchmove", handleTouchMove);
       try {
         if (ctx) {
           ctx.revert();
