@@ -212,116 +212,51 @@ export default function WhyPoulpy() {
     let ctx: gsap.Context | null = null;
 
     const setup = () => {
-      if (ctx) ctx.revert();
+      if (ctx) {
+        ctx.revert();
+      }
+
+      const maxScroll = Math.max(0, track.scrollWidth - window.innerWidth + 80);
+      const totalScrollDistance = Math.max(900, maxScroll * 0.7);
+      scrollDistanceRef.current = totalScrollDistance;
 
       ctx = gsap.context(() => {
-        // Mode Bureau (Desktop >= 640px) : Défilement synchronisé avec la molette verticale
-        if (window.innerWidth >= 640) {
-          const maxScroll = Math.max(0, track.scrollWidth - window.innerWidth + 80);
-          const totalScrollDistance = Math.max(900, maxScroll * 0.7);
-          scrollDistanceRef.current = totalScrollDistance;
+        gsap.to(track, {
+          x: -maxScroll,
+          ease: "none",
+          scrollTrigger: {
+            id: "whypoulpy-scroll",
+            trigger: section,
+            pin: true,
+            pinSpacing: true,
+            start: "top top",
+            end: () => `+=${totalScrollDistance}`,
+            scrub: 0.2,
+            invalidateOnRefresh: true,
+            onUpdate: (self: { progress: number }) => {
+              const progress = self.progress;
+              if (scrollPctRef.current) {
+                scrollPctRef.current.textContent = `${Math.round(progress * 100)}%`;
+              }
+              if (progressBarRef.current) {
+                progressBarRef.current.style.transform = `scaleX(${progress})`;
+              }
 
-          gsap.to(track, {
-            x: -maxScroll,
-            ease: "none",
-            scrollTrigger: {
-              id: "whypoulpy-scroll",
-              trigger: section,
-              pin: true,
-              pinSpacing: true,
-              start: "top top",
-              end: () => `+=${totalScrollDistance}`,
-              scrub: 0.2,
-              invalidateOnRefresh: true,
-              onUpdate: (self: { progress: number }) => {
-                const progress = self.progress;
-                if (scrollPctRef.current) {
-                  scrollPctRef.current.textContent = `${Math.round(progress * 100)}%`;
-                }
-                if (progressBarRef.current) {
-                  progressBarRef.current.style.transform = `scaleX(${progress})`;
-                }
-
-                const activeIdx = Math.min(
-                  pillars.length - 1,
-                  Math.floor(progress * (pillars.length + 0.5))
-                );
-                if (activeIdx !== activeIndexRef.current) {
-                  activeIndexRef.current = activeIdx;
-                  setActiveMediaIndex(activeIdx);
-                }
-              },
+              const activeIdx = Math.min(
+                pillars.length - 1,
+                Math.floor(progress * (pillars.length + 0.5))
+              );
+              if (activeIdx !== activeIndexRef.current) {
+                activeIndexRef.current = activeIdx;
+                setActiveMediaIndex(activeIdx);
+              }
             },
-          });
-        }
+          },
+        });
       }, section);
     };
 
     setup();
-
-    // Mode Mobile (< 640px) : Bloque le scroll vertical tant que l'utilisateur n'a pas swipé jusqu'au bout
-    let touchStartX = 0;
-    let touchStartY = 0;
-
-    const handleTouchStart = (e: TouchEvent) => {
-      if (window.innerWidth >= 640) return;
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (window.innerWidth >= 640) return;
-      const rect = section.getBoundingClientRect();
-      // On vérifie si la section est visible et ancrée en haut de l'écran (avec une marge de 10px)
-      const isAtSection = rect.top <= 10 && rect.bottom >= window.innerHeight - 10;
-      if (!isAtSection) return;
-
-      const currentX = e.touches[0].clientX;
-      const currentY = e.touches[0].clientY;
-      const deltaX = touchStartX - currentX;
-      const deltaY = touchStartY - currentY;
-
-      const maxScrollLeft = track.scrollWidth - track.clientWidth;
-      const isAtStart = track.scrollLeft <= 5;
-      const isAtEnd = track.scrollLeft >= maxScrollLeft - 10;
-
-      // Si l'utilisateur swipe vers le bas (veut descendre dans la page) mais n'est pas encore au bout des cartes
-      if (deltaY > 0 && !isAtEnd) {
-        if (e.cancelable) e.preventDefault();
-        return;
-      }
-
-      // Si l'utilisateur swipe vers le haut (veut remonter dans la page) mais n'est pas au début des cartes
-      if (deltaY < 0 && !isAtStart) {
-        if (e.cancelable) e.preventDefault();
-        return;
-      }
-    };
-
-    const handleTrackScroll = () => {
-      if (window.innerWidth >= 640) return;
-      const maxScroll = track.scrollWidth - track.clientWidth;
-      if (maxScroll <= 0) return;
-      const progress = Math.min(1, Math.max(0, track.scrollLeft / maxScroll));
-      if (scrollPctRef.current) {
-        scrollPctRef.current.textContent = `${Math.round(progress * 100)}%`;
-      }
-      if (progressBarRef.current) {
-        progressBarRef.current.style.transform = `scaleX(${progress})`;
-      }
-      const activeIdx = Math.min(
-        pillars.length - 1,
-        Math.round(progress * (pillars.length - 1))
-      );
-      if (activeIdx !== activeIndexRef.current) {
-        activeIndexRef.current = activeIdx;
-        setActiveMediaIndex(activeIdx);
-      }
-    };
-
-    track.addEventListener("scroll", handleTrackScroll, { passive: true });
-    window.addEventListener("touchstart", handleTouchStart, { passive: true });
-    window.addEventListener("touchmove", handleTouchMove, { passive: false });
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -335,7 +270,6 @@ export default function WhyPoulpy() {
     const handleResize = () => {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(() => {
-        setup();
         ScrollTrigger.refresh();
       }, 150);
     };
@@ -346,11 +280,10 @@ export default function WhyPoulpy() {
       observer.disconnect();
       clearTimeout(resizeTimer);
       window.removeEventListener("resize", handleResize);
-      track.removeEventListener("scroll", handleTrackScroll);
-      window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchmove", handleTouchMove);
       try {
-        if (ctx) ctx.revert();
+        if (ctx) {
+          ctx.revert();
+        }
       } catch (err) {
         // Safe for React Fast Refresh
       }
@@ -365,7 +298,7 @@ export default function WhyPoulpy() {
     >
       <div
         ref={pinnedContainerRef}
-        className="relative w-full min-h-[100dvh] h-screen overflow-hidden flex flex-col justify-start pt-16 sm:pt-24 lg:pt-26 pb-6 sm:pb-6"
+        className="relative w-full min-h-[100dvh] h-screen overflow-hidden flex flex-col justify-start pt-20 sm:pt-24 lg:pt-26 pb-4 sm:pb-6"
       >
         {/* Grand Titre de Catégorie — responsive et safe margin */}
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 mb-4 sm:mb-6 md:mb-8 shrink-0 z-20">
@@ -377,9 +310,10 @@ export default function WhyPoulpy() {
         {/* Large Rectangular Horizontal Sliding Track */}
         <div
           ref={trackRef}
-          className="flex items-center w-full sm:w-max pl-4 sm:pl-10 pr-12 sm:pr-24 select-none space-x-6 sm:space-x-12 shrink-0 overflow-x-auto sm:overflow-x-visible touch-pan-x scrollbar-none snap-x snap-mandatory sm:snap-none"
+          className="flex items-center w-max pl-4 sm:pl-10 pr-24 select-none space-x-8 sm:space-x-12 shrink-0"
           style={{
-            WebkitOverflowScrolling: "touch",
+            willChange: "transform",
+            transform: "translate3d(0, 0, 0)",
           }}
         >
           {pillars.map((item, idx) => {
@@ -389,7 +323,7 @@ export default function WhyPoulpy() {
             return (
               <div
                 key={item.num}
-                className="w-[88vw] xs:w-[86vw] sm:w-[860px] lg:w-[980px] xl:w-[1060px] h-[520px] sm:h-[530px] lg:h-[540px] max-h-[76vh] sm:max-h-[80vh] shrink-0 rounded-2xl sm:rounded-3xl bg-[#121117]/85 backdrop-blur-md p-4 sm:p-6 lg:p-12 flex flex-col justify-between transition-colors relative shadow-2xl shadow-black/80 overflow-hidden"
+                className="w-[90vw] xs:w-[88vw] sm:w-[860px] lg:w-[980px] xl:w-[1060px] h-[520px] sm:h-[530px] lg:h-[540px] max-h-[76vh] sm:max-h-[80vh] shrink-0 rounded-2xl sm:rounded-3xl bg-[#121117]/85 backdrop-blur-md p-4 sm:p-6 lg:p-12 flex flex-col justify-between transition-colors relative shadow-2xl shadow-black/80 overflow-hidden"
               >
                 {/* Header inside module */}
                 <div className="flex items-center justify-between border-b border-white/10 pb-2.5 sm:pb-4 shrink-0">
