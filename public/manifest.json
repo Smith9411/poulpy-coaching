@@ -5,6 +5,7 @@
   "start_url": "/",
   "id": "/",
   "display": "standalone",
+  "display_override": ["standalone", "fullscreen", "minimal-ui"],
   "background_color": "#07090D",
   "theme_color": "#07090D",
   "orientation": "portrait-primary",

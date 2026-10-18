@@ -209,18 +209,14 @@ export default function WhyPoulpy() {
     const pinnedContainer = pinnedContainerRef.current;
     if (!section || !track || !pinnedContainer) return;
 
-    let ctx: gsap.Context | null = null;
+    let mm = gsap.matchMedia();
 
     const setup = () => {
-      if (ctx) {
-        ctx.revert();
-      }
+      mm.add("(min-width: 640px)", () => {
+        const maxScroll = Math.max(0, track.scrollWidth - window.innerWidth + 80);
+        const totalScrollDistance = Math.max(900, maxScroll * 0.7);
+        scrollDistanceRef.current = totalScrollDistance;
 
-      const maxScroll = Math.max(0, track.scrollWidth - window.innerWidth + 80);
-      const totalScrollDistance = Math.max(900, maxScroll * 0.7);
-      scrollDistanceRef.current = totalScrollDistance;
-
-      ctx = gsap.context(() => {
         gsap.to(track, {
           x: -maxScroll,
           ease: "none",
@@ -253,10 +249,34 @@ export default function WhyPoulpy() {
             },
           },
         });
-      }, section);
+      });
     };
 
     setup();
+
+    // Mobile scroll-snap listener to update progress bar and active video
+    const handleMobileTrackScroll = () => {
+      if (window.innerWidth >= 640) return;
+      const maxScroll = track.scrollWidth - track.clientWidth;
+      if (maxScroll <= 0) return;
+      const progress = Math.min(1, Math.max(0, track.scrollLeft / maxScroll));
+      if (scrollPctRef.current) {
+        scrollPctRef.current.textContent = `${Math.round(progress * 100)}%`;
+      }
+      if (progressBarRef.current) {
+        progressBarRef.current.style.transform = `scaleX(${progress})`;
+      }
+      const activeIdx = Math.min(
+        pillars.length - 1,
+        Math.round(progress * (pillars.length - 1))
+      );
+      if (activeIdx !== activeIndexRef.current) {
+        activeIndexRef.current = activeIdx;
+        setActiveMediaIndex(activeIdx);
+      }
+    };
+
+    track.addEventListener("scroll", handleMobileTrackScroll, { passive: true });
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -280,10 +300,9 @@ export default function WhyPoulpy() {
       observer.disconnect();
       clearTimeout(resizeTimer);
       window.removeEventListener("resize", handleResize);
+      track.removeEventListener("scroll", handleMobileTrackScroll);
       try {
-        if (ctx) {
-          ctx.revert();
-        }
+        mm.revert();
       } catch (err) {
         // Safe for React Fast Refresh
       }
@@ -298,7 +317,7 @@ export default function WhyPoulpy() {
     >
       <div
         ref={pinnedContainerRef}
-        className="relative w-full min-h-[100dvh] h-screen overflow-hidden flex flex-col justify-start pt-20 sm:pt-24 lg:pt-26 pb-4 sm:pb-6"
+        className="relative w-full min-h-[auto] sm:min-h-[100dvh] sm:h-screen overflow-visible sm:overflow-hidden flex flex-col justify-start pt-16 sm:pt-24 lg:pt-26 pb-12 sm:pb-6"
       >
         {/* Grand Titre de Catégorie — responsive et safe margin */}
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-10 mb-4 sm:mb-6 md:mb-8 shrink-0 z-20">
@@ -310,10 +329,9 @@ export default function WhyPoulpy() {
         {/* Large Rectangular Horizontal Sliding Track */}
         <div
           ref={trackRef}
-          className="flex items-center w-max pl-4 sm:pl-10 pr-24 select-none space-x-8 sm:space-x-12 shrink-0"
+          className="flex items-center w-full sm:w-max pl-4 sm:pl-10 pr-6 sm:pr-24 select-none space-x-4 sm:space-x-12 shrink-0 overflow-x-auto sm:overflow-x-visible snap-x snap-mandatory sm:snap-none scrollbar-none"
           style={{
-            willChange: "transform",
-            transform: "translate3d(0, 0, 0)",
+            WebkitOverflowScrolling: "touch",
           }}
         >
           {pillars.map((item, idx) => {
@@ -323,7 +341,7 @@ export default function WhyPoulpy() {
             return (
               <div
                 key={item.num}
-                className="w-[90vw] xs:w-[88vw] sm:w-[860px] lg:w-[980px] xl:w-[1060px] h-[520px] sm:h-[530px] lg:h-[540px] max-h-[76vh] sm:max-h-[80vh] shrink-0 rounded-2xl sm:rounded-3xl bg-[#121117]/85 backdrop-blur-md p-4 sm:p-6 lg:p-12 flex flex-col justify-between transition-colors relative shadow-2xl shadow-black/80 overflow-hidden"
+                className="w-[85vw] xs:w-[82vw] sm:w-[860px] lg:w-[980px] xl:w-[1060px] h-[520px] sm:h-[530px] lg:h-[540px] max-h-[76vh] sm:max-h-[80vh] shrink-0 rounded-2xl sm:rounded-3xl bg-[#121117]/85 backdrop-blur-md p-4 sm:p-6 lg:p-12 flex flex-col justify-between transition-colors relative shadow-2xl shadow-black/80 overflow-hidden snap-center"
               >
                 {/* Header inside module */}
                 <div className="flex items-center justify-between border-b border-white/10 pb-2.5 sm:pb-4 shrink-0">
@@ -414,7 +432,7 @@ export default function WhyPoulpy() {
           })}
 
           {/* Closing Action Rectangle */}
-          <div className="w-[85vw] sm:w-[500px] h-[520px] sm:h-[530px] lg:h-[540px] max-h-[76vh] sm:max-h-[80vh] shrink-0 rounded-2xl sm:rounded-3xl bg-black/60 backdrop-blur-md p-6 sm:p-8 lg:p-12 flex flex-col justify-between relative shadow-2xl shadow-black/90 overflow-hidden">
+          <div className="w-[85vw] sm:w-[500px] h-[520px] sm:h-[530px] lg:h-[540px] max-h-[76vh] sm:max-h-[80vh] shrink-0 rounded-2xl sm:rounded-3xl bg-black/60 backdrop-blur-md p-6 sm:p-8 lg:p-12 flex flex-col justify-between relative shadow-2xl shadow-black/90 overflow-hidden snap-center">
             <div className="space-y-4">
               <h3 className="text-2xl sm:text-4xl font-display font-bold text-white tracking-tight leading-tight">
                 PRÊT À PASSER LE PALIER ?
