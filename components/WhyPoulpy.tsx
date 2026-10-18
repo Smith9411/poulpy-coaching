@@ -210,6 +210,7 @@ export default function WhyPoulpy() {
     if (!section || !track || !pinnedContainer) return;
 
     let ctx: gsap.Context | null = null;
+    let stInstance: ScrollTrigger | null = null;
 
     const setup = () => {
       if (ctx) {
@@ -221,7 +222,7 @@ export default function WhyPoulpy() {
       scrollDistanceRef.current = totalScrollDistance;
 
       ctx = gsap.context(() => {
-        gsap.to(track, {
+        const tween = gsap.to(track, {
           x: -maxScroll,
           ease: "none",
           scrollTrigger: {
@@ -253,10 +254,44 @@ export default function WhyPoulpy() {
             },
           },
         });
+        stInstance = tween.scrollTrigger || null;
       }, section);
     };
 
     setup();
+
+    // Permet le swipe horizontal avec le doigt en PLUS du scroll vertical classique
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!stInstance) return;
+      const progress = stInstance.progress;
+      // Actif quand la section est dans la zone d'épinglage
+      if (progress <= 0 || progress >= 1) return;
+
+      const currentX = e.touches[0].clientX;
+      const currentY = e.touches[0].clientY;
+      const deltaX = touchStartX - currentX;
+      const deltaY = touchStartY - currentY;
+
+      // Si le mouvement du doigt est principalement horizontal, on fait défiler la piste
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 8) {
+        touchStartX = currentX;
+        touchStartY = currentY;
+        const currentScroll = window.scrollY;
+        const targetScroll = Math.max(
+          stInstance.start,
+          Math.min(stInstance.end, currentScroll + deltaX * 1.8)
+        );
+        window.scrollTo({ top: targetScroll, behavior: 'instant' as ScrollBehavior });
+      }
+    };
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -275,11 +310,15 @@ export default function WhyPoulpy() {
     };
 
     window.addEventListener("resize", handleResize, { passive: true });
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
 
     return () => {
       observer.disconnect();
       clearTimeout(resizeTimer);
       window.removeEventListener("resize", handleResize);
+      window.removeEventListener("touchstart", handleTouchStart);
+      window.removeEventListener("touchmove", handleTouchMove);
       try {
         if (ctx) {
           ctx.revert();
