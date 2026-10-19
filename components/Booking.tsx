@@ -143,6 +143,18 @@ export default function Booking() {
               if (data.booking?.id) {
                 setConfirmedMissionId(data.booking.id.slice(0, 8).toUpperCase());
               }
+              if (data.booking?.student_discord) {
+                setStudentDiscord(data.booking.student_discord);
+              }
+              if (data.booking?.booking_time) {
+                setSelectedTime(data.booking.booking_time);
+              }
+              const riotMatch = typeof data.booking?.admin_notes === "string"
+                ? data.booking.admin_notes.match(/\[riot_id:([^\]]+)\]/i)
+                : null;
+              if (riotMatch && riotMatch[1]) {
+                setStudentRiotId(riotMatch[1].trim());
+              }
             })
             .catch((err) => console.error("Erreur confirmation réservation:", err));
         }
