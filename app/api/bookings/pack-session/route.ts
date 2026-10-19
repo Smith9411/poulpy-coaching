@@ -269,6 +269,18 @@ export async function POST(req: NextRequest) {
       console.error('[Notion Sync Error - Pack Session]', notionErr);
     }
 
+    // 5b. S'assurer que le statut in_coaching est bien actif sur le profil
+    try {
+      if (userId) {
+        await supabase
+          .from('profiles')
+          .update({ in_coaching: true })
+          .eq('id', userId);
+      }
+    } catch (e) {
+      console.error('[Pack Session in_coaching Error]', e);
+    }
+
     // Envoi de l'email officiel de confirmation avec Google Calendar
     try {
       if (studentEmail) {

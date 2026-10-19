@@ -89,8 +89,9 @@ export async function sendBookingConfirmationEmail(params: SendBookingEmailParam
 
   const formattedDate = (() => {
     try {
-      const d = new Date(bookingDate);
+      const d = new Date(`${bookingDate}T12:00:00Z`);
       return d.toLocaleDateString('fr-FR', {
+        timeZone: 'Europe/Paris',
         weekday: 'long',
         day: 'numeric',
         month: 'long',
@@ -308,8 +309,9 @@ export async function sendBookingReminderEmail(params: SendBookingEmailParams) {
 
   const formattedDate = (() => {
     try {
-      const d = new Date(bookingDate);
+      const d = new Date(`${bookingDate}T12:00:00Z`);
       return d.toLocaleDateString('fr-FR', {
+        timeZone: 'Europe/Paris',
         weekday: 'long',
         day: 'numeric',
         month: 'long',
@@ -532,8 +534,9 @@ export async function sendBookingRescheduledEmail(params: SendBookingEmailParams
 
   const formattedDate = (() => {
     try {
-      const d = new Date(bookingDate);
+      const d = new Date(`${bookingDate}T12:00:00Z`);
       return d.toLocaleDateString('fr-FR', {
+        timeZone: 'Europe/Paris',
         weekday: 'long',
         day: 'numeric',
         month: 'long',
@@ -637,16 +640,30 @@ export async function sendBookingRescheduledEmail(params: SendBookingEmailParams
 
   if (resend) {
     try {
-      const res = await resend.emails.send({
+      let res = await resend.emails.send({
         from: 'Poulpy Coaching <contact@poulpy-coaching.fr>',
         to: studentEmail,
         replyTo: 'contact@poulpy-coaching.fr',
         subject: `🔄 Séance déplacée : ${formattedDate} à ${bookingTime}`,
         html: htmlContent,
       });
-      if (res.error) return { error: res.error.message };
+      if (res.error && (res.error.message?.toLowerCase().includes('domain') || res.error.message?.toLowerCase().includes('verify'))) {
+        res = await resend.emails.send({
+          from: 'Poulpy Coaching <onboarding@resend.dev>',
+          to: studentEmail,
+          replyTo: 'contact@poulpy-coaching.fr',
+          subject: `🔄 Séance déplacée : ${formattedDate} à ${bookingTime}`,
+          html: htmlContent,
+        });
+      }
+      if (res.error) {
+        console.error('[Resend Error Rescheduled]', res.error);
+        return { error: res.error.message };
+      }
+      console.log(`[Email Rescheduled Sent] Envoyé à ${studentEmail} (ID: ${res.data?.id})`);
       return { success: true, id: res.data?.id };
     } catch (err: any) {
+      console.error('[Resend Rescheduled Exception]', err);
       return { error: err.message };
     }
   }
@@ -669,8 +686,9 @@ export async function sendBookingCancelledEmail(params: {
 
   const formattedDate = (() => {
     try {
-      const d = new Date(bookingDate);
+      const d = new Date(`${bookingDate}T12:00:00Z`);
       return d.toLocaleDateString('fr-FR', {
+        timeZone: 'Europe/Paris',
         weekday: 'long',
         day: 'numeric',
         month: 'long',
@@ -726,16 +744,30 @@ export async function sendBookingCancelledEmail(params: {
 
   if (resend) {
     try {
-      const res = await resend.emails.send({
+      let res = await resend.emails.send({
         from: 'Poulpy Coaching <contact@poulpy-coaching.fr>',
         to: studentEmail,
         replyTo: 'contact@poulpy-coaching.fr',
         subject: `Séance annulée : ${formattedDate} à ${bookingTime}`,
         html: htmlContent,
       });
-      if (res.error) return { error: res.error.message };
+      if (res.error && (res.error.message?.toLowerCase().includes('domain') || res.error.message?.toLowerCase().includes('verify'))) {
+        res = await resend.emails.send({
+          from: 'Poulpy Coaching <onboarding@resend.dev>',
+          to: studentEmail,
+          replyTo: 'contact@poulpy-coaching.fr',
+          subject: `Séance annulée : ${formattedDate} à ${bookingTime}`,
+          html: htmlContent,
+        });
+      }
+      if (res.error) {
+        console.error('[Resend Error Cancelled]', res.error);
+        return { error: res.error.message };
+      }
+      console.log(`[Email Cancelled Sent] Envoyé à ${studentEmail} (ID: ${res.data?.id})`);
       return { success: true, id: res.data?.id };
     } catch (err: any) {
+      console.error('[Resend Cancelled Exception]', err);
       return { error: err.message };
     }
   }
