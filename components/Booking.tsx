@@ -1146,16 +1146,15 @@ export default function Booking() {
                     </div>
 
                     <div>
-                      <label className="text-[11px] text-[#F5F4F0]/70 block uppercase font-bold tracking-wider mb-1.5 flex items-center gap-1.5">
-                        <Crosshair className="w-3.5 h-3.5 text-[#CA1C30]" />
-                        <span>RIOT ID / PSEUDO APEX (IN-GAME) <span className="text-[#CA1C30]">*</span> :</span>
+                      <label className="text-[11px] text-[#F5F4F0]/70 block uppercase font-bold tracking-wider mb-1.5">
+                        RIOT ID / PSEUDO APEX (IN-GAME) <span className="text-[#CA1C30]">*</span> :
                       </label>
                       <input
                         type="text"
                         placeholder={game === "Apex Legends" ? "Ex: Poulpy_Apex (Pseudo EA / Steam)" : "Ex: Poulpy#EUW (Riot ID avec #TAG)"}
                         value={studentRiotId}
                         onChange={(e) => setStudentRiotId(e.target.value)}
-                        className="w-full bg-[#1A1822] border border-[#CA1C30]/40 p-3 text-xs text-[#F5F4F0] placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
+                        className="w-full bg-[#1A1822] border border-white/20 p-3 text-xs text-[#F5F4F0] placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
                       />
                       <span className="text-[10px] text-[#F5F4F0]/50 mt-1 block">
                         Obligatoire pour que Poulpy puisse t&apos;ajouter en jeu avant la séance.
