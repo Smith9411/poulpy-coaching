@@ -1294,77 +1294,94 @@ export default function Booking() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.2 }}
-                className="py-6 text-center space-y-6 max-w-xl mx-auto"
+                className="py-4 text-center space-y-6 max-w-2xl mx-auto"
               >
-                <div className="w-16 h-16 bg-[#00B4A0]/15 border border-[#00B4A0] text-[#00B4A0] flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(0,180,160,0.3)] rounded-2xl">
-                  <Check className="w-8 h-8" />
-                </div>
-
-                <div className="space-y-2">
-                  <span className="text-xs text-[#00B4A0] font-bold tracking-widest uppercase block">
-                    CRÉNEAU VERROUILLÉ AVEC SUCCÈS
-                  </span>
-                  <h3 className="text-2xl sm:text-3xl font-display text-[#F5F4F0] tracking-wider">
-                    ORDRE DE MISSION : {confirmedMissionId}
-                  </h3>
-                  <p className="text-xs text-[#F5F4F0]/60 leading-relaxed">
-                    Ta session <strong className="text-[#F5F4F0]">{activePlan.name}</strong> du <strong className="text-[#F5F4F0]">{currentDay.fullDateLabel} à {selectedTime}</strong> a été enregistrée. Poulpy te contactera sur Discord (<strong className="text-[#00B4A0]">{studentDiscord}</strong>) avant le début de la séance.
-                  </p>
-                </div>
-
-                <div className="p-4 bg-[#1A1822] border border-white/10 text-left text-xs space-y-2 rounded-2xl">
-                  <div className="flex justify-between border-b border-white/5 pb-1.5">
-                    <span className="text-[#F5F4F0]/50">Formule :</span>
-                    <span className="text-[#F5F4F0] font-bold">{activePlan.name} ({activePlan.price})</span>
-                  </div>
-                  <div className="flex justify-between border-b border-white/5 pb-1.5">
-                    <span className="text-[#F5F4F0]/50">Date & Heure :</span>
-                    <span className="text-[#F5F4F0] font-bold">{currentDay.fullDateLabel} à {selectedTime}</span>
-                  </div>
-                  <div className="flex justify-between border-b border-white/5 pb-1.5">
-                    <span className="text-[#F5F4F0]/50">Contact Discord :</span>
-                    <span className="text-[#CA1C30] font-bold">{studentDiscord}</span>
-                  </div>
-                  {studentRiotId && (
-                    <div className="flex justify-between">
-                      <span className="text-[#F5F4F0]/50">Riot ID / Pseudo Jeu :</span>
-                      <span className="text-[#00B4A0] font-bold">{studentRiotId}</span>
+                {/* Ticket Container */}
+                <div className="bg-[#181720] border border-white/15 rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
+                  {/* Top Green Status Bar */}
+                  <div className="bg-[#00B4A0]/20 px-5 sm:px-7 py-3.5 flex flex-wrap items-center justify-between gap-2 border-b border-[#00B4A0]/20">
+                    <div className="flex items-center gap-2 text-[#00B4A0] text-xs font-bold tracking-wider uppercase">
+                      <Check className="w-4 h-4 stroke-[2.5]" />
+                      <span>SÉANCE CONFIRMÉE • POULPY COACHING</span>
                     </div>
-                  )}
-                </div>
-
-                {/* Discord CTA with IMPORTANT badge */}
-                <div className="relative p-5 bg-[#1A1822] border border-[#CA1C30] shadow-[0_0_25px_rgba(202,28,48,0.2)] text-left rounded-2xl">
-                  {/* Badge matching the pack badges */}
-                  <div className="absolute top-2 right-2 px-2 py-0.5 text-[9px] font-bold bg-[#CA1C30] text-black uppercase tracking-wider shadow-[0_0_10px_rgba(202,28,48,0.5)] rounded-full">
-                    IMPORTANT !
+                    <span className="text-xs font-bold text-[#F5F4F0] uppercase tracking-wider">
+                      {currentDay.fullDateLabel}
+                      {selectedTime ? ` • ${selectedTime}` : ""}
+                    </span>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-1">
-                    <div className="space-y-1 pr-0 sm:pr-4">
-                      <div className="text-xs font-bold text-[#F5F4F0] uppercase tracking-wider flex items-center gap-2">
-                        <span className="w-2 h-2 bg-[#CA1C30] animate-pulse rounded-full" />
-                        <span>REJOINDRE LE SERVEUR DISCORD</span>
-                      </div>
-                      <p className="text-[11px] text-[#F5F4F0]/70 leading-relaxed">
-                        Le salon vocal et le partage d&apos;écran de coaching se déroulent exclusivement sur le serveur Discord de Poulpy.
-                      </p>
+                  {/* Ticket Info Grid (2x2) */}
+                  <div className="p-6 sm:p-7 grid grid-cols-1 sm:grid-cols-2 gap-5 text-left">
+                    <div>
+                      <span className="text-[10px] text-[#F5F4F0]/45 uppercase tracking-wider block mb-1">
+                        FORMULE SÉLECTIONNÉE
+                      </span>
+                      <span className="text-sm sm:text-base font-bold text-[#F5F4F0] block">
+                        {activePlan.name} ({activePlan.price})
+                      </span>
                     </div>
 
-                    <a
-                      href="https://discord.gg/BC24FH4xpd"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn-cyber-primary flex items-center justify-center gap-2 py-3 px-6 text-xs font-bold uppercase tracking-wider shrink-0 cursor-pointer shadow-[0_0_20px_rgba(202,28,48,0.3)]"
-                    >
-                      <MessageCircle className="w-4 h-4" />
-                      <span>REJOINDRE LE DISCORD</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
+                    <div>
+                      <span className="text-[10px] text-[#F5F4F0]/45 uppercase tracking-wider block mb-1">
+                        CRÉNEAU HORAIRE
+                      </span>
+                      <span className="text-sm sm:text-base font-bold text-[#00B4A0] block">
+                        {currentDay.fullDateLabel}
+                        {selectedTime ? ` à ${selectedTime}` : ""}
+                      </span>
+                    </div>
+
+                    <div>
+                      <span className="text-[10px] text-[#F5F4F0]/45 uppercase tracking-wider block mb-1">
+                        COMPTE DISCORD
+                      </span>
+                      <span className="text-sm sm:text-base font-bold text-[#F5F4F0] block">
+                        {studentDiscord || "—"}
+                      </span>
+                    </div>
+
+                    <div>
+                      <span className="text-[10px] text-[#F5F4F0]/45 uppercase tracking-wider block mb-1">
+                        RIOT ID / PSEUDO JEU
+                      </span>
+                      <span className="text-sm sm:text-base font-bold text-[#CA1C30] block">
+                        {studentRiotId || "—"}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Dashed Perforation Line */}
+                  <div className="border-t-2 border-dashed border-[#CA1C30]/60" />
+
+                  {/* Bottom Half: Mandatory Discord Zone */}
+                  <div className="bg-[#CA1C30]/[0.08] p-6 sm:p-8 text-center space-y-4">
+                    <div className="inline-flex items-center justify-center px-4 py-1 bg-[#CA1C30] text-white text-[10px] font-bold uppercase tracking-wider rounded-full shadow-[0_0_15px_rgba(202,28,48,0.4)]">
+                      PRÉSENCE SUR LE DISCORD OBLIGATOIRE
+                    </div>
+
+                    <h3 className="text-lg sm:text-xl font-display text-[#F5F4F0] tracking-wider uppercase">
+                      REJOINS LE SERVEUR POUR DÉBLOQUER TA SÉANCE
+                    </h3>
+
+                    <p className="text-xs text-[#F5F4F0]/75 leading-relaxed max-w-lg mx-auto">
+                      Tant que tu n&apos;es pas sur le serveur Discord, la session ne peut pas être effectuée. Le vocal et le partage d&apos;écran avec Poulpy se déroulent uniquement dessus.
+                    </p>
+
+                    <div className="pt-1">
+                      <a
+                        href="https://discord.gg/BC24FH4xpd"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-2.5 w-full sm:w-auto sm:min-w-[380px] py-3.5 px-8 bg-[#CA1C30] hover:bg-[#CA1C30]/90 text-white font-display text-xs sm:text-sm uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-[0_0_25px_rgba(202,28,48,0.35)]"
+                      >
+                        <span>REJOINDRE LE SERVEUR DISCORD OFFICIEL</span>
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
+                    </div>
                   </div>
                 </div>
 
-                <div className="pt-2 flex justify-center">
+                <div className="pt-1 flex justify-center">
                   <button
                     onClick={handleReset}
                     className="btn-cyber-ghost py-2.5 px-6 text-xs uppercase cursor-pointer"

@@ -1,8 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Calendar, CheckCircle2, Gamepad2, MessageSquare, Shield, Sparkles, User, ArrowRight } from 'lucide-react';
-import Link from 'next/link';
+import { Check, ExternalLink } from 'lucide-react';
 import { BookingFormData, Plan } from './types';
 
 interface BookingConfirmationProps {
@@ -20,134 +19,102 @@ export default function BookingConfirmation({
 }: BookingConfirmationProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 15 }}
-      transition={{ duration: 0.3 }}
-      className="max-w-2xl mx-auto font-mono"
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.2 }}
+      className="py-4 text-center space-y-6 max-w-2xl mx-auto font-mono"
     >
-      <div className="reticle-box bg-[#121117] border border-white/10 rounded-2xl p-6 sm:p-10 relative text-center shadow-[0_0_50px_rgba(0,0,0,0.8)]">
-
-        {/* Animated Badge */}
-        <div className="w-16 h-16 mx-auto mb-5 border-2 border-[#00B4A0] bg-[#00B4A0]/10 flex items-center justify-center text-[#00B4A0] shadow-[0_0_20px_rgba(0,180,160,0.3)]">
-          <CheckCircle2 size={32} />
+      {/* Ticket Container */}
+      <div className="bg-[#181720] border border-white/15 rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.6)]">
+        {/* Top Green Status Bar */}
+        <div className="bg-[#00B4A0]/20 px-5 sm:px-7 py-3.5 flex flex-wrap items-center justify-between gap-2 border-b border-[#00B4A0]/20">
+          <div className="flex items-center gap-2 text-[#00B4A0] text-xs font-bold tracking-wider uppercase">
+            <Check className="w-4 h-4 stroke-[2.5]" />
+            <span>SÉANCE CONFIRMÉE • POULPY COACHING</span>
+          </div>
+          <span className="text-xs font-bold text-[#F5F4F0] uppercase tracking-wider">
+            {slotLabel}
+          </span>
         </div>
 
-        <div className="inline-block px-3 py-1 bg-white/5 border border-white/10 text-[10px] text-[#00B4A0] tracking-widest uppercase mb-3">
-          SESSION CONFIRMÉE // STATUS_OK
-        </div>
-
-        <h3 className="text-2xl sm:text-4xl font-display uppercase tracking-wider text-white mb-2">
-          RÉSERVATION VALIDÉE, <span className="text-[#CA1C30]">{formData.name}</span>
-        </h3>
-        <p className="text-white/60 text-xs sm:text-sm max-w-md mx-auto mb-8 leading-relaxed">
-          Ton créneau de coaching avec Poulpy est bien synchronisé. Prépare-toi pour ta session d'entraînement.
-        </p>
-
-        {/* Recap Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8 text-left">
-          <div className="p-3.5 bg-black/40 border border-white/10 flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center shrink-0 bg-[#CA1C30]/20 border border-[#CA1C30]/40 text-[#CA1C30]">
-              <User size={16} />
-            </div>
-            <div className="min-w-0">
-              <div className="font-bold text-white text-xs truncate uppercase tracking-wider">{plan.name}</div>
-              <div className="text-[11px] text-white/50">
-                {plan.duration} • {plan.price}
-              </div>
-            </div>
+        {/* Ticket Info Grid (2x2) */}
+        <div className="p-6 sm:p-7 grid grid-cols-1 sm:grid-cols-2 gap-5 text-left">
+          <div>
+            <span className="text-[10px] text-[#F5F4F0]/45 uppercase tracking-wider block mb-1">
+              FORMULE SÉLECTIONNÉE
+            </span>
+            <span className="text-sm sm:text-base font-bold text-[#F5F4F0] block">
+              {plan.name} ({plan.price})
+            </span>
           </div>
 
-          <div className="p-3.5 bg-black/40 border border-white/10 flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center shrink-0 bg-[#00B4A0]/20 border border-[#00B4A0]/40 text-[#00B4A0]">
-              <Calendar size={16} />
-            </div>
-            <div className="min-w-0">
-              <div className="font-bold text-white text-xs truncate uppercase tracking-wider">{slotLabel}</div>
-              <div className="text-[11px] text-white/50">Heure de Paris (CET)</div>
-            </div>
+          <div>
+            <span className="text-[10px] text-[#F5F4F0]/45 uppercase tracking-wider block mb-1">
+              CRÉNEAU HORAIRE
+            </span>
+            <span className="text-sm sm:text-base font-bold text-[#00B4A0] block">
+              {slotLabel}
+            </span>
           </div>
 
-          <div className="p-3.5 bg-black/40 border border-white/10 flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center shrink-0 bg-white/5 border border-white/10 text-white">
-              <Gamepad2 size={16} />
-            </div>
-            <div className="min-w-0">
-              <div className="font-bold text-white text-xs truncate uppercase tracking-wider">
-                {formData.game}{formData.riotId ? ` • ${formData.riotId}` : ''}
-              </div>
-              <div className="text-[11px] text-white/50">Jeu & Riot ID / Pseudo Apex</div>
-            </div>
+          <div>
+            <span className="text-[10px] text-[#F5F4F0]/45 uppercase tracking-wider block mb-1">
+              COMPTE DISCORD
+            </span>
+            <span className="text-sm sm:text-base font-bold text-[#F5F4F0] block">
+              {formData.discord || '—'}
+            </span>
           </div>
 
-          <div className="p-3.5 bg-black/40 border border-white/10 flex items-center gap-3">
-            <div className="w-9 h-9 flex items-center justify-center shrink-0 bg-[#5865F2]/20 border border-[#5865F2]/40 text-[#5865F2]">
-              <MessageSquare size={16} />
-            </div>
-            <div className="min-w-0">
-              <div className="font-bold text-white text-xs truncate uppercase tracking-wider">{formData.discord}</div>
-              <div className="text-[11px] text-white/50">Identifiant Discord</div>
-            </div>
+          <div>
+            <span className="text-[10px] text-[#F5F4F0]/45 uppercase tracking-wider block mb-1">
+              RIOT ID / PSEUDO JEU
+            </span>
+            <span className="text-sm sm:text-base font-bold text-[#CA1C30] block">
+              {formData.riotId || '—'}
+            </span>
           </div>
         </div>
 
-        {/* Steps roadmap */}
-        <div className="p-5 bg-black/40 border border-white/10 mb-8 text-left">
-          <h4 className="font-bold text-white text-xs uppercase tracking-wider mb-4 flex items-center gap-2">
-            <Shield size={14} className="text-[#00B4A0]" />
-            PROTOCOLE POST-RÉSERVATION :
-          </h4>
-          <div className="space-y-3 text-xs text-white/70">
-            <div className="flex items-start gap-3">
-              <span className="w-5 h-5 bg-[#CA1C30]/20 border border-[#CA1C30]/40 text-[#CA1C30] font-bold flex items-center justify-center shrink-0 text-[10px]">
-                01
-              </span>
-              <span>Rejoins le serveur Discord officiel pour la communication vocale.</span>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="w-5 h-5 bg-[#00B4A0]/20 border border-[#00B4A0]/40 text-[#00B4A0] font-bold flex items-center justify-center shrink-0 text-[10px]">
-                02
-              </span>
-              <span>Tu recevras un briefing direct de Poulpy avant le début de la session.</span>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="w-5 h-5 bg-white/10 border border-white/20 text-white font-bold flex items-center justify-center shrink-0 text-[10px]">
-                03
-              </span>
-              <span>Dépose un clip ou une VOD dans ton espace élève pour une analyse millimétrée.</span>
-            </div>
+        {/* Dashed Perforation Line */}
+        <div className="border-t-2 border-dashed border-[#CA1C30]/60" />
+
+        {/* Bottom Half: Mandatory Discord Zone */}
+        <div className="bg-[#CA1C30]/[0.08] p-6 sm:p-8 text-center space-y-4">
+          <div className="inline-flex items-center justify-center px-4 py-1 bg-[#CA1C30] text-white text-[10px] font-bold uppercase tracking-wider rounded-full shadow-[0_0_15px_rgba(202,28,48,0.4)]">
+            PRÉSENCE SUR LE DISCORD OBLIGATOIRE
+          </div>
+
+          <h3 className="text-lg sm:text-xl font-display text-[#F5F4F0] tracking-wider uppercase">
+            REJOINS LE SERVEUR POUR DÉBLOQUER TA SÉANCE
+          </h3>
+
+          <p className="text-xs text-[#F5F4F0]/75 leading-relaxed max-w-lg mx-auto">
+            Tant que tu n&apos;es pas sur le serveur Discord, la session ne peut pas être effectuée. Le vocal et le partage d&apos;écran avec Poulpy se déroulent uniquement dessus.
+          </p>
+
+          <div className="pt-1">
+            <a
+              href="https://discord.gg/BC24FH4xpd"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2.5 w-full sm:w-auto sm:min-w-[380px] py-3.5 px-8 bg-[#CA1C30] hover:bg-[#CA1C30]/90 text-white font-display text-xs sm:text-sm uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-[0_0_25px_rgba(202,28,48,0.35)]"
+            >
+              <span>REJOINDRE LE SERVEUR DISCORD OFFICIEL</span>
+              <ExternalLink className="w-4 h-4" />
+            </a>
           </div>
         </div>
+      </div>
 
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-          <a
-            href="https://discord.gg/BC24FH4xpd"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-cyber-primary w-full sm:w-auto py-3 px-6 text-xs inline-flex items-center justify-center gap-2"
-          >
-            <MessageSquare size={14} />
-            <span>REJOINDRE LE DISCORD</span>
-          </a>
-
-          <Link
-            href="/profile/coaching"
-            className="btn-cyber-ghost w-full sm:w-auto py-3 px-6 text-xs inline-flex items-center justify-center gap-2"
-          >
-            <Sparkles size={14} className="text-[#00B4A0]" />
-            <span>ESPACE SUIVI COACHING</span>
-          </Link>
-        </div>
-
-        <div className="mt-6 pt-4 border-t border-white/10">
-          <button
-            onClick={onReset}
-            className="text-[11px] text-white/40 hover:text-white transition-colors cursor-pointer uppercase tracking-wider"
-          >
-            Réserver un autre créneau
-          </button>
-        </div>
+      <div className="pt-1 flex justify-center">
+        <button
+          onClick={onReset}
+          className="btn-cyber-ghost py-2.5 px-6 text-xs uppercase cursor-pointer"
+        >
+          RÉSERVER UNE AUTRE SESSION
+        </button>
       </div>
     </motion.div>
   );
