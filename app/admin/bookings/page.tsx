@@ -13,6 +13,7 @@ import {
   ChevronUp,
   Clock,
   Copy,
+  Crosshair,
   Edit2,
   Gamepad2,
   Gift,
@@ -29,7 +30,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { CoachingBooking, CoachingSlot } from '@/components/booking/types';
+import { CoachingBooking, CoachingSlot, extractRiotIdFromBooking } from '@/components/booking/types';
 
 // Horaires de coaching par défaut
 const DEFAULT_HOURS = [
@@ -505,11 +506,13 @@ export default function AdminBookingsPage() {
     if (statusFilter !== 'all' && b.status !== statusFilter) return false;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
+      const riotId = extractRiotIdFromBooking(b) || '';
       const matchName = b.student_name.toLowerCase().includes(q);
       const matchEmail = b.student_email.toLowerCase().includes(q);
       const matchDiscord = b.student_discord.toLowerCase().includes(q);
+      const matchRiot = riotId.toLowerCase().includes(q);
       const matchGame = b.game.toLowerCase().includes(q);
-      return matchName || matchEmail || matchDiscord || matchGame;
+      return matchName || matchEmail || matchDiscord || matchRiot || matchGame;
     }
     return true;
   });
@@ -560,6 +563,7 @@ export default function AdminBookingsPage() {
   // Rendu d'une carte de réservation
   const renderBookingCard = (b: CoachingBooking) => {
     const isActionLoading = actionLoadingId === b.id;
+    const bookingRiotId = extractRiotIdFromBooking(b);
 
     return (
       <div
@@ -644,6 +648,29 @@ export default function AdminBookingsPage() {
                 <Copy size={11} />
               </button>
             </div>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <span className="text-gray-400">Riot ID / Apex :</span>
+            {bookingRiotId ? (
+              <div className="flex items-center gap-1 text-[#CA1C30] font-mono font-bold">
+                <Crosshair size={12} />
+                <span>{bookingRiotId}</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(bookingRiotId);
+                    showToast('success', `Riot ID / Pseudo de ${b.student_name} copié !`);
+                  }}
+                  className="p-1 hover:text-white"
+                  title="Copier le pseudo en jeu"
+                >
+                  <Copy size={11} />
+                </button>
+              </div>
+            ) : (
+              <span className="text-gray-500 italic text-[11px]">Non renseigné</span>
+            )}
           </div>
 
           <div className="flex items-center justify-between">

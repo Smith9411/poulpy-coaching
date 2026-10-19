@@ -58,11 +58,27 @@ export async function GET(req: NextRequest) {
       query = query.eq('status', statusFilter);
     }
 
-    const { data: bookings, error } = await query;
+    const [bookingsResult, authUsersResult] = await Promise.all([
+      query,
+      supabase.auth.admin.listUsers({ perPage: 1000 }).catch(() => ({ data: { users: [] } })),
+    ]);
+
+    const { data: bookings, error } = bookingsResult;
 
     if (error) {
       console.error('Erreur récupération bookings admin:', error);
       return NextResponse.json({ bookings: [] });
+    }
+
+    const riotIdByUserId = new Map<string, string>();
+    const riotIdByEmail = new Map<string, string>();
+    for (const u of authUsersResult?.data?.users || []) {
+      const meta = (u.user_metadata || {}) as Record<string, string | undefined>;
+      const rId = (meta.riot_id || meta.riotId || '').trim();
+      if (rId) {
+        riotIdByUserId.set(u.id, rId);
+        if (u.email) riotIdByEmail.set(u.email.trim().toLowerCase(), rId);
+      }
     }
 
     // Auto-complétion automatique des séances passées (fuseau Europe/Paris)
@@ -82,15 +98,25 @@ export async function GET(req: NextRequest) {
 
     const pastIdsToComplete: string[] = [];
     const allBookings = (bookings || []).map((b: any) => {
+      const matchRiot = typeof b.admin_notes === 'string' ? b.admin_notes.match(/\[riot_id:([^\]]+)\]/i) : null;
+      const emailKey = typeof b.student_email === 'string' ? b.student_email.trim().toLowerCase() : '';
+      const resolvedRiotId =
+        (typeof b.riot_id === 'string' && b.riot_id.trim()) ||
+        (matchRiot && matchRiot[1]?.trim()) ||
+        (b.user_id && riotIdByUserId.get(b.user_id)) ||
+        (emailKey && riotIdByEmail.get(emailKey)) ||
+        null;
+
+      let status = b.status;
       if ((b.status === 'confirmed' || b.status === 'rescheduled') && b.booking_date) {
         const isPastDate = b.booking_date < todayStr;
         const isTodayPastTime = b.booking_date === todayStr && b.booking_time && b.booking_time < currentHourStr;
         if (isPastDate || isTodayPastTime) {
           pastIdsToComplete.push(b.id);
-          return { ...b, status: 'completed' };
+          status = 'completed';
         }
       }
-      return b;
+      return { ...b, status, riot_id: resolvedRiotId };
     });
 
     if (pastIdsToComplete.length > 0) {
@@ -187,12 +213,22 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'Réservation introuvable' }, { status: 404 });
     }
 
+    const existingRiotTagMatch =
+      typeof currentBooking.admin_notes === 'string'
+        ? currentBooking.admin_notes.match(/\[riot_id:[^\]]+\]/i)
+        : null;
+    const existingRiotTag = existingRiotTagMatch ? existingRiotTagMatch[0] : '';
+
     // ── 1. ACTION : ANNULER ────────────────────────────────────────────────
     if (action === 'cancel') {
       const cleanedCancelNotes = await cancelScheduledReminderEmail(currentBooking.admin_notes);
+      let finalCancelNotes = adminNotes || cleanedCancelNotes || '';
+      if (existingRiotTag && !finalCancelNotes.includes(existingRiotTag)) {
+        finalCancelNotes = `${finalCancelNotes} ${existingRiotTag}`.trim();
+      }
       const updatePayload: Record<string, unknown> = {
         status: 'cancelled',
-        admin_notes: adminNotes || cleanedCancelNotes || null,
+        admin_notes: finalCancelNotes || null,
         updated_at: new Date().toISOString(),
       };
 
@@ -300,10 +336,13 @@ export async function PATCH(req: NextRequest) {
 
       // 3. Annuler l'ancien rappel programmé chez Resend et réinitialiser le marqueur
       const baseNotes = await cancelScheduledReminderEmail(currentBooking.admin_notes);
-      const cleanedNotes = String(adminNotes ?? baseNotes)
+      let cleanedNotes = String(adminNotes ?? baseNotes)
         .replace(/\s*\[reminder_2h_sent\]/g, '')
         .replace(/\s*\[reminder_email_id:[^\]]+\]/g, '')
         .trim();
+      if (existingRiotTag && !cleanedNotes.includes(existingRiotTag)) {
+        cleanedNotes = `${cleanedNotes} ${existingRiotTag}`.trim();
+      }
 
       const reschedulePayload: Record<string, unknown> = {
         booking_date: newDate,

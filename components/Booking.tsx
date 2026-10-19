@@ -90,6 +90,7 @@ export default function Booking() {
   const [studentName, setStudentName] = useState<string>("");
   const [studentEmail, setStudentEmail] = useState<string>("");
   const [studentDiscord, setStudentDiscord] = useState<string>("");
+  const [studentRiotId, setStudentRiotId] = useState<string>("");
   const [game, setGame] = useState<string>("Valorant");
   const [currentRank, setCurrentRank] = useState<string>("Diamant 2");
   const [objective, setObjective] = useState<string>("");
@@ -106,8 +107,10 @@ export default function Booking() {
     if (user) {
       if (user.username && !studentName) setStudentName(user.username);
       if (user.email && !studentEmail) setStudentEmail(user.email);
+      if (user.discord && !studentDiscord) setStudentDiscord(user.discord);
+      if (user.riotId && !studentRiotId) setStudentRiotId(user.riotId);
     }
-  }, [user, studentName, studentEmail]);
+  }, [user, studentName, studentEmail, studentDiscord, studentRiotId]);
 
   // Fetch real open slots from API
   const fetchSlots = async () => {
@@ -299,6 +302,10 @@ export default function Booking() {
         setSubmitError("L'identifiant Discord est requis pour initier le salon vocal.");
         return;
       }
+      if (!studentRiotId.trim()) {
+        setSubmitError("Le Riot ID (ex: Pseudo#TAG) ou Pseudo Apex est obligatoire pour que Poulpy puisse vous ajouter en jeu en avance.");
+        return;
+      }
       if (!studentEmail.trim()) {
         setSubmitError("L'adresse email est requise pour la confirmation.");
         return;
@@ -344,6 +351,7 @@ export default function Booking() {
             studentName: (studentName.trim() || user.username || studentDiscord.trim()),
             studentEmail: (studentEmail.trim() || user.email || ""),
             studentDiscord: studentDiscord.trim(),
+            riotId: studentRiotId.trim(),
             game: `${game} (${currentRank})`,
             notes: objective.trim(),
           }),
@@ -1109,30 +1117,49 @@ export default function Booking() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-4">
-                    <div>
-                      <label className="text-[11px] text-[#F5F4F0]/70 block uppercase font-bold tracking-wider mb-1.5">
-                        PSEUDO / PRÉNOM :
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Ex: TenZ ou Thomas"
-                        value={studentName}
-                        onChange={(e) => setStudentName(e.target.value)}
-                        className="w-full bg-[#1A1822] border border-white/20 p-3 text-xs text-[#F5F4F0] placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
-                      />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-[11px] text-[#F5F4F0]/70 block uppercase font-bold tracking-wider mb-1.5">
+                          PSEUDO / PRÉNOM :
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Ex: TenZ ou Thomas"
+                          value={studentName}
+                          onChange={(e) => setStudentName(e.target.value)}
+                          className="w-full bg-[#1A1822] border border-white/20 p-3 text-xs text-[#F5F4F0] placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[11px] text-[#F5F4F0]/70 block uppercase font-bold tracking-wider mb-1.5">
+                          IDENTIFIANT DISCORD <span className="text-[#CA1C30]">*</span> :
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Ex: poulpy_94"
+                          value={studentDiscord}
+                          onChange={(e) => setStudentDiscord(e.target.value)}
+                          className="w-full bg-[#1A1822] border border-white/20 p-3 text-xs text-[#F5F4F0] placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
+                        />
+                      </div>
                     </div>
 
                     <div>
-                      <label className="text-[11px] text-[#F5F4F0]/70 block uppercase font-bold tracking-wider mb-1.5">
-                        IDENTIFIANT DISCORD <span className="text-[#CA1C30]">*</span> :
+                      <label className="text-[11px] text-[#F5F4F0]/70 block uppercase font-bold tracking-wider mb-1.5 flex items-center gap-1.5">
+                        <Crosshair className="w-3.5 h-3.5 text-[#CA1C30]" />
+                        <span>RIOT ID / PSEUDO APEX (IN-GAME) <span className="text-[#CA1C30]">*</span> :</span>
                       </label>
                       <input
                         type="text"
-                        placeholder="Ex: poulpy_94 ou monpseudo#1234"
-                        value={studentDiscord}
-                        onChange={(e) => setStudentDiscord(e.target.value)}
-                        className="w-full bg-[#1A1822] border border-white/20 p-3 text-xs text-[#F5F4F0] placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
+                        placeholder={game === "Apex Legends" ? "Ex: Poulpy_Apex (Pseudo EA / Steam)" : "Ex: Poulpy#EUW (Riot ID avec #TAG)"}
+                        value={studentRiotId}
+                        onChange={(e) => setStudentRiotId(e.target.value)}
+                        className="w-full bg-[#1A1822] border border-[#CA1C30]/40 p-3 text-xs text-[#F5F4F0] placeholder-white/30 focus:border-[#CA1C30] focus:outline-none transition-colors rounded-xl"
                       />
+                      <span className="text-[10px] text-[#F5F4F0]/50 mt-1 block">
+                        Obligatoire pour que Poulpy puisse t&apos;ajouter en jeu avant la séance.
+                      </span>
                     </div>
 
                     <div>
@@ -1188,7 +1215,7 @@ export default function Booking() {
                         OBJECTIFS / BLOCAGES PRINCIPAUX :
                       </label>
                       <textarea
-                        rows={3}
+                        rows={4}
                         placeholder="Ex: Difficulté à monter au-delà de Diamant, perte de duels en 1v1, problème de crosshair placement..."
                         value={objective}
                         onChange={(e) => setObjective(e.target.value)}
@@ -1283,10 +1310,16 @@ export default function Booking() {
                     <span className="text-[#F5F4F0]/50">Date & Heure :</span>
                     <span className="text-[#F5F4F0] font-bold">{currentDay.fullDateLabel} à {selectedTime}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between border-b border-white/5 pb-1.5">
                     <span className="text-[#F5F4F0]/50">Contact Discord :</span>
                     <span className="text-[#CA1C30] font-bold">{studentDiscord}</span>
                   </div>
+                  {studentRiotId && (
+                    <div className="flex justify-between">
+                      <span className="text-[#F5F4F0]/50">Riot ID / Pseudo Jeu :</span>
+                      <span className="text-[#00B4A0] font-bold">{studentRiotId}</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Discord CTA with IMPORTANT badge */}

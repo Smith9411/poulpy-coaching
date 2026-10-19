@@ -13,6 +13,7 @@ export interface User {
   avatarUrl?: string | null;
   bio?: string | null;
   discord?: string | null;
+  riotId?: string | null;
   twitch?: string | null;
   youtube?: string | null;
   tiktok?: string | null;
@@ -34,6 +35,7 @@ interface AuthContextType {
   updateBio: (newBio: string) => Promise<void>;
   updateSocials: (socials: {
     discord?: string | null;
+    riotId?: string | null;
     twitch?: string | null;
     youtube?: string | null;
     tiktok?: string | null;
@@ -54,6 +56,7 @@ async function buildUser(session: Session): Promise<User> {
   let bio: string | null = null;
   let profileUsername: string | null = null;
   let discord: string | null = meta.discord || null;
+  let riotId: string | null = meta.riot_id || meta.riotId || null;
   let twitch: string | null = meta.twitch || null;
   let youtube: string | null = meta.youtube || null;
   let tiktok: string | null = meta.tiktok || null;
@@ -81,11 +84,12 @@ async function buildUser(session: Session): Promise<User> {
   try {
     const { data: socialData, error: socialErr } = await supabase
       .from('profiles')
-      .select('discord, twitch, youtube, tiktok')
+      .select('discord, riot_id, twitch, youtube, tiktok')
       .eq('id', session.user.id)
       .maybeSingle();
     if (!socialErr && socialData) {
       if (socialData.discord) discord = socialData.discord;
+      if ((socialData as { riot_id?: string }).riot_id) riotId = (socialData as { riot_id?: string }).riot_id!;
       if (socialData.twitch) twitch = socialData.twitch;
       if (socialData.youtube) youtube = socialData.youtube;
       if (socialData.tiktok) tiktok = socialData.tiktok;
@@ -108,6 +112,7 @@ async function buildUser(session: Session): Promise<User> {
     avatarUrl,
     bio,
     discord,
+    riotId,
     twitch,
     youtube,
     tiktok,
@@ -252,6 +257,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const updateSocials = async (socials: {
     discord?: string | null;
+    riotId?: string | null;
     twitch?: string | null;
     youtube?: string | null;
     tiktok?: string | null;
@@ -280,6 +286,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         ? {
             ...prev,
             discord: result.socials.discord,
+            riotId: result.socials.riotId,
             twitch: result.socials.twitch,
             youtube: result.socials.youtube,
             tiktok: result.socials.tiktok,

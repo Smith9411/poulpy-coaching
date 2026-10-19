@@ -8,7 +8,7 @@ import { supabase } from '@/lib/supabase';
 import { useState, useRef, useEffect, useMemo } from 'react';
 import FavoriteGames from '@/components/FavoriteGames';
 import SocialLinks from '@/components/SocialLinks';
-import { CoachingBooking } from '@/components/booking/types';
+import { CoachingBooking, extractRiotIdFromBooking, cleanStudentAdminNotes } from '@/components/booking/types';
 import CyberNavbar from '@/components/CyberNavbar';
 import CyberFooter from '@/components/CyberFooter';
 
@@ -81,7 +81,7 @@ async function verifyImageMagicBytes(file: File): Promise<boolean> {
 }
 
 export default function Profile() {
-  const { user, logout, updateAvatar, updateUsername, updateBio, isLoading: authLoading } = useAuth();
+  const { user, logout, updateAvatar, updateUsername, updateBio, refreshUser, isLoading: authLoading } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [isEditingName, setIsEditingName] = useState(false);
@@ -111,9 +111,16 @@ export default function Profile() {
   const [selectedPackSlotId, setSelectedPackSlotId] = useState<string | null>(null);
   const [selectedPackTime, setSelectedPackTime] = useState<string>('');
   const [packGame, setPackGame] = useState<string>('Valorant');
+  const [packRiotId, setPackRiotId] = useState<string>('');
   const [packNotes, setPackNotes] = useState<string>('');
   const [isBookingPackSession, setIsBookingPackSession] = useState(false);
   const [packBookingError, setPackBookingError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user?.riotId && !packRiotId) {
+      setPackRiotId(user.riotId);
+    }
+  }, [user?.riotId, packRiotId]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const statusTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -230,6 +237,10 @@ export default function Profile() {
       setPackBookingError('Veuillez sélectionner un créneau horaire disponible.');
       return;
     }
+    if (!packRiotId.trim()) {
+      setPackBookingError('Ton Riot ID / Pseudo Apex est obligatoire pour que Poulpy puisse t\'ajouter en jeu.');
+      return;
+    }
     const currentDay = packDaysList[selectedPackDayIndex];
     if (!currentDay) return;
 
@@ -253,6 +264,7 @@ export default function Profile() {
           bookingDate: currentDay.dateIso,
           bookingTime: selectedPackTime,
           game: packGame,
+          riotId: packRiotId.trim(),
           notes: packNotes,
         }),
       });
@@ -267,6 +279,7 @@ export default function Profile() {
       setSelectedPackTime('');
       setSelectedPackSlotId(null);
       setPackNotes('');
+      refreshUser().catch(() => {});
       fetchPackSlots();
       loadBookings();
     } catch (err: unknown) {
@@ -566,9 +579,9 @@ export default function Profile() {
                   <>Nouvelle date retenue : <strong className="text-white">{new Date(alert.booking_date).toLocaleDateString('fr-FR')} à {alert.booking_time}</strong>.</>
                 )}
               </p>
-              {alert.admin_notes && (
+              {cleanStudentAdminNotes(alert.admin_notes) && (
                 <p className="text-[11px] italic text-white/50">
-                  Message du coach : &laquo; {alert.admin_notes} &raquo;
+                  Message du coach : &laquo; {cleanStudentAdminNotes(alert.admin_notes)} &raquo;
                 </p>
               )}
             </div>
@@ -962,8 +975,8 @@ export default function Profile() {
                       </div>
                     </div>
 
-                    {/* Game & Notes */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    {/* Game, Riot ID & Notes */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
                       <div>
                         <label className="text-[10px] text-white/70 block uppercase font-bold tracking-wider mb-1">
                           DISCIPLINE :
@@ -984,6 +997,19 @@ export default function Profile() {
 
                       <div>
                         <label className="text-[10px] text-white/70 block uppercase font-bold tracking-wider mb-1">
+                          RIOT ID / PSEUDO APEX <span className="text-[#CA1C30]">*</span> :
+                        </label>
+                        <input
+                          type="text"
+                          placeholder={packGame === 'Apex Legends' ? 'Ex: Poulpy_Apex' : 'Ex: Poulpy#EUW'}
+                          value={packRiotId}
+                          onChange={(e) => setPackRiotId(e.target.value)}
+                          className="w-full bg-black border border-[#CA1C30]/40 rounded-xl p-2.5 text-xs text-white placeholder-white/30 focus:border-[#CA1C30] focus:outline-none"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="text-[10px] text-white/70 block uppercase font-bold tracking-wider mb-1">
                           NOTES DU JOUEUR :
                         </label>
                         <input
@@ -992,8 +1018,7 @@ export default function Profile() {
                           value={packNotes}
                           onChange={(e) => setPackNotes(e.target.value)}
                           className="w-full bg-black border border-white/20 rounded-xl p-2.5 text-xs text-white placeholder-white/30 focus:border-[#CA1C30] focus:outline-none"
-                        >
-                        </input>
+                        />
                       </div>
                     </div>
 
@@ -1087,57 +1112,63 @@ export default function Profile() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {studentBookings.map((b) => (
-                    <div
-                      key={b.id}
-                      className="rounded-xl bg-black/40 border border-white/10 hover:border-white/20 transition-colors p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
-                    >
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="data-badge data-badge-laser text-[9px]">
-                            {b.plan_name}
-                          </span>
-                          <span
-                            className={`data-badge text-[9px] ${
-                              b.status === 'completed'
-                                ? 'border-white/20 bg-white/10 text-white/60'
-                                : b.status === 'rescheduled'
-                                ? 'data-badge-acid'
-                                : 'data-badge-laser'
-                            }`}
+                  {studentBookings.map((b) => {
+                    const bookingRiotId = extractRiotIdFromBooking(b) || user.riotId;
+                    return (
+                      <div
+                        key={b.id}
+                        className="rounded-xl bg-black/40 border border-white/10 hover:border-white/20 transition-colors p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3"
+                      >
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className="data-badge data-badge-laser text-[9px]">
+                              {b.plan_name}
+                            </span>
+                            <span
+                              className={`data-badge text-[9px] ${
+                                b.status === 'completed'
+                                  ? 'border-white/20 bg-white/10 text-white/60'
+                                  : b.status === 'rescheduled'
+                                  ? 'data-badge-acid'
+                                  : 'data-badge-laser'
+                              }`}
+                            >
+                              {b.status === 'completed' ? 'TERMINÉE' : b.status === 'rescheduled' ? 'REPORTÉE' : 'CONFIRMÉE'}
+                            </span>
+                          </div>
+
+                          <div className="text-sm font-bold text-white flex items-center gap-2">
+                            <Calendar size={14} className="text-[#00B4A0]" />
+                            <span>
+                              {new Date(b.booking_date).toLocaleDateString('fr-FR', {
+                                weekday: 'short',
+                                day: 'numeric',
+                                month: 'short',
+                              })}{' '}
+                              à {b.booking_time}
+                            </span>
+                          </div>
+                          <p className="text-xs text-white/60">
+                            {b.plan_duration} • Discipline : <span className="text-[#CA1C30] font-bold">{b.game}</span>
+                            {bookingRiotId && (
+                              <> • Pseudo jeu : <span className="text-[#00B4A0] font-bold">{bookingRiotId}</span></>
+                            )}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2 shrink-0">
+                          <a
+                            href="https://discord.gg/BC24FH4xpd"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1.5 rounded-lg bg-[#00B4A0]/10 hover:bg-[#00B4A0]/20 border border-[#00B4A0]/30 text-[#00B4A0] hover:text-white text-[11px] font-bold uppercase transition-colors"
                           >
-                            {b.status === 'completed' ? 'TERMINÉE' : b.status === 'rescheduled' ? 'REPORTÉE' : 'CONFIRMÉE'}
-                          </span>
+                            SALON DISCORD
+                          </a>
                         </div>
-
-                        <div className="text-sm font-bold text-white flex items-center gap-2">
-                          <Calendar size={14} className="text-[#00B4A0]" />
-                          <span>
-                            {new Date(b.booking_date).toLocaleDateString('fr-FR', {
-                              weekday: 'short',
-                              day: 'numeric',
-                              month: 'short',
-                            })}{' '}
-                            à {b.booking_time}
-                          </span>
-                        </div>
-                        <p className="text-xs text-white/60">
-                          {b.plan_duration} • Discipline : <span className="text-[#CA1C30] font-bold">{b.game}</span>
-                        </p>
                       </div>
-
-                      <div className="flex items-center gap-2 shrink-0">
-                        <a
-                          href="https://discord.gg/BC24FH4xpd"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-3 py-1.5 rounded-lg bg-[#00B4A0]/10 hover:bg-[#00B4A0]/20 border border-[#00B4A0]/30 text-[#00B4A0] hover:text-white text-[11px] font-bold uppercase transition-colors"
-                        >
-                          SALON DISCORD
-                        </a>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

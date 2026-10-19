@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
 
     const bookingsQuery = supabaseAdmin
       .from('coaching_bookings')
-      .select('user_id, student_email, student_discord, created_at')
+      .select('user_id, student_email, student_discord, admin_notes, created_at')
       .order('created_at', { ascending: false });
 
     const [authRes, profRes, bookingsRes] = await Promise.all([
@@ -84,17 +84,20 @@ export async function GET(req: NextRequest) {
       id: string;
       email?: string;
       created_at?: string;
-      user_metadata?: { username?: string; avatar_url?: string; discord?: string };
+      user_metadata?: { username?: string; avatar_url?: string; discord?: string; riot_id?: string; riotId?: string };
     }>;
 
     const bookingsList = ((bookingsRes as { data?: unknown[] })?.data || []) as Array<{
       user_id?: string | null;
       student_email?: string | null;
       student_discord?: string | null;
+      admin_notes?: string | null;
     }>;
 
     const discordByUserId = new Map<string, string>();
     const discordByEmail = new Map<string, string>();
+    const riotIdByUserId = new Map<string, string>();
+    const riotIdByEmail = new Map<string, string>();
 
     for (const b of bookingsList) {
       if (b.user_id && b.student_discord && !discordByUserId.has(b.user_id)) {
@@ -104,6 +107,19 @@ export async function GET(req: NextRequest) {
         const em = b.student_email.trim().toLowerCase();
         if (!discordByEmail.has(em)) {
           discordByEmail.set(em, b.student_discord.trim());
+        }
+      }
+      const matchRiot = typeof b.admin_notes === 'string' ? b.admin_notes.match(/\[riot_id:([^\]]+)\]/i) : null;
+      const rId = matchRiot && matchRiot[1] ? matchRiot[1].trim() : '';
+      if (rId) {
+        if (b.user_id && !riotIdByUserId.has(b.user_id)) {
+          riotIdByUserId.set(b.user_id, rId);
+        }
+        if (b.student_email) {
+          const em = b.student_email.trim().toLowerCase();
+          if (!riotIdByEmail.has(em)) {
+            riotIdByEmail.set(em, rId);
+          }
         }
       }
     }
@@ -119,6 +135,7 @@ export async function GET(req: NextRequest) {
       apex_rank?: string | null;
       bio?: string | null;
       discord?: string | null;
+      riot_id?: string | null;
       twitch?: string | null;
       youtube?: string | null;
       tiktok?: string | null;
@@ -149,6 +166,13 @@ export async function GET(req: NextRequest) {
         discordByUserId.get(id) ||
         (userEmail ? discordByEmail.get(userEmail) : null) ||
         null;
+      const riotId =
+        p?.riot_id ||
+        meta.riot_id ||
+        meta.riotId ||
+        riotIdByUserId.get(id) ||
+        (userEmail ? riotIdByEmail.get(userEmail) : null) ||
+        null;
       const twitch = p?.twitch || meta.twitch || null;
       const youtube = p?.youtube || meta.youtube || null;
       const tiktok = p?.tiktok || meta.tiktok || null;
@@ -167,6 +191,7 @@ export async function GET(req: NextRequest) {
         apexRank: p?.apex_rank || null,
         bio,
         discord,
+        riotId,
         twitch,
         youtube,
         tiktok,
@@ -187,7 +212,7 @@ export async function PATCH(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { userId, username, isAdmin, inCoaching, discord, twitch, youtube, tiktok } = body;
+    const { userId, username, isAdmin, inCoaching, discord, riotId, twitch, youtube, tiktok } = body;
 
     if (!userId) {
       return NextResponse.json({ error: 'userId manquant' }, { status: 400 });
@@ -215,7 +240,11 @@ export async function PATCH(req: NextRequest) {
     }
 
     const hasSocialUpdates =
-      discord !== undefined || twitch !== undefined || youtube !== undefined || tiktok !== undefined;
+      discord !== undefined ||
+      riotId !== undefined ||
+      twitch !== undefined ||
+      youtube !== undefined ||
+      tiktok !== undefined;
 
     if (Object.keys(updates).length === 0 && !hasSocialUpdates) {
       return NextResponse.json({ error: 'Aucune modification fournie' }, { status: 400 });
@@ -241,6 +270,7 @@ export async function PATCH(req: NextRequest) {
       const newMeta = { ...existingMeta };
 
       if (discord !== undefined) newMeta.discord = discord ? String(discord).trim() : null;
+      if (riotId !== undefined) newMeta.riot_id = riotId ? String(riotId).trim() : null;
       if (twitch !== undefined) newMeta.twitch = twitch ? String(twitch).trim() : null;
       if (youtube !== undefined) newMeta.youtube = youtube ? String(youtube).trim() : null;
       if (tiktok !== undefined) newMeta.tiktok = tiktok ? String(tiktok).trim() : null;
@@ -255,6 +285,7 @@ export async function PATCH(req: NextRequest) {
       try {
         const profSocialUpdates: Record<string, string | null> = {};
         if (discord !== undefined) profSocialUpdates.discord = discord ? String(discord).trim() : null;
+        if (riotId !== undefined) profSocialUpdates.riot_id = riotId ? String(riotId).trim() : null;
         if (twitch !== undefined) profSocialUpdates.twitch = twitch ? String(twitch).trim() : null;
         if (youtube !== undefined) profSocialUpdates.youtube = youtube ? String(youtube).trim() : null;
         if (tiktok !== undefined) profSocialUpdates.tiktok = tiktok ? String(tiktok).trim() : null;

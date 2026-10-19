@@ -33,6 +33,7 @@ export async function POST(req: NextRequest) {
       studentName,
       studentEmail,
       studentDiscord,
+      riotId,
       game,
       notes,
     } = body;
@@ -43,6 +44,12 @@ export async function POST(req: NextRequest) {
     }
     if (!studentName?.trim() || !studentEmail?.trim() || !studentDiscord?.trim()) {
       return NextResponse.json({ error: 'Nom, email et pseudo Discord obligatoires.' }, { status: 400 });
+    }
+    if (!riotId?.trim()) {
+      return NextResponse.json(
+        { error: 'Riot ID / Pseudo Apex obligatoire pour que Poulpy puisse t\'ajouter en jeu en avance.' },
+        { status: 400 }
+      );
     }
     if (!planId || !planName) {
       return NextResponse.json({ error: 'Formule de coaching requise.' }, { status: 400 });
@@ -70,6 +77,21 @@ export async function POST(req: NextRequest) {
     }
 
     const userId = authData.user.id;
+    const cleanRiotId = riotId.trim();
+
+    // Sauvegarder automatiquement le Riot ID / Pseudo Apex (et Discord) sur le profil du joueur
+    try {
+      const existingMeta = authData.user.user_metadata || {};
+      await supabase.auth.admin.updateUserById(userId, {
+        user_metadata: {
+          ...existingMeta,
+          riot_id: cleanRiotId,
+          discord: existingMeta.discord || studentDiscord.trim(),
+        },
+      });
+    } catch (metaErr) {
+      console.warn('Update user_metadata riot_id warning:', metaErr);
+    }
 
     // 2. Vérification anti-double-réservation sur la même date et heure dans coaching_bookings
     const { data: activeDuplicate } = await supabase
@@ -240,6 +262,7 @@ export async function POST(req: NextRequest) {
             studentName: studentName.trim(),
             studentEmail: studentEmail.trim().toLowerCase(),
             studentDiscord: studentDiscord.trim(),
+            riotId: cleanRiotId,
             game: game || 'Valorant',
             notes: notes?.trim() || '',
           },
@@ -293,6 +316,7 @@ export async function POST(req: NextRequest) {
         student_discord: studentDiscord.trim(),
         game: game || 'Valorant',
         notes: notes?.trim() || null,
+        admin_notes: `[riot_id:${cleanRiotId}]`,
         status: 'confirmed',
         read_by_admin: false,
       })

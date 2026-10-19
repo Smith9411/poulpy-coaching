@@ -73,8 +73,10 @@ export default function BookingConfirmation({
               <Gamepad2 size={16} />
             </div>
             <div className="min-w-0">
-              <div className="font-bold text-white text-xs truncate uppercase tracking-wider">{formData.game}</div>
-              <div className="text-[11px] text-white/50">Jeu sélectionné</div>
+              <div className="font-bold text-white text-xs truncate uppercase tracking-wider">
+                {formData.game}{formData.riotId ? ` • ${formData.riotId}` : ''}
+              </div>
+              <div className="text-[11px] text-white/50">Jeu & Riot ID / Pseudo Apex</div>
             </div>
           </div>
 

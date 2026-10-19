@@ -36,6 +36,7 @@ interface StudentProfile {
   valorantRank?: string | null;
   apexRank?: string | null;
   discord?: string | null;
+  riotId?: string | null;
   twitch?: string | null;
   youtube?: string | null;
   tiktok?: string | null;
@@ -119,6 +120,7 @@ export default function StudentCoachingPage() {
         valorantRank: profile.valorantRank,
         apexRank: profile.apexRank,
         discord: profile.discord,
+        riotId: profile.riotId,
         twitch: profile.twitch,
         youtube: profile.youtube,
         tiktok: profile.tiktok,
@@ -617,6 +619,7 @@ export default function StudentCoachingPage() {
               <SocialLinks
                 socials={{
                   discord: student.discord,
+                  riotId: student.riotId,
                   twitch: student.twitch,
                   youtube: student.youtube,
                   tiktok: student.tiktok,

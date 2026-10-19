@@ -34,7 +34,8 @@ export default function BookingFormStep({
   const [formData, setFormData] = useState<BookingFormData>({
     name: user?.username || '',
     email: user?.email || '',
-    discord: '',
+    discord: user?.discord || '',
+    riotId: user?.riotId || '',
     game: 'Valorant',
     notes: '',
   });
@@ -48,6 +49,8 @@ export default function BookingFormStep({
         ...prev,
         name: prev.name || user.username || '',
         email: prev.email || user.email || '',
+        discord: prev.discord || user.discord || '',
+        riotId: prev.riotId || user.riotId || '',
       }));
     }
   }, [user]);
@@ -68,6 +71,10 @@ export default function BookingFormStep({
     }
     if (!formData.discord.trim()) {
       setError('Ton pseudo Discord est obligatoire pour que Poulpy te contacte.');
+      return;
+    }
+    if (!formData.riotId?.trim()) {
+      setError('Ton Riot ID / Pseudo Apex est obligatoire pour que Poulpy puisse t\'ajouter en jeu en avance.');
       return;
     }
 
@@ -108,6 +115,7 @@ export default function BookingFormStep({
           studentName: formData.name,
           studentEmail: formData.email,
           studentDiscord: formData.discord,
+          riotId: formData.riotId?.trim(),
           game: formData.game,
           notes: formData.notes,
         }),
@@ -207,26 +215,45 @@ export default function BookingFormStep({
           </div>
         </div>
 
-        {/* Discord handle */}
-        <div>
-          <label className="block text-xs font-semibold text-gray-300 mb-1.5">
-            Pseudo Discord <span className="text-cyan-400">*</span> (Ex: poulpy_off)
-          </label>
-          <div className="relative">
-            <MessageSquare size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-400" />
-            <input
-              type="text"
-              required
-              value={formData.discord}
-              onChange={(e) => setFormData({ ...formData, discord: e.target.value })}
-              placeholder="Ton identifiant Discord pour l'invitation vocale"
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-cyan-400 transition-colors"
-            />
+        {/* Discord & Riot ID / Apex Tag */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+              Pseudo Discord <span className="text-cyan-400">*</span> (Ex: poulpy_off)
+            </label>
+            <div className="relative">
+              <MessageSquare size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-400" />
+              <input
+                type="text"
+                required
+                value={formData.discord}
+                onChange={(e) => setFormData({ ...formData, discord: e.target.value })}
+                placeholder="Ton identifiant Discord"
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-cyan-400 transition-colors"
+              />
+            </div>
           </div>
-          <span className="text-[11px] text-gray-400 mt-1 block">
-            Poulpy t'ajoutera pour la session vocale et le suivi personnalisé.
-          </span>
+
+          <div>
+            <label className="block text-xs font-semibold text-gray-300 mb-1.5">
+              Riot ID / Pseudo Apex <span className="text-purple-400">*</span>
+            </label>
+            <div className="relative">
+              <Gamepad2 size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-purple-400" />
+              <input
+                type="text"
+                required
+                value={formData.riotId || ''}
+                onChange={(e) => setFormData({ ...formData, riotId: e.target.value })}
+                placeholder={formData.game === 'Apex Legends' ? 'Ex: Poulpy_Apex' : 'Ex: Poulpy#EUW'}
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-purple-500 transition-colors"
+              />
+            </div>
+          </div>
         </div>
+        <span className="text-[11px] text-gray-400 -mt-3 block">
+          Poulpy t&apos;ajoutera sur Discord et en jeu en avance pour préparer ta session.
+        </span>
 
         {/* Game selection */}
         <div>

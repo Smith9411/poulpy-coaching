@@ -4,7 +4,7 @@ import Link from 'next/link';
 import {
   Shield, ArrowLeft, User, Search, MessageSquare, RefreshCw,
   Loader2, Mail, Calendar, Bell, Film, Sparkles, FileText, CheckCircle2,
-  Clock, Check, Copy
+  Clock, Check, Copy, Crosshair
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -15,6 +15,7 @@ interface StudentRow {
   username: string;
   email: string;
   discord?: string | null;
+  riotId?: string | null;
   isAdmin: boolean;
   inCoaching: boolean;
   createdAt: string;
@@ -31,6 +32,7 @@ export default function AdminCoaching() {
   const [activeTab, setActiveTab] = useState<'active' | 'history'>('active');
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [copiedDiscordId, setCopiedDiscordId] = useState<string | null>(null);
+  const [copiedRiotId, setCopiedRiotId] = useState<string | null>(null);
   const [successNotice, setSuccessNotice] = useState<string>('');
   const [error, setError] = useState('');
 
@@ -72,11 +74,13 @@ export default function AdminCoaching() {
         initial: string;
         inCoaching?: boolean;
         discord?: string | null;
+        riotId?: string | null;
       }) => ({
         id: p.id,
         username: p.username,
         email: p.email,
         discord: p.discord || null,
+        riotId: p.riotId || null,
         isAdmin: false,
         inCoaching: p.inCoaching === true,
         createdAt: p.createdAt,
@@ -156,7 +160,8 @@ export default function AdminCoaching() {
       .filter(student =>
         student.username.toLowerCase().includes(q) ||
         student.email.toLowerCase().includes(q) ||
-        (student.discord && student.discord.toLowerCase().includes(q))
+        (student.discord && student.discord.toLowerCase().includes(q)) ||
+        (student.riotId && student.riotId.toLowerCase().includes(q))
       )
       .sort((a, b) => {
         if (b.unreadCount !== a.unreadCount) return b.unreadCount - a.unreadCount;
@@ -264,6 +269,28 @@ export default function AdminCoaching() {
                     <MessageSquare size={11} className="shrink-0" />
                     <span>Discord</span>
                     {copiedDiscordId === student.id ? (
+                      <Check size={11} className="text-emerald-400" />
+                    ) : (
+                      <Copy size={10} className="opacity-70" />
+                    )}
+                  </button>
+                )}
+                {student.riotId && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      navigator.clipboard.writeText(student.riotId!);
+                      setCopiedRiotId(student.id);
+                      setTimeout(() => setCopiedRiotId(null), 2000);
+                    }}
+                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-mono font-semibold bg-[#CA1C30]/15 border border-[#CA1C30]/35 text-[#CA1C30] hover:bg-[#CA1C30]/30 hover:text-white transition-colors cursor-pointer"
+                    title={`Copier le Riot ID / Pseudo Apex : ${student.riotId}`}
+                  >
+                    <Crosshair size={11} className="shrink-0" />
+                    <span className="max-w-[140px] truncate">{student.riotId}</span>
+                    {copiedRiotId === student.id ? (
                       <Check size={11} className="text-emerald-400" />
                     ) : (
                       <Copy size={10} className="opacity-70" />

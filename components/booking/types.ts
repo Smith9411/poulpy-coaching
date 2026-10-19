@@ -28,6 +28,7 @@ export interface BookingFormData {
   name: string;
   email: string;
   discord: string;
+  riotId?: string;
   game: string;
   notes?: string;
 }
@@ -54,6 +55,7 @@ export interface CoachingBooking {
   student_name: string;
   student_email: string;
   student_discord: string;
+  riot_id?: string | null;
   game: string;
   notes?: string | null;
   status: 'confirmed' | 'completed' | 'rescheduled' | 'cancelled';
@@ -62,4 +64,29 @@ export interface CoachingBooking {
   created_at: string;
   updated_at?: string;
 }
+
+export function extractRiotIdFromBooking(b?: {
+  riot_id?: string | null;
+  admin_notes?: string | null;
+} | null): string | null {
+  if (!b) return null;
+  if (b.riot_id && b.riot_id.trim()) return b.riot_id.trim();
+  if (b.admin_notes) {
+    const match = b.admin_notes.match(/\[riot_id:([^\]]+)\]/i);
+    if (match?.[1]?.trim()) return match[1].trim();
+  }
+  return null;
+}
+
+export function cleanStudentAdminNotes(notes?: string | null): string | null {
+  if (!notes) return null;
+  const cleaned = notes
+    .replace(/\s*\[riot_id:[^\]]+\]/gi, '')
+    .replace(/\s*\[stripe_session:[^\]]+\]/gi, '')
+    .replace(/\s*\[reminder_2h_sent\]/gi, '')
+    .replace(/\s*\[reminder_email_id:[^\]]+\]/gi, '')
+    .trim();
+  return cleaned || null;
+}
+
 

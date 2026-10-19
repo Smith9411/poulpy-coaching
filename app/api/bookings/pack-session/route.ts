@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
     const userEmail = authData.user.email?.toLowerCase();
 
     const body = await req.json();
-    const { slotId, bookingDate, bookingTime, game, notes, discord } = body;
+    const { slotId, bookingDate, bookingTime, game, notes, discord, riotId } = body;
 
     if (!bookingDate || !bookingTime) {
       return NextResponse.json({ error: 'Date et heure requises.' }, { status: 400 });
@@ -137,6 +137,26 @@ export async function POST(req: NextRequest) {
       .select('username, email')
       .eq('id', userId)
       .maybeSingle();
+
+    const existingMeta = authData.user.user_metadata || {};
+    const cleanRiotId = String(riotId || existingMeta.riot_id || existingMeta.riotId || '').trim();
+    if (!cleanRiotId) {
+      return NextResponse.json(
+        { error: 'Riot ID / Pseudo Apex obligatoire pour que Poulpy puisse t\'ajouter en jeu.' },
+        { status: 400 }
+      );
+    }
+
+    try {
+      await supabase.auth.admin.updateUserById(userId, {
+        user_metadata: {
+          ...existingMeta,
+          riot_id: cleanRiotId,
+        },
+      });
+    } catch (metaErr) {
+      console.warn('Update user_metadata riot_id in pack-session warning:', metaErr);
+    }
 
     const studentName = profile?.username || packSummary.latestBooking?.student_name || 'Élève';
     const studentDiscord = discord?.trim() || packSummary.latestBooking?.student_discord || studentName;
@@ -202,6 +222,7 @@ export async function POST(req: NextRequest) {
         student_discord: studentDiscord,
         game: selectedGame,
         notes: notes?.trim() || `Séance ${sessionNumber}/${packSummary.totalSessions} issue du ${packSummary.packName}`,
+        admin_notes: `[riot_id:${cleanRiotId}]`,
         status: 'confirmed',
         read_by_admin: false,
       })

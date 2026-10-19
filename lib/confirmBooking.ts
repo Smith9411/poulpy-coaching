@@ -62,6 +62,7 @@ export async function confirmStripeBooking(sessionId: string) {
       studentName,
       studentEmail,
       studentDiscord,
+      riotId,
       game,
       notes,
     } = meta;
@@ -73,6 +74,9 @@ export async function confirmStripeBooking(sessionId: string) {
     const amountStr = session.amount_total
       ? `${(session.amount_total / 100).toFixed(0)} €`
       : (planPrice || '0 €');
+
+    const cleanRiotId = riotId?.trim() || '';
+    const riotTagMarker = cleanRiotId ? ` [riot_id:${cleanRiotId}]` : '';
 
     // 3. Insertion officielle dans coaching_bookings
     const { data: newBooking, error: bookingErr } = await supabase
@@ -92,7 +96,7 @@ export async function confirmStripeBooking(sessionId: string) {
         game: game || 'Valorant',
         notes: notes?.trim() || null,
         status: 'confirmed',
-        admin_notes: `Paiement Stripe validé (${amountStr}) [stripe_session:${sessionId}]`,
+        admin_notes: `Paiement Stripe validé (${amountStr}) [stripe_session:${sessionId}]${riotTagMarker}`,
         read_by_admin: false,
       })
       .select()
@@ -101,6 +105,22 @@ export async function confirmStripeBooking(sessionId: string) {
     if (bookingErr || !newBooking) {
       console.error('Erreur insertion réservation confirmée Stripe:', bookingErr);
       return { error: 'Erreur lors de l\'enregistrement de la réservation.' };
+    }
+
+    if (userId && cleanRiotId) {
+      try {
+        const { data: targetUser } = await supabase.auth.admin.getUserById(userId);
+        const existingMeta = targetUser?.user?.user_metadata || {};
+        await supabase.auth.admin.updateUserById(userId, {
+          user_metadata: {
+            ...existingMeta,
+            riot_id: cleanRiotId,
+            discord: existingMeta.discord || studentDiscord?.trim() || null,
+          },
+        });
+      } catch (metaErr) {
+        console.warn('Update user_metadata riot_id after Stripe warning:', metaErr);
+      }
     }
 
     // 4. Verrouillage du créneau (is_booked = true)

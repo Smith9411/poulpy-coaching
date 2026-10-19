@@ -49,35 +49,36 @@ export async function GET(req: NextRequest) {
 
     // 1. Try reading from profiles
     let discord: string | null = null;
+    let riotId: string | null = null;
     let twitch: string | null = null;
     let youtube: string | null = null;
     let tiktok: string | null = null;
 
     const { data: profile, error: profError } = await supabaseAdmin
       .from('profiles')
-      .select('discord, twitch, youtube, tiktok')
+      .select('discord, riot_id, twitch, youtube, tiktok')
       .eq('id', userId)
       .maybeSingle();
 
     if (!profError && profile) {
       discord = profile.discord || null;
+      riotId = (profile as { riot_id?: string }).riot_id || null;
       twitch = profile.twitch || null;
       youtube = profile.youtube || null;
       tiktok = profile.tiktok || null;
     }
 
     // 2. Fallback to auth metadata if profile columns are empty
-    if (!discord && !twitch && !youtube && !tiktok) {
-      const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(userId);
-      const meta = authUser?.user?.user_metadata || {};
-      discord = meta.discord || null;
-      twitch = meta.twitch || null;
-      youtube = meta.youtube || null;
-      tiktok = meta.tiktok || null;
-    }
+    const { data: authUser } = await supabaseAdmin.auth.admin.getUserById(userId);
+    const meta = authUser?.user?.user_metadata || {};
+    if (!discord) discord = meta.discord || null;
+    if (!riotId) riotId = meta.riot_id || meta.riotId || null;
+    if (!twitch) twitch = meta.twitch || null;
+    if (!youtube) youtube = meta.youtube || null;
+    if (!tiktok) tiktok = meta.tiktok || null;
 
     return NextResponse.json({
-      socials: { discord, twitch, youtube, tiktok },
+      socials: { discord, riotId, twitch, youtube, tiktok },
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Erreur récupération réseaux';
@@ -99,6 +100,7 @@ export async function POST(req: NextRequest) {
 
     const body = await req.json();
     const discord = cleanHandle(body.discord);
+    const riotId = cleanHandle(body.riotId ?? body.riot_id);
     const twitch = cleanHandle(body.twitch);
     const youtube = cleanHandle(body.youtube);
     const tiktok = cleanHandle(body.tiktok);
@@ -108,6 +110,7 @@ export async function POST(req: NextRequest) {
       user_metadata: {
         ...user.user_metadata,
         discord,
+        riot_id: riotId,
         twitch,
         youtube,
         tiktok,
@@ -120,6 +123,7 @@ export async function POST(req: NextRequest) {
         .from('profiles')
         .update({
           discord,
+          riot_id: riotId,
           twitch,
           youtube,
           tiktok,
@@ -131,7 +135,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      socials: { discord, twitch, youtube, tiktok },
+      socials: { discord, riotId, twitch, youtube, tiktok },
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Erreur sauvegarde réseaux';

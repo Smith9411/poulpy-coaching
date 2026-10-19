@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, Copy, Edit2, ExternalLink, Globe, Loader2, X } from 'lucide-react';
+import { Check, Copy, Crosshair, Edit2, ExternalLink, Globe, Loader2, X } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 export interface SocialLinksData {
   discord?: string | null;
+  riotId?: string | null;
   twitch?: string | null;
   youtube?: string | null;
   tiktok?: string | null;
@@ -64,7 +65,7 @@ export function formatSocialUrl(platform: 'twitch' | 'youtube' | 'tiktok', val: 
   return trimmed;
 }
 
-export function formatSocialDisplay(platform: 'discord' | 'twitch' | 'youtube' | 'tiktok', val: string): string {
+export function formatSocialDisplay(platform: 'discord' | 'riotId' | 'twitch' | 'youtube' | 'tiktok', val: string): string {
   const trimmed = val.trim();
   if (platform === 'twitch') {
     return trimmed.replace(/^https?:\/\/(www\.)?twitch\.tv\//i, '').replace(/^@/, '');
@@ -100,6 +101,7 @@ export default function SocialLinks({
   // Active data source: passed prop or current logged user
   const currentSocials: SocialLinksData = initialSocials || {
     discord: user?.discord || null,
+    riotId: user?.riotId || null,
     twitch: user?.twitch || null,
     youtube: user?.youtube || null,
     tiktok: user?.tiktok || null,
@@ -107,6 +109,7 @@ export default function SocialLinks({
 
   const [draft, setDraft] = useState<SocialLinksData>({
     discord: currentSocials.discord || '',
+    riotId: currentSocials.riotId || '',
     twitch: currentSocials.twitch || '',
     youtube: currentSocials.youtube || '',
     tiktok: currentSocials.tiktok || '',
@@ -118,9 +121,16 @@ export default function SocialLinks({
     setTimeout(() => setCopiedField(null), 2000);
   };
 
+  const handleCopyRiotId = (tag: string) => {
+    navigator.clipboard.writeText(tag);
+    setCopiedField('riotId');
+    setTimeout(() => setCopiedField(null), 2000);
+  };
+
   const handleOpenEdit = () => {
     setDraft({
       discord: currentSocials.discord || '',
+      riotId: currentSocials.riotId || '',
       twitch: currentSocials.twitch || '',
       youtube: currentSocials.youtube || '',
       tiktok: currentSocials.tiktok || '',
@@ -133,6 +143,7 @@ export default function SocialLinks({
     try {
       await updateSocials({
         discord: draft.discord?.trim() || null,
+        riotId: draft.riotId?.trim() || null,
         twitch: draft.twitch?.trim() || null,
         youtube: draft.youtube?.trim() || null,
         tiktok: draft.tiktok?.trim() || null,
@@ -148,6 +159,7 @@ export default function SocialLinks({
 
   const hasAnySocial =
     Boolean(currentSocials.discord?.trim()) ||
+    Boolean(currentSocials.riotId?.trim()) ||
     Boolean(currentSocials.twitch?.trim()) ||
     Boolean(currentSocials.youtube?.trim()) ||
     Boolean(currentSocials.tiktok?.trim());
@@ -172,6 +184,23 @@ export default function SocialLinks({
             <DiscordIcon className="w-3.5 h-3.5" />
             <span>{currentSocials.discord}</span>
             {copiedField === 'discord' ? (
+              <Check size={12} className="text-green-400" />
+            ) : (
+              <Copy size={11} className="opacity-60" />
+            )}
+          </button>
+        )}
+
+        {currentSocials.riotId && (
+          <button
+            type="button"
+            onClick={() => handleCopyRiotId(currentSocials.riotId!)}
+            title="Cliquer pour copier le Riot ID / Pseudo Apex"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#CA1C30]/15 hover:bg-[#CA1C30]/25 text-[#CA1C30] border border-[#CA1C30]/30 text-xs font-mono font-medium transition-colors"
+          >
+            <Crosshair size={13} />
+            <span>{currentSocials.riotId}</span>
+            {copiedField === 'riotId' ? (
               <Check size={12} className="text-green-400" />
             ) : (
               <Copy size={11} className="opacity-60" />
@@ -270,6 +299,21 @@ export default function SocialLinks({
               />
             </div>
 
+            {/* Riot ID / Apex Tag */}
+            <div>
+              <label className="block text-[11px] font-bold text-white/70 mb-1 flex items-center gap-1.5 uppercase">
+                <span className="text-[#CA1C30]"><Crosshair className="w-3.5 h-3.5" /></span>
+                <span>Riot ID / Pseudo Apex</span>
+              </label>
+              <input
+                type="text"
+                value={draft.riotId || ''}
+                onChange={(e) => setDraft({ ...draft, riotId: e.target.value })}
+                placeholder="Ex: Poulpy#EUW ou Poulpy_Apex"
+                className="w-full px-3 py-2 bg-black border border-white/20 text-white placeholder-white/30 text-xs focus:outline-none focus:border-[#CA1C30] transition-colors"
+              />
+            </div>
+
             {/* Twitch */}
             <div>
               <label className="block text-[11px] font-bold text-white/70 mb-1 flex items-center gap-1.5 uppercase">
@@ -301,7 +345,7 @@ export default function SocialLinks({
             </div>
 
             {/* TikTok */}
-            <div>
+            <div className="sm:col-span-2">
               <label className="block text-[11px] font-bold text-white/70 mb-1 flex items-center gap-1.5 uppercase">
                 <span className="text-[#00B4A0]"><TiktokIcon className="w-3.5 h-3.5" /></span>
                 <span>TikTok</span>
@@ -360,6 +404,40 @@ export default function SocialLinks({
               </div>
               <span className="text-[11px] text-[#7289da] font-bold flex items-center gap-1 flex-shrink-0 pl-2">
                 {copiedField === 'discord' ? (
+                  <>
+                    <Check size={13} className="text-[#00B4A0]" />
+                    <span className="text-[#00B4A0]">Copié !</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy size={12} className="opacity-60 group-hover:opacity-100" />
+                    <span className="hidden sm:inline">Copier</span>
+                  </>
+                )}
+              </span>
+            </button>
+          ) : null}
+
+          {/* Riot ID / Apex Tag Badge */}
+          {currentSocials.riotId ? (
+            <button
+              type="button"
+              onClick={() => handleCopyRiotId(currentSocials.riotId!)}
+              className="flex items-center justify-between p-3 border border-[#CA1C30]/35 bg-[#CA1C30]/10 hover:bg-[#CA1C30]/15 text-left transition-all group cursor-pointer"
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 bg-[#CA1C30]/20 flex items-center justify-center text-[#CA1C30] flex-shrink-0">
+                  <Crosshair className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <span className="text-[10px] text-white/50 block uppercase font-bold tracking-wider">Riot ID / Pseudo Apex</span>
+                  <span className="text-xs sm:text-sm font-bold text-white truncate block">
+                    {currentSocials.riotId}
+                  </span>
+                </div>
+              </div>
+              <span className="text-[11px] text-[#CA1C30] font-bold flex items-center gap-1 flex-shrink-0 pl-2">
+                {copiedField === 'riotId' ? (
                   <>
                     <Check size={13} className="text-[#00B4A0]" />
                     <span className="text-[#00B4A0]">Copié !</span>

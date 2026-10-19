@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Shield, ArrowLeft, User, Search, ShieldOff, ShieldCheck, AlertTriangle, Trash2, RefreshCw, Edit2, Check, X, Loader2, ImageOff, Mail, Sparkles, Share2, ChevronDown, ExternalLink } from 'lucide-react';
+import { Shield, ArrowLeft, User, Search, ShieldOff, ShieldCheck, AlertTriangle, Trash2, RefreshCw, Edit2, Check, X, Loader2, ImageOff, Mail, Sparkles, Share2, ChevronDown, ExternalLink, Crosshair, Copy } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { useState, useEffect, useCallback, useMemo, useRef, Fragment } from 'react';
@@ -17,6 +17,7 @@ interface UserRow {
   avatarUrl?: string | null;
   initial: string;
   discord?: string | null;
+  riotId?: string | null;
   twitch?: string | null;
   youtube?: string | null;
   tiktok?: string | null;
@@ -93,6 +94,7 @@ export default function AdminUsers() {
               avatarUrl: null,
               initial: name.charAt(0).toUpperCase(),
               discord: p.discord || null,
+              riotId: p.riot_id || null,
               twitch: p.twitch || null,
               youtube: p.youtube || null,
               tiktok: p.tiktok || null,
@@ -286,7 +288,7 @@ export default function AdminUsers() {
     });
   };
 
-  const handleRemoveSocial = async (u: UserRow, platform: 'discord' | 'twitch' | 'youtube' | 'tiktok') => {
+  const handleRemoveSocial = async (u: UserRow, platform: 'discord' | 'riotId' | 'twitch' | 'youtube' | 'tiktok') => {
     const actionKey = `${u.id}-${platform}`;
     setRemovingSocialKey(actionKey);
     setLoadError('');
@@ -323,6 +325,7 @@ export default function AdminUsers() {
 
       const labels: Record<string, string> = {
         discord: 'Discord',
+        riotId: 'Riot ID / Pseudo Apex',
         twitch: 'Twitch',
         youtube: 'YouTube',
         tiktok: 'TikTok',
@@ -501,7 +504,7 @@ export default function AdminUsers() {
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {filteredUsers.map((u) => {
-                    const socialCount = [u.discord, u.twitch, u.youtube, u.tiktok].filter(Boolean).length;
+                    const socialCount = [u.discord, u.riotId, u.twitch, u.youtube, u.tiktok].filter(Boolean).length;
                     const isExpanded = expandedSocials.has(u.id);
 
                     return (
@@ -751,12 +754,57 @@ export default function AdminUsers() {
                                           <span className="text-gray-200 font-mono font-medium">{u.discord}</span>
                                           <button
                                             type="button"
+                                            onClick={() => {
+                                              navigator.clipboard.writeText(u.discord!);
+                                              showSuccess(`Discord de ${u.username} copié !`);
+                                            }}
+                                            title="Copier le pseudo Discord"
+                                            className="p-1 rounded hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                                          >
+                                            <Copy size={11} />
+                                          </button>
+                                          <button
+                                            type="button"
                                             onClick={() => handleRemoveSocial(u, 'discord')}
                                             disabled={removingSocialKey === `${u.id}-discord`}
                                             title="Retirer ce compte Discord"
-                                            className="ml-1 p-1 rounded hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors disabled:opacity-40"
+                                            className="ml-0.5 p-1 rounded hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors disabled:opacity-40"
                                           >
                                             {removingSocialKey === `${u.id}-discord` ? (
+                                              <Loader2 size={12} className="animate-spin text-red-400" />
+                                            ) : (
+                                              <Trash2 size={12} />
+                                            )}
+                                          </button>
+                                        </div>
+                                      )}
+
+                                      {/* Riot ID / Pseudo Apex */}
+                                      {u.riotId && (
+                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#CA1C30]/15 border border-[#CA1C30]/35 text-xs">
+                                          <span className="text-[#CA1C30] flex items-center">
+                                            <Crosshair size={13} />
+                                          </span>
+                                          <span className="text-gray-200 font-mono font-bold">{u.riotId}</span>
+                                          <button
+                                            type="button"
+                                            onClick={() => {
+                                              navigator.clipboard.writeText(u.riotId!);
+                                              showSuccess(`Riot ID / Pseudo de ${u.username} copié !`);
+                                            }}
+                                            title="Copier le Riot ID / Pseudo Apex"
+                                            className="p-1 rounded hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+                                          >
+                                            <Copy size={11} />
+                                          </button>
+                                          <button
+                                            type="button"
+                                            onClick={() => handleRemoveSocial(u, 'riotId')}
+                                            disabled={removingSocialKey === `${u.id}-riotId`}
+                                            title="Retirer ce Riot ID / Pseudo Apex"
+                                            className="ml-0.5 p-1 rounded hover:bg-red-500/20 text-gray-400 hover:text-red-400 transition-colors disabled:opacity-40"
+                                          >
+                                            {removingSocialKey === `${u.id}-riotId` ? (
                                               <Loader2 size={12} className="animate-spin text-red-400" />
                                             ) : (
                                               <Trash2 size={12} />
