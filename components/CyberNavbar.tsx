@@ -40,7 +40,7 @@ export default function CyberNavbar({
   const isHomePage = pathname === "/";
 
   const { user, logout } = useAuth();
-  const [scrolled, setScrolled] = useState(!isHomePage);
+  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -55,7 +55,7 @@ export default function CyberNavbar({
 
     const handleScroll = () => {
       // Solid/blur background active as soon as scrolling starts (> 30px), or always solid on subpages
-      const isScrolled = isHomePage ? window.scrollY > 30 : true;
+      const isScrolled = window.scrollY > 30;
       setScrolled(isScrolled);
 
       if (!isHomePage || window.scrollY < 120) {
@@ -218,9 +218,18 @@ export default function CyberNavbar({
       >
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex items-center justify-between gap-2 xl:gap-4 flex-nowrap">
           {/* Typographic Brand Logo */}
-          <a
-            href="#hero"
-            onClick={(e) => handleNavClick(e, "#hero")}
+          <Link
+            href="/"
+            onClick={(e) => {
+              if (isHomePage) {
+                e.preventDefault();
+                gsap.to(window, {
+                  scrollTo: { y: 0, autoKill: false },
+                  duration: 1.2,
+                  ease: "power3.inOut",
+                });
+              }
+            }}
             className="flex items-center gap-3 group flex-shrink-0"
           >
             <div className="flex items-center gap-2 font-mono">
@@ -228,7 +237,7 @@ export default function CyberNavbar({
                 POULPY
               </span>
             </div>
-          </a>
+          </Link>
 
           {/* Desktop Navigation Links — strictly on a single line */}
           <nav className="hidden lg:flex items-center gap-0.5 xl:gap-1.5 2xl:gap-2 font-mono text-[9.5px] xl:text-[10.5px] 2xl:text-[11px] relative flex-shrink-0 whitespace-nowrap">

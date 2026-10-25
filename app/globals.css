@@ -732,3 +732,23 @@ html.light .btn-cyber-ghost {
   }
 }
 
+
+
+/* Watermark Trophée VCT unifié Dark & Light */
+.vct-trophy-watermark {
+  background-image: url('/vct-trophy-official-bw.png');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  filter: contrast(1.35) brightness(0.95);
+  mix-blend-mode: screen;
+  opacity: 0.22;
+  mask-image: radial-gradient(ellipse 92% 88% at 50% 50%, black 50%, transparent 98%);
+  -webkit-mask-image: radial-gradient(ellipse 92% 88% at 50% 50%, black 50%, transparent 98%);
+}
+
+html.light .vct-trophy-watermark {
+  mix-blend-mode: multiply !important;
+  opacity: 0.12 !important;
+  filter: contrast(1.25) brightness(0.7) !important;
+}
