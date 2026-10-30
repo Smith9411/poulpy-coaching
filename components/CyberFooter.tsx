@@ -64,7 +64,7 @@ export default function CyberFooter() {
 
         <div className="max-w-7xl mx-auto pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] text-[#F5F4F0]/30">
           <div>
-            &copy; 2026 POULPY COACHING. TOUS DROITS RÉSERVÉS.
+            &copy; 2026 POULPY COACHING (EI Eliott BIDOC SONGE) · SIREN 131 509 176 · TOUS DROITS RÉSERVÉS.
           </div>
 
           <button
@@ -100,7 +100,7 @@ export default function CyberFooter() {
               <div>
                 <strong className="text-[#F5F4F0] block mb-1">01. PRESTATIONS &amp; OBJET</strong>
                 <p>
-                  Poulpy Coaching dispense des prestations de formation et de perfectionnement tactique e-sportif (Valorant, Apex Legends) sous forme de sessions individuelles en visioconférence ou d&apos;analyses de replays VOD.
+                  Les présentes Conditions Générales de Vente régissent les prestations de coaching et d&apos;analyse e-sportive (Valorant, Apex Legends) dispensées par Eliott Antoine BIDOC SONGE (Entrepreneur Individuel sous l&apos;enseigne Poulpy Coaching, SIRET : 131 509 176 00015, dispensé de TVA - art. 293 B du CGI) via le site poulpy-coaching.fr.
                 </p>
               </div>
 
@@ -220,13 +220,20 @@ export default function CyberFooter() {
 
             <div className="space-y-4 text-xs text-[#F5F4F0]/70 leading-relaxed">
               <div>
-                <strong className="text-[#F5F4F0] block mb-1">01. ÉDITEUR DE LA PLATEFORME</strong>
+                <strong className="text-[#F5F4F0] block mb-1">01. ÉDITEUR DU SITE &amp; INFORMATIONS LÉGALES</strong>
                 <p>
-                  Le site <span className="text-[#00B4A0]">poulpy-coaching.fr</span> est édité par Coach Poulpy (Poulpy Coaching), prestataire indépendant de services d&apos;entraînement, de coaching e-sportif et d&apos;analyse tactique.
+                  Le site <span className="text-[#00B4A0]">poulpy-coaching.fr</span> est édité et exploité par :
                 </p>
-                <p className="mt-1 text-[#F5F4F0]/50">
-                  Contact officiel : <span className="text-white">contact@poulpy-coaching.fr</span> ou via le serveur Discord communautaire officiel.
-                </p>
+                <div className="mt-2 space-y-1 text-[#F5F4F0]/80">
+                  <p>• <strong>Exploitant :</strong> Eliott Antoine BIDOC SONGE (Coach Poulpy)</p>
+                  <p>• <strong>Statut juridique :</strong> Entrepreneur Individuel (EI) — Micro-entreprise</p>
+                  <p>• <strong>Numéro SIRET :</strong> 131 509 176 00015</p>
+                  <p>• <strong>Numéro SIREN :</strong> 131 509 176</p>
+                  <p>• <strong>Immatriculation :</strong> Inscrit au Registre National des Entreprises (RNE)</p>
+                  <p>• <strong>Régime fiscal &amp; TVA :</strong> Franchise en base de TVA (art. 293 B du CGI - TVA non applicable)</p>
+                  <p>• <strong>Siège :</strong> 77500 Chelles, France (adresse postale complète transmise sur facture ou sur simple demande légale)</p>
+                  <p>• <strong>Contact officiel :</strong> <span className="text-white">contact@poulpy-coaching.fr</span> ou via le serveur Discord communautaire officiel.</p>
+                </div>
               </div>
 
               <div>
