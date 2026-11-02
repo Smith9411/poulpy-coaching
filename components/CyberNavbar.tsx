@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -26,9 +27,10 @@ import {
 import DecryptedText from "./DecryptedText";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/lib/supabase";
-import AuthModal from "./AuthModal";
 import ThemeToggle from "./ThemeToggle";
 import NotificationBell from "./NotificationBell";
+
+const AuthModal = dynamic(() => import("./AuthModal"), { ssr: false });
 
 export default function CyberNavbar({
   onOpenBooking,
@@ -47,6 +49,11 @@ export default function CyberNavbar({
   const [activeSection, setActiveSection] = useState<string>("");
 
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const mobileOpenRef = useRef(false);
+
+  useEffect(() => {
+    mobileOpenRef.current = mobileOpen;
+  }, [mobileOpen]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -60,6 +67,11 @@ export default function CyberNavbar({
 
       if (!isHomePage || window.scrollY < 120) {
         setActiveSection("");
+        return;
+      }
+
+      // Skip 8x getBoundingClientRect() layout reads on mobile when drawer is closed
+      if (window.innerWidth < 1024 && !mobileOpenRef.current) {
         return;
       }
 

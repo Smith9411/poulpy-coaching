@@ -52,15 +52,12 @@ export default function Scene3D() {
       const particleTexture = new THREE.CanvasTexture(canvas);
 
       // 3. VCT 2026 Champions Shanghai Dragon Vortex (Calibrated Harmonious Palette)
-      const PARTICLE_COUNT = isMobile ? 3800 : 6000;
+      const PARTICLE_COUNT = isMobile ? 3200 : 6000;
       const geometry = new THREE.BufferGeometry();
       const positions = new Float32Array(PARTICLE_COUNT * 3);
       const colors = new Float32Array(PARTICLE_COUNT * 3);
-      const aArmProgress = new Float32Array(PARTICLE_COUNT);
       const aIsAmbient = new Float32Array(PARTICLE_COUNT);
       const aRadius = new Float32Array(PARTICLE_COUNT);
-      const aArmOffset = new Float32Array(PARTICLE_COUNT);
-      const aThetaNoise = new Float32Array(PARTICLE_COUNT);
 
       // Softer, elegant pastel red (less blinding, subtle background depth) & vibrant botanical greens
       const cKoiRed = new THREE.Color(0xc02e40);      // Rouge profond velouté (moins criard)
@@ -90,10 +87,7 @@ export default function Scene3D() {
           positions[i * 3 + 1] = r * Math.sin(theta);
           positions[i * 3 + 2] = z;
 
-          aArmProgress[i] = progress;
           aRadius[i] = r;
-          aArmOffset[i] = armOffset;
-          aThetaNoise[i] = noise;
 
           let col = cKoiRed;
           if (r < 180) {
@@ -127,10 +121,7 @@ export default function Scene3D() {
           positions[i * 3 + 1] = r * Math.sin(theta);
           positions[i * 3 + 2] = z;
 
-          aArmProgress[i] = Math.random();
           aRadius[i] = r;
-          aArmOffset[i] = 0;
-          aThetaNoise[i] = 0;
 
           const rand = Math.random();
           const col = rand > 0.45 ? cSeafoam : rand > 0.15 ? cWashi : (rand > 0.06 ? cWhiteLight : cKoiRedLight);
@@ -147,7 +138,7 @@ export default function Scene3D() {
 
       const animUniforms = {
         uProgress: { value: 0.0 },
-        uSize: { value: isMobile ? 4.0 : 4.5 },
+        uSize: { value: isMobile ? 4.35 : 4.5 },
         uScale: { value: height * 0.5 },
         uTexture: { value: particleTexture },
       };
@@ -262,10 +253,32 @@ export default function Scene3D() {
       }
 
       let currentScroll = typeof window !== "undefined" ? window.scrollY : 0;
+      let animId = 0;
+      let isLoopRunning = false;
+      let lastTime = performance.now();
+
+      const startLoop = () => {
+        if (!isLoopRunning && !document.hidden && currentScroll <= heroCutoff) {
+          isLoopRunning = true;
+          lastTime = performance.now();
+          animId = requestAnimationFrame(animate);
+        }
+      };
+
       const onScroll = () => {
         currentScroll = window.scrollY;
+        if (currentScroll <= heroCutoff && !isLoopRunning) {
+          startLoop();
+        }
       };
       window.addEventListener("scroll", onScroll, { passive: true });
+
+      const onVisibilityChange = () => {
+        if (!document.hidden && currentScroll <= heroCutoff) {
+          startLoop();
+        }
+      };
+      document.addEventListener("visibilitychange", onVisibilityChange);
 
       const onResize = () => {
         halfW = window.innerWidth * 0.5;
@@ -281,19 +294,15 @@ export default function Scene3D() {
       // Pre-warm the GPU pipeline with a single render pass while splash screen covers viewport
       renderer.render(scene, camera);
 
-      // 5. Ultra-Smooth 60/120Hz GPU-Accelerated Render Loop (0% CPU overhead)
-      let animId: number;
-      let lastTime = performance.now();
-
+      // 5. Ultra-Smooth 60/120Hz GPU-Accelerated Render Loop (Strictly 0 Hz when scrolled past hero)
       const animate = () => {
-        animId = requestAnimationFrame(animate);
-
-        // Pause rendering when tab is hidden or user has scrolled down past hero
-        if (document.hidden) return;
-        if (currentScroll > heroCutoff) {
-          lastTime = performance.now();
+        // Completely halt RAF scheduling when tab is hidden or user has scrolled down past hero
+        if (document.hidden || currentScroll > heroCutoff) {
+          isLoopRunning = false;
           return;
         }
+
+        animId = requestAnimationFrame(animate);
 
         const now = performance.now();
         const delta = Math.min((now - lastTime) * 0.001, 0.05);
@@ -328,15 +337,17 @@ export default function Scene3D() {
         renderer.render(scene, camera);
       };
 
-      animate();
+      startLoop();
 
       return () => {
+        isLoopRunning = false;
         cancelAnimationFrame(animId);
         if (fallbackTimer) clearTimeout(fallbackTimer);
         window.removeEventListener("poulpy_splash_reveal", startReveal);
         window.removeEventListener("mousemove", onMouseMove);
         window.removeEventListener("scroll", onScroll);
         window.removeEventListener("resize", onResize);
+        document.removeEventListener("visibilitychange", onVisibilityChange);
         geometry.dispose();
         material.dispose();
         particleTexture.dispose();

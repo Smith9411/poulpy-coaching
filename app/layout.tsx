@@ -1,10 +1,32 @@
 import type { Metadata, Viewport } from "next";
+import { Plus_Jakarta_Sans, Space_Grotesk, Unbounded } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import PwaRegister from "@/components/PwaRegister";
 import SplashScreen from "@/components/SplashScreen";
 import SmoothScroll from "@/components/SmoothScroll";
 import { Analytics } from "@vercel/analytics/next";
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-sans",
+  display: "swap",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-accent",
+  display: "swap",
+});
+
+const unbounded = Unbounded({
+  subsets: ["latin"],
+  weight: ["600", "700", "800", "900"],
+  variable: "--font-unbounded",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.poulpy-coaching.fr"),
@@ -289,7 +311,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" suppressHydrationWarning>
+    <html
+      lang="fr"
+      className={`${plusJakartaSans.variable} ${spaceGrotesk.variable} ${unbounded.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <meta name="google-site-verification" content="nT2EwQTNqVoSAscGKb752xfoEhAUA6UO3mZBD8D04DQ" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
@@ -297,9 +323,6 @@ export default function RootLayout({
         <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512x512.png" />
         <link rel="shortcut icon" type="image/png" href="/poulpy-favicon.png" />
         <link rel="apple-touch-icon" sizes="180x180" href="/poulpy-favicon.png" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=Unbounded:wght@600;700;800;900&display=swap" rel="stylesheet" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

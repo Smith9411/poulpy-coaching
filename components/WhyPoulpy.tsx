@@ -29,6 +29,7 @@ interface PillarVideoProps {
   clipSubtitle: string;
   isActive: boolean;
   isSectionInView: boolean;
+  shouldPreload: boolean;
   accentColor: "acid" | "laser";
 }
 
@@ -39,6 +40,7 @@ function PillarLargeVideo({
   clipSubtitle,
   isActive,
   isSectionInView,
+  shouldPreload,
   accentColor,
 }: PillarVideoProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -91,7 +93,7 @@ function PillarLargeVideo({
         loop
         muted
         playsInline
-        preload="metadata"
+        preload={shouldPreload ? (isActive ? "auto" : "metadata") : "none"}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
         className="w-full h-full object-cover"
@@ -202,6 +204,7 @@ export default function WhyPoulpy() {
 
   const [activeMediaIndex, setActiveMediaIndex] = useState<number>(0);
   const [isSectionInView, setIsSectionInView] = useState(false);
+  const [shouldPreload, setShouldPreload] = useState(false);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -296,10 +299,22 @@ export default function WhyPoulpy() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsSectionInView(entry.isIntersecting);
+        if (entry.isIntersecting) setShouldPreload(true);
       },
       { threshold: 0.05 }
     );
     observer.observe(section);
+
+    const preloadObserver = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldPreload(true);
+          preloadObserver.disconnect();
+        }
+      },
+      { rootMargin: "700px 0px" }
+    );
+    preloadObserver.observe(section);
 
     let resizeTimer: NodeJS.Timeout;
     const handleResize = () => {
@@ -315,6 +330,7 @@ export default function WhyPoulpy() {
 
     return () => {
       observer.disconnect();
+      preloadObserver.disconnect();
       clearTimeout(resizeTimer);
       window.removeEventListener("resize", handleResize);
       window.removeEventListener("touchstart", handleTouchStart);
@@ -399,6 +415,7 @@ export default function WhyPoulpy() {
                       clipSubtitle={item.clipSubtitle}
                       isActive={isMediaActive}
                       isSectionInView={isSectionInView}
+                      shouldPreload={shouldPreload}
                       accentColor={item.color}
                     />
                   </div>

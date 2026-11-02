@@ -17,53 +17,43 @@ export default function SplashScreen() {
     }
 
     let isCancelled = false;
+    const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
 
     // Smooth visual increments while page and fonts are loading
     const p1 = setTimeout(() => {
-      if (!isCancelled) setProgress(50);
-    }, 180);
+      if (!isCancelled) setProgress(55);
+    }, isMobile ? 110 : 160);
 
     const p2 = setTimeout(() => {
-      if (!isCancelled) setProgress(85);
-    }, 420);
-
-    // Wait for real page completion: document.readyState === 'complete' AND document.fonts.ready
-    const waitForLoad = new Promise<void>((resolve) => {
-      if (typeof document !== "undefined" && document.readyState === "complete") {
-        resolve();
-      } else if (typeof window !== "undefined") {
-        window.addEventListener("load", () => resolve(), { once: true });
-      } else {
-        resolve();
-      }
-    });
+      if (!isCancelled) setProgress(88);
+    }, isMobile ? 230 : 350);
 
     const waitForFonts =
       typeof document !== "undefined" && document.fonts
         ? document.fonts.ready
         : Promise.resolve();
 
-    // Safety fallback timeout to prevent hanging if external scripts stall
-    const safetyTimeout = new Promise<void>((resolve) => setTimeout(resolve, 1400));
+    // Fast cap so mobile LCP is never penalized by slow subresources
+    const safetyTimeout = new Promise<void>((resolve) =>
+      setTimeout(resolve, isMobile ? 360 : 650)
+    );
 
     const startTime = performance.now();
 
-    Promise.race([
-      Promise.all([waitForLoad, waitForFonts]),
-      safetyTimeout,
-    ]).then(() => {
+    let unmountTimer: NodeJS.Timeout | undefined;
+
+    Promise.race([waitForFonts, safetyTimeout]).then(() => {
       if (isCancelled) return;
 
-      // Ensure minimum presence (at least 600ms total) so it never flashes aggressively
+      // Crisp presence so it never flashes aggressively yet releases LCP quickly on mobile
       const elapsed = performance.now() - startTime;
-      const minDelay = Math.max(0, 600 - elapsed);
+      const minBootDuration = isMobile ? 300 : 480;
+      const minDelay = Math.max(0, minBootDuration - elapsed);
 
       setTimeout(() => {
         if (isCancelled) return;
         setProgress(100);
 
-        // Small 120ms pause after reaching 100% so the user sees completion,
-        // and browser post-load micro-tasks finish before the animation starts
         setTimeout(() => {
           if (isCancelled) return;
           setIsFadingOut(true);
@@ -71,20 +61,18 @@ export default function SplashScreen() {
             (window as any).__poulpy_splash_done = true;
             window.dispatchEvent(new CustomEvent("poulpy_splash_reveal"));
           }
-        }, 120);
+          unmountTimer = setTimeout(() => {
+            if (!isCancelled) setIsVisible(false);
+          }, 380);
+        }, isMobile ? 60 : 100);
       }, minDelay);
     });
-
-    // Completely unmount safely after 8s
-    const unmountTimer = setTimeout(() => {
-      setIsVisible(false);
-    }, 8000);
 
     return () => {
       isCancelled = true;
       clearTimeout(p1);
       clearTimeout(p2);
-      clearTimeout(unmountTimer);
+      if (unmountTimer) clearTimeout(unmountTimer);
     };
   }, []);
 

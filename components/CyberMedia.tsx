@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import DecryptedText from "./DecryptedText";
 import { Tv, ExternalLink, MessageCircle } from "lucide-react";
@@ -24,6 +24,27 @@ export function TwitchIcon({ className = "w-4 h-4" }: { className?: string }) {
 export default function CyberMedia() {
   const [platform, setPlatform] = useState<"youtube" | "twitch">("youtube");
   const [transitionKey, setTransitionKey] = useState(0);
+  const [shouldLoadEmbeds, setShouldLoadEmbeds] = useState(false);
+  const sectionRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      setShouldLoadEmbeds(true);
+      return;
+    }
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldLoadEmbeds(true);
+          obs.disconnect();
+        }
+      },
+      { rootMargin: "600px 0px" }
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   const youtubeUrl = "https://www.youtube.com/@Poulpy_C";
   const youtubeEmbed = "https://www.youtube-nocookie.com/embed/4gfWbGCA5q0";
@@ -37,7 +58,7 @@ export default function CyberMedia() {
   };
 
   return (
-    <section id="media" className="pt-10 sm:pt-14 pb-14 sm:pb-16 px-6 sm:px-12 lg:px-16 bg-transparent font-mono">
+    <section ref={sectionRef} id="media" className="pt-10 sm:pt-14 pb-14 sm:pb-16 px-6 sm:px-12 lg:px-16 bg-transparent font-mono">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-white/10 pb-6">
@@ -82,14 +103,16 @@ export default function CyberMedia() {
         <div className="relative w-full aspect-video bg-black rounded-2xl sm:rounded-3xl border border-white/10 overflow-hidden select-none shadow-2xl">
           {/* Base Layer: YouTube Player */}
           <div className="absolute inset-0 w-full h-full">
-            <iframe
-              src={youtubeEmbed}
-              title="Poulpy YouTube"
-              loading="lazy"
-              className="w-full h-full border-0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-            />
+            {shouldLoadEmbeds && (
+              <iframe
+                src={youtubeEmbed}
+                title="Poulpy YouTube"
+                loading="lazy"
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            )}
           </div>
 
           {/* Top Animated Layer: Twitch Player with Diagonal Slash Wipe */}
