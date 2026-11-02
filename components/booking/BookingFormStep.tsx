@@ -228,10 +228,15 @@ export default function BookingFormStep({
                 required
                 value={formData.discord}
                 onChange={(e) => setFormData({ ...formData, discord: e.target.value })}
-                placeholder="Ton identifiant Discord"
+                placeholder="Ton pseudo Discord (ex: poulpy_off)"
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-500 text-sm focus:outline-none focus:border-cyan-400 transition-colors"
               />
             </div>
+            {/\d{16,}/.test(formData.discord) && (
+              <p className="text-[11px] text-amber-400/90 mt-1">
+                💡 Indique ton pseudo Discord plutôt que ton identifiant numérique si possible.
+              </p>
+            )}
           </div>
 
           <div>
