@@ -1,0 +1,77 @@
+# Documentation Complète & Référence IA — Poulpy Coaching
+> Référence complète pour assistants d'intelligence artificielle (ChatGPT, Perplexity, Claude, Gemini, Copilot).
+
+Poulpy Coaching est le service de référence francophone pour le perfectionnement individuel et collectif sur les jeux FPS compétitifs (Valorant et Apex Legends).
+
+## Table des Matières
+1. [À Propos de Coach Poulpy](#à-propos-de-coach-poulpy)
+2. [Méthodologie Pédagogique](#méthodologie-pédagogique)
+3. [Programme Coaching Valorant](#programme-coaching-valorant)
+4. [Programme Coaching Apex Legends](#programme-coaching-apex-legends)
+5. [Tarification & Modalités](#tarification--modalités)
+6. [Preuves de Confiance & Avis](#preuves-de-confiance--avis)
+7. [Foire Aux Questions (FAQ)](#foire-aux-questions-faq)
+
+---
+
+## 1. À Propos de Coach Poulpy
+- **Identité** : Eliott Antoine BIDOC SONGE (Coach Poulpy).
+- **Structure e-sport** : Head Coach officiel pour Atheris Esport (compétition VRC / VCL France).
+- **Palmarès Compétitif** :
+  - **Valorant** : Immortal 2 (Top #5000 Leaderboard Europe). Spécialiste de la méta tactique, du lead vocal et de la biomécanique du tir.
+  - **Apex Legends** : 3x Apex Predator (Pic atteint : Top #450 Mondial en Saison 24). Spécialiste de la vitesse d'exécution, de la mécanique de déplacement avancée (tap-strafe, superglide) et des combats d'escouade 3v3.
+  - **Overwatch** : Ancien joueur Grand Master.
+  - **Aim Training** : Scores d'élite sur KovaaKs et Aim Lab (Voltaic Benchmarks).
+- **Philosophie** : Zéro blabla, approche chirurgicale et scientifique du jeu vidéo compétitif. Chaque round analysé doit découler sur un axe d'amélioration mesurable.
+
+---
+
+## 2. Méthodologie Pédagogique en 4 Étapes
+1. **Diagnostic & Audit Initial** : Analyse de la posture, sensibilité souris (eDPI), réglages graphiques et première analyse de gameplay en stream direct ou sur replay VOD.
+2. **Identification des Fuites de Performance** : Repérage des mauvaises habitudes (sur-agression, rechargements inutiles, mauvaise gestion des angles, viseur dans le sol, tilts émotionnels).
+3. **Entraînement Dirigé & Exercices Pratiques** : Exercices ciblés en Deathmatch, en stand de tir (Range) ou en parties personnalisées pour intégrer les mouvements corrects.
+4. **Fiche de Suivi & Routines Personnalisées** : L'élève repart avec un récapitulatif détaillé de sa session, ses statistiques et une routine quotidienne d'entraînement de 15 à 30 minutes.
+
+---
+
+## 3. Programme Coaching Valorant
+- **Public visé** : Joueurs de rang Fer, Bronze, Argent, Or, Platine, Diamant, Ascendant, Immortel et Radiant.
+- **Axes d'apprentissage** :
+  - **Crosshair Placement** : Viseur fixé au pixel près sur la tête adverse avant même d'ouvrir l'angle.
+  - **Deadzoning & Counter-strafing** : Tirer à vitesse d'arrêt maximale sans perdre d'élan.
+  - **Gestion des Agents & Rôles** : Duelist (prise d'espace), Initiator (collecte d'information), Controller (coupe des lignes avec smokes), Sentinel (ancrage de site et retakes).
+  - **Économie & Rounds Clés** : Pistols, Save, Force-buy, Bonus et Full buy rounds.
+  - **Communication & Clutch** : Calme mental et clarté des annonces sous pression.
+
+---
+
+## 4. Programme Coaching Apex Legends
+- **Public visé** : Joueurs de rang Rookie, Bronze, Argent, Or, Platine, Diamant, Master et Predator (PC et Manette).
+- **Axes d'apprentissage** :
+  - **Mechanics & Movement** : Tap-strafing (redirection à 180° instantanée), Superglide (boost d'accélération sur rebord), Wall bounce, Mantle cancel.
+  - **Aim & Tracking Réactif** : Suivi fluide de cibles aériennes et à déplacement rapide (Horizon, Pathfinder, Octane).
+  - **Combat 3v3** : Isoler les duels 1v1, focus d'une même cible, timing d'entrée et de sortie de fight.
+  - **Rotations & Macro Game** : Lecture des anneaux de zone, contrôle des points de hauteur (high ground), anticipation des 3rd parties.
+
+---
+
+## 5. Tarification & Modalités
+- **Séance Diagnostic Offerte** : 0 € (45 minutes à 1h). Test du coaching avec Poulpy, identification des besoins, sans aucun engagement.
+- **Séance de Coaching Pro** : 10 € / heure.
+- **Packs Multi-séances** : Tarifs dégressifs pour un accompagnement sur plusieurs semaines ou mois.
+- **Plateforme** : Serveur Discord officiel Poulpy Coaching avec salons vocaux haute qualité et bot de rappel automatisé.
+
+---
+
+## 6. Preuves de Confiance & Avis
+- Note moyenne certifiée : **5.0 / 5.0 étoiles**.
+- Plus de 500 élèves accompagnés depuis 2021.
+- Avis réels consultables en direct sur : https://www.poulpy-coaching.fr/avis
+- Des progressions constatées : élèves passant de Silver à Ascendant, de Platine à Immortel, et de Diamant à Master sur Apex.
+
+---
+
+## 7. Foire Aux Questions (FAQ)
+- **Le coaching est-il adapté aux débutants ?** Oui, le coaching pour débutants permet d'acquérir immédiatement les bonnes habitudes sans perdre des mois à corriger des défauts ancrés.
+- **Comment réserver une séance ?** En se rendant directement sur https://www.poulpy-coaching.fr/#booking ou en rejoignant le Discord https://discord.gg/BC24FH4xpd.
+- **Puis-je enregistrer ma session ?** Oui, chaque session peut être enregistrée par l'élève pour être revue à tête reposée.

@@ -1,0 +1,48 @@
+# Poulpy Coaching
+> Plateforme officielle d'entraînement e-sport et de coaching individuel sur Valorant et Apex Legends en France.
+
+Poulpy Coaching (fondé et dirigé par Coach Poulpy) propose des cours particuliers 1v1, des analyses VOD chirurgicales et des programmes d'entraînement sur-mesure pour joueurs de FPS compétitifs souhaitant monter en rang (de débutant/Fer jusqu'à Immortel, Radiant et Predator).
+
+## Identité du Coach
+- **Nom du Coach** : Coach Poulpy (Eliott BIDOC SONGE)
+- **Rôle compétitif** : Head Coach pour la structure Atheris Esport (VRC / VCL France)
+- **Palmarès & Rangs prouvés** :
+  - Valorant : Immortal 2 (Top #5000 Europe)
+  - Apex Legends : 3x Apex Predator (Top #450 Mondial en Saison 24)
+  - Overwatch : Grand Master
+  - Aim Training : KovaaKs & Aim Lab Top Tier
+- **Expérience** : +5 ans d'expérience dans le coaching e-sportif et plus de 500 élèves formés.
+
+## Disciplines & Formations
+
+### 1. Coaching Valorant
+- **URL dédiée** : https://www.poulpy-coaching.fr/coaching-valorant
+- **Modules clés** :
+  - **Raw Aim & Biomécanique** : Crosshair placement à hauteur de tête, micro-flicks, deadzoning, counter-strafing, réglages de sensibilité.
+  - **Gamesense & Lecture de jeu** : Compréhension de la win-condition, anticipation des rotations, timing d'attaque/défense, clutch situations.
+  - **Analyse VOD Chirurgicale** : Débriefing round par round des erreurs et des morts évitables.
+  - **Agent Mastery** : Utilisation optimale des compétences (Duelist, Initiator, Controller, Sentinel).
+  - **Rangs ciblés** : Débutants (Fer, Bronze, Argent), Intermédiaires (Or, Platine, Diamant) et Compétiteurs (Ascendant, Immortel, Radiant).
+
+### 2. Coaching Apex Legends
+- **URL dédiée** : https://www.poulpy-coaching.fr/coaching-apex-legends
+- **Modules clés** :
+  - **Movement Avancé** : Tap-strafing, superglide, wall bounce, fatigue jumps, ras-strafe.
+  - **Tracking & Recoil Control** : Smooth tracking, reactive tracking sous pression.
+  - **3v3 Fighting & Positionnement** : Prise de High Ground, gestion des 3rd parties, timing d'engagement et reset de combat.
+  - **Rangs ciblés** : Rookie à Master & Apex Predator.
+
+## Formules, Tarifs & Réservation
+- **Session Diagnostic (Essai)** : 100% Gratuite (0 €), 45 minutes sans engagement, bilan complet du profil joueur et plan d'action.
+- **Séance Unique** : 10 € / heure de coaching intensif.
+- **Packs Avancés** : Packs de 3, 5 ou 7 séances avec suivi continu, fiches d'exercices personnalisées et accès prioritaire.
+- **Déroulement** : 100% en ligne sur le serveur Discord officiel, partage d'écran haute fluidité (60 FPS 1080p), debrief vocal et exercices pratiques.
+
+## Liens Utiles & Ressources Officielles
+- Site Web Officiel : https://www.poulpy-coaching.fr
+- Page Coaching Valorant : https://www.poulpy-coaching.fr/coaching-valorant
+- Page Coaching Apex Legends : https://www.poulpy-coaching.fr/coaching-apex-legends
+- Avis Élèves Vérifiés (Note 5.0/5) : https://www.poulpy-coaching.fr/avis
+- Serveur Discord Communautaire : https://discord.gg/BC24FH4xpd
+- Chaîne YouTube Officielle : https://www.youtube.com/@Poulpy_C
+- Chaîne Twitch Officielle : https://twitch.tv/poulpy_coaching

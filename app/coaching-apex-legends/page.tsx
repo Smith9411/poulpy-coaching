@@ -5,7 +5,7 @@ import CyberFooter from "@/components/CyberFooter";
 import GameFaq, { FaqItem } from "@/components/GameFaq";
 
 export const metadata: Metadata = {
-  title: "Coaching Apex Legends France — Movement, Aim & 3v3 | Poulpy Coaching",
+  title: "Coaching Apex Legends France — Movement & Analyse VOD",
   description:
     "Coaching Apex Legends individuel par Coach Poulpy (3x Pick Pred #450). Tap-strafe, superglides, tracking haute vélocité et rotations 3v3 vers Master et Predator.",
   alternates: {
@@ -27,6 +27,14 @@ const apexFaqs: FaqItem[] = [
     a: "On développe tes compétences sur les 3 axes majeurs d'Apex : le movement avancé (tap-strafe, superglides réguliers, wall-bounces), le tracking au corps à corps sous pression (recoil smoothing, duels au pompe) et le sens tactique en 3v3 (isoler les duels, armor swap sous 0.5s et survie aux 3rd parties).",
   },
   {
+    q: "Travaille-t-on les mécaniques de movement avancées (Tap-strafe, Superglide, Wall bounce) ?",
+    a: "Absolument. Nous décomposons au ralenti le timing exact de chaque input au clavier/souris ou manette : régularité du superglide, enchaînement tap-strafing à 180°, fatigue wall bounce et ras-strafe pour devenir intouchable dans les espaces clos.",
+  },
+  {
+    q: "Le coaching Apex est-il utile pour monter Master et Apex Predator ?",
+    a: "Oui, Coach Poulpy (3x Top #450 Predator en S24) t'enseigne les fondamentaux des lobbies de haut niveau : prise de position en zone prioritaire, contrôle du high ground, timing d'engagement et décision de reset en 3v3 pour sécuriser les points RP.",
+  },
+  {
     q: "Le coaching convient-il aux joueurs manette (controller) ?",
     a: "Oui ! Tous les fondamentaux de positionnement, de timing d'engagement, de gestion de couverture, de rotations de zone et de macro-game en ranked s'appliquent à 100%, que tu sois sur manette ou clavier/souris.",
   },
@@ -40,9 +48,70 @@ const apexFaqs: FaqItem[] = [
   },
 ];
 
+const apexJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": ["Course", "Service"],
+      "@id": "https://www.poulpy-coaching.fr/coaching-apex-legends#course",
+      "name": "Coaching Apex Legends France — Movement & Analyse VOD",
+      "description":
+        "Coaching personnalisé Apex Legends en France : cours particuliers individuels, perfectionnement du movement (tap-strafe, superglide, wall bounce), tracking haute vélocité, gestion des combats 3v3 et rotations de zone vers Master & Predator.",
+      "provider": {
+        "@type": "Person",
+        "name": "Coach Poulpy",
+        "jobTitle": "Coach E-sport Apex Legends (3x Predator #450)",
+        "url": "https://www.poulpy-coaching.fr"
+      },
+      "educationalCredentialAwarded": "Progression en Ranked (Rookie à Predator)",
+      "hasCourseInstance": {
+        "@type": "CourseInstance",
+        "courseMode": "Online",
+        "courseWorkload": "PT1H"
+      },
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Session Diagnostic Apex Legends (Offerte)",
+          "price": "0",
+          "priceCurrency": "EUR",
+          "availability": "https://schema.org/InStock",
+          "url": "https://www.poulpy-coaching.fr/#booking"
+        },
+        {
+          "@type": "Offer",
+          "name": "Coaching Apex Legends 1h",
+          "price": "10.00",
+          "priceCurrency": "EUR",
+          "availability": "https://schema.org/InStock",
+          "url": "https://www.poulpy-coaching.fr/#booking"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://www.poulpy-coaching.fr/coaching-apex-legends#faq",
+      "mainEntity": apexFaqs.map((faq) => ({
+        "@type": "Question",
+        "name": faq.q,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": faq.a
+        }
+      }))
+    }
+  ]
+};
+
 export default function CoachingApexLegendsPage() {
   return (
     <main className="w-full min-h-screen relative text-[#F5F4F0] selection:bg-[#CA1C30]/40 selection:text-white overflow-x-hidden">
+      {/* Données structurées invisibles pour Google & IA (Schema.org JSON-LD) */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(apexJsonLd) }}
+      />
+
       {/* Arrière-plan avec la coupe officielle (sans quadrillage) */}
       <div
         className="fixed inset-0 pointer-events-none select-none z-0 overflow-hidden"
@@ -64,7 +133,7 @@ export default function CoachingApexLegendsPage() {
           MOVEMENT ÉLITE &amp; RANKED MASTER • ACCOMPAGNEMENT 1-ON-1 PAR COACH POULPY
         </p>
 
-        {/* Phrase descriptive */}
+        {/* Phrase descriptive demandée par l'utilisateur */}
         <p className="mt-6 text-base sm:text-lg text-white/75 max-w-xl leading-relaxed">
           Progresse avec Poulpy : analyse VOD de tes parties, movement avancé et gamesense pour carry tes ranked.
         </p>

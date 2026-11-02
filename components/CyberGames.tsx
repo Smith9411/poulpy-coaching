@@ -227,14 +227,23 @@ export default function CyberGames({ onOpenBooking }: CyberGamesProps) {
                 animate="visible"
                 className="pt-4 flex justify-start"
               >
-                <button
-                  onClick={onOpenBooking}
-                  className={`${
-                    isAcid ? "btn-cyber-primary" : "btn-cyber-laser"
-                  } px-8 py-3.5 text-xs font-mono font-bold tracking-wider cursor-pointer`}
-                >
-                  <span>S&apos;ENTRAÎNER SUR {current.title}</span>
-                </button>
+                <div className="flex flex-wrap items-center gap-3">
+                  <button
+                    onClick={onOpenBooking}
+                    className={`${
+                      isAcid ? "btn-cyber-primary" : "btn-cyber-laser"
+                    } px-8 py-3.5 text-xs font-mono font-bold tracking-wider cursor-pointer`}
+                  >
+                    <span>S&apos;ENTRAÎNER SUR {current.title}</span>
+                  </button>
+                  <a
+                    href={current.id === "val" ? "/coaching-valorant" : "/coaching-apex-legends"}
+                    className="btn-cyber-ghost px-5 py-3.5 text-xs font-mono font-semibold tracking-wider flex items-center gap-1.5 cursor-pointer hover:border-white/40 transition-colors"
+                  >
+                    <span>PAGE {current.title}</span>
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </a>
+                </div>
               </motion.div>
             </motion.div>
           </AnimatePresence>

@@ -5,7 +5,7 @@ import CyberFooter from "@/components/CyberFooter";
 import GameFaq, { FaqItem } from "@/components/GameFaq";
 
 export const metadata: Metadata = {
-  title: "Coaching Valorant France — Cours Particuliers & Analyse VOD | Poulpy Coaching",
+  title: "Coaching Valorant France — Cours Particuliers & Analyse VOD",
   description:
     "Coaching Valorant individuel par Coach Poulpy (Immortal 2 #5000). Analyse VOD chirurgicale, crosshair placement, routines d'aim et progression rapide vers Immortel & Radiant.",
   alternates: {
@@ -31,8 +31,16 @@ const valorantFaqs: FaqItem[] = [
     a: "La session se déroule en direct en vocal et partage d'écran 60 FPS sur le serveur Discord privé de Poulpy Coaching. Tu débriefes directement avec Poulpy (Head Coach Atheris Esport, Immortal 2 #5000) et tu repars avec des axes d'amélioration précis et une fiche d'exercices personnalisée.",
   },
   {
-    q: "Quel niveau faut-il avoir pour commencer ?",
+    q: "Quel niveau faut-il avoir pour commencer le coaching ?",
     a: "Tous les rangs sont accompagnés : du joueur débutant bloqué en Fer, Bronze, Argent ou Or qui veut poser des bases solides, au joueur compétitif cherchant à passer Diamant, Ascendant, Immortel ou Radiant.",
+  },
+  {
+    q: "Comment le coaching m'aide à monter de Fer/Bronze jusqu'à Ascendant/Immortel ?",
+    a: "Chaque palier a ses blocages : en Fer/Bronze/Silver, nous travaillons la sensibilité, la posture et le viseur à hauteur de tête. En Gold/Platine/Diamant, l'accent est mis sur la prise d'information, les peeks avantageux et l'économie. En Ascendant et Immortel, nous analysons les micro-erreurs de timing, le tempo de round et la communication d'équipe.",
+  },
+  {
+    q: "Puis-je être coaché quel que soit mon agent principal (Duelist, Initiator, Controller, Sentinel) ?",
+    a: "Oui, l'accompagnement s'adapte à 100% à ton pool d'agents. Que tu joues Jett, Reyna, Sova, Fade, Omen, Viper ou Cypher, nous étudions l'utilisation optimale de tes utilitaires (lineups, flashes, smokes réactives) et ton rôle exact dans la composition d'équipe.",
   },
   {
     q: "Comment fonctionne la séance d'essai gratuite ?",
@@ -40,9 +48,70 @@ const valorantFaqs: FaqItem[] = [
   },
 ];
 
+const valorantJsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": ["Course", "Service"],
+      "@id": "https://www.poulpy-coaching.fr/coaching-valorant#course",
+      "name": "Coaching Valorant France — Cours Particuliers & Analyse VOD",
+      "description":
+        "Coaching personnalisé Valorant en France : cours particuliers individuels, analyse VOD chirurgicale de vos replays, travail de l'aim (crosshair placement, deadzoning, micro-flicks), optimisation de vos agents et prise de décision en ranked pour monter Immortel & Radiant.",
+      "provider": {
+        "@type": "Person",
+        "name": "Coach Poulpy",
+        "jobTitle": "Head Coach E-sport Atheris Esport (Immortal 2 #5000)",
+        "url": "https://www.poulpy-coaching.fr"
+      },
+      "educationalCredentialAwarded": "Progression en Ranked (Fer à Radiant)",
+      "hasCourseInstance": {
+        "@type": "CourseInstance",
+        "courseMode": "Online",
+        "courseWorkload": "PT1H"
+      },
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Session Diagnostic Valorant (Offerte)",
+          "price": "0",
+          "priceCurrency": "EUR",
+          "availability": "https://schema.org/InStock",
+          "url": "https://www.poulpy-coaching.fr/#booking"
+        },
+        {
+          "@type": "Offer",
+          "name": "Coaching Valorant 1h",
+          "price": "10.00",
+          "priceCurrency": "EUR",
+          "availability": "https://schema.org/InStock",
+          "url": "https://www.poulpy-coaching.fr/#booking"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://www.poulpy-coaching.fr/coaching-valorant#faq",
+      "mainEntity": valorantFaqs.map((faq) => ({
+        "@type": "Question",
+        "name": faq.q,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": faq.a
+        }
+      }))
+    }
+  ]
+};
+
 export default function CoachingValorantPage() {
   return (
     <main className="w-full min-h-screen relative text-[#F5F4F0] selection:bg-[#CA1C30]/40 selection:text-white overflow-x-hidden">
+      {/* Données structurées invisibles pour Google & IA (Schema.org JSON-LD) */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(valorantJsonLd) }}
+      />
+
       {/* Arrière-plan avec la coupe officielle (sans quadrillage) */}
       <div
         className="fixed inset-0 pointer-events-none select-none z-0 overflow-hidden"
